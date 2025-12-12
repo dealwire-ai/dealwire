@@ -3,9 +3,8 @@
   "private": "true",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "pnpm -r dev",
-    "build": "pnpm -r build"
+    "dev": "pnpm --filter @analyzer/api dev & pnpm --filter @analyzer/web dev",
+    "build": "pnpm --filter @analyzer/api build && pnpm --filter @analyzer/web build"
   },
   "packageManager": "pnpm@10.25.0"
 }
