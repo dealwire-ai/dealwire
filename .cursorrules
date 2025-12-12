@@ -1,0 +1,22 @@
+# Analyzer - Monorepo Architecture
+
+## Structure
+- `apps/web` - Next.js 16 frontend (React 19, Tailwind 4)
+- `apps/api` - NestJS 11 backend
+
+## Commands (from root)
+- `pnpm dev` - Run both frontend and backend
+- `pnpm build` - Build both apps
+
+## Ports
+- Frontend: http://localhost:3000
+- Backend: http://localhost:3001
+
+## Deployment
+- Frontend: Vercel (root dir: apps/web)
+- Backend: Railway (root dir: apps/api)
+
+## Package naming
+- Frontend: `@analyzer/web`
+- Backend: `@analyzer/api`
+
