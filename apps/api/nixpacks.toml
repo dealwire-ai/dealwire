@@ -1,10 +1,12 @@
 [phases.setup]
-nixPkgs = ["nodejs-22_x", "poppler_utils", "binutils"]
+nixPkgs = ["nodejs-22_x", "poppler", "binutils"]
 
 [phases.install]
 cmds = [
   "corepack enable",
   "corepack prepare pnpm@10.25.0 --activate",
+  "which pdftotext || echo 'WARNING: pdftotext not found'",
+  "which strings || echo 'WARNING: strings not found'",
   "pnpm install --frozen-lockfile --filter @analyzer/api..."
 ]
 
