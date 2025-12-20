@@ -15,7 +15,6 @@
     "db:studio": "prisma studio"
   },
   "dependencies": {
-    "@napi-rs/canvas": "^0.1.85",
     "@nestjs/common": "^11.0.1",
     "@nestjs/core": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",
@@ -24,11 +23,11 @@
     "cheerio": "^1.1.2",
     "marked": "^17.0.1",
     "openai": "^6.15.0",
+    "pdf-parse": "^2.4.5",
     "reflect-metadata": "^0.2.2",
     "resend": "^6.6.0",
     "rxjs": "^7.8.1",
     "svix": "^1.82.0",
-    "unpdf": "^1.4.0",
     "zod": "^4.2.1"
   },
   "devDependencies": {

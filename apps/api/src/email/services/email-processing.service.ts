@@ -1,7 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { load } from 'cheerio';
 import { EmailSenderService } from './email-sender.service';
-import { extractText } from 'unpdf';
 
 interface AttachmentMetadata {
   filename: string;
@@ -127,8 +126,13 @@ export class EmailProcessingService {
           attachmentInfo.filename.toLowerCase().endsWith('.pdf')) {
         try {
           const pdfBuffer = Buffer.from(buffer);
-          const { text } = await extractText(pdfBuffer);
-          const extractedText = text.join('\n').trim();
+
+          // Import pdf-parse dynamically (CommonJS module)
+          const pdfParse = await import('pdf-parse');
+          const parsePdf = (typeof pdfParse === 'function' ? pdfParse : pdfParse.default) as any;
+
+          const pdfData = await parsePdf(pdfBuffer);
+          const extractedText = pdfData.text.trim();
 
           if (extractedText) {
             this.logger.log(
