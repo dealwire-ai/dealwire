@@ -1,9 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { load } from 'cheerio';
 import { EmailSenderService } from './email-sender.service';
-
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const pdfParse = require('pdf-parse');
+import { extractText } from 'unpdf';
 
 interface AttachmentMetadata {
   filename: string;
@@ -129,13 +127,8 @@ export class EmailProcessingService {
           attachmentInfo.filename.toLowerCase().endsWith('.pdf')) {
         try {
           const pdfBuffer = Buffer.from(buffer);
-
-          // pdf-parse returns a promise directly
-          const pdfData = await pdfParse.default
-            ? await pdfParse.default(pdfBuffer)
-            : await pdfParse(pdfBuffer);
-
-          const extractedText = pdfData.text.trim();
+          const { text } = await extractText(pdfBuffer);
+          const extractedText = text.join('\n').trim();
 
           if (extractedText) {
             this.logger.log(
