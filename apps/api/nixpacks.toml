@@ -1,0 +1,15 @@
+[phases.setup]
+nixPkgs = ["nodejs-22_x"]
+
+[phases.install]
+cmds = [
+  "corepack enable",
+  "corepack prepare pnpm@10.25.0 --activate",
+  "pnpm install --frozen-lockfile --filter @analyzer/api..."
+]
+
+[phases.build]
+cmds = ["pnpm run build"]
+
+[start]
+cmd = "node dist/src/main.js"
