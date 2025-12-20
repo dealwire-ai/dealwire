@@ -128,9 +128,11 @@ export class EmailProcessingService {
           const pdfBuffer = Buffer.from(buffer);
 
           // Import pdf-parse dynamically (CommonJS module)
-          const { PDFParse } = await import('pdf-parse');
+          const pdfParseModule: any = await import('pdf-parse');
+          // The module structure varies - try the actual default export
+          const parsePdf = pdfParseModule.default || pdfParseModule.PDFParse || pdfParseModule;
 
-          const pdfData = await (PDFParse as any)(pdfBuffer);
+          const pdfData = await parsePdf(pdfBuffer);
           const extractedText = pdfData.text.trim();
 
           if (extractedText) {
