@@ -128,8 +128,15 @@ export class EmailProcessingService {
           const pdfBuffer = Buffer.from(buffer);
 
           // Import pdf-parse dynamically (CommonJS module)
-          const pdfParse = await import('pdf-parse');
-          const parsePdf = (typeof pdfParse === 'function' ? pdfParse : pdfParse.default) as any;
+          const pdfParseModule = await import('pdf-parse');
+
+          // Debug: log what we got
+          this.logger.debug(`pdfParseModule type: ${typeof pdfParseModule}`);
+          this.logger.debug(`pdfParseModule.default type: ${typeof pdfParseModule.default}`);
+          this.logger.debug(`pdfParseModule keys: ${Object.keys(pdfParseModule)}`);
+
+          // Try different ways to get the function (CommonJS quirks)
+          const parsePdf = (pdfParseModule.default || pdfParseModule) as any;
 
           const pdfData = await parsePdf(pdfBuffer);
           const extractedText = pdfData.text.trim();
