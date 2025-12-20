@@ -129,13 +129,21 @@ export class EmailProcessingService {
           attachmentInfo.filename.toLowerCase().endsWith('.pdf')) {
         try {
           const pdfBuffer = Buffer.from(buffer);
-          const pdfData = await pdfParse(pdfBuffer);
+
+          // pdf-parse returns a promise directly
+          const pdfData = await pdfParse.default
+            ? await pdfParse.default(pdfBuffer)
+            : await pdfParse(pdfBuffer);
+
           const extractedText = pdfData.text.trim();
 
           if (extractedText) {
             this.logger.log(
               `Extracted ${extractedText.length} characters from PDF: ${attachmentInfo.filename}`,
             );
+            this.logger.log('=== OCR-EXTRACTED TEXT START ===');
+            this.logger.log(extractedText);
+            this.logger.log('=== OCR-EXTRACTED TEXT END ===');
             return extractedText;
           } else {
             this.logger.warn(`No text extracted from PDF: ${attachmentInfo.filename}`);
