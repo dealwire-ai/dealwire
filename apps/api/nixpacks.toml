@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["nodejs-22_x"]
+nixPkgs = ["nodejs-22_x", "poppler_utils"]
 
 [phases.install]
 cmds = [
