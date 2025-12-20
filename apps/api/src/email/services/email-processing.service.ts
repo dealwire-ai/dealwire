@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { load } from 'cheerio';
 import { EmailSenderService } from './email-sender.service';
-import OpenAI from 'openai';
+import PDFParser from 'pdf2json';
 
 interface AttachmentMetadata {
   filename: string;
@@ -14,13 +14,8 @@ interface AttachmentMetadata {
 @Injectable()
 export class EmailProcessingService {
   private readonly logger = new Logger(EmailProcessingService.name);
-  private readonly openai: OpenAI;
 
-  constructor(private readonly emailSender: EmailSenderService) {
-    this.openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
-  }
+  constructor(private readonly emailSender: EmailSenderService) {}
 
   async extractEmailBody(emailId: string): Promise<{ text: string; images: string[] }> {
     try {
@@ -127,46 +122,40 @@ export class EmailProcessingService {
         `Downloaded attachment: ${attachmentInfo.filename} (${buffer.byteLength} bytes)`,
       );
 
-      // Parse PDFs using OpenAI (simple and works everywhere)
+      // Parse PDFs using pdf2json (pure JS, reliable)
       if (attachmentInfo.contentType === 'application/pdf' ||
           attachmentInfo.filename.toLowerCase().endsWith('.pdf')) {
         try {
-          // Convert to base64 for OpenAI
-          const base64Pdf = Buffer.from(buffer).toString('base64');
-          const dataUrl = `data:application/pdf;base64,${base64Pdf}`;
+          const pdfBuffer = Buffer.from(buffer);
 
-          this.logger.log(`Extracting text from PDF using OpenAI: ${attachmentInfo.filename}`);
+          this.logger.log(`Extracting text from PDF: ${attachmentInfo.filename}`);
 
-          const response = await this.openai.chat.completions.create({
-            model: 'gpt-4o',
-            messages: [
-              {
-                role: 'user',
-                content: [
-                  {
-                    type: 'text',
-                    text: 'Extract ALL text from this PDF document. Return ONLY the extracted text, nothing else. Preserve formatting and structure as much as possible.',
-                  },
-                  {
-                    type: 'image_url',
-                    image_url: { url: dataUrl },
-                  },
-                ],
-              },
-            ],
-            max_tokens: 4096,
+          // Use pdf2json - returns promise
+          const extractedText = await new Promise<string>((resolve, reject) => {
+            const pdfParser = new (PDFParser as any)(null, 1);
+
+            pdfParser.on('pdfParser_dataError', (errData: any) =>
+              reject(new Error(errData.parserError))
+            );
+
+            pdfParser.on('pdfParser_dataReady', () => {
+              const text = (pdfParser as any).getRawTextContent();
+              resolve(text);
+            });
+
+            pdfParser.parseBuffer(pdfBuffer);
           });
 
-          const extractedText = response.choices[0]?.message?.content?.trim() || '';
+          const trimmedText = extractedText.trim();
 
-          if (extractedText) {
+          if (trimmedText) {
             this.logger.log(
-              `Extracted ${extractedText.length} characters from PDF: ${attachmentInfo.filename}`,
+              `Extracted ${trimmedText.length} characters from PDF: ${attachmentInfo.filename}`,
             );
             this.logger.log('=== OCR-EXTRACTED TEXT START ===');
-            this.logger.log(extractedText);
+            this.logger.log(trimmedText);
             this.logger.log('=== OCR-EXTRACTED TEXT END ===');
-            return extractedText;
+            return trimmedText;
           } else {
             this.logger.warn(`No text extracted from PDF: ${attachmentInfo.filename}`);
             return '';
