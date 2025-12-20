@@ -1,0 +1,26 @@
+{
+  "Dshorenstein@hildrethadvisors.com": {
+    "deal_criteria": "Focus on multifamily and industrial. Minimum 6% cap rate. Prefer value-add opportunities with below-market rents. Flag any deferred maintenance or environmental issues.",
+    "logo_url": "https://cdn.prod.website-files.com/64b15c6db22487552ddf04a6/64b15c6db22487552ddf06b9_HREA_Logo.png",
+    "company_name": "Hildreth Real Estate Advisors",
+    "brand_color": "#2A4A7C"
+  },
+  "isaac@frontstep.ai": {
+    "deal_criteria": "I only want to look at deals that are in the state of New York.",
+    "logo_url": "https://cdn.prod.website-files.com/64b15c6db22487552ddf04a6/64b15c6db22487552ddf06b9_HREA_Logo.png",
+    "company_name": "Hildreth Real Estate Advisors",
+    "brand_color": "#2A4A7C"
+  },
+  "noah@frontstep.ai": {
+    "deal_criteria": "Focus on multifamily and industrial. Minimum 6% cap rate. Prefer value-add opportunities with below-market rents. Flag any deferred maintenance or environmental issues.",
+    "logo_url": "https://cdn.prod.website-files.com/64b15c6db22487552ddf04a6/64b15c6db22487552ddf06b9_HREA_Logo.png",
+    "company_name": "Hildreth Real Estate Advisors",
+    "brand_color": "#2A4A7C"
+  },
+  "_default": {
+    "deal_criteria": null,
+    "logo_url": null,
+    "company_name": null,
+    "brand_color": null
+  }
+}
