@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { load } from 'cheerio';
 import { EmailSenderService } from './email-sender.service';
-import PDFParser from 'pdf2json';
+import { extractPdfText } from './pdf-parser';
 
 interface AttachmentMetadata {
   filename: string;
@@ -122,7 +122,7 @@ export class EmailProcessingService {
         `Downloaded attachment: ${attachmentInfo.filename} (${buffer.byteLength} bytes)`,
       );
 
-      // Parse PDFs using pdf2json (pure JS, reliable)
+      // Parse PDFs using system pdftotext (fuck npm libraries)
       if (attachmentInfo.contentType === 'application/pdf' ||
           attachmentInfo.filename.toLowerCase().endsWith('.pdf')) {
         try {
@@ -130,23 +130,7 @@ export class EmailProcessingService {
 
           this.logger.log(`Extracting text from PDF: ${attachmentInfo.filename}`);
 
-          // Use pdf2json - returns promise
-          const extractedText = await new Promise<string>((resolve, reject) => {
-            const pdfParser = new (PDFParser as any)(null, 1);
-
-            pdfParser.on('pdfParser_dataError', (errData: any) =>
-              reject(new Error(errData.parserError))
-            );
-
-            pdfParser.on('pdfParser_dataReady', () => {
-              const text = (pdfParser as any).getRawTextContent();
-              resolve(text);
-            });
-
-            pdfParser.parseBuffer(pdfBuffer);
-          });
-
-          const trimmedText = extractedText.trim();
+          const trimmedText = await extractPdfText(pdfBuffer);
 
           if (trimmedText) {
             this.logger.log(
