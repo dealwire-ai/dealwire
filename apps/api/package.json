@@ -23,11 +23,11 @@
     "cheerio": "^1.1.2",
     "marked": "^17.0.1",
     "openai": "^6.15.0",
-    "pdf-parse": "^2.4.5",
     "reflect-metadata": "^0.2.2",
     "resend": "^6.6.0",
     "rxjs": "^7.8.1",
     "svix": "^1.82.0",
+    "unpdf": "^1.4.0",
     "zod": "^4.2.1"
   },
   "devDependencies": {
@@ -39,7 +39,6 @@
     "@types/express": "^5.0.0",
     "@types/jest": "^30.0.0",
     "@types/node": "^22.10.7",
-    "@types/pdf-parse": "^1.1.5",
     "@types/react": "^19.2.7",
     "@types/supertest": "^6.0.2",
     "eslint": "^9.18.0",
