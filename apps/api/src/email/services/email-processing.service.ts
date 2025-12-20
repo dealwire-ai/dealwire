@@ -2,6 +2,9 @@ import { Injectable, Logger } from '@nestjs/common';
 import { load } from 'cheerio';
 import { EmailSenderService } from './email-sender.service';
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const pdfParse = require('pdf-parse');
+
 interface AttachmentMetadata {
   filename: string;
   contentType: string;
@@ -117,16 +120,40 @@ export class EmailProcessingService {
       }
 
       const buffer = await response.arrayBuffer();
-
-      // For now, we'll just log that we have the attachment
-      // In a full implementation, you'd parse PDFs, images, etc.
       this.logger.log(
         `Downloaded attachment: ${attachmentInfo.filename} (${buffer.byteLength} bytes)`,
       );
 
-      // TODO: Implement document parsing for PDFs, images, etc.
-      // This would be similar to the Python version's DocumentParserService
+      // Parse PDFs
+      if (attachmentInfo.contentType === 'application/pdf' ||
+          attachmentInfo.filename.toLowerCase().endsWith('.pdf')) {
+        try {
+          const pdfBuffer = Buffer.from(buffer);
+          const pdfData = await pdfParse(pdfBuffer);
+          const extractedText = pdfData.text.trim();
 
+          if (extractedText) {
+            this.logger.log(
+              `Extracted ${extractedText.length} characters from PDF: ${attachmentInfo.filename}`,
+            );
+            return extractedText;
+          } else {
+            this.logger.warn(`No text extracted from PDF: ${attachmentInfo.filename}`);
+            return '';
+          }
+        } catch (pdfError) {
+          const errorMessage = pdfError instanceof Error ? pdfError.message : String(pdfError);
+          this.logger.error(
+            `PDF parsing failed for ${attachmentInfo.filename}: ${errorMessage}`,
+          );
+          return '';
+        }
+      }
+
+      // For non-PDF attachments, return empty for now
+      this.logger.debug(
+        `Skipping non-PDF attachment: ${attachmentInfo.filename} (${attachmentInfo.contentType})`,
+      );
       return '';
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
