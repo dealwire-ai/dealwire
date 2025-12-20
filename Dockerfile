@@ -24,7 +24,6 @@ RUN pnpm install --frozen-lockfile --filter @analyzer/api...
 
 # Copy application code
 COPY apps/api apps/api
-COPY prisma prisma
 
 # Generate Prisma client
 RUN cd apps/api && pnpm exec prisma generate
