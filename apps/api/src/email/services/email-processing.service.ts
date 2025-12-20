@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { load } from 'cheerio';
 import { EmailSenderService } from './email-sender.service';
+import OpenAI from 'openai';
 
 interface AttachmentMetadata {
   filename: string;
@@ -13,8 +14,13 @@ interface AttachmentMetadata {
 @Injectable()
 export class EmailProcessingService {
   private readonly logger = new Logger(EmailProcessingService.name);
+  private readonly openai: OpenAI;
 
-  constructor(private readonly emailSender: EmailSenderService) {}
+  constructor(private readonly emailSender: EmailSenderService) {
+    this.openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+  }
 
   async extractEmailBody(emailId: string): Promise<{ text: string; images: string[] }> {
     try {
@@ -121,19 +127,37 @@ export class EmailProcessingService {
         `Downloaded attachment: ${attachmentInfo.filename} (${buffer.byteLength} bytes)`,
       );
 
-      // Parse PDFs
+      // Parse PDFs using OpenAI (simple and works everywhere)
       if (attachmentInfo.contentType === 'application/pdf' ||
           attachmentInfo.filename.toLowerCase().endsWith('.pdf')) {
         try {
-          const pdfBuffer = Buffer.from(buffer);
+          // Convert to base64 for OpenAI
+          const base64Pdf = Buffer.from(buffer).toString('base64');
+          const dataUrl = `data:application/pdf;base64,${base64Pdf}`;
 
-          // Import pdf-parse dynamically (CommonJS module)
-          const pdfParseModule: any = await import('pdf-parse');
-          // The module structure varies - try the actual default export
-          const parsePdf = pdfParseModule.default || pdfParseModule.PDFParse || pdfParseModule;
+          this.logger.log(`Extracting text from PDF using OpenAI: ${attachmentInfo.filename}`);
 
-          const pdfData = await parsePdf(pdfBuffer);
-          const extractedText = pdfData.text.trim();
+          const response = await this.openai.chat.completions.create({
+            model: 'gpt-4o',
+            messages: [
+              {
+                role: 'user',
+                content: [
+                  {
+                    type: 'text',
+                    text: 'Extract ALL text from this PDF document. Return ONLY the extracted text, nothing else. Preserve formatting and structure as much as possible.',
+                  },
+                  {
+                    type: 'image_url',
+                    image_url: { url: dataUrl },
+                  },
+                ],
+              },
+            ],
+            max_tokens: 4096,
+          });
+
+          const extractedText = response.choices[0]?.message?.content?.trim() || '';
 
           if (extractedText) {
             this.logger.log(
