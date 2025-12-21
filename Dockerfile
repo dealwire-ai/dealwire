@@ -34,5 +34,5 @@ RUN pnpm --filter @analyzer/api run build
 # Expose port
 EXPOSE 8080
 
-# Start the application
-CMD ["node", "apps/api/dist/src/main.js"]
+# Start the application (run db push before starting to sync schema)
+CMD cd apps/api && npx prisma db push --skip-generate && node dist/src/main.js
