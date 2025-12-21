@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { marked } from 'marked';
-import { DealDecision } from '../../ai/models/deal-decision.model';
+import { DealDecision } from '../../model/deal-decision.model';
 
 @Injectable()
 export class EmailTemplateService {
@@ -154,3 +154,4 @@ export class EmailTemplateService {
 </html>`;
   }
 }
+

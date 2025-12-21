@@ -90,3 +90,4 @@ export class ClientPreferencesService {
     this.loadPreferences();
   }
 }
+
