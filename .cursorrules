@@ -20,3 +20,9 @@
 - Frontend: `@analyzer/web`
 - Backend: `@analyzer/api`
 
+## Email Processing Flow
+1. Resend webhook (`/webhooks/resend`) receives `email.received` event
+2. `EmailProcessingService.extractAllText()` - pulls email body + downloads/OCRs PDF attachments
+3. `DealSummaryService.summarizeDeal()` - AI summarizes deal using client's criteria from `preferences.json`
+4. `DealDecisionService.makeDecision()` - AI returns pass/fail/maybe + reasoning
+5. `EmailTemplateService` formats HTML response, `EmailSenderService` sends reply to original sender

@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { PrismaModule } from './prisma/prisma.module';
-import { WebhookModule } from './webhook/webhook.module';
+import { AppController } from './controller/app.controller';
+import { AppService } from './service/app.service';
+import { PrismaModule } from './module/prisma.module';
+import { WebhookModule } from './module/webhook.module';
 
 @Module({
   imports: [PrismaModule, WebhookModule],

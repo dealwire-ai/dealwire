@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { load } from 'cheerio';
 import { EmailSenderService } from './email-sender.service';
-import { extractPdfText } from './pdf-parser';
+import { extractPdfText } from '../../util/pdf-parser';
 
 interface AttachmentMetadata {
   filename: string;
@@ -205,3 +205,4 @@ export class EmailProcessingService {
     return allExtractedText;
   }
 }
+

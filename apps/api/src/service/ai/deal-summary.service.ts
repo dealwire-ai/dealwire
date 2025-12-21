@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import OpenAI from 'openai';
-import { aiConfig } from '../config/ai.config';
+import { aiConfig } from '../../config/ai.config';
 
 @Injectable()
 export class DealSummaryService {
@@ -89,3 +89,4 @@ export class DealSummaryService {
     }
   }
 }
+

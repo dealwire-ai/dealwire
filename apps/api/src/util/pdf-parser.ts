@@ -38,3 +38,4 @@ export async function extractPdfText(pdfBuffer: Buffer): Promise<string> {
     await fs.unlink(tmpTxt).catch(() => {});
   }
 }
+
