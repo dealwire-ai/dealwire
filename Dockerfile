@@ -1,10 +1,11 @@
 # Base image with Node.js
 FROM node:22-slim
 
-# Install system dependencies for PDF parsing
+# Install system dependencies for PDF parsing and Prisma
 RUN apt-get update && apt-get install -y \
     poppler-utils \
     binutils \
+    openssl \
     && rm -rf /var/lib/apt/lists/*
 
 # Enable corepack for pnpm
