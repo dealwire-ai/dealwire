@@ -183,15 +183,11 @@ export class MicrosoftWebhookService {
       `Decision for ${event.messageId}: ${decision.decision} - ${decision.reason}`,
     );
 
-    // Send reply to the inbox owner (our user), not the original sender
+    // Send reply
     if (!recipientEmail) {
       this.logger.warn(`No recipient email for ${event.messageId}`);
       return;
     }
-
-    const replySubject = event.subject
-      ? `Re: ${event.subject}`
-      : 'Deal Summary';
 
     const htmlEmail = this.emailTemplate.formatSummaryAsHtml(
       summary,
@@ -200,6 +196,26 @@ export class MicrosoftWebhookService {
       clientPrefs.companyName,
       clientPrefs.brandColor,
     );
+
+    // For Microsoft emails, reply via Graph API to stay in thread
+    if (event.source === 'microsoft' && accessToken) {
+      const success = await this.graphService.replyToMessage(
+        accessToken,
+        event.messageId,
+        htmlEmail,
+      );
+      if (success) {
+        this.logger.log(`Reply sent via Graph for ${event.messageId}`);
+      } else {
+        this.logger.error(`Failed to send Graph reply for ${event.messageId}`);
+      }
+      return;
+    }
+
+    // Fallback to Resend for non-Microsoft emails
+    const replySubject = event.subject
+      ? `Re: ${event.subject}`
+      : 'Deal Summary';
 
     await this.emailSender.sendEmail({
       to: [recipientEmail],
