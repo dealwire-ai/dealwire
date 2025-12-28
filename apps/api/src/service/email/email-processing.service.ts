@@ -125,32 +125,7 @@ export class EmailProcessingService {
       // Parse PDFs using system pdftotext (fuck npm libraries)
       if (attachmentInfo.contentType === 'application/pdf' ||
           attachmentInfo.filename.toLowerCase().endsWith('.pdf')) {
-        try {
-          const pdfBuffer = Buffer.from(buffer);
-
-          this.logger.log(`Extracting text from PDF: ${attachmentInfo.filename}`);
-
-          const trimmedText = await extractPdfText(pdfBuffer);
-
-          if (trimmedText) {
-            this.logger.log(
-              `Extracted ${trimmedText.length} characters from PDF: ${attachmentInfo.filename}`,
-            );
-            this.logger.log('=== OCR-EXTRACTED TEXT START ===');
-            this.logger.log(trimmedText);
-            this.logger.log('=== OCR-EXTRACTED TEXT END ===');
-            return trimmedText;
-          } else {
-            this.logger.warn(`No text extracted from PDF: ${attachmentInfo.filename}`);
-            return '';
-          }
-        } catch (pdfError) {
-          const errorMessage = pdfError instanceof Error ? pdfError.message : String(pdfError);
-          this.logger.error(
-            `PDF parsing failed for ${attachmentInfo.filename}: ${errorMessage}`,
-          );
-          return '';
-        }
+        return this.processPdfBuffer(Buffer.from(buffer), attachmentInfo.filename);
       }
 
       // For non-PDF attachments, return empty for now
@@ -163,6 +138,36 @@ export class EmailProcessingService {
       this.logger.error(
         `Attachment processing failed for ${attachmentInfo.filename}: ${errorMessage}`,
       );
+      return '';
+    }
+  }
+
+  /**
+   * Process a PDF buffer and extract text
+   * Exposed for use by Microsoft webhook service
+   */
+  async processPdfBuffer(buffer: Buffer, filename?: string): Promise<string> {
+    const name = filename || 'attachment.pdf';
+    try {
+      this.logger.log(`Extracting text from PDF: ${name}`);
+
+      const trimmedText = await extractPdfText(buffer);
+
+      if (trimmedText) {
+        this.logger.log(
+          `Extracted ${trimmedText.length} characters from PDF: ${name}`,
+        );
+        this.logger.log('=== OCR-EXTRACTED TEXT START ===');
+        this.logger.log(trimmedText);
+        this.logger.log('=== OCR-EXTRACTED TEXT END ===');
+        return trimmedText;
+      } else {
+        this.logger.warn(`No text extracted from PDF: ${name}`);
+        return '';
+      }
+    } catch (pdfError) {
+      const errorMessage = pdfError instanceof Error ? pdfError.message : String(pdfError);
+      this.logger.error(`PDF parsing failed for ${name}: ${errorMessage}`);
       return '';
     }
   }

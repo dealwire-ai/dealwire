@@ -1,10 +1,10 @@
 export interface ClerkConfig {
-  secretKey: string;
+  clerkSecretKey: string;
   webhookSecret: string;
 }
 
 export const clerkConfig = (): ClerkConfig => ({
-  secretKey: process.env.CLERK_SECRET_KEY || '',
+  clerkSecretKey: process.env.CLERK_SECRET_KEY || '',
   webhookSecret: process.env.CLERK_WEBHOOK_SECRET || '',
 });
 
