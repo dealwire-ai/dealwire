@@ -7,6 +7,7 @@ import { EmailTemplateService } from '../email/email-template.service';
 import { ClientPreferencesService } from '../preferences/client-preferences.service';
 import { DealSummaryService } from '../ai/deal-summary.service';
 import { DealDecisionService } from '../ai/deal-decision.service';
+import { DealDetectionService } from '../ai/deal-detection.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { NormalizedEmailEvent } from '../../dto/normalized-email-event.dto';
 
@@ -44,6 +45,7 @@ export class MicrosoftWebhookService {
     private readonly clientPreferences: ClientPreferencesService,
     private readonly dealSummary: DealSummaryService,
     private readonly dealDecision: DealDecisionService,
+    private readonly dealDetection: DealDetectionService,
     private readonly prisma: PrismaService,
   ) {}
 
@@ -145,11 +147,26 @@ export class MicrosoftWebhookService {
       return;
     }
 
+    // Get body text for detection
+    const bodyText = event.bodyText || this.htmlToText(event.bodyHtml || '');
+
+    // Quick check: is this a deal-related email?
+    const detection = await this.dealDetection.isDealEmail(
+      event.subject,
+      bodyText,
+      event.attachments.length > 0,
+    );
+
+    if (!detection.isDeal) {
+      this.logger.log(
+        `Skipping non-deal email: ${event.messageId} - "${event.subject}" (${detection.reason})`,
+      );
+      return;
+    }
+
     // Extract text from email body
     const allExtractedText: string[] = [];
 
-    // Get body text
-    const bodyText = event.bodyText || this.htmlToText(event.bodyHtml || '');
     if (bodyText) {
       allExtractedText.push(`--- Email Body Text ---\n${bodyText}`);
     }
