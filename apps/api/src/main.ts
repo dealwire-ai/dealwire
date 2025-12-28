@@ -3,13 +3,6 @@ import { AppModule } from './app.module';
 import { json } from 'express';
 
 async function bootstrap() {
-  console.log(`
-    ___    _   _____    __  __  ____________ 
-   /   |  / | / /   |  / / /\\ \\/ /__  / ____/
-  / /| | /  |/ / /| | / /  \\  /  / / / __/   
- / ___ |/ /|  / ___ |/ /___/ /  / /_/ /___   
-/_/  |_/_/ |_/_/  |_/_____/_/  /___/_____/   
-  `);
   console.log('Starting Nest application...');
   
   const app = await NestFactory.create(AppModule, {
