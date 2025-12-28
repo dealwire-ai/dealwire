@@ -159,6 +159,49 @@ export class MicrosoftGraphService {
   }
 
   /**
+   * Reply to a message using Microsoft Graph (stays in same thread)
+   */
+  async replyToMessage(
+    accessToken: string,
+    messageId: string,
+    htmlBody: string,
+  ): Promise<boolean> {
+    try {
+      const response = await fetch(
+        `${GRAPH_BASE_URL}/me/messages/${messageId}/reply`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            message: {
+              body: {
+                contentType: 'html',
+                content: htmlBody,
+              },
+            },
+          }),
+        },
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        this.logger.error(`Failed to reply to message ${messageId}: ${response.status} - ${errorText}`);
+        return false;
+      }
+
+      this.logger.log(`Reply sent via Graph for message ${messageId}`);
+      return true;
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Error replying to message ${messageId}: ${msg}`);
+      return false;
+    }
+  }
+
+  /**
    * Convert a Microsoft Graph message to our NormalizedEmailEvent format
    */
   async toNormalizedEvent(

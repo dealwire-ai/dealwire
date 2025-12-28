@@ -157,9 +157,6 @@ export class EmailProcessingService {
         this.logger.log(
           `Extracted ${trimmedText.length} characters from PDF: ${name}`,
         );
-        this.logger.log('=== OCR-EXTRACTED TEXT START ===');
-        this.logger.log(trimmedText);
-        this.logger.log('=== OCR-EXTRACTED TEXT END ===');
         return trimmedText;
       } else {
         this.logger.warn(`No text extracted from PDF: ${name}`);
