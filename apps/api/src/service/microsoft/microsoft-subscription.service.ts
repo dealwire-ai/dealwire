@@ -37,14 +37,13 @@ export class MicrosoftSubscriptionService {
       return false;
     }
 
-    // Check if user already has a subscription
+    // Check if user already has a subscription in our DB
     const existing = await this.prisma.microsoftSubscription.findUnique({
       where: { userId },
     });
 
     if (existing) {
       this.logger.log(`User ${userId} already has subscription ${existing.subscriptionId}`);
-      // Optionally renew if close to expiry
       const hoursUntilExpiry =
         (existing.expiresAt.getTime() - Date.now()) / (1000 * 60 * 60);
       if (hoursUntilExpiry < 24) {
@@ -52,6 +51,10 @@ export class MicrosoftSubscriptionService {
       }
       return true;
     }
+
+    // Clean up any existing subscriptions on Microsoft's side
+    // (from previous sign-ups that weren't properly cleaned up)
+    await this.deleteExistingGraphSubscriptions(accessToken);
 
     const expirationDateTime = new Date(
       Date.now() + SUBSCRIPTION_EXPIRY_MINUTES * 60 * 1000,
@@ -234,6 +237,47 @@ export class MicrosoftSubscriptionService {
 
     for (const sub of expiring) {
       await this.renewSubscription(sub.userId);
+    }
+  }
+
+  /**
+   * Delete all existing subscriptions on Microsoft's side
+   * This cleans up orphaned subscriptions from previous sign-ups
+   */
+  private async deleteExistingGraphSubscriptions(
+    accessToken: string,
+  ): Promise<void> {
+    try {
+      // List all subscriptions
+      const response = await fetch(`${GRAPH_BASE_URL}/subscriptions`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        this.logger.warn(`Failed to list subscriptions: ${response.status}`);
+        return;
+      }
+
+      const data = await response.json();
+      const subscriptions = data.value || [];
+
+      // Delete each subscription for our resource
+      for (const sub of subscriptions) {
+        if (sub.resource === SUBSCRIPTION_RESOURCE) {
+          this.logger.log(`Deleting orphaned subscription ${sub.id}`);
+          await fetch(`${GRAPH_BASE_URL}/subscriptions/${sub.id}`, {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${accessToken}` },
+          });
+        }
+      }
+    } catch (error) {
+      // Best effort - continue with creation even if cleanup fails
+      const msg = error instanceof Error ? error.message : String(error);
+      this.logger.warn(`Failed to clean up old subscriptions: ${msg}`);
     }
   }
 }
