@@ -20,7 +20,7 @@ interface GraphSubscription {
 @Injectable()
 export class MicrosoftSubscriptionService {
   private readonly logger = new Logger(MicrosoftSubscriptionService.name);
-  private readonly config = microsoftConfig();
+  private readonly microsoftConfig = microsoftConfig();
 
   constructor(
     private readonly prisma: PrismaService,
@@ -69,10 +69,10 @@ export class MicrosoftSubscriptionService {
         },
         body: JSON.stringify({
           changeType: 'created',
-          notificationUrl: `${this.config.apiBaseUrl}/webhooks/microsoft`,
+          notificationUrl: `${this.microsoftConfig.apiBaseUrl}/webhooks/microsoft`,
           resource: SUBSCRIPTION_RESOURCE,
           expirationDateTime,
-          clientState: this.config.webhookSecret,
+          clientState: this.microsoftConfig.webhookSecret,
         }),
       });
 

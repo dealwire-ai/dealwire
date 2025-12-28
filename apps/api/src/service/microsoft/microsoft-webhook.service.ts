@@ -37,16 +37,16 @@ export class MicrosoftWebhookService {
   private readonly DEDUP_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
   constructor(
-    private readonly graphService: MicrosoftGraphService,
+    private readonly microsoftGraphService: MicrosoftGraphService,
     private readonly subscriptionService: MicrosoftSubscriptionService,
-    private readonly emailProcessing: EmailProcessingService,
-    private readonly emailSender: EmailSenderService,
-    private readonly emailTemplate: EmailTemplateService,
-    private readonly clientPreferences: ClientPreferencesService,
-    private readonly dealSummary: DealSummaryService,
-    private readonly dealDecision: DealDecisionService,
-    private readonly dealDetection: DealDetectionService,
-    private readonly prisma: PrismaService,
+    private readonly emailProcessingService: EmailProcessingService,
+    private readonly emailSenderService: EmailSenderService,
+    private readonly emailTemplateService: EmailTemplateService,
+    private readonly clientPreferencesService: ClientPreferencesService,
+    private readonly dealSummaryService: DealSummaryService,
+    private readonly dealDecisionService: DealDecisionService,
+    private readonly dealDetectionService: DealDetectionService,
+    private readonly prismaService: PrismaService,
   ) {}
 
   /**
@@ -93,14 +93,14 @@ export class MicrosoftWebhookService {
     }
 
     // Get access token for this user
-    const accessToken = await this.graphService.getAccessToken(userId);
+    const accessToken = await this.microsoftGraphService.getAccessToken(userId);
     if (!accessToken) {
       this.logger.error(`No access token for user ${userId}`);
       return;
     }
 
     // Fetch the email and convert to normalized format
-    const emailEvent = await this.graphService.toNormalizedEvent(
+    const emailEvent = await this.microsoftGraphService.toNormalizedEvent(
       userId,
       accessToken,
       messageId,
@@ -112,7 +112,7 @@ export class MicrosoftWebhookService {
     }
 
     // Get inbox owner's email for preferences and reply
-    const inboxOwner = await this.prisma.user.findUnique({
+    const inboxOwner = await this.prismaService.user.findUnique({
       where: { id: userId },
       select: { email: true },
     });
@@ -159,7 +159,7 @@ export class MicrosoftWebhookService {
     const bodyText = event.bodyText || this.htmlToText(event.bodyHtml || '');
 
     // Quick check: is this a deal-related email?
-    const detection = await this.dealDetection.isDealEmail(
+    const detection = await this.dealDetectionService.isDealEmail(
       event.subject,
       bodyText,
       event.attachments.length > 0,
@@ -186,13 +186,13 @@ export class MicrosoftWebhookService {
           att.contentType === 'application/pdf' ||
           att.filename.toLowerCase().endsWith('.pdf')
         ) {
-          const content = await this.graphService.getAttachmentContent(
+          const content = await this.microsoftGraphService.getAttachmentContent(
             accessToken,
             event.messageId,
             att.contentId,
           );
           if (content) {
-            const text = await this.emailProcessing.processPdfBuffer(content);
+            const text = await this.emailProcessingService.processPdfBuffer(content);
             if (text) {
               allExtractedText.push(`--- ${att.filename} ---\n${text}`);
             }
@@ -209,10 +209,10 @@ export class MicrosoftWebhookService {
     const combinedText = allExtractedText.join('\n\n');
 
     // Look up client preferences using the inbox owner's email
-    const clientPrefs = this.clientPreferences.getPreferences(recipientEmail);
+    const clientPrefs = this.clientPreferencesService.getPreferences(recipientEmail);
 
     // Generate AI summary
-    const summary = await this.dealSummary.summarizeDeal(
+    const summary = await this.dealSummaryService.summarizeDeal(
       combinedText,
       clientPrefs.dealCriteria,
     );
@@ -222,7 +222,7 @@ export class MicrosoftWebhookService {
     );
 
     // Make deal decision
-    const decision = await this.dealDecision.makeDecision(
+    const decision = await this.dealDecisionService.makeDecision(
       summary,
       clientPrefs.dealCriteria,
     );
@@ -237,7 +237,7 @@ export class MicrosoftWebhookService {
       return;
     }
 
-    const htmlEmail = this.emailTemplate.formatSummaryAsHtml(
+    const htmlEmail = this.emailTemplateService.formatSummaryAsHtml(
       summary,
       decision,
       clientPrefs.logoUrl,
@@ -247,7 +247,7 @@ export class MicrosoftWebhookService {
 
     // For Microsoft emails, reply to self via Graph API to stay in thread
     if (event.source === 'microsoft' && accessToken) {
-      const success = await this.graphService.replyToSelf(
+      const success = await this.microsoftGraphService.replyToSelf(
         accessToken,
         event.messageId,
         recipientEmail,
@@ -266,7 +266,7 @@ export class MicrosoftWebhookService {
       ? `Re: ${event.subject}`
       : 'Deal Summary';
 
-    await this.emailSender.sendEmail({
+    await this.emailSenderService.sendEmail({
       to: [recipientEmail],
       subject: replySubject,
       html: htmlEmail,

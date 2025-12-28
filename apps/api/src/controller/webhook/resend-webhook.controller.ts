@@ -15,7 +15,7 @@ import { emailConfig } from '../../config/email.config';
 @Controller('webhooks')
 export class ResendWebhookController extends BaseWebhookController {
   protected readonly logger = new Logger(ResendWebhookController.name);
-  private readonly config = emailConfig();
+  private readonly emailConfig = emailConfig();
 
   constructor(private readonly resendWebhookService: ResendWebhookService) {
     super();
@@ -35,7 +35,7 @@ export class ResendWebhookController extends BaseWebhookController {
       svixId,
       svixTimestamp,
       svixSignature,
-      this.config.resendWebhookSecret,
+      this.emailConfig.resendWebhookSecret,
     );
 
     if (body.type !== 'email.received') {

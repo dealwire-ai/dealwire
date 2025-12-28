@@ -7,7 +7,7 @@ export class MicrosoftSchedulerService {
   private readonly logger = new Logger(MicrosoftSchedulerService.name);
 
   constructor(
-    private readonly subscriptionService: MicrosoftSubscriptionService,
+    private readonly microsoftSubscriptionService: MicrosoftSubscriptionService,
   ) {}
 
   /**
@@ -17,7 +17,7 @@ export class MicrosoftSchedulerService {
   @Cron(CronExpression.EVERY_12_HOURS)
   async handleSubscriptionRenewal(): Promise<void> {
     this.logger.log('Running scheduled subscription renewal...');
-    await this.subscriptionService.renewExpiringSubscriptions();
+    await this.microsoftSubscriptionService.renewExpiringSubscriptions();
     this.logger.log('Subscription renewal complete');
   }
 }

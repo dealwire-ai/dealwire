@@ -14,12 +14,12 @@ type DealDetection = z.infer<typeof DealDetectionSchema>;
 @Injectable()
 export class DealDetectionService {
   private readonly logger = new Logger(DealDetectionService.name);
-  private readonly config = aiConfig();
+  private readonly aiConfig = aiConfig();
   private openai: OpenAI;
 
   constructor() {
     this.openai = new OpenAI({
-      apiKey: this.config.openaiApiKey,
+      apiKey: this.aiConfig.openaiApiKey,
     });
   }
 
@@ -34,7 +34,7 @@ export class DealDetectionService {
   ): Promise<DealDetection> {
     try {
       const response = await this.openai.chat.completions.create({
-        model: 'gpt-4o-mini', // Fast and cheap for classification
+        model: 'gpt-4o-mini', // we should keep this as something fast and cheap for deal classification
         temperature: 0,
         messages: [
           {
