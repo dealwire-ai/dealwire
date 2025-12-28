@@ -122,6 +122,14 @@ export class MicrosoftWebhookService {
       return;
     }
 
+    // Skip emails from the user themselves (prevents infinite loop from reply-to-self)
+    if (emailEvent.from.toLowerCase() === inboxOwner.email.toLowerCase()) {
+      this.logger.debug(
+        `Skipping self-sent email: ${emailEvent.messageId} - "${emailEvent.subject}"`,
+      );
+      return;
+    }
+
     this.logger.log(
       `Processing Microsoft email: ${emailEvent.messageId} from ${emailEvent.from} to ${inboxOwner.email} - "${emailEvent.subject}"`,
     );
