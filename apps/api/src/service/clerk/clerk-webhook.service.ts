@@ -1,11 +1,15 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { MicrosoftSubscriptionService } from '../microsoft/microsoft-subscription.service';
 
 @Injectable()
 export class ClerkWebhookService {
   private readonly logger = new Logger(ClerkWebhookService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly microsoftSubscription: MicrosoftSubscriptionService,
+  ) {}
 
   async handleEvent(eventType: string, data: any): Promise<void> {
     switch (eventType) {
@@ -53,6 +57,27 @@ export class ClerkWebhookService {
       },
     });
     this.logger.log(`User created: ${data.id}`);
+
+    // Create Microsoft Graph subscription for email notifications
+    // This runs async - don't block the webhook response
+    this.createMicrosoftSubscription(data.id);
+  }
+
+  private async createMicrosoftSubscription(userId: string): Promise<void> {
+    try {
+      const success = await this.microsoftSubscription.createSubscription(userId);
+      if (success) {
+        this.logger.log(`Microsoft subscription created for user ${userId}`);
+      } else {
+        this.logger.warn(
+          `Failed to create Microsoft subscription for user ${userId} - ` +
+          `user may not have connected Microsoft account`,
+        );
+      }
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Error creating Microsoft subscription: ${msg}`);
+    }
   }
 
   private async upsertUser(data: any): Promise<void> {
@@ -76,6 +101,8 @@ export class ClerkWebhookService {
   }
 
   private async deleteUser(id: string): Promise<void> {
+    // Delete Microsoft subscription first (cascade should handle it, but be explicit)
+    await this.microsoftSubscription.deleteSubscription(id);
     await this.prisma.user.delete({ where: { id } });
     this.logger.log(`User deleted: ${id}`);
   }

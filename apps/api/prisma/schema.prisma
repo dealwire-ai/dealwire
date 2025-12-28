@@ -17,6 +17,8 @@ model User {
   organization   Organization? @relation(fields: [organizationId], references: [id])
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+
+  microsoftSubscription MicrosoftSubscription?
 }
 
 model Organization {
@@ -27,6 +29,18 @@ model Organization {
   users     User[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model MicrosoftSubscription {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  subscriptionId String   @unique // Graph subscription ID
+  resource       String   // e.g. "me/mailFolders('Inbox')/messages"
+  expiresAt      DateTime
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 
