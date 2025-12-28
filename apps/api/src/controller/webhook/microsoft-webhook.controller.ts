@@ -14,7 +14,7 @@ import { microsoftConfig } from '../../config/microsoft.config';
 @Controller('webhooks')
 export class MicrosoftWebhookController {
   private readonly logger = new Logger(MicrosoftWebhookController.name);
-  private readonly config = microsoftConfig();
+  private readonly microsoftConfig = microsoftConfig();
 
   constructor(
     private readonly microsoftWebhookService: MicrosoftWebhookService,
@@ -44,7 +44,7 @@ export class MicrosoftWebhookController {
     // Validate clientState to ensure notification is from our subscription
     if (body?.value) {
       for (const notification of body.value) {
-        if (notification.clientState !== this.config.webhookSecret) {
+        if (notification.clientState !== this.microsoftConfig.webhookSecret) {
           this.logger.warn('Invalid clientState in notification');
           throw new BadRequestException('Invalid clientState');
         }

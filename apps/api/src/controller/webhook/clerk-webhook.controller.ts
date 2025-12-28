@@ -15,7 +15,7 @@ import { clerkConfig } from '../../config/clerk.config';
 @Controller('webhooks')
 export class ClerkWebhookController extends BaseWebhookController {
   protected readonly logger = new Logger(ClerkWebhookController.name);
-  private readonly config = clerkConfig();
+  private readonly clerkConfig = clerkConfig();
 
   constructor(private readonly clerkWebhookService: ClerkWebhookService) {
     super();
@@ -35,7 +35,7 @@ export class ClerkWebhookController extends BaseWebhookController {
       svixId,
       svixTimestamp,
       svixSignature,
-      this.config.webhookSecret,
+      this.clerkConfig.webhookSecret,
     );
 
     this.logger.log(`Clerk webhook received: ${body.type}`);

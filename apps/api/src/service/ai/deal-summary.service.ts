@@ -5,16 +5,16 @@ import { aiConfig } from '../../config/ai.config';
 @Injectable()
 export class DealSummaryService {
   private readonly logger = new Logger(DealSummaryService.name);
-  private readonly config = aiConfig();
+  private readonly aiConfig = aiConfig();
   private openai: OpenAI;
 
   constructor() {
     this.openai = new OpenAI({
-      apiKey: this.config.openaiApiKey,
+      apiKey: this.aiConfig.openaiApiKey,
     });
 
     this.logger.log(
-      `OpenAI LLM initialized (model: ${this.config.openaiModel}, temperature: ${this.config.openaiTemperature})`,
+      `OpenAI LLM initialized (model: ${this.aiConfig.openaiModel}, temperature: ${this.aiConfig.openaiTemperature})`,
     );
   }
 
@@ -60,8 +60,8 @@ export class DealSummaryService {
         `Here is the extracted text:\n\n${extractedText}`;
 
       const response = await this.openai.chat.completions.create({
-        model: this.config.openaiModel,
-        temperature: this.config.openaiTemperature,
+        model: this.aiConfig.openaiModel,
+        temperature: this.aiConfig.openaiTemperature,
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt },
@@ -75,7 +75,7 @@ export class DealSummaryService {
       }
 
       this.logger.log(
-        `Deal summary generated (length: ${summary.length}, model: ${this.config.openaiModel})`,
+        `Deal summary generated (length: ${summary.length}, model: ${this.aiConfig.openaiModel})`,
       );
 
       return summary;

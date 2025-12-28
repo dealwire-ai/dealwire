@@ -6,12 +6,12 @@ import { DealDecision } from '../../model/deal-decision.model';
 @Injectable()
 export class DealDecisionService {
   private readonly logger = new Logger(DealDecisionService.name);
-  private readonly config = aiConfig();
+  private readonly aiConfig = aiConfig();
   private openai: OpenAI;
 
   constructor() {
     this.openai = new OpenAI({
-      apiKey: this.config.openaiApiKey,
+      apiKey: this.aiConfig.openaiApiKey,
     });
   }
 
@@ -41,8 +41,8 @@ export class DealDecisionService {
       }
 
       const response = await this.openai.chat.completions.create({
-        model: this.config.openaiModel,
-        temperature: this.config.openaiTemperature,
+        model: this.aiConfig.openaiModel,
+        temperature: this.aiConfig.openaiTemperature,
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: `Deal Summary:\n\n${summary}` },
@@ -63,7 +63,7 @@ export class DealDecisionService {
       };
 
       this.logger.log(
-        `Deal decision made: ${decision.decision} (model: ${this.config.openaiModel})`,
+        `Deal decision made: ${decision.decision} (model: ${this.aiConfig.openaiModel})`,
       );
 
       return decision;
