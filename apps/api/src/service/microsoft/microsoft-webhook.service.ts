@@ -31,6 +31,9 @@ interface GraphNotificationPayload {
 @Injectable()
 export class MicrosoftWebhookService {
   private readonly logger = new Logger(MicrosoftWebhookService.name);
+  // Simple dedup cache - tracks processed message IDs for 5 minutes
+  private readonly processedMessages = new Map<string, number>();
+  private readonly DEDUP_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
   constructor(
     private readonly graphService: MicrosoftGraphService,
@@ -63,6 +66,16 @@ export class MicrosoftWebhookService {
   ): Promise<void> {
     const { subscriptionId, resourceData } = notification;
     const messageId = resourceData.id;
+
+    // Dedup check - skip if we've already processed this message recently
+    const now = Date.now();
+    if (this.processedMessages.has(messageId)) {
+      this.logger.debug(`Skipping duplicate notification for ${messageId}`);
+      return;
+    }
+    // Mark as processed and clean up old entries
+    this.processedMessages.set(messageId, now);
+    this.cleanupProcessedMessages();
 
     // Find which user this subscription belongs to
     const userId =
@@ -235,6 +248,15 @@ export class MicrosoftWebhookService {
       .replace(/<[^>]+>/g, ' ')
       .replace(/\s+/g, ' ')
       .trim();
+  }
+
+  private cleanupProcessedMessages(): void {
+    const now = Date.now();
+    for (const [messageId, timestamp] of this.processedMessages) {
+      if (now - timestamp > this.DEDUP_TTL_MS) {
+        this.processedMessages.delete(messageId);
+      }
+    }
   }
 }
 
