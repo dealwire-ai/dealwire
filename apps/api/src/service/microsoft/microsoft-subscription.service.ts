@@ -174,9 +174,15 @@ export class MicrosoftSubscriptionService {
    * Delete a user's subscription (e.g., when user disconnects or is deleted)
    */
   async deleteSubscription(userId: string): Promise<void> {
-    const subscription = await this.prisma.microsoftSubscription.findUnique({
-      where: { userId },
-    });
+    let subscription;
+    try {
+      subscription = await this.prisma.microsoftSubscription.findUnique({
+        where: { userId },
+      });
+    } catch {
+      // Table might not exist during migrations
+      return;
+    }
 
     if (!subscription) return;
 
@@ -195,8 +201,12 @@ export class MicrosoftSubscriptionService {
       }
     }
 
-    await this.prisma.microsoftSubscription.delete({ where: { userId } });
-    this.logger.log(`Deleted subscription for user ${userId}`);
+    try {
+      await this.prisma.microsoftSubscription.delete({ where: { userId } });
+      this.logger.log(`Deleted subscription for user ${userId}`);
+    } catch {
+      // Best effort
+    }
   }
 
   /**

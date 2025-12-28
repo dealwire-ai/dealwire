@@ -47,8 +47,16 @@ export class ClerkWebhookService {
   }
 
   private async createUser(data: any): Promise<void> {
-    await this.prisma.user.create({
-      data: {
+    // Use upsert to handle edge cases (e.g., failed delete, re-signup with same email)
+    await this.prisma.user.upsert({
+      where: { id: data.id },
+      update: {
+        email: data.email_addresses?.[0]?.email_address,
+        firstName: data.first_name,
+        lastName: data.last_name,
+        imageUrl: data.image_url,
+      },
+      create: {
         id: data.id,
         email: data.email_addresses?.[0]?.email_address || '',
         firstName: data.first_name,
@@ -102,9 +110,22 @@ export class ClerkWebhookService {
 
   private async deleteUser(id: string): Promise<void> {
     // Delete Microsoft subscription first (cascade should handle it, but be explicit)
-    await this.microsoftSubscription.deleteSubscription(id);
-    await this.prisma.user.delete({ where: { id } });
-    this.logger.log(`User deleted: ${id}`);
+    try {
+      await this.microsoftSubscription.deleteSubscription(id);
+    } catch (error) {
+      // Don't fail user deletion if subscription deletion fails
+      const msg = error instanceof Error ? error.message : String(error);
+      this.logger.warn(`Failed to delete Microsoft subscription for ${id}: ${msg}`);
+    }
+
+    try {
+      await this.prisma.user.delete({ where: { id } });
+      this.logger.log(`User deleted: ${id}`);
+    } catch (error) {
+      // User might not exist in our DB yet
+      const msg = error instanceof Error ? error.message : String(error);
+      this.logger.warn(`Failed to delete user ${id}: ${msg}`);
+    }
   }
 
   private async createOrganization(data: any): Promise<void> {
