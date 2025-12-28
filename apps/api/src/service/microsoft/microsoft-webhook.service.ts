@@ -7,6 +7,7 @@ import { EmailTemplateService } from '../email/email-template.service';
 import { ClientPreferencesService } from '../preferences/client-preferences.service';
 import { DealSummaryService } from '../ai/deal-summary.service';
 import { DealDecisionService } from '../ai/deal-decision.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { NormalizedEmailEvent } from '../../dto/normalized-email-event.dto';
 
 interface GraphNotification {
@@ -40,6 +41,7 @@ export class MicrosoftWebhookService {
     private readonly clientPreferences: ClientPreferencesService,
     private readonly dealSummary: DealSummaryService,
     private readonly dealDecision: DealDecisionService,
+    private readonly prisma: PrismaService,
   ) {}
 
   /**
@@ -89,20 +91,37 @@ export class MicrosoftWebhookService {
       return;
     }
 
+    // Get inbox owner's email for preferences and reply
+    const inboxOwner = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { email: true },
+    });
+
+    if (!inboxOwner?.email) {
+      this.logger.error(`No email found for user ${userId}`);
+      return;
+    }
+
     this.logger.log(
-      `Processing Microsoft email: ${emailEvent.messageId} from ${emailEvent.from} - "${emailEvent.subject}"`,
+      `Processing Microsoft email: ${emailEvent.messageId} from ${emailEvent.from} to ${inboxOwner.email} - "${emailEvent.subject}"`,
     );
 
-    await this.processNormalizedEmail(emailEvent, accessToken);
+    await this.processNormalizedEmail(emailEvent, accessToken, inboxOwner.email);
   }
 
   /**
-   * Process a normalized email event (shared logic for both Resend and Microsoft)
+   * Process a normalized email event
+   * @param inboxOwnerEmail - For Microsoft: the user's email (recipient). For Resend: undefined (uses sender).
    */
   async processNormalizedEmail(
     event: NormalizedEmailEvent,
     accessToken?: string,
+    inboxOwnerEmail?: string,
   ): Promise<void> {
+    // For Microsoft emails, the inbox owner is the recipient (our user)
+    // For Resend emails (forwarded), the sender is our client
+    const recipientEmail = inboxOwnerEmail || event.from;
+
     // Extract text from email body
     const allExtractedText: string[] = [];
 
@@ -141,8 +160,8 @@ export class MicrosoftWebhookService {
 
     const combinedText = allExtractedText.join('\n\n');
 
-    // Look up client preferences
-    const clientPrefs = this.clientPreferences.getPreferences(event.from);
+    // Look up client preferences using the inbox owner's email
+    const clientPrefs = this.clientPreferences.getPreferences(recipientEmail);
 
     // Generate AI summary
     const summary = await this.dealSummary.summarizeDeal(
@@ -164,9 +183,9 @@ export class MicrosoftWebhookService {
       `Decision for ${event.messageId}: ${decision.decision} - ${decision.reason}`,
     );
 
-    // Send reply
-    if (!event.from) {
-      this.logger.warn(`No sender email for ${event.messageId}`);
+    // Send reply to the inbox owner (our user), not the original sender
+    if (!recipientEmail) {
+      this.logger.warn(`No recipient email for ${event.messageId}`);
       return;
     }
 
@@ -183,13 +202,13 @@ export class MicrosoftWebhookService {
     );
 
     await this.emailSender.sendEmail({
-      to: [event.from],
+      to: [recipientEmail],
       subject: replySubject,
       html: htmlEmail,
       text: summary,
     });
 
-    this.logger.log(`Reply sent for ${event.messageId} to ${event.from}`);
+    this.logger.log(`Reply sent for ${event.messageId} to ${recipientEmail}`);
   }
 
   private htmlToText(html: string): string {
