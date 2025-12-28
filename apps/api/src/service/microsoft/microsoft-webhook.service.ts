@@ -138,7 +138,12 @@ export class MicrosoftWebhookService {
   ): Promise<void> {
     // For Microsoft emails, the inbox owner is the recipient (our user)
     // For Resend emails (forwarded), the sender is our client
-    const recipientEmail = inboxOwnerEmail || event.from;
+    const recipientEmail = inboxOwnerEmail;
+
+    if (!recipientEmail) {
+      this.logger.warn(`No recipient email for ${event.messageId}`);
+      return;
+    }
 
     // Extract text from email body
     const allExtractedText: string[] = [];
@@ -215,15 +220,16 @@ export class MicrosoftWebhookService {
       clientPrefs.brandColor,
     );
 
-    // For Microsoft emails, reply via Graph API to stay in thread
+    // For Microsoft emails, reply to self via Graph API to stay in thread
     if (event.source === 'microsoft' && accessToken) {
-      const success = await this.graphService.replyToMessage(
+      const success = await this.graphService.replyToSelf(
         accessToken,
         event.messageId,
+        recipientEmail,
         htmlEmail,
       );
       if (success) {
-        this.logger.log(`Reply sent via Graph for ${event.messageId}`);
+        this.logger.log(`Reply-to-self sent via Graph for ${event.messageId}`);
       } else {
         this.logger.error(`Failed to send Graph reply for ${event.messageId}`);
       }
