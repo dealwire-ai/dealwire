@@ -4,7 +4,7 @@ export const microsoftConfig = () => ({
   /** Base URL for our API (used as notificationUrl for Graph subscriptions) */
   apiBaseUrl: process.env.API_BASE_URL || 'http://localhost:3001',
   /** Clerk provider ID for Microsoft OAuth */
-  clerkProviderId: 'oauth_microsoft',
+  clerkProviderId: 'microsoft',
 });
 
 

@@ -40,7 +40,7 @@ export class MicrosoftGraphService {
     try {
       const tokens = await this.clerk.users.getUserOauthAccessToken(
         userId,
-        'oauth_microsoft',
+        'microsoft',
       );
 
       if (!tokens.data || tokens.data.length === 0) {
