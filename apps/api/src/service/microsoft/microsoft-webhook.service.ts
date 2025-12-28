@@ -51,6 +51,11 @@ export class MicrosoftWebhookService {
    * Process notifications from Microsoft Graph
    */
   async handleNotifications(payload: GraphNotificationPayload): Promise<void> {
+    if (!payload?.value || !Array.isArray(payload.value)) {
+      this.logger.debug('Received non-notification payload (lifecycle event or empty)');
+      return;
+    }
+
     for (const notification of payload.value) {
       if (notification.changeType !== 'created') {
         this.logger.debug(`Ignoring ${notification.changeType} notification`);
