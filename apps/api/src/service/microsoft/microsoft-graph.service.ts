@@ -159,44 +159,86 @@ export class MicrosoftGraphService {
   }
 
   /**
-   * Reply to a message using Microsoft Graph (stays in same thread)
+   * Send a reply-to-self in the same thread (for deal analysis)
+   * Creates a reply draft, changes recipient to self, then sends
    */
-  async replyToMessage(
+  async replyToSelf(
     accessToken: string,
     messageId: string,
+    userEmail: string,
     htmlBody: string,
   ): Promise<boolean> {
     try {
-      const response = await fetch(
-        `${GRAPH_BASE_URL}/me/messages/${messageId}/reply`,
+      // Step 1: Create a reply draft
+      const createResponse = await fetch(
+        `${GRAPH_BASE_URL}/me/messages/${messageId}/createReply`,
         {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
           },
+        },
+      );
+
+      if (!createResponse.ok) {
+        const errorText = await createResponse.text();
+        this.logger.error(`Failed to create reply draft: ${createResponse.status} - ${errorText}`);
+        return false;
+      }
+
+      const draft = await createResponse.json();
+      const draftId = draft.id;
+
+      // Step 2: Update the draft - change recipients to self and set body
+      const updateResponse = await fetch(
+        `${GRAPH_BASE_URL}/me/messages/${draftId}`,
+        {
+          method: 'PATCH',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
           body: JSON.stringify({
-            message: {
-              body: {
-                contentType: 'html',
-                content: htmlBody,
-              },
+            toRecipients: [
+              { emailAddress: { address: userEmail } },
+            ],
+            body: {
+              contentType: 'html',
+              content: htmlBody,
             },
           }),
         },
       );
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        this.logger.error(`Failed to reply to message ${messageId}: ${response.status} - ${errorText}`);
+      if (!updateResponse.ok) {
+        const errorText = await updateResponse.text();
+        this.logger.error(`Failed to update reply draft: ${updateResponse.status} - ${errorText}`);
         return false;
       }
 
-      this.logger.log(`Reply sent via Graph for message ${messageId}`);
+      // Step 3: Send the draft
+      const sendResponse = await fetch(
+        `${GRAPH_BASE_URL}/me/messages/${draftId}/send`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+
+      if (!sendResponse.ok) {
+        const errorText = await sendResponse.text();
+        this.logger.error(`Failed to send reply: ${sendResponse.status} - ${errorText}`);
+        return false;
+      }
+
+      this.logger.log(`Reply-to-self sent via Graph for message ${messageId}`);
       return true;
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
-      this.logger.error(`Error replying to message ${messageId}: ${msg}`);
+      this.logger.error(`Error sending reply-to-self for ${messageId}: ${msg}`);
       return false;
     }
   }
