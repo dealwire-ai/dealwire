@@ -43,7 +43,16 @@ export class ClientPreferencesService {
       const data = JSON.parse(rawData);
 
       for (const [key, value] of Object.entries(data)) {
-        this.preferences.set(key.toLowerCase(), value as ClientPreferences);
+        // Convert snake_case JSON keys to camelCase
+        const raw = value as Record<string, unknown>;
+        const prefs: ClientPreferences = {
+          dealCriteria: raw.deal_criteria as string | undefined,
+          logoUrl: raw.logo_url as string | undefined,
+          companyName: raw.company_name as string | undefined,
+          brandColor: raw.brand_color as string | undefined,
+          passedFolderName: raw.passedFolderName as string | undefined,
+        };
+        this.preferences.set(key.toLowerCase(), prefs);
       }
 
       this.logger.log(
