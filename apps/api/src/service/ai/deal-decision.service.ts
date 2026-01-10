@@ -26,10 +26,13 @@ export class DealDecisionService {
       if (dealCriteria) {
         systemPrompt =
           'You are a real estate acquisitions analyst. Evaluate whether this deal ' +
-          "matches the client's specific criteria and make a yes/no decision. " +
-          `Client criteria: ${dealCriteria}\n\n` +
-          "Return 'yes' if the deal matches the criteria, 'no' otherwise. " +
-          'Provide a one-sentence reason for your decision. ' +
+          "STRICTLY matches the client's criteria. The criteria are HARD REQUIREMENTS - " +
+          'if ANY criterion is not met (especially geography, property type, or size), ' +
+          "the answer MUST be 'no'.\n\n" +
+          `CLIENT CRITERIA (these are non-negotiable requirements):\n${dealCriteria}\n\n` +
+          "Return 'yes' ONLY if ALL criteria are met. Return 'no' if ANY criterion is not met. " +
+          'Be strict - a property in New Jersey does NOT satisfy a "New York only" requirement. ' +
+          'Provide a one-sentence reason for your decision, citing which criterion was not met if applicable. ' +
           'Respond with JSON in the format: {"decision": "yes" or "no", "reason": "your reason"}.';
       } else {
         systemPrompt =
