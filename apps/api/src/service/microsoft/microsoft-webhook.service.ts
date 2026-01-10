@@ -250,17 +250,12 @@ export class MicrosoftWebhookService {
 
     // For Microsoft emails, reply to self via Graph API to stay in thread
     if (event.source === 'microsoft' && accessToken) {
-      const success = await this.microsoftGraphService.replyToSelf(
+      await this.microsoftGraphService.replyToSelf(
         accessToken,
         event.messageId,
         recipientEmail,
         htmlEmail,
       );
-      if (success) {
-        this.logger.log(`Reply-to-self sent via Graph for ${event.messageId}`);
-      } else {
-        this.logger.error(`Failed to send Graph reply for ${event.messageId}`);
-      }
 
       // Move passed deals to folder
       if (decision.decision === 'no') {
