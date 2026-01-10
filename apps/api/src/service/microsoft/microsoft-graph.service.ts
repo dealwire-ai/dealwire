@@ -244,6 +244,96 @@ export class MicrosoftGraphService {
   }
 
   /**
+   * Get or create a mail folder by name
+   * Returns the folder ID
+   */
+  async getOrCreateFolder(
+    accessToken: string,
+    folderName: string,
+  ): Promise<string | null> {
+    try {
+      // First, try to find the folder
+      const searchResponse = await fetch(
+        `${GRAPH_BASE_URL}/me/mailFolders?$filter=displayName eq '${encodeURIComponent(folderName)}'`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+
+      if (searchResponse.ok) {
+        const data = await searchResponse.json();
+        if (data.value && data.value.length > 0) {
+          this.logger.debug(`Found existing folder: ${folderName}`);
+          return data.value[0].id;
+        }
+      }
+
+      // Folder doesn't exist, create it
+      const createResponse = await fetch(`${GRAPH_BASE_URL}/me/mailFolders`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ displayName: folderName }),
+      });
+
+      if (!createResponse.ok) {
+        const errorText = await createResponse.text();
+        this.logger.error(`Failed to create folder ${folderName}: ${createResponse.status} - ${errorText}`);
+        return null;
+      }
+
+      const folder = await createResponse.json();
+      this.logger.log(`Created folder: ${folderName} (${folder.id})`);
+      return folder.id;
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Error getting/creating folder ${folderName}: ${msg}`);
+      return null;
+    }
+  }
+
+  /**
+   * Move a message to a specific folder
+   */
+  async moveMessage(
+    accessToken: string,
+    messageId: string,
+    folderId: string,
+  ): Promise<boolean> {
+    try {
+      const response = await fetch(
+        `${GRAPH_BASE_URL}/me/messages/${messageId}/move`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ destinationId: folderId }),
+        },
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        this.logger.error(`Failed to move message ${messageId}: ${response.status} - ${errorText}`);
+        return false;
+      }
+
+      this.logger.log(`Moved message ${messageId} to folder ${folderId}`);
+      return true;
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Error moving message ${messageId}: ${msg}`);
+      return false;
+    }
+  }
+
+  /**
    * Convert a Microsoft Graph message to our NormalizedEmailEvent format
    */
   async toNormalizedEvent(
