@@ -334,6 +334,21 @@ export class MicrosoftGraphService {
   }
 
   /**
+   * Move a message to a "passed deals" folder (gets or creates folder first)
+   */
+  async moveMessageToPassedFolder(
+    accessToken: string,
+    messageId: string,
+    folderName: string,
+  ): Promise<boolean> {
+    const folderId = await this.getOrCreateFolder(accessToken, folderName);
+    if (!folderId) {
+      return false;
+    }
+    return this.moveMessage(accessToken, messageId, folderId);
+  }
+
+  /**
    * Convert a Microsoft Graph message to our NormalizedEmailEvent format
    */
   async toNormalizedEvent(

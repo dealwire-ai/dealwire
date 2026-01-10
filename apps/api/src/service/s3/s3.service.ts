@@ -1,0 +1,84 @@
+import { Injectable, Logger } from '@nestjs/common';
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { s3Config } from '../../config/s3.config';
+
+@Injectable()
+export class S3Service {
+  private readonly logger = new Logger(S3Service.name);
+  private readonly config = s3Config();
+  private readonly s3Client: S3Client;
+
+  constructor() {
+    if (!this.config.accessKeyId || !this.config.secretAccessKey) {
+      this.logger.warn('AWS credentials not configured - S3 uploads will fail');
+    }
+
+    this.s3Client = new S3Client({
+      region: this.config.region,
+      credentials: {
+        accessKeyId: this.config.accessKeyId,
+        secretAccessKey: this.config.secretAccessKey,
+      },
+    });
+  }
+
+  /**
+   * Upload a file to S3 and return the S3 key
+   * @param buffer File content
+   * @param filename Original filename
+   * @param dealId Deal ID for organizing files
+   * @returns S3 key (path) where file was stored
+   */
+  async uploadDealAttachment(
+    buffer: Buffer,
+    filename: string,
+    dealId: string,
+  ): Promise<string> {
+    if (!this.config.dealAttachmentsBucket) {
+      throw new Error('AWS_DEAL_ATTACHMENTS_S3_BUCKET_NAME not configured');
+    }
+
+    // Generate S3 key: deals/{dealId}/{timestamp}-{filename}
+    const timestamp = Date.now();
+    const sanitizedFilename = filename.replace(/[^a-zA-Z0-9.-]/g, '_');
+    const s3Key = `deals/${dealId}/${timestamp}-${sanitizedFilename}`;
+
+    try {
+      await this.s3Client.send(
+        new PutObjectCommand({
+          Bucket: this.config.dealAttachmentsBucket,
+          Key: s3Key,
+          Body: buffer,
+          ContentType: this.getContentType(filename),
+        }),
+      );
+
+      this.logger.log(`Uploaded ${filename} to S3: ${s3Key}`);
+      return s3Key;
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Failed to upload ${filename} to S3: ${msg}`);
+      throw new Error(`S3 upload failed: ${msg}`);
+    }
+  }
+
+  /**
+   * Get content type from filename extension
+   */
+  private getContentType(filename: string): string {
+    const ext = filename.toLowerCase().split('.').pop();
+    const contentTypes: Record<string, string> = {
+      pdf: 'application/pdf',
+      jpg: 'image/jpeg',
+      jpeg: 'image/jpeg',
+      png: 'image/png',
+      gif: 'image/gif',
+      txt: 'text/plain',
+      doc: 'application/msword',
+      docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      xls: 'application/vnd.ms-excel',
+      xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    };
+    return contentTypes[ext || ''] || 'application/octet-stream';
+  }
+}
