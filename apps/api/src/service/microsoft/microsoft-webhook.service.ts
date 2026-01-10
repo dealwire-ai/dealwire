@@ -4,7 +4,10 @@ import { MicrosoftSubscriptionService } from './microsoft-subscription.service';
 import { EmailProcessingService } from '../email/email-processing.service';
 import { EmailSenderService } from '../email/email-sender.service';
 import { EmailTemplateService } from '../email/email-template.service';
-import { ClientPreferencesService } from '../preferences/client-preferences.service';
+import {
+  ClientPreferencesService,
+  DEFAULT_PASSED_FOLDER,
+} from '../preferences/client-preferences.service';
 import { DealSummaryService } from '../ai/deal-summary.service';
 import { DealDecisionService } from '../ai/deal-decision.service';
 import { DealDetectionService } from '../ai/deal-detection.service';
@@ -258,6 +261,24 @@ export class MicrosoftWebhookService {
       } else {
         this.logger.error(`Failed to send Graph reply for ${event.messageId}`);
       }
+
+      // Move passed deals to folder
+      if (decision.decision === 'no') {
+        const folderName = clientPrefs.passedFolderName || DEFAULT_PASSED_FOLDER;
+        const folderId = await this.microsoftGraphService.getOrCreateFolder(
+          accessToken,
+          folderName,
+        );
+        if (folderId) {
+          await this.microsoftGraphService.moveMessage(
+            accessToken,
+            event.messageId,
+            folderId,
+          );
+          this.logger.log(`Moved passed deal to folder: ${folderName}`);
+        }
+      }
+
       return;
     }
 
