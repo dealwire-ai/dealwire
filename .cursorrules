@@ -1,28 +1,215 @@
-# Analyzer - Monorepo Architecture
+# Analyzer - AI-Powered Real Estate Deal Analysis Platform
 
-## Structure
+## Overview
+Analyzer is a monorepo that provides automated real estate deal analysis. When users connect their Microsoft Outlook account, the system monitors their inbox for deal-related emails (teasers, offering memorandums, etc.), extracts and analyzes the content using AI, and replies with a structured summary and go/no-go decision based on client-specific criteria.
+
+## Architecture
+
+### Monorepo Structure
 - `apps/web` - Next.js 16 frontend (React 19, Tailwind 4)
 - `apps/api` - NestJS 11 backend
 
-## Commands (from root)
+### Commands (from root)
 - `pnpm dev` - Run both frontend and backend
 - `pnpm build` - Build both apps
 
-## Ports
+### Ports
 - Frontend: http://localhost:3000
 - Backend: http://localhost:3001
 
-## Deployment
+### Deployment
 - Frontend: Vercel (root dir: apps/web)
-- Backend: Railway (root dir: apps/api)
+- Backend: Railway (root dir: apps/api, uses Dockerfile)
 
-## Package naming
+### Package naming
 - Frontend: `@analyzer/web`
 - Backend: `@analyzer/api`
 
-## Email Processing Flow
-1. Resend webhook (`/webhooks/resend`) receives `email.received` event
-2. `EmailProcessingService.extractAllText()` - pulls email body + downloads/OCRs PDF attachments
-3. `DealSummaryService.summarizeDeal()` - AI summarizes deal using client's criteria from `preferences.json`
-4. `DealDecisionService.makeDecision()` - AI returns pass/fail/maybe + reasoning
-5. `EmailTemplateService` formats HTML response, `EmailSenderService` sends reply to original sender
+---
+
+## Backend Architecture (`apps/api`)
+
+### Core Email Processing Flow
+
+1. **Microsoft Graph Webhook** (`/webhooks/microsoft`)
+   - Receives `email.received` notifications from Microsoft Graph
+   - Validates subscription and clientState for security
+
+2. **Deal Detection** (`DealDetectionService`)
+   - Quick AI classification using `gpt-4o-mini`
+   - Determines if email is about a real estate deal (teaser, OM, acquisition opportunity)
+   - Skips non-deal emails to save processing resources
+
+3. **Email Processing** (`EmailProcessingService`)
+   - Extracts text from email body
+   - Downloads and OCRs PDF attachments using `pdf-parse`
+   - Combines all text for analysis
+
+4. **Deal Summary** (`DealSummaryService`)
+   - Uses AI to generate structured summary of the deal
+   - Extracts key metrics: price, cap rate, NOI, location, property type, etc.
+   - Applies client-specific criteria for emphasis
+
+5. **Deal Decision** (`DealDecisionService`)
+   - AI evaluates deal against client's HARD REQUIREMENTS
+   - Returns yes/no decision with reasoning
+   - Criteria are non-negotiable (e.g., "New York only" means NJ = automatic no)
+
+6. **Reply via Graph** (`MicrosoftGraphService.replyToSelf`)
+   - Creates reply draft, sets recipient to user's own email
+   - Sends reply in same conversation thread
+   - Prevents infinite loops by skipping self-sent emails
+
+7. **Folder Organization**
+   - "No" decisions: email is moved to configurable folder (default: "Passed Deals")
+   - "Yes" decisions: email stays in inbox with analysis reply
+
+---
+
+## Key Services
+
+### Microsoft Module (`src/module/microsoft.module.ts`)
+
+| Service | Purpose |
+|---------|---------|
+| `MicrosoftGraphService` | Microsoft Graph API calls: get messages, attachments, create/send replies, manage folders |
+| `MicrosoftSubscriptionService` | Create/renew/delete Graph subscriptions, stored in DB |
+| `MicrosoftWebhookService` | Handle incoming Graph notifications, orchestrate processing pipeline |
+| `MicrosoftSchedulerService` | Cron job (every 12 hours) to renew expiring subscriptions |
+
+### AI Module (`src/module/ai.module.ts`)
+
+| Service | Purpose |
+|---------|---------|
+| `DealDetectionService` | Quick deal vs. non-deal classification |
+| `DealSummaryService` | Generate structured deal summary |
+| `DealDecisionService` | Yes/no decision based on client criteria |
+
+### Email Module (`src/module/email.module.ts`)
+
+| Service | Purpose |
+|---------|---------|
+| `EmailProcessingService` | Extract text from emails and PDFs |
+| `EmailSenderService` | Send emails via Resend (fallback, not primary) |
+| `EmailTemplateService` | Format HTML email with branding |
+
+### Webhook Module (`src/module/webhook.module.ts`)
+
+| Controller | Purpose |
+|------------|---------|
+| `ClerkWebhookController` | Handle Clerk user lifecycle events |
+| `MicrosoftWebhookController` | Handle Microsoft Graph notifications |
+| `ResendWebhookController` | Handle Resend email events (legacy) |
+
+### Other Services
+
+| Service | Purpose |
+|---------|---------|
+| `ClerkWebhookService` | User creation → create Graph subscription; User deletion → cleanup |
+| `ClientPreferencesService` | Load client preferences from `src/data/preferences.json` |
+| `PrismaService` | Database access (PostgreSQL via Supabase) |
+
+---
+
+## Client Preferences (`src/data/preferences.json`)
+
+JSON file mapping user emails to their preferences:
+
+```json
+{
+  "user@example.com": {
+    "deal_criteria": "I only want deals in New York state.",
+    "logo_url": "https://...",
+    "company_name": "Acme Investments",
+    "brand_color": "#2A4A7C",
+    "passedFolderName": "Passed Deals"
+  },
+  "_default": {
+    "deal_criteria": null,
+    ...
+  }
+}
+```
+
+**Note:** JSON uses snake_case keys, service converts to camelCase.
+
+---
+
+## Database Schema (Prisma)
+
+### User
+- `id` (Clerk user ID)
+- `email`
+- `firstName`, `lastName`
+- Timestamps
+
+### MicrosoftSubscription
+- Links user to their Graph subscription
+- Stores `subscriptionId`, `resource`, `expiresAt`
+- Used for renewal cron job
+
+---
+
+## Environment Variables
+
+### Required for API
+
+| Variable | Purpose |
+|----------|---------|
+| `DATABASE_URL` | PostgreSQL connection (Supabase pooler) |
+| `DIRECT_URL` | Direct PostgreSQL connection (for migrations) |
+| `CLERK_SECRET_KEY` | Clerk backend SDK |
+| `CLERK_WEBHOOK_SECRET` | Verify Clerk webhooks |
+| `OPENAI_API_KEY` | AI services |
+| `RESEND_API_KEY` | Email sending (fallback) |
+| `API_BASE_URL` | Production URL (https://deals.frontstep.ai) |
+| `MICROSOFT_WEBHOOK_SECRET` | Graph webhook clientState validation |
+
+---
+
+## External Integrations
+
+### Microsoft Graph API
+- Permissions needed: `Mail.ReadWrite` (delegated)
+- Webhook subscription resource: `me/mailFolders('Inbox')/messages`
+- Subscriptions expire after ~3 days, renewed automatically
+
+### Clerk
+- OAuth provider for Microsoft login
+- Backend SDK used to fetch user's Microsoft access token
+- Webhooks for user lifecycle events
+
+### OpenAI
+- Model: `gpt-4o-mini` (configurable)
+- Temperature: 0 (deterministic)
+- Used for deal detection, summarization, and decision-making
+
+---
+
+## Important Patterns
+
+### Preventing Infinite Loops
+- `MicrosoftWebhookService` checks if email sender = inbox owner
+- If so, skips processing (it's our own reply-to-self)
+
+### Deduplication
+- In-memory cache of processed message IDs
+- Prevents duplicate processing from Graph notification retries
+
+### Error Resilience
+- Subscription operations wrapped in try/catch
+- Failed operations logged but don't crash user creation flow
+
+### Orphaned Subscription Cleanup
+- Before creating new subscription, lists existing ones
+- Deletes any that aren't in our database (stale from previous deploys)
+
+---
+
+## Development Tips
+
+1. **Testing email flow**: Send email to user's Outlook, watch Railway logs
+2. **Preferences not loading?**: Check snake_case vs camelCase mapping
+3. **Subscription not working?**: Verify `API_BASE_URL` is HTTPS
+4. **Replies not threaded?**: Must use Graph API's `createReply` endpoint
+5. **Migrations**: Run manually or deploy triggers `prisma migrate deploy`
