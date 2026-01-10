@@ -8,17 +8,18 @@ datasource db {
 }
 
 model User {
-  id             String   @id
-  email          String   @unique
+  id             String        @id
+  email          String        @unique
   firstName      String?
   lastName       String?
   imageUrl       String?
   organizationId String?
   organization   Organization? @relation(fields: [organizationId], references: [id])
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
 
   microsoftSubscription MicrosoftSubscription?
+  receivedDeals         Deal[]                 @relation("ReceivedDeals")
 }
 
 model Organization {
@@ -27,6 +28,7 @@ model Organization {
   slug      String?  @unique
   imageUrl  String?
   users     User[]
+  deals     Deal[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -35,7 +37,7 @@ model MicrosoftSubscription {
   id             String   @id @default(cuid())
   userId         String   @unique
   subscriptionId String   @unique // Graph subscription ID
-  resource       String   // e.g. "me/mailFolders('Inbox')/messages"
+  resource       String // e.g. "me/mailFolders('Inbox')/messages"
   expiresAt      DateTime
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
@@ -43,7 +45,75 @@ model MicrosoftSubscription {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+// ============================================
+// DEAL - An acquisition opportunity
+// ============================================
+model Deal {
+  id String @id @default(cuid())
 
+  // Belongs to an org (team can all see it)
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
 
+  // Which user's inbox did this come from?
+  receivedByUserId String?
+  receivedByUser   User?   @relation("ReceivedDeals", fields: [receivedByUserId], references: [id])
 
+  // Source email info
+  sourceMessageId  String?   @unique // Microsoft Graph message ID
+  sourceFrom       String? // Who sent it
+  sourceSubject    String?
+  sourceReceivedAt DateTime?
 
+  // Initial Screening (inline for now)
+  initialScreeningDecision Decision?
+  initialScreeningSummary  String?   @db.Text
+  initialScreeningAt       DateTime?
+
+  // Relationships
+  asset     Asset?     @relation(fields: [assetId], references: [id])
+  assetId   String?
+  documents Document[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Decision {
+  YES
+  NO
+}
+
+// ============================================
+// ASSET - The thing being acquired
+// ============================================
+model Asset {
+  id String @id @default(cuid())
+
+  address String?
+  city    String?
+  state   String?
+  country String? @default("USA")
+
+  deals     Deal[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ============================================
+// DOCUMENT - Any file attached to a deal
+// ============================================
+model Document {
+  id     String @id @default(cuid())
+  dealId String
+  deal   Deal   @relation(fields: [dealId], references: [id], onDelete: Cascade)
+
+  filename    String
+  contentType String
+  sizeBytes   Int?
+
+  s3Key         String?
+  extractedText String? @db.Text
+
+  createdAt DateTime @default(now())
+}
