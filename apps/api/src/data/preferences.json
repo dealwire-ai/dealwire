@@ -9,7 +9,8 @@
     "deal_criteria": "I only want to look at deals that are in the state of New York.",
     "logo_url": "https://cdn.prod.website-files.com/64b15c6db22487552ddf04a6/64b15c6db22487552ddf06b9_HREA_Logo.png",
     "company_name": "Hildreth Real Estate Advisors",
-    "brand_color": "#2A4A7C"
+    "brand_color": "#2A4A7C",
+    "passedFolderName": "Passed Deals"
   },
   "isaac@frontstep.ai": {
     "deal_criteria": "I only want to look at deals that are in the state of New York.",
@@ -22,6 +23,13 @@
     "logo_url": "https://cdn.prod.website-files.com/64b15c6db22487552ddf04a6/64b15c6db22487552ddf06b9_HREA_Logo.png",
     "company_name": "Hildreth Real Estate Advisors",
     "brand_color": "#2A4A7C"
+  },
+  "placeholder@jkequities.com": {
+    "deal_criteria": "Geography: Eastern seaboard, Southeast, Midwest. Target markets: New York City Proper, New York Metro Area, New England near major metro areas, Chicago (Downtown) or near North Suburbs, Virginia (Richmond Metro, Hampton Roads), Carolinas. Asset Types: Residential development and redevelopment including Multifamily, Condominiums, Build-to-Rent, Office to Residential conversions, Industrial to Residential conversions. Multifamily cash flowing assets. Build to Rent (development, existing cash flowing, or bulk SFR purchase). Industrial opportunistic cash flowing assets. Development sites including covered land. Size: Up to $100 MM total capitalization.",
+    "logo_url": null,
+    "company_name": "JK Equities",
+    "brand_color": null,
+    "passedFolderName": "Passed Deals"
   },
   "_default": {
     "deal_criteria": null,
