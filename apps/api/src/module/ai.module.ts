@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { DealSummaryService } from '../service/ai/deal-summary.service';
-import { DealDecisionService } from '../service/ai/deal-decision.service';
-import { DealDetectionService } from '../service/ai/deal-detection.service';
+import { DealSummaryService } from '../service/deal/deal-summary.service';
+import { DealDecisionService } from '../service/deal/deal-decision.service';
+import { DealDetectionService } from '../service/deal/deal-detection.service';
 
 @Module({
   providers: [DealSummaryService, DealDecisionService, DealDetectionService],

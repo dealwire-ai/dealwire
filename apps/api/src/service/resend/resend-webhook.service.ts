@@ -3,8 +3,8 @@ import { EmailProcessingService } from '../email/email-processing.service';
 import { EmailSenderService } from '../email/email-sender.service';
 import { EmailTemplateService } from '../email/email-template.service';
 import { ClientPreferencesService } from '../preferences/client-preferences.service';
-import { DealSummaryService } from '../ai/deal-summary.service';
-import { DealDecisionService } from '../ai/deal-decision.service';
+import { DealSummaryService } from '../deal/deal-summary.service';
+import { DealDecisionService } from '../deal/deal-decision.service';
 
 @Injectable()
 export class ResendWebhookService {
