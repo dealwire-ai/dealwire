@@ -7,7 +7,11 @@ export interface ClientPreferences {
   logoUrl?: string;
   companyName?: string;
   brandColor?: string;
+  /** Folder name for passed/rejected deals (default: "Passed Deals") */
+  passedFolderName?: string;
 }
+
+export const DEFAULT_PASSED_FOLDER = 'Passed Deals';
 
 @Injectable()
 export class ClientPreferencesService {
