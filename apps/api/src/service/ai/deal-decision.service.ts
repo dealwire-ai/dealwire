@@ -19,6 +19,10 @@ export class DealDecisionService {
     summary: string,
     dealCriteria?: string,
   ): Promise<DealDecision> {
+    this.logger.log(
+      `Making decision with criteria: ${dealCriteria ? `"${dealCriteria.slice(0, 100)}..."` : 'NONE (using generic evaluation)'}`,
+    );
+
     try {
       // Build prompt based on whether criteria is provided
       let systemPrompt: string;
