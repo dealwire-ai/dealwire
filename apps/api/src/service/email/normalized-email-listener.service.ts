@@ -34,6 +34,8 @@ export class NormalizedEmailListenerService {
     try {
       const queuedMessage: QueuedEmailMessage = JSON.parse(message.Body);
 
+      this.logger.log(`Received message: ${JSON.stringify(queuedMessage)}`);
+
       // Validate required fields
       if (!queuedMessage.event || !queuedMessage.inboxOwnerEmail) {
         this.logger.warn('Invalid message format, skipping');
