@@ -1,3 +1,6 @@
+// MUST be first import - initializes OTEL before NestJS
+import './instrumentation';
+
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { json } from 'express';
@@ -23,6 +26,7 @@ async function bootstrap() {
   await app.listen(port, '0.0.0.0');
 
   console.log(`🚀 API running on port ${port}`);
+  console.log(`📊 Metrics available at http://localhost:9464/metrics`);
 }
 
 bootstrap().catch((err) => {
