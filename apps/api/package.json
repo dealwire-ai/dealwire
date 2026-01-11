@@ -12,16 +12,23 @@
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:push": "prisma db push",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:integration": "jest --testPathPatterns=integration",
+    "test:localstack:up": "docker compose -f docker-compose.test.yml up -d",
+    "test:localstack:down": "docker compose -f docker-compose.test.yml down"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.966.0",
+    "@aws-sdk/client-sqs": "^3.966.0",
     "@clerk/backend": "^2.29.0",
     "@nestjs/common": "^11.0.1",
     "@nestjs/core": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/schedule": "^6.1.0",
     "@prisma/client": "^6.1.0",
+    "@ssut/nestjs-sqs": "^3.0.1",
     "@types/cheerio": "^1.0.0",
     "cheerio": "^1.1.2",
     "express": "^5.2.1",
@@ -67,15 +74,21 @@
       "json",
       "ts"
     ],
-    "rootDir": "src",
-    "testRegex": ".*\\.spec\\.ts$",
+    "rootDir": ".",
+    "testMatch": [
+      "**/*.spec.ts",
+      "**/test/**/*.spec.ts"
+    ],
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "collectCoverageFrom": [
-      "**/*.(t|j)s"
+      "src/**/*.(t|j)s"
     ],
-    "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "coverageDirectory": "coverage",
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "^src/(.*)$": "<rootDir>/src/$1"
+    }
   }
 }

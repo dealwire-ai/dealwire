@@ -5,9 +5,10 @@ import { AppService } from './service/app.service';
 import { PrismaModule } from './module/prisma.module';
 import { WebhookModule } from './module/webhook.module';
 import { MetricsModule } from './module/metrics.module';
+import { EmailProcessorModule } from './module/email-processor.module';
 
 @Module({
-  imports: [PrismaModule, WebhookModule, MetricsModule],
+  imports: [PrismaModule, WebhookModule, MetricsModule, EmailProcessorModule],
   controllers: [AppController, MetricsController],
   providers: [AppService],
 })

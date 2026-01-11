@@ -7,9 +7,9 @@ import { ClientPreferencesService } from '../preferences/client-preferences.serv
 import { DealSummaryService } from '../deal/deal-summary.service';
 import { DealDecisionService } from '../deal/deal-decision.service';
 import { DealDetectionService } from '../deal/deal-detection.service';
+import { MetricsService } from '../metrics/metrics.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { S3Service } from '../s3/s3.service';
-import { MetricsService } from '../metrics/metrics.service';
 import { NormalizedEmailEvent } from '../../dto/normalized-email-event.dto';
 
 // Mock marked module to avoid ES module issues
@@ -109,7 +109,6 @@ describe('EmailProcessorService', () => {
             recordDealSkipped: jest.fn(),
             recordDealProcessed: jest.fn(),
             recordProcessingError: jest.fn(),
-            recordEmailReceived: jest.fn(),
           },
         },
       ],
