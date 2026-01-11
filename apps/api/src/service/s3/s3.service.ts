@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
 import { s3Config } from '../../config/s3.config';
 
 @Injectable()
@@ -59,6 +59,44 @@ export class S3Service {
       const msg = error instanceof Error ? error.message : String(error);
       this.logger.error(`Failed to upload ${filename} to S3: ${msg}`);
       throw new Error(`S3 upload failed: ${msg}`);
+    }
+  }
+
+  /**
+   * Download a file from S3 by its key
+   * @param s3Key S3 key (path) of the file
+   * @returns File content as Buffer
+   */
+  async downloadDealAttachment(s3Key: string): Promise<Buffer> {
+    if (!this.config.dealAttachmentsBucket) {
+      throw new Error('AWS_DEAL_ATTACHMENTS_S3_BUCKET_NAME not configured');
+    }
+
+    try {
+      const response = await this.s3Client.send(
+        new GetObjectCommand({
+          Bucket: this.config.dealAttachmentsBucket,
+          Key: s3Key,
+        }),
+      );
+
+      if (!response.Body) {
+        throw new Error(`No content found for S3 key: ${s3Key}`);
+      }
+
+      // Convert stream to Buffer
+      const chunks: Uint8Array[] = [];
+      for await (const chunk of response.Body as any) {
+        chunks.push(chunk);
+      }
+      const buffer = Buffer.concat(chunks);
+
+      this.logger.debug(`Downloaded ${s3Key} from S3 (${buffer.length} bytes)`);
+      return buffer;
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Failed to download ${s3Key} from S3: ${msg}`);
+      throw new Error(`S3 download failed: ${msg}`);
     }
   }
 

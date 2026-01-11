@@ -12,6 +12,7 @@ interface QueuedEmailMessage {
   inboxOwnerEmail: string;
   receivedByUserId?: string;
   organizationId?: string;
+  dealId?: string; // Pre-generated dealId for S3 organization
 }
 
 @Injectable()
@@ -70,6 +71,7 @@ export class NormalizedEmailListenerService {
         inboxOwnerEmail: queuedMessage.inboxOwnerEmail,
         receivedByUserId: queuedMessage.receivedByUserId,
         organizationId,
+        dealId: queuedMessage.dealId, // Pre-generated dealId for S3 organization
       };
 
       await this.emailProcessor.process(ctx);
