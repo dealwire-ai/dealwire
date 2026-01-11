@@ -1,4 +1,5 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Res } from '@nestjs/common';
+import { Response } from 'express';
 import { AppService } from '../service/app.service';
 
 @Controller()
@@ -11,11 +12,9 @@ export class AppController {
   }
 
   @Get('health')
-  health(): { status: string; timestamp: string } {
-    return {
-      status: 'ok',
-      timestamp: new Date().toISOString(),
-    };
+  health(@Res() res: Response): void {
+    // Plain text response - more reliable for healthchecks
+    res.status(200).send('ok');
   }
 }
 
