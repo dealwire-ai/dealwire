@@ -1,9 +1,0 @@
-import { Module, Global } from '@nestjs/common';
-import { MetricsService } from '../service/metrics/metrics.service';
-
-@Global()
-@Module({
-  providers: [MetricsService],
-  exports: [MetricsService],
-})
-export class MetricsModule {}
