@@ -1,8 +1,8 @@
-import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { MicrosoftGraphService } from './microsoft-graph.service';
 import { MicrosoftSubscriptionService } from './microsoft-subscription.service';
 import { PrismaService } from '../prisma/prisma.service';
-import { DealProcessorService } from '../deal/deal-processor.service';
+import { SQSService } from '../sqs/sqs.service';
 import { MetricsService } from '../metrics/metrics.service';
 
 interface GraphNotification {
@@ -34,8 +34,7 @@ export class MicrosoftWebhookService {
     private readonly microsoftGraphService: MicrosoftGraphService,
     private readonly subscriptionService: MicrosoftSubscriptionService,
     private readonly prismaService: PrismaService,
-    @Inject(forwardRef(() => DealProcessorService))
-    private readonly dealProcessorService: DealProcessorService,
+    private readonly sqsService: SQSService,
     private readonly metricsService: MetricsService,
   ) {}
 
@@ -122,11 +121,11 @@ export class MicrosoftWebhookService {
     }
 
     this.logger.log(
-      `Processing Microsoft email: ${emailEvent.messageId} from ${emailEvent.from} to ${inboxOwner.email} - "${emailEvent.subject}"`,
+      `Enqueueing Microsoft email: ${emailEvent.messageId} from ${emailEvent.from} to ${inboxOwner.email} - "${emailEvent.subject}"`,
     );
 
-    // Delegate to deal processor
-    const result = await this.dealProcessorService.processDeal({
+    // Enqueue to SQS for async processing
+    await this.sqsService.enqueueNormalizedEmail({
       event: emailEvent,
       accessToken,
       inboxOwnerEmail: inboxOwner.email,
@@ -134,13 +133,7 @@ export class MicrosoftWebhookService {
       organizationId: inboxOwner.organizationId || undefined,
     });
 
-    if (result.processed) {
-      this.logger.log(
-        `Deal processed: ${result.dealId || 'not saved'}, decision: ${result.decision}`,
-      );
-    } else {
-      this.logger.log(`Email skipped: ${result.skippedReason}`);
-    }
+    this.logger.log(`Email enqueued: ${emailEvent.messageId}`);
   }
 
   private cleanupProcessedMessages(): void {

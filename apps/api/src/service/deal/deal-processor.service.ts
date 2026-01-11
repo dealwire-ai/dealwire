@@ -6,9 +6,9 @@ import {
   ClientPreferencesService,
   DEFAULT_PASSED_FOLDER,
 } from '../preferences/client-preferences.service';
-import { DealSummaryService } from './deal-summary.service';
-import { DealDecisionService } from './deal-decision.service';
-import { DealDetectionService } from './deal-detection.service';
+import { DealSummaryService } from '../deal/deal-summary.service';
+import { DealDecisionService } from '../deal/deal-decision.service';
+import { DealDetectionService } from '../deal/deal-detection.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { S3Service } from '../s3/s3.service';
 import { MetricsService } from '../metrics/metrics.service';
@@ -32,8 +32,8 @@ export interface ProcessDealResult {
 }
 
 @Injectable()
-export class DealProcessorService {
-  private readonly logger = new Logger(DealProcessorService.name);
+export class EmailProcessorService {
+  private readonly logger = new Logger(EmailProcessorService.name);
   private readonly aiConfig = aiConfig();
 
   constructor(
@@ -50,9 +50,9 @@ export class DealProcessorService {
   ) {}
 
   /**
-   * Process an incoming deal from any source (Microsoft, Resend, etc.)
+   * Process an incoming email from any source (Microsoft, Resend, etc.)
    */
-  async processDeal(ctx: ProcessDealContext): Promise<ProcessDealResult> {
+  async process(ctx: ProcessDealContext): Promise<ProcessDealResult> {
     const { event, accessToken, inboxOwnerEmail, receivedByUserId, organizationId } = ctx;
 
     try {

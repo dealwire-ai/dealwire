@@ -1,14 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { DealProcessorService } from './deal-processor.service';
+import { EmailProcessorService } from '../email/email-processor.service';
 import { EmailProcessingService } from '../email/email-processing.service';
 import { EmailTemplateService } from '../email/email-template.service';
 import { MicrosoftGraphService } from '../microsoft/microsoft-graph.service';
 import { ClientPreferencesService } from '../preferences/client-preferences.service';
-import { DealSummaryService } from './deal-summary.service';
-import { DealDecisionService } from './deal-decision.service';
-import { DealDetectionService } from './deal-detection.service';
+import { DealSummaryService } from '../deal/deal-summary.service';
+import { DealDecisionService } from '../deal/deal-decision.service';
+import { DealDetectionService } from '../deal/deal-detection.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { S3Service } from '../s3/s3.service';
+import { MetricsService } from '../metrics/metrics.service';
 import { NormalizedEmailEvent } from '../../dto/normalized-email-event.dto';
 
 // Mock marked module to avoid ES module issues
@@ -16,8 +17,8 @@ jest.mock('marked', () => ({
   marked: jest.fn((text: string) => text),
 }));
 
-describe('DealProcessorService', () => {
-  let service: DealProcessorService;
+describe('EmailProcessorService', () => {
+  let service: EmailProcessorService;
   let s3Service: jest.Mocked<S3Service>;
   let prismaService: jest.Mocked<PrismaService>;
   let microsoftGraphService: jest.Mocked<MicrosoftGraphService>;
@@ -28,7 +29,7 @@ describe('DealProcessorService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        DealProcessorService,
+        EmailProcessorService,
         {
           provide: EmailProcessingService,
           useValue: {
@@ -101,10 +102,20 @@ describe('DealProcessorService', () => {
             uploadDealAttachment: jest.fn(),
           },
         },
+        {
+          provide: MetricsService,
+          useValue: {
+            recordAICall: jest.fn(),
+            recordDealSkipped: jest.fn(),
+            recordDealProcessed: jest.fn(),
+            recordProcessingError: jest.fn(),
+            recordEmailReceived: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
-    service = module.get<DealProcessorService>(DealProcessorService);
+    service = module.get<EmailProcessorService>(EmailProcessorService);
     s3Service = module.get(S3Service);
     prismaService = module.get(PrismaService);
     microsoftGraphService = module.get(MicrosoftGraphService);
@@ -164,7 +175,7 @@ describe('DealProcessorService', () => {
     });
 
     // Act
-    const result = await service.processDeal(ctx);
+    const result = await service.process(ctx);
 
     // Assert
     expect(result.processed).toBe(true);
@@ -229,7 +240,7 @@ describe('DealProcessorService', () => {
     (prismaService.document.create as jest.Mock).mockResolvedValue({ id: 'doc123' });
 
     // Act
-    const result = await service.processDeal(ctx);
+    const result = await service.process(ctx);
 
     // Assert
     expect(result.processed).toBe(true);
