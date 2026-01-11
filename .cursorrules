@@ -206,6 +206,53 @@ JSON file mapping user emails to their preferences:
 
 ---
 
+## TypeScript Type Rules
+
+### Error Handling
+- **ALWAYS** type error parameters explicitly - never use implicit `any`
+- Use `error: unknown` for catch blocks and error handlers
+- Extract error messages safely:
+  ```typescript
+  catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error);
+    // handle error
+  }
+  ```
+
+### Type Safety Rules
+- Never leave parameters with implicit `any` type
+- Use `unknown` for values of uncertain type, then narrow with type guards
+- Prefer `Error` type checking: `error instanceof Error`
+- For non-Error values, use `String(error)` as fallback
+
+### Examples
+
+**✅ Good:**
+```typescript
+catch (error: unknown) {
+  const msg = error instanceof Error ? error.message : String(error);
+  this.logger.error(`Failed: ${msg}`);
+}
+
+process.on('SIGTERM', () => {
+  sdk.shutdown()
+    .catch((error: unknown) => console.error('Error', error));
+});
+```
+
+**❌ Bad:**
+```typescript
+catch (error) {  // implicit any
+  this.logger.error(`Failed: ${error.message}`);
+}
+
+.catch((error) => {  // implicit any
+  console.error('Error', error);
+});
+```
+
+---
+
 ## Development Tips
 
 1. **Testing email flow**: Send email to user's Outlook, watch Railway logs
