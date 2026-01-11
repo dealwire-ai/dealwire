@@ -11,8 +11,6 @@ import { DealDecisionService } from './deal-decision.service';
 import { DealDetectionService } from './deal-detection.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { S3Service } from '../s3/s3.service';
-import { MetricsService } from '../metrics/metrics.service';
-import { aiConfig } from '../../config/ai.config';
 import { NormalizedEmailEvent } from '../../dto/normalized-email-event.dto';
 
 export interface ProcessDealContext {
@@ -34,7 +32,6 @@ export interface ProcessDealResult {
 @Injectable()
 export class DealProcessorService {
   private readonly logger = new Logger(DealProcessorService.name);
-  private readonly aiConfig = aiConfig();
 
   constructor(
     private readonly emailProcessingService: EmailProcessingService,
@@ -46,7 +43,6 @@ export class DealProcessorService {
     private readonly dealDetectionService: DealDetectionService,
     private readonly prismaService: PrismaService,
     private readonly s3Service: S3Service,
-    private readonly metricsService: MetricsService,
   ) {}
 
   /**
@@ -55,109 +51,90 @@ export class DealProcessorService {
   async processDeal(ctx: ProcessDealContext): Promise<ProcessDealResult> {
     const { event, accessToken, inboxOwnerEmail, receivedByUserId, organizationId } = ctx;
 
-    try {
-      // Step 1: Quick deal detection
-      const detectionStart = Date.now();
-      const bodyText = event.bodyText || this.htmlToText(event.bodyHtml || '');
-      const detection = await this.dealDetectionService.isDealEmail(
-        event.subject,
-        bodyText,
-        event.attachments.length > 0,
+    // Step 1: Quick deal detection
+    const bodyText = event.bodyText || this.htmlToText(event.bodyHtml || '');
+    const detection = await this.dealDetectionService.isDealEmail(
+      event.subject,
+      bodyText,
+      event.attachments.length > 0,
+    );
+
+    if (!detection.isDeal) {
+      this.logger.log(
+        `Skipping non-deal email: ${event.messageId} - "${event.subject}" (${detection.reason})`,
       );
-      const detectionDuration = (Date.now() - detectionStart) / 1000;
-      this.metricsService.recordAICall('detection', 'gpt-4o-mini', detectionDuration, 'success');
+      return { processed: false, skippedReason: detection.reason };
+    }
 
-      if (!detection.isDeal) {
-        this.logger.log(
-          `Skipping non-deal email: ${event.messageId} - "${event.subject}" (${detection.reason})`,
-        );
-        this.metricsService.recordDealSkipped(detection.reason || 'unknown');
-        return { processed: false, skippedReason: detection.reason };
-      }
+    // Step 2: Extract text from email and attachments
+    const extractedTexts = await this.extractAllText(event, accessToken);
+    if (extractedTexts.length === 0) {
+      this.logger.log(`No text extracted from email ${event.messageId}`);
+      return { processed: false, skippedReason: 'No text extracted' };
+    }
 
-      // Step 2: Extract text from email and attachments
-      const extractedTexts = await this.extractAllText(event, accessToken);
-      if (extractedTexts.length === 0) {
-        this.logger.log(`No text extracted from email ${event.messageId}`);
-        this.metricsService.recordDealSkipped('No text extracted');
-        return { processed: false, skippedReason: 'No text extracted' };
-      }
+    const combinedText = extractedTexts.join('\n\n');
 
-      const combinedText = extractedTexts.join('\n\n');
+    // Step 3: Get client preferences
+    const clientPrefs = this.clientPreferencesService.getPreferences(inboxOwnerEmail);
 
-      // Step 3: Get client preferences
-      const clientPrefs = this.clientPreferencesService.getPreferences(inboxOwnerEmail);
+    // Step 4: Generate AI summary
+    const summary = await this.dealSummaryService.summarizeDeal(
+      combinedText,
+      clientPrefs.dealCriteria,
+    );
+    this.logger.log(`Generated summary for ${event.messageId} (${summary.length} chars)`);
 
-      // Step 4: Generate AI summary
-      const summaryStart = Date.now();
-      const summary = await this.dealSummaryService.summarizeDeal(
-        combinedText,
-        clientPrefs.dealCriteria,
+    // Step 5: Make AI decision
+    const decision = await this.dealDecisionService.makeDecision(
+      summary,
+      clientPrefs.dealCriteria,
+    );
+    this.logger.log(`Decision for ${event.messageId}: ${decision.decision} - ${decision.reason}`);
+
+    // Step 6: Save deal to database and upload attachments
+    let dealId: string | undefined;
+    if (organizationId) {
+      dealId = await this.saveDeal(ctx, summary, decision.decision as 'yes' | 'no', accessToken);
+    } else {
+      this.logger.warn(`User ${receivedByUserId} has no organization - deal will not be saved`);
+    }
+
+    // Step 7: Send reply
+    const htmlEmail = this.emailTemplateService.formatSummaryAsHtml(
+      summary,
+      decision,
+      clientPrefs.logoUrl,
+      clientPrefs.companyName,
+      clientPrefs.brandColor,
+    );
+
+    if (event.source === 'microsoft' && accessToken) {
+      await this.microsoftGraphService.replyToSelf(
+        accessToken,
+        event.messageId,
+        inboxOwnerEmail,
+        htmlEmail,
       );
-      const summaryDuration = (Date.now() - summaryStart) / 1000;
-      this.metricsService.recordAICall('summary', this.aiConfig.openaiModel, summaryDuration, 'success');
-      this.logger.log(`Generated summary for ${event.messageId} (${summary.length} chars)`);
+      this.logger.log(`Reply-to-self sent via Graph for ${event.messageId}`);
 
-      // Step 5: Make AI decision
-      const decisionStart = Date.now();
-      const decision = await this.dealDecisionService.makeDecision(
-        summary,
-        clientPrefs.dealCriteria,
-      );
-      const decisionDuration = (Date.now() - decisionStart) / 1000;
-      this.metricsService.recordAICall('decision', this.aiConfig.openaiModel, decisionDuration, 'success');
-      this.logger.log(`Decision for ${event.messageId}: ${decision.decision} - ${decision.reason}`);
-
-      // Step 6: Save deal to database and upload attachments
-      let dealId: string | undefined;
-      if (organizationId) {
-        dealId = await this.saveDeal(ctx, summary, decision.decision as 'yes' | 'no', accessToken);
-      } else {
-        this.logger.warn(`User ${receivedByUserId} has no organization - deal will not be saved`);
-      }
-
-      // Step 7: Send reply
-      const htmlEmail = this.emailTemplateService.formatSummaryAsHtml(
-        summary,
-        decision,
-        clientPrefs.logoUrl,
-        clientPrefs.companyName,
-        clientPrefs.brandColor,
-      );
-
-      if (event.source === 'microsoft' && accessToken) {
-        await this.microsoftGraphService.replyToSelf(
+      // Step 8: Move passed deals to folder
+      if (decision.decision === 'no') {
+        const folderName = clientPrefs.passedFolderName || DEFAULT_PASSED_FOLDER;
+        await this.microsoftGraphService.moveMessageToPassedFolder(
           accessToken,
           event.messageId,
-          inboxOwnerEmail,
-          htmlEmail,
+          folderName,
         );
-        this.logger.log(`Reply-to-self sent via Graph for ${event.messageId}`);
-
-        // Step 8: Move passed deals to folder
-        if (decision.decision === 'no') {
-          const folderName = clientPrefs.passedFolderName || DEFAULT_PASSED_FOLDER;
-          await this.microsoftGraphService.moveMessageToPassedFolder(
-            accessToken,
-            event.messageId,
-            folderName,
-          );
-        }
       }
-
-      this.metricsService.recordDealProcessed(decision.decision as 'yes' | 'no', event.source);
-
-      return {
-        processed: true,
-        dealId,
-        decision: decision.decision as 'yes' | 'no',
-        reason: decision.reason,
-      };
-    } catch (error) {
-      const errorType = error instanceof Error ? error.constructor.name : 'Unknown';
-      this.metricsService.recordProcessingError(errorType, 'processing');
-      throw error;
     }
+
+    return {
+      processed: true,
+      dealId,
+      decision: decision.decision as 'yes' | 'no',
+      reason: decision.reason,
+    };
   }
 
   private async extractAllText(
