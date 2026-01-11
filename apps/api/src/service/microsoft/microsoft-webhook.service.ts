@@ -3,6 +3,7 @@ import { MicrosoftGraphService } from './microsoft-graph.service';
 import { MicrosoftSubscriptionService } from './microsoft-subscription.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { DealProcessorService } from '../deal/deal-processor.service';
+import { MetricsService } from '../metrics/metrics.service';
 
 interface GraphNotification {
   subscriptionId: string;
@@ -35,6 +36,7 @@ export class MicrosoftWebhookService {
     private readonly prismaService: PrismaService,
     @Inject(forwardRef(() => DealProcessorService))
     private readonly dealProcessorService: DealProcessorService,
+    private readonly metricsService: MetricsService,
   ) {}
 
   /**
@@ -52,6 +54,7 @@ export class MicrosoftWebhookService {
         continue;
       }
 
+      this.metricsService.recordEmailReceived('microsoft');
       await this.processEmailNotification(notification);
     }
   }

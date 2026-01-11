@@ -5,6 +5,7 @@ import { EmailTemplateService } from '../email/email-template.service';
 import { ClientPreferencesService } from '../preferences/client-preferences.service';
 import { DealSummaryService } from '../deal/deal-summary.service';
 import { DealDecisionService } from '../deal/deal-decision.service';
+import { MetricsService } from '../metrics/metrics.service';
 
 @Injectable()
 export class ResendWebhookService {
@@ -17,11 +18,14 @@ export class ResendWebhookService {
     private readonly clientPreferences: ClientPreferencesService,
     private readonly dealSummary: DealSummaryService,
     private readonly dealDecision: DealDecisionService,
+    private readonly metricsService: MetricsService,
   ) {}
 
   async handleEmailReceived(emailData: any): Promise<void> {
     const emailId = emailData.email_id;
     const attachmentsMetadata = emailData.attachments || [];
+
+    this.metricsService.recordEmailReceived('resend');
 
     this.logger.log(
       `Email received: ${emailId} from ${emailData.from} to ${emailData.to} - "${emailData.subject}" (${attachmentsMetadata.length} attachments)`,
