@@ -33,10 +33,7 @@ export class ClerkWebhookService {
         break;
       case 'organizationMembership.created':
       case 'organizationMembership.updated':
-        await this.addUserToOrganization(
-          data.public_user_data?.user_id,
-          data.organization?.id,
-        );
+        await this.addUserToOrganization(data);
         break;
       case 'organizationMembership.deleted':
         await this.removeUserFromOrganization(data.public_user_data?.user_id);
@@ -163,10 +160,48 @@ export class ClerkWebhookService {
     this.logger.log(`Organization deleted: ${id}`);
   }
 
-  private async addUserToOrganization(
-    userId: string,
-    organizationId: string,
-  ): Promise<void> {
+  private async addUserToOrganization(data: any): Promise<void> {
+    const userId = data.public_user_data?.user_id;
+    const organizationId = data.organization?.id;
+    const organization = data.organization;
+
+    if (!userId || !organizationId) {
+      this.logger.warn(
+        `Missing userId or organizationId in membership event: userId=${userId}, orgId=${organizationId}`,
+      );
+      return;
+    }
+
+    // Ensure organization exists first (race condition: membership.created can fire before organization.created)
+    if (organization) {
+      await this.prisma.organization.upsert({
+        where: { id: organizationId },
+        update: {
+          name: organization.name,
+          slug: organization.slug,
+          imageUrl: organization.image_url,
+        },
+        create: {
+          id: organizationId,
+          name: organization.name,
+          slug: organization.slug,
+          imageUrl: organization.image_url,
+        },
+      });
+    }
+
+    // Ensure user exists before updating
+    const userExists = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!userExists) {
+      this.logger.warn(
+        `User ${userId} does not exist, cannot add to organization ${organizationId}`,
+      );
+      return;
+    }
+
     await this.prisma.user.update({
       where: { id: userId },
       data: { organizationId },
