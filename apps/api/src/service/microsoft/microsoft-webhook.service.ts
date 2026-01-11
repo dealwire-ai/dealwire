@@ -3,6 +3,7 @@ import { MicrosoftGraphService } from './microsoft-graph.service';
 import { MicrosoftSubscriptionService } from './microsoft-subscription.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { SQSService } from '../sqs/sqs.service';
+import { S3Service } from '../s3/s3.service';
 import { MetricsService } from '../metrics/metrics.service';
 
 interface GraphNotification {
@@ -35,6 +36,7 @@ export class MicrosoftWebhookService {
     private readonly subscriptionService: MicrosoftSubscriptionService,
     private readonly prismaService: PrismaService,
     private readonly sqsService: SQSService,
+    private readonly s3Service: S3Service,
     private readonly metricsService: MetricsService,
   ) {}
 
@@ -121,19 +123,86 @@ export class MicrosoftWebhookService {
     }
 
     this.logger.log(
+      `Processing Microsoft email: ${emailEvent.messageId} from ${emailEvent.from} to ${inboxOwner.email} - "${emailEvent.subject}"`,
+    );
+
+    // Generate a dealId UUID for S3 organization (will be used when creating Deal record)
+    // This ensures attachments are organized correctly even before Deal is created
+    const dealId = this.generateDealId();
+
+    // Upload attachments to S3 before enqueueing
+    // This decouples processing from Microsoft Graph API
+    if (emailEvent.attachments.length > 0) {
+      await this.uploadAttachmentsToS3(emailEvent, accessToken, dealId);
+    }
+
+    this.logger.log(
       `Enqueueing Microsoft email: ${emailEvent.messageId} from ${emailEvent.from} to ${inboxOwner.email} - "${emailEvent.subject}"`,
     );
 
-    // Enqueue to SQS for async processing
+    // Enqueue to SQS for async processing (attachments already in S3)
     await this.sqsService.enqueueNormalizedEmail({
       event: emailEvent,
       accessToken,
       inboxOwnerEmail: inboxOwner.email,
       receivedByUserId: userId,
       organizationId: inboxOwner.organizationId || undefined,
+      dealId, // Pre-generated dealId for S3 organization
     });
 
     this.logger.log(`Email enqueued: ${emailEvent.messageId}`);
+  }
+
+  /**
+   * Generate a dealId (cuid format, like Prisma's default)
+   */
+  private generateDealId(): string {
+    // Simple cuid-like generator (or use a library)
+    // For now, use timestamp + random to create a unique ID
+    const timestamp = Date.now().toString(36);
+    const random = Math.random().toString(36).substring(2, 10);
+    return `deal_${timestamp}_${random}`;
+  }
+
+  /**
+   * Download attachments from Microsoft Graph and upload to S3
+   * Updates emailEvent.attachments with s3Key for each attachment
+   */
+  private async uploadAttachmentsToS3(
+    emailEvent: { messageId: string; attachments: Array<{ contentId: string; filename: string; s3Key?: string }> },
+    accessToken: string,
+    dealId: string,
+  ): Promise<void> {
+    for (const att of emailEvent.attachments) {
+      try {
+        // Download attachment content from Microsoft Graph
+        const content = await this.microsoftGraphService.getAttachmentContent(
+          accessToken,
+          emailEvent.messageId,
+          att.contentId,
+        );
+
+        if (!content) {
+          this.logger.warn(`Failed to download attachment ${att.filename}, skipping S3 upload`);
+          continue;
+        }
+
+        // Upload to S3 using pre-generated dealId
+        const s3Key = await this.s3Service.uploadDealAttachment(
+          content,
+          att.filename,
+          dealId,
+        );
+
+        // Update attachment with S3 key
+        att.s3Key = s3Key;
+        this.logger.log(`Uploaded attachment ${att.filename} to S3: ${s3Key}`);
+      } catch (error) {
+        const msg = error instanceof Error ? error.message : String(error);
+        this.logger.error(`Failed to upload attachment ${att.filename} to S3: ${msg}`);
+        // Continue with other attachments even if one fails
+      }
+    }
   }
 
   private cleanupProcessedMessages(): void {

@@ -6,6 +6,8 @@ export interface NormalizedEmailAttachment {
   size?: number;
   /** For Resend: download URL. For Microsoft: attachment ID */
   contentId: string;
+  /** S3 key where attachment is stored (if already uploaded) */
+  s3Key?: string;
 }
 
 export interface NormalizedEmailEvent {

@@ -21,6 +21,7 @@ export interface ProcessDealContext {
   inboxOwnerEmail: string;
   receivedByUserId?: string;
   organizationId?: string;
+  dealId?: string; // Pre-generated dealId for S3 organization
 }
 
 export interface ProcessDealResult {
@@ -172,15 +173,31 @@ export class EmailProcessorService {
       texts.push(`--- Email Body ---\n${bodyText}`);
     }
 
-    // PDF attachments (Microsoft source only for now)
-    if (event.source === 'microsoft' && accessToken && event.attachments.length > 0) {
+    // Process attachments (prefer S3, fallback to Microsoft Graph)
+    if (event.attachments.length > 0) {
       for (const att of event.attachments) {
         if (att.contentType === 'application/pdf' || att.filename.toLowerCase().endsWith('.pdf')) {
-          const content = await this.microsoftGraphService.getAttachmentContent(
-            accessToken,
-            event.messageId,
-            att.contentId,
-          );
+          let content: Buffer | null = null;
+
+          // Prefer S3 if available (already uploaded)
+          if (att.s3Key) {
+            try {
+              content = await this.s3Service.downloadDealAttachment(att.s3Key);
+            } catch (error) {
+              const msg = error instanceof Error ? error.message : String(error);
+              this.logger.warn(`Failed to download ${att.filename} from S3 (${att.s3Key}): ${msg}, falling back to Graph API`);
+            }
+          }
+
+          // Fallback to Microsoft Graph if S3 not available
+          if (!content && event.source === 'microsoft' && accessToken) {
+            content = await this.microsoftGraphService.getAttachmentContent(
+              accessToken,
+              event.messageId,
+              att.contentId,
+            );
+          }
+
           if (content) {
             const text = await this.emailProcessingService.processPdfBuffer(content);
             if (text) {
@@ -200,12 +217,13 @@ export class EmailProcessorService {
     decision: 'yes' | 'no',
     accessToken?: string,
   ): Promise<string | undefined> {
-    const { event, organizationId, receivedByUserId } = ctx;
+    const { event, organizationId, receivedByUserId, dealId } = ctx;
 
     try {
-      // Step 1: Create deal first (to get dealId)
+      // Step 1: Create deal (use pre-generated dealId if provided, otherwise Prisma generates one)
       const savedDeal = await this.prismaService.deal.create({
         data: {
+          id: dealId, // Use pre-generated dealId from webhook (for S3 organization)
           organizationId: organizationId!,
           receivedByUserId,
           sourceMessageId: event.messageId,
@@ -220,23 +238,9 @@ export class EmailProcessorService {
       });
       this.logger.log(`Deal saved: ${savedDeal.id}`);
 
-      // Step 2: Upload attachments to S3 and create Document records
-      if (event.attachments.length > 0 && event.source === 'microsoft' && accessToken) {
-        await this.uploadAttachmentsAndCreateDocuments(
-          savedDeal.id,
-          event,
-          accessToken,
-        );
-      } else if (event.attachments.length > 0) {
-        // Create Document records without S3 (for non-Microsoft sources or missing token)
-        await this.prismaService.document.createMany({
-          data: event.attachments.map((att) => ({
-            dealId: savedDeal.id,
-            filename: att.filename,
-            contentType: att.contentType,
-            sizeBytes: att.size,
-          })),
-        });
+      // Step 2: Create Document records (attachments already in S3 from webhook)
+      if (event.attachments.length > 0) {
+        await this.createDocumentRecords(savedDeal.id, event);
       }
 
       return savedDeal.id;
@@ -248,77 +252,47 @@ export class EmailProcessorService {
   }
 
   /**
-   * Download attachments from Microsoft Graph, upload to S3, and create Document records
+   * Create Document records from attachments (already uploaded to S3 in webhook)
+   * If S3 key exists, download and extract text for PDFs
    */
-  private async uploadAttachmentsAndCreateDocuments(
+  private async createDocumentRecords(
     dealId: string,
     event: NormalizedEmailEvent,
-    accessToken: string,
   ): Promise<void> {
     for (const att of event.attachments) {
       try {
-        // Download attachment content
-        const content = await this.microsoftGraphService.getAttachmentContent(
-          accessToken,
-          event.messageId,
-          att.contentId,
-        );
-
-        if (!content) {
-          this.logger.warn(`Failed to download attachment ${att.filename}, creating Document without S3 key`);
-          await this.prismaService.document.create({
-            data: {
-              dealId,
-              filename: att.filename,
-              contentType: att.contentType,
-              sizeBytes: att.size,
-            },
-          });
-          continue;
-        }
-
-        // Upload to S3
-        const s3Key = await this.s3Service.uploadDealAttachment(
-          content,
-          att.filename,
-          dealId,
-        );
-
-        // Extract text if PDF (for searchability)
         let extractedText: string | undefined;
-        if (att.contentType === 'application/pdf' || att.filename.toLowerCase().endsWith('.pdf')) {
-          extractedText = await this.emailProcessingService.processPdfBuffer(content);
+
+        // If attachment is already in S3, download and extract text
+        if (att.s3Key) {
+          try {
+            const content = await this.s3Service.downloadDealAttachment(att.s3Key);
+            // Extract text if PDF (for searchability)
+            if (att.contentType === 'application/pdf' || att.filename.toLowerCase().endsWith('.pdf')) {
+              extractedText = await this.emailProcessingService.processPdfBuffer(content);
+            }
+          } catch (error) {
+            const msg = error instanceof Error ? error.message : String(error);
+            this.logger.warn(`Failed to download ${att.filename} from S3 for text extraction: ${msg}`);
+          }
         }
 
-        // Create Document record with S3 key
+        // Create Document record
         await this.prismaService.document.create({
           data: {
             dealId,
             filename: att.filename,
             contentType: att.contentType,
             sizeBytes: att.size,
-            s3Key,
+            s3Key: att.s3Key, // Use S3 key from attachment if available
             extractedText,
           },
         });
 
-        this.logger.log(`Document saved: ${att.filename} → ${s3Key}`);
+        this.logger.log(`Document saved: ${att.filename}${att.s3Key ? ` → ${att.s3Key}` : ''}`);
       } catch (error) {
         const msg = error instanceof Error ? error.message : String(error);
-        this.logger.error(`Failed to process attachment ${att.filename}: ${msg}`);
-        // Create Document record without S3 key as fallback
-        try {
-          await this.prismaService.document.create({
-            data: {
-              dealId,
-              filename: att.filename,
-              contentType: att.contentType,
-              sizeBytes: att.size,
-            },
-          });
-        } catch (dbError) {
-          this.logger.error(`Failed to create Document record for ${att.filename}`);
-        }
+        this.logger.error(`Failed to create Document record for ${att.filename}: ${msg}`);
       }
     }
   }
