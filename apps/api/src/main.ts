@@ -1,13 +1,15 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { json } from 'express';
+import { JsonLogger } from './util/json-logger';
 
 async function bootstrap() {
-  console.log('Starting Nest application...');
+  const jsonLogger = new JsonLogger();
+  jsonLogger.setLogLevels(['error', 'warn', 'log']);
   
   const app = await NestFactory.create(AppModule, {
     rawBody: true,
-    logger: ['error', 'warn', 'log'],
+    logger: jsonLogger,
   });
 
   // Enable JSON parsing with raw body for webhook verification
@@ -22,12 +24,22 @@ async function bootstrap() {
   const port = process.env.PORT ? Number(process.env.PORT) : 3001;
   await app.listen(port, '0.0.0.0');
 
-  console.log(`🚀 API running on port ${port}`);
-  console.log(`✅ Health check available at http://0.0.0.0:${port}/health`);
+  jsonLogger.log(`🚀 API running on port ${port}`, 'Bootstrap');
+  jsonLogger.log(`✅ Health check available at http://0.0.0.0:${port}/health`, 'Bootstrap');
 }
 
 bootstrap().catch((err) => {
-  console.error('Failed to start application:', err);
+  const errorMessage = err instanceof Error ? err.message : String(err);
+  const errorStack = err instanceof Error ? err.stack : undefined;
+  console.error(
+    JSON.stringify({
+      timestamp: new Date().toISOString(),
+      level: 'error',
+      context: 'Bootstrap',
+      message: `Failed to start application: ${errorMessage}`,
+      trace: errorStack,
+    }),
+  );
   process.exit(1);
 });
 
