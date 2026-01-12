@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import OpenAI from 'openai';
 import { aiConfig } from '../../config/ai.config';
+import { MetricsService } from '../metrics/metrics.service';
 
 @Injectable()
 export class DealSummaryService {
@@ -8,7 +9,7 @@ export class DealSummaryService {
   private readonly aiConfig = aiConfig();
   private openai: OpenAI;
 
-  constructor() {
+  constructor(private readonly metricsService: MetricsService) {
     this.openai = new OpenAI({
       apiKey: this.aiConfig.openaiApiKey,
     });
@@ -22,6 +23,7 @@ export class DealSummaryService {
     extractedText: string,
     dealCriteria?: string,
   ): Promise<string> {
+    const start = Date.now();
     try {
       // Build system prompt with optional client criteria
       let systemPrompt =
@@ -74,12 +76,17 @@ export class DealSummaryService {
         throw new Error('Empty response from OpenAI');
       }
 
+      const duration = (Date.now() - start) / 1000;
+      this.metricsService.recordAICall('summary', this.aiConfig.openaiModel, duration, 'success');
+
       this.logger.log(
         `Deal summary generated (length: ${summary.length}, model: ${this.aiConfig.openaiModel})`,
       );
 
       return summary;
     } catch (error) {
+      const duration = (Date.now() - start) / 1000;
+      this.metricsService.recordAICall('summary', this.aiConfig.openaiModel, duration, 'error');
       const errorMessage = error instanceof Error ? error.message : String(error);
       const errorType = error instanceof Error ? error.constructor.name : 'Unknown';
       this.logger.error(

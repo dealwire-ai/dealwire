@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import OpenAI from 'openai';
 import { aiConfig } from '../../config/ai.config';
 import { DealDecision } from '../../model/deal-decision.model';
+import { MetricsService } from '../metrics/metrics.service';
 
 @Injectable()
 export class DealDecisionService {
@@ -9,7 +10,7 @@ export class DealDecisionService {
   private readonly aiConfig = aiConfig();
   private openai: OpenAI;
 
-  constructor() {
+  constructor(private readonly metricsService: MetricsService) {
     this.openai = new OpenAI({
       apiKey: this.aiConfig.openaiApiKey,
     });
@@ -19,10 +20,7 @@ export class DealDecisionService {
     summary: string,
     dealCriteria?: string,
   ): Promise<DealDecision> {
-    this.logger.log(
-      `Making decision with criteria: ${dealCriteria ? `"${dealCriteria.slice(0, 100)}..."` : 'NONE (using generic evaluation)'}`,
-    );
-
+    const start = Date.now();
     try {
       // Build prompt based on whether criteria is provided
       let systemPrompt: string;
@@ -69,12 +67,17 @@ export class DealDecisionService {
         reason: parsedContent.reason,
       };
 
+      const duration = (Date.now() - start) / 1000;
+      this.metricsService.recordAICall('decision', this.aiConfig.openaiModel, duration, 'success');
+
       this.logger.log(
-        `Deal decision made: ${decision.decision} (model: ${this.aiConfig.openaiModel})`,
+        `Deal decision made: ${decision.decision} (model: ${this.aiConfig.openaiModel}) for deal criteria: ${dealCriteria}`,
       );
 
       return decision;
     } catch (error) {
+      const duration = (Date.now() - start) / 1000;
+      this.metricsService.recordAICall('decision', this.aiConfig.openaiModel, duration, 'error');
       const errorMessage = error instanceof Error ? error.message : String(error);
       const errorType = error instanceof Error ? error.constructor.name : 'Unknown';
       this.logger.error(

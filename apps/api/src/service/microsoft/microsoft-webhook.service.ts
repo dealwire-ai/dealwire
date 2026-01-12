@@ -126,19 +126,12 @@ export class MicrosoftWebhookService {
       `Processing Microsoft email: ${emailEvent.messageId} from ${emailEvent.from} to ${inboxOwner.email} - "${emailEvent.subject}"`,
     );
 
-    // Generate a dealId UUID for S3 organization (will be used when creating Deal record)
-    // This ensures attachments are organized correctly even before Deal is created
     const dealId = this.generateDealId();
 
     // Upload attachments to S3 before enqueueing
-    // This decouples processing from Microsoft Graph API
     if (emailEvent.attachments.length > 0) {
       await this.uploadAttachmentsToS3(emailEvent, accessToken, dealId);
     }
-
-    this.logger.log(
-      `Enqueueing Microsoft email: ${emailEvent.messageId} from ${emailEvent.from} to ${inboxOwner.email} - "${emailEvent.subject}"`,
-    );
 
     // Enqueue to SQS for async processing (attachments already in S3)
     await this.sqsService.enqueueNormalizedEmail({
@@ -146,11 +139,9 @@ export class MicrosoftWebhookService {
       accessToken,
       inboxOwnerEmail: inboxOwner.email,
       receivedByUserId: userId,
-      organizationId: inboxOwner.organizationId || undefined,
-      dealId, // Pre-generated dealId for S3 organization
+      organizationId: inboxOwner.organizationId ?? null,
+      dealId,
     });
-
-    this.logger.log(`Email enqueued: ${emailEvent.messageId}`);
   }
 
   /**
@@ -174,34 +165,27 @@ export class MicrosoftWebhookService {
     dealId: string,
   ): Promise<void> {
     for (const att of emailEvent.attachments) {
-      try {
-        // Download attachment content from Microsoft Graph
-        const content = await this.microsoftGraphService.getAttachmentContent(
-          accessToken,
-          emailEvent.messageId,
-          att.contentId,
-        );
+      // Download attachment content from Microsoft Graph
+      const content = await this.microsoftGraphService.getAttachmentContent(
+        accessToken,
+        emailEvent.messageId,
+        att.contentId,
+      );
 
-        if (!content) {
-          this.logger.warn(`Failed to download attachment ${att.filename}, skipping S3 upload`);
-          continue;
-        }
-
-        // Upload to S3 using pre-generated dealId
-        const s3Key = await this.s3Service.uploadDealAttachment(
-          content,
-          att.filename,
-          dealId,
-        );
-
-        // Update attachment with S3 key
-        att.s3Key = s3Key;
-        this.logger.log(`Uploaded attachment ${att.filename} to S3: ${s3Key}`);
-      } catch (error) {
-        const msg = error instanceof Error ? error.message : String(error);
-        this.logger.error(`Failed to upload attachment ${att.filename} to S3: ${msg}`);
-        // Continue with other attachments even if one fails
+      if (!content) {
+        this.logger.warn(`Failed to download attachment ${att.filename}, skipping S3 upload`);
+        continue;
       }
+
+      // Upload to S3 using pre-generated dealId
+      const s3Key = await this.s3Service.uploadDealAttachment(
+        content,
+        att.filename,
+        dealId,
+      );
+
+      // Update attachment with S3 key
+      att.s3Key = s3Key;
     }
   }
 

@@ -58,15 +58,12 @@ export class EmailProcessorService {
 
     try {
       // Step 1: Quick deal detection
-      const detectionStart = Date.now();
       const bodyText = event.bodyText || this.htmlToText(event.bodyHtml || '');
       const detection = await this.dealDetectionService.isDealEmail(
         event.subject,
         bodyText,
         event.attachments.length > 0,
       );
-      const detectionDuration = (Date.now() - detectionStart) / 1000;
-      this.metricsService.recordAICall('detection', 'gpt-4o-mini', detectionDuration, 'success');
 
       if (!detection.isDeal) {
         this.logger.log(
@@ -90,24 +87,17 @@ export class EmailProcessorService {
       const clientPrefs = this.clientPreferencesService.getPreferences(inboxOwnerEmail);
 
       // Step 4: Generate AI summary
-      const summaryStart = Date.now();
       const summary = await this.dealSummaryService.summarizeDeal(
         combinedText,
         clientPrefs.dealCriteria,
       );
-      const summaryDuration = (Date.now() - summaryStart) / 1000;
-      this.metricsService.recordAICall('summary', this.aiConfig.openaiModel, summaryDuration, 'success');
       this.logger.log(`Generated summary for ${event.messageId} (${summary.length} chars)`);
 
       // Step 5: Make AI decision
-      const decisionStart = Date.now();
       const decision = await this.dealDecisionService.makeDecision(
         summary,
         clientPrefs.dealCriteria,
       );
-      const decisionDuration = (Date.now() - decisionStart) / 1000;
-      this.metricsService.recordAICall('decision', this.aiConfig.openaiModel, decisionDuration, 'success');
-      this.logger.log(`Decision for ${event.messageId}: ${decision.decision} - ${decision.reason}`);
 
       // Step 6: Save deal to database and upload attachments
       let dealId: string | undefined;
@@ -133,7 +123,6 @@ export class EmailProcessorService {
           inboxOwnerEmail,
           htmlEmail,
         );
-        this.logger.log(`Reply-to-self sent via Graph for ${event.messageId}`);
 
         // Step 8: Move passed deals to folder
         if (decision.decision === 'no') {

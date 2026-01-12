@@ -8,11 +8,11 @@ import { PrismaService } from '../prisma/prisma.service';
 
 interface QueuedEmailMessage {
   event: NormalizedEmailEvent;
-  accessToken?: string;
+  accessToken: string;
   inboxOwnerEmail: string;
-  receivedByUserId?: string;
-  organizationId?: string;
-  dealId?: string; // Pre-generated dealId for S3 organization
+  receivedByUserId: string;
+  organizationId: string | null;
+  dealId: string; // Pre-generated dealId for S3 organization
 }
 
 @Injectable()
@@ -50,9 +50,10 @@ export class NormalizedEmailListenerService {
         return;
       }
 
-      // If Microsoft source, ensure we have access token
+      // Access token is now always provided, but validate it
       let accessToken: string | undefined = queuedMessage.accessToken;
-      if (queuedMessage.event.source === 'microsoft' && queuedMessage.receivedByUserId && !accessToken) {
+      if (queuedMessage.event.source === 'microsoft' && !accessToken) {
+        // Fallback: try to fetch if missing (shouldn't happen, but be defensive)
         const token = await this.microsoftGraphService.getAccessToken(queuedMessage.receivedByUserId);
         if (!token) {
           this.logger.error(`No access token for user ${queuedMessage.receivedByUserId}`);
@@ -61,14 +62,15 @@ export class NormalizedEmailListenerService {
         accessToken = token;
       }
 
-      // If organizationId not provided, fetch it
+      // OrganizationId is now always provided (may be null)
       let organizationId = queuedMessage.organizationId;
       if (!organizationId && queuedMessage.receivedByUserId) {
+        // Fallback: try to fetch if null (shouldn't happen, but be defensive)
         const user = await this.prismaService.user.findUnique({
           where: { id: queuedMessage.receivedByUserId },
           select: { organizationId: true },
         });
-        organizationId = user?.organizationId || undefined;
+        organizationId = user?.organizationId ?? null;
       }
 
       // Process the email
@@ -77,7 +79,7 @@ export class NormalizedEmailListenerService {
         accessToken,
         inboxOwnerEmail: queuedMessage.inboxOwnerEmail,
         receivedByUserId: queuedMessage.receivedByUserId,
-        organizationId,
+        organizationId: organizationId ?? undefined,
         dealId: queuedMessage.dealId, // Pre-generated dealId for S3 organization
       };
 

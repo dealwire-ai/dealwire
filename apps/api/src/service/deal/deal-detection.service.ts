@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import OpenAI from 'openai';
 import { z } from 'zod';
 import { aiConfig } from '../../config/ai.config';
+import { MetricsService } from '../metrics/metrics.service';
 
 const DealDetectionSchema = z.object({
   isDeal: z.boolean().describe('Whether this email is about a real estate deal offering'),
@@ -17,7 +18,7 @@ export class DealDetectionService {
   private readonly aiConfig = aiConfig();
   private openai: OpenAI;
 
-  constructor() {
+  constructor(private readonly metricsService: MetricsService) {
     this.openai = new OpenAI({
       apiKey: this.aiConfig.openaiApiKey,
     });
@@ -32,6 +33,7 @@ export class DealDetectionService {
     bodyPreview: string,
     hasAttachments: boolean,
   ): Promise<DealDetection> {
+    const start = Date.now();
     try {
       const response = await this.openai.chat.completions.create({
         model: 'gpt-4o-mini', // we should keep this as something fast and cheap for deal classification
@@ -72,17 +74,23 @@ Has attachments: ${hasAttachments ? 'Yes' : 'No'}`,
 
       const content = response.choices[0]?.message?.content;
       if (!content) {
+        const duration = (Date.now() - start) / 1000;
+        this.metricsService.recordAICall('detection', 'gpt-4o-mini', duration, 'error');
         this.logger.warn('No content from deal detection');
         return { isDeal: false, confidence: 'low', reason: 'No response' };
       }
 
       const result = DealDetectionSchema.safeParse(JSON.parse(content));
       if (!result.success) {
+        const duration = (Date.now() - start) / 1000;
+        this.metricsService.recordAICall('detection', 'gpt-4o-mini', duration, 'error');
         this.logger.warn(`Invalid deal detection response: ${result.error.message}`);
         return { isDeal: true, confidence: 'low', reason: 'Parse failed, defaulting to process' };
       }
 
       const parsed = result.data;
+      const duration = (Date.now() - start) / 1000;
+      this.metricsService.recordAICall('detection', 'gpt-4o-mini', duration, 'success');
 
       this.logger.log(
         `Deal detection: isDeal=${parsed.isDeal}, confidence=${parsed.confidence}, reason="${parsed.reason}"`,
@@ -90,6 +98,8 @@ Has attachments: ${hasAttachments ? 'Yes' : 'No'}`,
 
       return parsed;
     } catch (error) {
+      const duration = (Date.now() - start) / 1000;
+      this.metricsService.recordAICall('detection', 'gpt-4o-mini', duration, 'error');
       const msg = error instanceof Error ? error.message : String(error);
       this.logger.error(`Deal detection failed: ${msg}`);
       // Default to true on error so we don't miss deals
