@@ -196,7 +196,6 @@ describe('EmailProcessorService', () => {
         contentType: 'application/pdf',
         sizeBytes: 1024,
         s3Key: s3Key,
-        extractedText: 'extracted pdf text',
       },
     });
   });
