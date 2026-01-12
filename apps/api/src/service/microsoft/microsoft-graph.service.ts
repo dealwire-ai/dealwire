@@ -16,6 +16,7 @@ interface GraphMessage {
   body: { content: string; contentType: 'text' | 'html' };
   receivedDateTime: string;
   hasAttachments: boolean;
+  conversationId?: string;
 }
 
 interface GraphAttachment {
@@ -64,12 +65,15 @@ export class MicrosoftGraphService {
     messageId: string,
   ): Promise<GraphMessage | null> {
     try {
-      const response = await fetch(`${GRAPH_BASE_URL}/me/messages/${messageId}`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `${GRAPH_BASE_URL}/me/messages/${messageId}?$select=id,subject,from,toRecipients,body,receivedDateTime,hasAttachments,conversationId`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
         },
-      });
+      );
 
       if (!response.ok) {
         this.logger.error(
@@ -324,7 +328,42 @@ export class MicrosoftGraphService {
         return false;
       }
 
-      this.logger.log(`Moved message ${messageId} to folder ${folderId}`);
+      // Verify the move by checking the returned message's parentFolderId
+      const movedMessage = await response.json();
+      if (movedMessage.parentFolderId !== folderId) {
+        this.logger.warn(
+          `Move may have failed: expected parentFolderId=${folderId}, got ${movedMessage.parentFolderId}`,
+        );
+        return false;
+      }
+
+      // Verify the original message is no longer in Inbox (Graph API move creates new message, old ID should 404)
+      // Note: The /move endpoint returns a NEW message ID in the destination folder
+      // The original message ID should no longer exist in the source folder
+      const originalMessageCheck = await fetch(
+        `${GRAPH_BASE_URL}/me/messages/${messageId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+
+      if (originalMessageCheck.ok) {
+        const original = await originalMessageCheck.json();
+        if (original.parentFolderId !== folderId) {
+          this.logger.warn(
+            `Original message ${messageId} still exists in source folder (parentFolderId: ${original.parentFolderId})`,
+          );
+        }
+      } else if (originalMessageCheck.status === 404) {
+        // This is expected - original message ID no longer exists (moved successfully)
+        this.logger.debug(`Original message ${messageId} no longer exists (moved successfully)`);
+      }
+
+      this.logger.log(
+        `Moved message ${messageId} to folder ${folderId} (new message ID: ${movedMessage.id}, parentFolderId: ${movedMessage.parentFolderId})`,
+      );
       return true;
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
@@ -345,7 +384,65 @@ export class MicrosoftGraphService {
     if (!folderId) {
       return false;
     }
-    return this.moveMessage(accessToken, messageId, folderId);
+
+    // Get the conversation ID to move all messages in the thread
+    const message = await this.getMessage(accessToken, messageId);
+    if (!message?.conversationId) {
+      // Fallback: just move the single message
+      return this.moveMessage(accessToken, messageId, folderId);
+    }
+
+    // Move all messages in the conversation
+    return this.moveConversation(accessToken, message.conversationId, folderId);
+  }
+
+  /**
+   * Move all messages in a conversation to a folder
+   */
+  async moveConversation(
+    accessToken: string,
+    conversationId: string,
+    folderId: string,
+  ): Promise<boolean> {
+    try {
+      // Find all messages in this conversation
+      const response = await fetch(
+        `${GRAPH_BASE_URL}/me/messages?$filter=conversationId eq '${conversationId}'&$select=id,parentFolderId`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        this.logger.error(`Failed to find conversation messages: ${response.status} - ${errorText}`);
+        return false;
+      }
+
+      const data = await response.json();
+      const messages = data.value || [];
+
+      this.logger.log(`Found ${messages.length} messages in conversation ${conversationId}`);
+
+      // Move each message that isn't already in the target folder
+      let movedCount = 0;
+      for (const msg of messages) {
+        if (msg.parentFolderId !== folderId) {
+          const success = await this.moveMessage(accessToken, msg.id, folderId);
+          if (success) movedCount++;
+        }
+      }
+
+      this.logger.log(`Moved ${movedCount}/${messages.length} messages to folder ${folderId}`);
+      return true;
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Error moving conversation ${conversationId}: ${msg}`);
+      return false;
+    }
   }
 
   /**
