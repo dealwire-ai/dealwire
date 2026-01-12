@@ -35,7 +35,14 @@ export class NormalizedEmailListenerService {
     try {
       const queuedMessage: QueuedEmailMessage = JSON.parse(message.Body);
 
-      this.logger.log(`Received message: ${JSON.stringify(queuedMessage)}`);
+      this.logger.log(
+        `Received message: messageId=${queuedMessage.event?.messageId}, ` +
+        `source=${queuedMessage.event?.source}, ` +
+        `from=${queuedMessage.event?.from}, ` +
+        `subject=${queuedMessage.event?.subject}, ` +
+        `inboxOwner=${queuedMessage.inboxOwnerEmail}, ` +
+        `attachments=${queuedMessage.event?.attachments?.length || 0}`,
+      );
 
       // Validate required fields
       if (!queuedMessage.event || !queuedMessage.inboxOwnerEmail) {
