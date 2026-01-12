@@ -5,6 +5,7 @@ import { EmailProcessorService, ProcessDealContext } from './email-processor.ser
 import { NormalizedEmailEvent } from '../../dto/normalized-email-event.dto';
 import { MicrosoftGraphService } from '../microsoft/microsoft-graph.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { MetricsService } from '../metrics/metrics.service';
 
 interface QueuedEmailMessage {
   event: NormalizedEmailEvent;
@@ -23,6 +24,7 @@ export class NormalizedEmailListenerService {
     private readonly emailProcessor: EmailProcessorService,
     private readonly microsoftGraphService: MicrosoftGraphService,
     private readonly prismaService: PrismaService,
+    private readonly metricsService: MetricsService,
   ) {}
 
   @SqsMessageHandler('normalized-email', false)
@@ -84,8 +86,11 @@ export class NormalizedEmailListenerService {
       };
 
       await this.emailProcessor.process(ctx);
+      this.metricsService.recordSqsMessageReceived('normalized-email', 'success');
       this.logger.log(`Processed email ${queuedMessage.event.messageId} from queue`);
     } catch (error) {
+      this.metricsService.recordSqsMessageReceived('normalized-email', 'error');
+      this.metricsService.recordSqsError('normalized-email', 'receive');
       const msg = error instanceof Error ? error.message : String(error);
       this.logger.error(`Failed to process queued message: ${msg}`);
       // Re-throw to let the library handle retries
@@ -95,6 +100,7 @@ export class NormalizedEmailListenerService {
 
   @SqsConsumerEventHandler('normalized-email', 'processing_error')
   onProcessingError(error: Error, message: Message): void {
+    this.metricsService.recordSqsError('normalized-email', 'receive');
     this.logger.error(`SQS processing error: ${error.message}`, error.stack);
   }
 }

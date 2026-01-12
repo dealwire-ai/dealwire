@@ -7,13 +7,29 @@ export class MetricsService implements OnModuleInit {
   private registry: Registry | null = null;
   private enabled = false;
 
-  // Metrics
+  // Deal metrics
   private dealsProcessed: Counter<string> | null = null;
   private dealsSkipped: Counter<string> | null = null;
+  private dealProcessingDuration: Histogram<string> | null = null;
+
+  // AI metrics
   private aiCalls: Counter<string> | null = null;
   private aiCallDuration: Histogram<string> | null = null;
+
+  // Email metrics
   private emailsReceived: Counter<string> | null = null;
   private processingErrors: Counter<string> | null = null;
+
+  // SQS metrics
+  private sqsMessagesSent: Counter<string> | null = null;
+  private sqsMessagesReceived: Counter<string> | null = null;
+  private sqsErrors: Counter<string> | null = null;
+
+  // S3 metrics
+  private s3Uploads: Counter<string> | null = null;
+  private s3UploadBytes: Counter<string> | null = null;
+  private s3Downloads: Counter<string> | null = null;
+  private s3Errors: Counter<string> | null = null;
 
   onModuleInit() {
     try {
@@ -42,6 +58,14 @@ export class MetricsService implements OnModuleInit {
       name: 'deals_skipped_total',
       help: 'Total number of deals skipped (not a deal)',
       labelNames: ['reason'],
+      registers: [this.registry],
+    });
+
+    this.dealProcessingDuration = new Histogram({
+      name: 'deal_processing_duration_seconds',
+      help: 'End-to-end duration of deal processing in seconds',
+      labelNames: ['decision', 'source'],
+      buckets: [1, 5, 10, 30, 60, 120, 300],
       registers: [this.registry],
     });
 
@@ -74,6 +98,56 @@ export class MetricsService implements OnModuleInit {
       name: 'deal_processing_errors_total',
       help: 'Total deal processing errors',
       labelNames: ['error_type', 'stage'],
+      registers: [this.registry],
+    });
+
+    // SQS metrics
+    this.sqsMessagesSent = new Counter({
+      name: 'sqs_messages_sent_total',
+      help: 'Total messages sent to SQS',
+      labelNames: ['queue', 'status'],
+      registers: [this.registry],
+    });
+
+    this.sqsMessagesReceived = new Counter({
+      name: 'sqs_messages_received_total',
+      help: 'Total messages received from SQS',
+      labelNames: ['queue', 'status'],
+      registers: [this.registry],
+    });
+
+    this.sqsErrors = new Counter({
+      name: 'sqs_errors_total',
+      help: 'Total SQS operation errors',
+      labelNames: ['queue', 'operation'],
+      registers: [this.registry],
+    });
+
+    // S3 metrics
+    this.s3Uploads = new Counter({
+      name: 's3_uploads_total',
+      help: 'Total S3 upload operations',
+      labelNames: ['status'],
+      registers: [this.registry],
+    });
+
+    this.s3UploadBytes = new Counter({
+      name: 's3_upload_bytes_total',
+      help: 'Total bytes uploaded to S3',
+      registers: [this.registry],
+    });
+
+    this.s3Downloads = new Counter({
+      name: 's3_downloads_total',
+      help: 'Total S3 download operations',
+      labelNames: ['status'],
+      registers: [this.registry],
+    });
+
+    this.s3Errors = new Counter({
+      name: 's3_errors_total',
+      help: 'Total S3 operation errors',
+      labelNames: ['operation'],
       registers: [this.registry],
     });
   }
@@ -111,6 +185,57 @@ export class MetricsService implements OnModuleInit {
   recordProcessingError(errorType: string, stage: string) {
     if (this.enabled && this.processingErrors) {
       this.processingErrors.inc({ error_type: errorType, stage });
+    }
+  }
+
+  recordDealProcessingDuration(
+    durationSeconds: number,
+    decision: 'yes' | 'no',
+    source: string,
+  ) {
+    if (this.enabled && this.dealProcessingDuration) {
+      this.dealProcessingDuration.observe({ decision, source }, durationSeconds);
+    }
+  }
+
+  // SQS metrics
+  recordSqsMessageSent(queue: string, status: 'success' | 'error') {
+    if (this.enabled && this.sqsMessagesSent) {
+      this.sqsMessagesSent.inc({ queue, status });
+    }
+  }
+
+  recordSqsMessageReceived(queue: string, status: 'success' | 'error') {
+    if (this.enabled && this.sqsMessagesReceived) {
+      this.sqsMessagesReceived.inc({ queue, status });
+    }
+  }
+
+  recordSqsError(queue: string, operation: 'send' | 'receive') {
+    if (this.enabled && this.sqsErrors) {
+      this.sqsErrors.inc({ queue, operation });
+    }
+  }
+
+  // S3 metrics
+  recordS3Upload(status: 'success' | 'error', bytes?: number) {
+    if (this.enabled && this.s3Uploads) {
+      this.s3Uploads.inc({ status });
+      if (status === 'success' && bytes && this.s3UploadBytes) {
+        this.s3UploadBytes.inc(bytes);
+      }
+    }
+  }
+
+  recordS3Download(status: 'success' | 'error') {
+    if (this.enabled && this.s3Downloads) {
+      this.s3Downloads.inc({ status });
+    }
+  }
+
+  recordS3Error(operation: 'upload' | 'download') {
+    if (this.enabled && this.s3Errors) {
+      this.s3Errors.inc({ operation });
     }
   }
 

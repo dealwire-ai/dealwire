@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { SqsService } from '@ssut/nestjs-sqs';
 import { NormalizedEmailEvent } from '../../dto/normalized-email-event.dto';
+import { MetricsService } from '../metrics/metrics.service';
 
 interface QueuedEmailMessage {
   event: NormalizedEmailEvent;
@@ -15,7 +16,10 @@ interface QueuedEmailMessage {
 export class SQSService {
   private readonly logger = new Logger(SQSService.name);
 
-  constructor(private readonly sqsService: SqsService) {}
+  constructor(
+    private readonly sqsService: SqsService,
+    private readonly metricsService: MetricsService,
+  ) {}
 
   /**
    * Enqueue a normalized email event to the queue
@@ -35,10 +39,13 @@ export class SQSService {
         id,
         body: messageBody,
       });
-      this.logger.debug(`Message enqueued to normalized-email queue: ${messageBody.event?.messageId} from ${messageBody.event?.from} to ${messageBody.inboxOwnerEmail} - "${messageBody.event?.subject}"`);
+      this.metricsService.recordSqsMessageSent('normalized-email', 'success');
+      this.logger.debug(`Message sent to normalized-email queue: ${messageBody.event?.messageId} from ${messageBody.event?.from} to ${messageBody.inboxOwnerEmail} - "${messageBody.event?.subject}"`);
     } catch (error) {
+      this.metricsService.recordSqsMessageSent('normalized-email', 'error');
+      this.metricsService.recordSqsError('normalized-email', 'send');
       const msg = error instanceof Error ? error.message : String(error);
-      this.logger.error(`Failed to enqueue message: ${msg}`);
+      this.logger.error(`Failed to send message: ${msg}`);
       throw error;
     }
   }
