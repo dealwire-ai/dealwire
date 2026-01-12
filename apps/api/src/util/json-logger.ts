@@ -71,7 +71,9 @@ export class JsonLogger implements LoggerService {
 
     const json = JSON.stringify(logEntry);
     const color = levelColors[level] || colors.reset;
-    const levelUpper = level.toUpperCase().padEnd(7);
+    // Map 'log' to 'INFO' for display, keep others as-is
+    const displayLevel = level === 'log' ? 'INFO' : level.toUpperCase();
+    const levelUpper = displayLevel.padEnd(7);
 
     // Colorize the output: [LEVEL] timestamp [Context] message
     console.log(
