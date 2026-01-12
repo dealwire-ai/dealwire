@@ -324,6 +324,13 @@ export class MicrosoftGraphService {
 
       if (!response.ok) {
         const errorText = await response.text();
+        // 404 means message doesn't exist - might already be moved, deleted, or not indexed yet
+        if (response.status === 404) {
+          this.logger.debug(
+            `Message ${messageId} not found (may already be moved or not indexed yet)`,
+          );
+          return false; // Not an error, just skip it
+        }
         this.logger.error(`Failed to move message ${messageId}: ${response.status} - ${errorText}`);
         return false;
       }
@@ -398,6 +405,7 @@ export class MicrosoftGraphService {
 
   /**
    * Move all messages in a conversation to a folder
+   * Includes retry logic to handle Graph API indexing delays
    */
   async moveConversation(
     accessToken: string,
@@ -405,8 +413,11 @@ export class MicrosoftGraphService {
     folderId: string,
   ): Promise<boolean> {
     try {
-      // Find all messages in this conversation
-      const response = await fetch(
+      // Wait a bit for Graph API to index the reply we just sent
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      // Find all messages in this conversation from Inbox
+      const inboxResponse = await fetch(
         `${GRAPH_BASE_URL}/me/messages?$filter=conversationId eq '${conversationId}'&$select=id,parentFolderId`,
         {
           headers: {
@@ -416,28 +427,68 @@ export class MicrosoftGraphService {
         },
       );
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        this.logger.error(`Failed to find conversation messages: ${response.status} - ${errorText}`);
-        return false;
+      // Also check Sent Items for the reply message
+      const sentItemsResponse = await fetch(
+        `${GRAPH_BASE_URL}/me/mailFolders('SentItems')/messages?$filter=conversationId eq '${conversationId}'&$select=id,parentFolderId`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+
+      const allMessages: Array<{ id: string; parentFolderId: string }> = [];
+
+      if (inboxResponse.ok) {
+        const inboxData = await inboxResponse.json();
+        allMessages.push(...(inboxData.value || []));
       }
 
-      const data = await response.json();
-      const messages = data.value || [];
+      if (sentItemsResponse.ok) {
+        const sentData = await sentItemsResponse.json();
+        allMessages.push(...(sentData.value || []));
+      }
 
-      this.logger.log(`Found ${messages.length} messages in conversation ${conversationId}`);
+      // Deduplicate by message ID (reply appears in both Inbox and Sent Items)
+      const uniqueMessages = Array.from(
+        new Map(allMessages.map((msg) => [msg.id, msg])).values(),
+      );
+
+      this.logger.log(`Found ${uniqueMessages.length} messages in conversation ${conversationId}`);
 
       // Move each message that isn't already in the target folder
       let movedCount = 0;
-      for (const msg of messages) {
-        if (msg.parentFolderId !== folderId) {
-          const success = await this.moveMessage(accessToken, msg.id, folderId);
-          if (success) movedCount++;
+      let skippedCount = 0;
+      for (const msg of uniqueMessages) {
+        if (msg.parentFolderId === folderId) {
+          skippedCount++;
+          this.logger.debug(`Message ${msg.id} already in target folder, skipping`);
+        } else {
+          // Retry logic for messages that might not be indexed yet
+          let success = false;
+          for (let attempt = 0; attempt < 3; attempt++) {
+            success = await this.moveMessage(accessToken, msg.id, folderId);
+            if (success) break;
+
+            // If 404 and not last attempt, wait and retry
+            if (attempt < 2) {
+              await new Promise((resolve) => setTimeout(resolve, 1000 * (attempt + 1)));
+            }
+          }
+
+          if (success) {
+            movedCount++;
+          } else {
+            skippedCount++;
+          }
         }
       }
 
-      this.logger.log(`Moved ${movedCount}/${messages.length} messages to folder ${folderId}`);
-      return true;
+      this.logger.log(
+        `Conversation move complete: ${movedCount} moved, ${skippedCount} skipped (already in folder or not found)`,
+      );
+      return movedCount > 0; // Success if we moved at least one message
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
       this.logger.error(`Error moving conversation ${conversationId}: ${msg}`);
