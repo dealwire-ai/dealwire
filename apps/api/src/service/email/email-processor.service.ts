@@ -55,6 +55,7 @@ export class EmailProcessorService {
    */
   async process(ctx: ProcessDealContext): Promise<ProcessDealResult> {
     const { event, accessToken, inboxOwnerEmail, receivedByUserId, organizationId } = ctx;
+    const startTime = Date.now();
 
     try {
       // Step 1: Quick deal detection
@@ -135,7 +136,17 @@ export class EmailProcessorService {
         }
       }
 
+      const durationSeconds = (Date.now() - startTime) / 1000;
       this.metricsService.recordDealProcessed(decision.decision as 'yes' | 'no', event.source);
+      this.metricsService.recordDealProcessingDuration(
+        durationSeconds,
+        decision.decision as 'yes' | 'no',
+        event.source,
+      );
+
+      this.logger.log(
+        `Deal processed in ${durationSeconds.toFixed(2)}s: ${event.messageId} → ${decision.decision}`,
+      );
 
       return {
         processed: true,

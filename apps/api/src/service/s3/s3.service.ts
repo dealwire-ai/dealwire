@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
 import { s3Config } from '../../config/s3.config';
+import { MetricsService } from '../metrics/metrics.service';
 
 @Injectable()
 export class S3Service {
@@ -8,7 +9,7 @@ export class S3Service {
   private readonly config = s3Config();
   private readonly s3Client: S3Client;
 
-  constructor() {
+  constructor(private readonly metricsService: MetricsService) {
     if (!this.config.accessKeyId || !this.config.secretAccessKey) {
       this.logger.warn('AWS credentials not configured - S3 uploads will fail');
     }
@@ -53,9 +54,12 @@ export class S3Service {
         }),
       );
 
+      this.metricsService.recordS3Upload('success', buffer.length);
       this.logger.log(`Uploaded ${filename} to S3: ${s3Key}`);
       return s3Key;
     } catch (error) {
+      this.metricsService.recordS3Upload('error');
+      this.metricsService.recordS3Error('upload');
       const msg = error instanceof Error ? error.message : String(error);
       this.logger.error(`Failed to upload ${filename} to S3: ${msg}`);
       throw new Error(`S3 upload failed: ${msg}`);
@@ -91,9 +95,12 @@ export class S3Service {
       }
       const buffer = Buffer.concat(chunks);
 
+      this.metricsService.recordS3Download('success');
       this.logger.debug(`Downloaded ${s3Key} from S3 (${buffer.length} bytes)`);
       return buffer;
     } catch (error) {
+      this.metricsService.recordS3Download('error');
+      this.metricsService.recordS3Error('download');
       const msg = error instanceof Error ? error.message : String(error);
       this.logger.error(`Failed to download ${s3Key} from S3: ${msg}`);
       throw new Error(`S3 download failed: ${msg}`);
