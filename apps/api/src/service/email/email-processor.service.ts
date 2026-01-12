@@ -188,7 +188,7 @@ export class EmailProcessorService {
           }
 
           if (content) {
-            const text = await this.emailProcessingService.processPdfBuffer(content);
+            const text = await this.emailProcessingService.processPdfBuffer(content, att.filename);
             if (text) {
               texts.push(`--- ${att.filename} ---\n${text}`);
             }
@@ -242,7 +242,7 @@ export class EmailProcessorService {
 
   /**
    * Create Document records from attachments (already uploaded to S3 in webhook)
-   * If S3 key exists, download and extract text for PDFs
+   * Documents point to S3 - text can be extracted on-demand when needed
    */
   private async createDocumentRecords(
     dealId: string,
@@ -250,31 +250,14 @@ export class EmailProcessorService {
   ): Promise<void> {
     for (const att of event.attachments) {
       try {
-        let extractedText: string | undefined;
-
-        // If attachment is already in S3, download and extract text
-        if (att.s3Key) {
-          try {
-            const content = await this.s3Service.downloadDealAttachment(att.s3Key);
-            // Extract text if PDF (for searchability)
-            if (att.contentType === 'application/pdf' || att.filename.toLowerCase().endsWith('.pdf')) {
-              extractedText = await this.emailProcessingService.processPdfBuffer(content);
-            }
-          } catch (error) {
-            const msg = error instanceof Error ? error.message : String(error);
-            this.logger.warn(`Failed to download ${att.filename} from S3 for text extraction: ${msg}`);
-          }
-        }
-
-        // Create Document record
+        // Create Document record pointing to S3
         await this.prismaService.document.create({
           data: {
             dealId,
             filename: att.filename,
             contentType: att.contentType,
             sizeBytes: att.size,
-            s3Key: att.s3Key, // Use S3 key from attachment if available
-            extractedText,
+            s3Key: att.s3Key, // S3 key where document is stored
           },
         });
 

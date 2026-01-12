@@ -275,13 +275,8 @@ export class EmailProcessorService {
           dealId,
         );
 
-        // Extract text if PDF (for searchability)
-        let extractedText: string | undefined;
-        if (att.contentType === 'application/pdf' || att.filename.toLowerCase().endsWith('.pdf')) {
-          extractedText = await this.emailProcessingService.processPdfBuffer(content);
-        }
-
         // Create Document record with S3 key
+        // Documents point to S3 - text can be extracted on-demand when needed
         await this.prismaService.document.create({
           data: {
             dealId,
@@ -289,7 +284,6 @@ export class EmailProcessorService {
             contentType: att.contentType,
             sizeBytes: att.size,
             s3Key,
-            extractedText,
           },
         });
 
