@@ -1,5 +1,28 @@
 import { LoggerService, LogLevel } from '@nestjs/common';
 
+// ANSI color codes
+const colors = {
+  reset: '\x1b[0m',
+  bright: '\x1b[1m',
+  dim: '\x1b[2m',
+  red: '\x1b[31m',
+  green: '\x1b[32m',
+  yellow: '\x1b[33m',
+  blue: '\x1b[34m',
+  magenta: '\x1b[35m',
+  cyan: '\x1b[36m',
+  gray: '\x1b[90m',
+};
+
+const levelColors: Record<LogLevel, string> = {
+  error: colors.red,
+  fatal: colors.red,
+  warn: colors.yellow,
+  log: colors.green,
+  debug: colors.blue,
+  verbose: colors.gray,
+};
+
 export class JsonLogger implements LoggerService {
   private logLevels: LogLevel[] = ['log', 'error', 'warn', 'debug', 'verbose'];
 
@@ -46,6 +69,16 @@ export class JsonLogger implements LoggerService {
       ...extra,
     };
 
-    console.log(JSON.stringify(logEntry));
+    const json = JSON.stringify(logEntry);
+    const color = levelColors[level] || colors.reset;
+    const levelUpper = level.toUpperCase().padEnd(7);
+
+    // Colorize the output: [LEVEL] timestamp [Context] message
+    console.log(
+      `${color}${colors.bright}[${levelUpper}]${colors.reset} ` +
+      `${colors.dim}${logEntry.timestamp}${colors.reset} ` +
+      `${colors.cyan}[${logEntry.context}]${colors.reset} ` +
+      `${logEntry.message}${extra?.trace ? `\n${colors.red}${extra.trace}${colors.reset}` : ''}`,
+    );
   }
 }
