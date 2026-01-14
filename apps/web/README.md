@@ -1,1 +1,1 @@
-Deployed to: https://analyzer-63v5idtio-isaacs-projects-a9507009.vercel.app/
+Deployed to: https://deals.frontstep.ai

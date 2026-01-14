@@ -1,1 +1,1 @@
-Deployed to: https://analyzer-api-production.up.railway.app/
+Deployed to: https://api.deals.frontstep.ai
