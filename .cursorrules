@@ -162,7 +162,7 @@ JSON file mapping user emails to their preferences:
 | `CLERK_WEBHOOK_SECRET` | Verify Clerk webhooks |
 | `OPENAI_API_KEY` | AI services |
 | `RESEND_API_KEY` | Email sending (fallback) |
-| `API_BASE_URL` | Production URL (https://deals.frontstep.ai) |
+| `API_BASE_URL` | Production URL (https://api.deals.frontstep.ai) |
 | `MICROSOFT_WEBHOOK_SECRET` | Graph webhook clientState validation |
 
 ---
