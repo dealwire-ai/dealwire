@@ -75,7 +75,7 @@ Analyzer is a monorepo that provides automated real estate deal analysis. When u
 | `MicrosoftGraphService` | Microsoft Graph API calls: get messages, attachments, create/send replies, manage folders |
 | `MicrosoftSubscriptionService` | Create/renew/delete Graph subscriptions, stored in DB |
 | `MicrosoftWebhookService` | Handle incoming Graph notifications, orchestrate processing pipeline |
-| `MicrosoftSchedulerService` | Cron job (every 12 hours) to renew expiring subscriptions |
+| `MicrosoftRenewalSchedulerService` | Cron job (every 12 hours) to renew expiring subscriptions |
 
 ### AI Module (`src/module/ai.module.ts`)
 
