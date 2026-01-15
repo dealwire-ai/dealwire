@@ -92,7 +92,6 @@ export class EmailProcessorService {
         combinedText,
         clientPrefs.dealCriteria,
       );
-      this.logger.log(`Generated summary for ${event.messageId} (${summary.length} chars)`);
 
       // Step 5: Make AI decision
       const decision = await this.dealDecisionService.makeDecision(
