@@ -36,8 +36,13 @@ export class MicrosoftGraphService {
 
   /**
    * Get Microsoft OAuth access token for a user from Clerk
+   * @param userId - Clerk user ID
+   * @param logLevel - Log level for missing token: 'warn' (default) for unexpected cases, 'debug' for expected cases (e.g., checking if user has connected)
    */
-  async getAccessToken(userId: string): Promise<string | null> {
+  async getAccessToken(
+    userId: string,
+    logLevel: 'warn' | 'debug' = 'warn',
+  ): Promise<string | null> {
     try {
       const tokens = await this.clerk.users.getUserOauthAccessToken(
         userId,
@@ -45,7 +50,11 @@ export class MicrosoftGraphService {
       );
 
       if (!tokens.data || tokens.data.length === 0) {
-        this.logger.warn(`No Microsoft OAuth token found for user ${userId}`);
+        if (logLevel === 'debug') {
+          this.logger.debug(`No Microsoft OAuth token found for user ${userId}`);
+        } else {
+          this.logger.warn(`No Microsoft OAuth token found for user ${userId}`);
+        }
         return null;
       }
 
