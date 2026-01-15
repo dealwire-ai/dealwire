@@ -22,6 +22,9 @@ export class ClerkWebhookService {
       case 'user.deleted':
         await this.deleteUser(data.id);
         break;
+      case 'oauth_access_token.created':
+        await this.handleOAuthTokenCreated(data);
+        break;
       case 'organization.created':
         await this.createOrganization(data);
         break;
@@ -83,6 +86,41 @@ export class ClerkWebhookService {
       const msg = error instanceof Error ? error.message : String(error);
       this.logger.error(`Error creating Microsoft subscription: ${msg}`);
     }
+  }
+
+  /**
+   * Handle OAuth token creation - create subscription when Microsoft is connected
+   */
+  private async handleOAuthTokenCreated(data: any): Promise<void> {
+    const userId = data.user_id;
+    const provider = data.provider;
+
+    // Only handle Microsoft OAuth connections
+    if (provider !== 'microsoft') {
+      return;
+    }
+
+    if (!userId) {
+      this.logger.warn('OAuth token created event missing user_id');
+      return;
+    }
+
+    this.logger.log(`Microsoft OAuth token created for user ${userId}`);
+    
+    // Ensure user exists in our DB first
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      this.logger.warn(
+        `User ${userId} not found in DB, cannot create subscription yet`,
+      );
+      return;
+    }
+
+    // Create subscription now that Microsoft is connected
+    await this.createMicrosoftSubscription(userId);
   }
 
   private async upsertUser(data: any): Promise<void> {

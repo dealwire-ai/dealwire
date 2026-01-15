@@ -31,9 +31,10 @@ export class MicrosoftSubscriptionService {
    * Create a new Microsoft Graph subscription for a user's inbox
    */
   async createSubscription(userId: string): Promise<boolean> {
-    const accessToken = await this.graphService.getAccessToken(userId);
+    // Use debug level - it's expected that users might not have connected Microsoft yet
+    const accessToken = await this.graphService.getAccessToken(userId, 'debug');
     if (!accessToken) {
-      this.logger.error(`Cannot create subscription: no token for ${userId}`);
+      this.logger.debug(`Cannot create subscription: no token for ${userId}`);
       return false;
     }
 
@@ -138,7 +139,10 @@ export class MicrosoftSubscriptionService {
             Authorization: `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ expirationDateTime }),
+          body: JSON.stringify({
+            expirationDateTime,
+            notificationUrl: `${this.microsoftConfig.apiBaseUrl}/webhooks/microsoft`,
+          }),
         },
       );
 
@@ -224,6 +228,7 @@ export class MicrosoftSubscriptionService {
 
   /**
    * Renew all subscriptions expiring within the next 24 hours
+   * Also creates subscriptions for users who have OAuth tokens but no subscription
    * Call this from a cron job
    */
   async renewExpiringSubscriptions(): Promise<void> {
@@ -237,6 +242,58 @@ export class MicrosoftSubscriptionService {
 
     for (const sub of expiring) {
       await this.renewSubscription(sub.userId);
+    }
+
+    // Also check for users with Microsoft OAuth tokens but no subscription
+    await this.createMissingSubscriptions();
+  }
+
+  /**
+   * Find users who have Microsoft OAuth tokens but no subscription and create them
+   */
+  private async createMissingSubscriptions(): Promise<void> {
+    // Get all users
+    const allUsers = await this.prisma.user.findMany({
+      select: { id: true },
+    });
+
+    let created = 0;
+    let skipped = 0;
+
+    for (const user of allUsers) {
+      // Check if user already has a subscription
+      const existing = await this.prisma.microsoftSubscription.findUnique({
+        where: { userId: user.id },
+      });
+
+      if (existing) {
+        continue;
+      }
+
+      // Check if user has a Microsoft OAuth token (use debug level - expected that many users won't have tokens)
+      const accessToken = await this.graphService.getAccessToken(
+        user.id,
+        'debug',
+      );
+      if (!accessToken) {
+        skipped++;
+        continue;
+      }
+
+      // User has token but no subscription - create it
+      this.logger.log(
+        `Found user ${user.id} with Microsoft token but no subscription, creating...`,
+      );
+      const success = await this.createSubscription(user.id);
+      if (success) {
+        created++;
+      }
+    }
+
+    if (created > 0 || skipped > 0) {
+      this.logger.log(
+        `Subscription check: created ${created} new subscriptions, skipped ${skipped} users without tokens`,
+      );
     }
   }
 
