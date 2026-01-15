@@ -32,7 +32,7 @@ export class MicrosoftSubscriptionService {
    */
   async createSubscription(userId: string): Promise<boolean> {
     // Use debug level - it's expected that users might not have connected Microsoft yet
-    const accessToken = await this.graphService.getAccessToken(userId, 'debug');
+    const accessToken = await this.graphService.getMicrosoftOAuthTokenFromClerk(userId, 'debug');
     if (!accessToken) {
       this.logger.debug(`Cannot create subscription: no token for ${userId}`);
       return false;
@@ -120,7 +120,7 @@ export class MicrosoftSubscriptionService {
       return this.createSubscription(userId);
     }
 
-    const accessToken = await this.graphService.getAccessToken(userId);
+    const accessToken = await this.graphService.getMicrosoftOAuthTokenFromClerk(userId);
     if (!accessToken) {
       this.logger.error(`Cannot renew subscription: no token for ${userId}`);
       return false;
@@ -193,7 +193,7 @@ export class MicrosoftSubscriptionService {
 
     if (!subscription) return;
 
-    const accessToken = await this.graphService.getAccessToken(userId);
+    const accessToken = await this.graphService.getMicrosoftOAuthTokenFromClerk(userId);
     if (accessToken) {
       try {
         await fetch(
@@ -290,7 +290,7 @@ export class MicrosoftSubscriptionService {
       }
 
       // Check if user has a Microsoft OAuth token (use debug level - expected that many users won't have tokens)
-      const accessToken = await this.graphService.getAccessToken(
+      const accessToken = await this.graphService.getMicrosoftOAuthTokenFromClerk(
         user.id,
         'debug',
       );
