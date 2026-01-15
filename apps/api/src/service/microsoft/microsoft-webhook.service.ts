@@ -85,7 +85,7 @@ export class MicrosoftWebhookService {
     }
 
     // Get access token for this user
-    const accessToken = await this.microsoftGraphService.getAccessToken(userId);
+    const accessToken = await this.microsoftGraphService.getMicrosoftOAuthTokenFromClerk(userId);
     if (!accessToken) {
       this.logger.error(`No access token for user ${userId}`);
       return;

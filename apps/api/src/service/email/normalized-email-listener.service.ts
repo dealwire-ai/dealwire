@@ -56,7 +56,7 @@ export class NormalizedEmailListenerService {
       let accessToken: string | undefined = queuedMessage.accessToken;
       if (queuedMessage.event.source === 'microsoft' && !accessToken) {
         // Fallback: try to fetch if missing (shouldn't happen, but be defensive)
-        const token = await this.microsoftGraphService.getAccessToken(queuedMessage.receivedByUserId);
+        const token = await this.microsoftGraphService.getMicrosoftOAuthTokenFromClerk(queuedMessage.receivedByUserId);
         if (!token) {
           this.logger.error(`No access token for user ${queuedMessage.receivedByUserId}`);
           throw new Error(`No access token for user ${queuedMessage.receivedByUserId}`);

@@ -39,7 +39,7 @@ export class MicrosoftGraphService {
    * @param userId - Clerk user ID
    * @param logLevel - Log level for missing token: 'warn' (default) for unexpected cases, 'debug' for expected cases (e.g., checking if user has connected)
    */
-  async getAccessToken(
+  async getMicrosoftOAuthTokenFromClerk(
     userId: string,
     logLevel: 'warn' | 'debug' = 'warn',
   ): Promise<string | null> {
