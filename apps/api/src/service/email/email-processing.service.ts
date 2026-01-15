@@ -149,8 +149,6 @@ export class EmailProcessingService {
   async processPdfBuffer(buffer: Buffer, filename?: string): Promise<string> {
     const name = filename || 'attachment.pdf';
     try {
-      this.logger.log(`Extracting text from PDF: ${name}`);
-
       const trimmedText = await extractPdfText(buffer);
 
       if (trimmedText) {
