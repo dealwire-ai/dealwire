@@ -238,10 +238,24 @@ export class MicrosoftSubscriptionService {
       where: { expiresAt: { lt: threshold } },
     });
 
-    this.logger.log(`Found ${expiring.length} subscriptions to renew`);
+    this.logger.log(`Found ${expiring.length} subscriptions expiring within 24 hours`);
+
+    let renewed = 0;
+    let failed = 0;
 
     for (const sub of expiring) {
-      await this.renewSubscription(sub.userId);
+      const success = await this.renewSubscription(sub.userId);
+      if (success) {
+        renewed++;
+      } else {
+        failed++;
+      }
+    }
+
+    if (expiring.length > 0) {
+      this.logger.log(
+        `Subscription renewal: ${renewed} renewed, ${failed} failed`,
+      );
     }
 
     // Also check for users with Microsoft OAuth tokens but no subscription
@@ -257,8 +271,12 @@ export class MicrosoftSubscriptionService {
       select: { id: true },
     });
 
+    this.logger.log(`Checking ${allUsers.length} users for missing subscriptions`);
+
     let created = 0;
+    let failed = 0;
     let skipped = 0;
+    let alreadyHasSubscription = 0;
 
     for (const user of allUsers) {
       // Check if user already has a subscription
@@ -267,6 +285,7 @@ export class MicrosoftSubscriptionService {
       });
 
       if (existing) {
+        alreadyHasSubscription++;
         continue;
       }
 
@@ -287,14 +306,16 @@ export class MicrosoftSubscriptionService {
       const success = await this.createSubscription(user.id);
       if (success) {
         created++;
+      } else {
+        failed++;
       }
     }
 
-    if (created > 0 || skipped > 0) {
-      this.logger.log(
-        `Subscription check: created ${created} new subscriptions, skipped ${skipped} users without tokens`,
-      );
-    }
+    this.logger.log(
+      `Subscription check complete: ${allUsers.length} users checked, ` +
+      `${alreadyHasSubscription} already have subscriptions, ` +
+      `${created} created, ${failed} failed, ${skipped} skipped (no token)`,
+    );
   }
 
   /**

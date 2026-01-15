@@ -3,7 +3,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { MicrosoftGraphService } from '../service/microsoft/microsoft-graph.service';
 import { MicrosoftSubscriptionService } from '../service/microsoft/microsoft-subscription.service';
 import { MicrosoftWebhookService } from '../service/microsoft/microsoft-webhook.service';
-import { MicrosoftSchedulerService } from '../service/microsoft/microsoft-scheduler.service';
+import { MicrosoftRenewalSchedulerService } from '../service/microsoft/microsoft-renewal-scheduler.service';
 import { MicrosoftWebhookController } from '../controller/webhook/microsoft-webhook.controller';
 import { PrismaModule } from './prisma.module';
 import { EmailProcessorModule } from './email-processor.module';
@@ -22,7 +22,7 @@ import { ClientPreferencesService } from '../service/preferences/client-preferen
     MicrosoftGraphService,
     MicrosoftSubscriptionService,
     MicrosoftWebhookService,
-    MicrosoftSchedulerService,
+    MicrosoftRenewalSchedulerService,
     ClientPreferencesService,
   ],
   exports: [MicrosoftGraphService, MicrosoftSubscriptionService, ClientPreferencesService],
