@@ -47,6 +47,51 @@ export class ClerkWebhookService {
   }
 
   private async createUser(data: any): Promise<void> {
+    // Log all user creation data for debugging
+    const userData = {
+      id: data.id,
+      email: data.email_addresses?.[0]?.email_address,
+      firstName: data.first_name,
+      lastName: data.last_name,
+      imageUrl: data.image_url,
+      emailAddresses: data.email_addresses,
+      externalAccounts: data.external_accounts,
+      samlAccounts: data.saml_accounts,
+      passwordEnabled: data.password_enabled,
+      totpEnabled: data.totp_enabled,
+      backupCodesEnabled: data.backup_codes_enabled,
+      twoFactorEnabled: data.two_factor_enabled,
+      publicMetadata: data.public_metadata,
+      privateMetadata: data.private_metadata,
+      unsafeMetadata: data.unsafe_metadata,
+      createdAt: data.created_at,
+      updatedAt: data.updated_at,
+      lastSignInAt: data.last_sign_in_at,
+      banned: data.banned,
+      locked: data.locked,
+      lockoutExpiresInSeconds: data.lockout_expires_in_seconds,
+      verificationAttemptsRemaining: data.verification_attempts_remaining,
+      createdAtTimestamp: data.created_at_timestamp,
+      updatedAtTimestamp: data.updated_at_timestamp,
+    };
+
+    this.logger.log(
+      `User created: ${data.id} - Full payload: ${JSON.stringify(userData, null, 2)}`,
+    );
+
+    // Extract SSO connection info if present
+    if (data.external_accounts && data.external_accounts.length > 0) {
+      const ssoConnections = data.external_accounts.map((acc: any) => ({
+        provider: acc.provider,
+        externalId: acc.external_id,
+        email: acc.email_address,
+        verified: acc.verification?.status === 'verified',
+      }));
+      this.logger.log(
+        `User ${data.id} SSO connections: ${JSON.stringify(ssoConnections)}`,
+      );
+    }
+
     // Use upsert to handle edge cases (e.g., failed delete, re-signup with same email)
     await this.prisma.user.upsert({
       where: { id: data.id },
@@ -64,7 +109,6 @@ export class ClerkWebhookService {
         imageUrl: data.image_url,
       },
     });
-    this.logger.log(`User created: ${data.id}`);
 
     // Create Microsoft Graph subscription for email notifications
     // This runs async - don't block the webhook response
