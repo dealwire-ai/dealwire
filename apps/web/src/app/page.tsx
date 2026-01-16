@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useRef } from 'react';
+import Link from 'next/link';
 import { motion, useInView } from 'framer-motion';
 import { Building2, Brain, Workflow, Sparkles, Linkedin, Mail } from 'lucide-react';
 import { Button } from "../components/ui/button";
@@ -40,16 +41,15 @@ export default function Home() {
             <span className="text-xl font-semibold tracking-tight">Levine & Weinstein</span>
           </div>
           <div className="hidden md:flex items-center gap-8 text-sm text-white/60">
-            <a href="#services" className="hover:text-white transition-colors">Services</a>
-            <a href="#about" className="hover:text-white transition-colors">About</a>
-            <a href="#contact" className="hover:text-white transition-colors">Contact</a>
+            <button onClick={() => document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-white transition-colors">Services</button>
+            <button onClick={() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-white transition-colors">About</button>
+            <button onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-white transition-colors">Contact</button>
           </div>
-          <Button 
-            className="bg-[#3ECFA0] hover:bg-[#35b88f] text-black font-medium px-6"
-            onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
-          >
-            Get Started
-          </Button>
+          <Link href="/book">
+            <Button className="bg-[#3ECFA0] hover:bg-[#35b88f] text-black font-medium px-6">
+              Book a Call
+            </Button>
+          </Link>
         </div>
       </nav>
 
@@ -70,23 +70,24 @@ export default function Home() {
           >
             
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-normal tracking-tight leading-[0.95] mb-8">
-              Work less.<br />
-              Close more.
+              Bespoke AI for<br />
+              Real Estate teams.
             </h1>
             
             <p className="text-lg md:text-xl text-white/50 max-w-xl leading-relaxed mb-12">
-              Your competitors spend hours on tasks AI handles in minutes.
-              We build custom tools that transform how CRE teams acquire, operate, and scale.
+              While competitors manually screen OMs and build proformas, your team closes.
+              We build custom tools around your strategy and scale with your pipeline.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button 
-                size="lg"
-                className="bg-[#3ECFA0] hover:bg-[#35b88f] text-black font-semibold px-8 h-14 text-base uppercase tracking-wide"
-                onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
-              >
-                Start Transformation
-              </Button>
+              <Link href="/book">
+                <Button 
+                  size="lg"
+                  className="bg-[#3ECFA0] hover:bg-[#35b88f] text-black font-semibold px-8 h-14 text-base uppercase tracking-wide"
+                >
+                  Let&apos;s Talk
+                </Button>
+              </Link>
               <Button 
                 size="lg"
                 variant="outline"
@@ -106,10 +107,10 @@ export default function Home() {
           <FadeInSection>
             <p className="text-[#3ECFA0] text-sm font-medium tracking-wider uppercase mb-4">What We Build</p>
             <h2 className="text-4xl md:text-5xl font-normal tracking-tight mb-6">
-              Your back office, automated.
+              Your grunt work, handled.
             </h2>
             <p className="text-white/50 text-lg max-w-2xl mb-16">
-              From teasers hitting your inbox to K-1s going out the door—we build AI that handles the work you hate but can&apos;t ignore.
+              From teasers hitting your inbox to K-1s going out the door— we build AI that handles the work you hate but can&apos;t ignore.
             </p>
           </FadeInSection>
           
@@ -124,7 +125,7 @@ export default function Home() {
               {
                 icon: Workflow,
                 title: "Operations",
-                tagline: "The grunt work, gone.",
+                tagline: "Operations that scale.",
                 description: "Lease abstracts in seconds. CAM reconciliations without the headache. Tenant notices, rent rolls, and NOI tracking that runs itself."
               },
               {
@@ -153,11 +154,11 @@ export default function Home() {
       <section id="about" className="relative z-10 px-6 lg:px-16 py-24 lg:py-32">
         <div className="max-w-7xl mx-auto">
           <FadeInSection>
-            <p className="text-[#3ECFA0] text-sm font-medium tracking-wider uppercase mb-4">The Founders</p>
+            <p className="text-[#3ECFA0] text-sm font-medium tracking-wider uppercase mb-4">The Team</p>
             <h2 className="text-4xl md:text-5xl font-normal tracking-tight mb-6">
               Built by engineers,
               <br />
-              <span className="text-white/40">backed by RE leaders</span>
+              <span className="text-white/40">backed by RE veterans.</span>
             </h2>
             <p className="text-white/50 max-w-2xl text-lg leading-relaxed mb-16">
               We&apos;re Isaac and Noah—two computer science majors from Northeastern University 
@@ -170,12 +171,12 @@ export default function Home() {
               {
                 name: "Isaac Levine",
                 role: "Co-Founder",
-                bio: "Computer Science @ Northeastern. Co-built frontstep.ai and now focuses on creating AI solutions that solve real problems for RE professionals."
+                bio: "Computer Science @ Northeastern University. Cofounded frontstep.ai and now focuses on creating AI solutions that solve real problems for RE professionals."
               },
               {
                 name: "Noah Weinstein",
                 role: "Co-Founder",
-                bio: "Computer Science @ Northeastern. Co-built frontstep.ai and brings a passion for clean architecture and scalable systems to every project."
+                bio: "Computer Science @ Northeastern University. Cofounded frontstep.ai and brings a passion for clean architecture and scalable systems to every project."
               }
             ].map((founder, index) => (
               <FadeInSection key={index} delay={index * 0.15}>
@@ -211,13 +212,13 @@ export default function Home() {
               {[
                 {
                   name: "David Shorenstein",
-                  role: "Strategic Advisor",
-                  bio: "15+ years in NYC real estate. Co-founded Silvershore Properties, assembling a $300M+ portfolio across 250+ properties. Former CIO at Forrest Shorenstein Capital, Senior Associate at Marcus & Millichap. NYU Stern graduate."
+                  role: "Advisor",
+                  bio: "15+ years in NYC real estate. Co-founded Silvershore Properties, assembling a $300M+ portfolio across 250+ properties. Former CIO at Forrest Shorenstein Capital, Senior Associate at Marcus & Millichap."
                 },
                 {
                   name: "Jordan Karlik",
-                  role: "Strategic Advisor",
-                  bio: "Started in CMBS at Deutsche Bank and Ernst & Young. Led RE development projects in Chicago through market cycles. Now oversees all aspects of JK Equities with focus on construction and sourcing."
+                  role: "Advisor",
+                  bio: "Started in CMBS at Deutsche Bank and Ernst & Young. Led RE development projects in Chicago through market cycles. Now oversees all aspects of JK Equities, which has collectively participated in $1.5 billion of real estate transactions over 40 years."
                 }
               ].map((advisor, index) => (
                 <div key={index} className="p-6 bg-white/[0.02] border border-white/5 rounded-2xl">
@@ -276,15 +277,14 @@ export default function Home() {
                   In 12 months, you&apos;ll either be the firm that figured out AI—or one of the ones asking how they did it.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <a href="mailto:hello@levineweinstein.com">
+                  <Link href="/book">
                     <Button 
                       size="lg"
                       className="bg-[#3ECFA0] hover:bg-[#35b88f] text-black font-semibold px-8 h-14 text-base uppercase tracking-wide w-full sm:w-auto"
                     >
-                      <Mail className="w-5 h-5 mr-2" />
                       Book a Call
                     </Button>
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>
