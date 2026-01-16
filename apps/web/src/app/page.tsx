@@ -70,12 +70,13 @@ export default function Home() {
           >
             
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-normal tracking-tight leading-[0.95] mb-8">
-              Custom AI tooling for modern RE firms
+              Work less.<br />
+              Close more.
             </h1>
             
             <p className="text-lg md:text-xl text-white/50 max-w-xl leading-relaxed mb-12">
-              We build bespoke artificial intelligence solutions that streamline operations, 
-              enhance decision-making, and drive growth for real estate businesses.
+              Your competitors spend hours on tasks AI handles in minutes.
+              We build custom tools that transform how CRE teams acquire, operate, and scale.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4">
@@ -84,15 +85,15 @@ export default function Home() {
                 className="bg-[#3ECFA0] hover:bg-[#35b88f] text-black font-semibold px-8 h-14 text-base uppercase tracking-wide"
                 onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
               >
-                Get Started
+                Start Transformation
               </Button>
               <Button 
                 size="lg"
                 variant="outline"
                 className="border-white/20 bg-transparent text-white hover:bg-white/5 px-8 h-14 text-base uppercase tracking-wide"
-                onClick={() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })}
+                onClick={() => document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' })}
               >
-                Key Features
+                View Services
               </Button>
             </div>
           </motion.div>
@@ -104,9 +105,12 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <FadeInSection>
             <p className="text-[#3ECFA0] text-sm font-medium tracking-wider uppercase mb-4">What We Build</p>
-            <h2 className="text-4xl md:text-5xl font-normal tracking-tight mb-16">
-              Tailored AI solutions
+            <h2 className="text-4xl md:text-5xl font-normal tracking-tight mb-6">
+              Your back office, automated.
             </h2>
+            <p className="text-white/50 text-lg max-w-2xl mb-16">
+              From teasers hitting your inbox to K-1s going out the door—we build AI that handles the work you hate but can&apos;t ignore.
+            </p>
           </FadeInSection>
           
           <div className="grid md:grid-cols-3 gap-6">
@@ -114,17 +118,20 @@ export default function Home() {
               {
                 icon: Building2,
                 title: "Acquisitions",
-                description: "Streamline deal sourcing, due diligence, and underwriting. From automated comps analysis to AI-powered property evaluation, we accelerate your acquisition pipeline."
+                tagline: "Screen 100 deals. Underwrite 10. Close the best.",
+                description: "Auto-parse OMs and teasers. Run comps against your buy box. Generate proformas and LOIs before your competitors open the email."
               },
               {
                 icon: Workflow,
                 title: "Operations",
-                description: "Optimize property and portfolio management. Automate tenant communications, maintenance workflows, lease administration, and reporting to run smoother operations."
+                tagline: "The grunt work, gone.",
+                description: "Lease abstracts in seconds. CAM reconciliations without the headache. Tenant notices, rent rolls, and NOI tracking that runs itself."
               },
               {
                 icon: Brain,
                 title: "Capital & Investors",
-                description: "Enhance fundraising and investor relations. Automate LP reporting, personalized communications, and capital pipeline management to strengthen relationships and close faster."
+                tagline: "Your LPs will notice.",
+                description: "Automated quarterly reports, waterfall distributions, and K-1 prep. Keep your investors informed without the manual lift."
               }
             ].map((service, index) => (
               <FadeInSection key={index} delay={index * 0.1}>
@@ -132,7 +139,8 @@ export default function Home() {
                   <div className="w-12 h-12 bg-[#3ECFA0]/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-[#3ECFA0]/20 transition-colors">
                     <service.icon className="w-6 h-6 text-[#3ECFA0]" />
                   </div>
-                  <h3 className="text-xl font-medium mb-3">{service.title}</h3>
+                  <h3 className="text-xl font-medium mb-2">{service.title}</h3>
+                  <p className="text-[#3ECFA0] text-sm font-medium mb-3">{service.tagline}</p>
                   <p className="text-white/50 leading-relaxed">{service.description}</p>
                 </div>
               </FadeInSection>
@@ -149,7 +157,7 @@ export default function Home() {
             <h2 className="text-4xl md:text-5xl font-normal tracking-tight mb-6">
               Built by engineers,
               <br />
-              <span className="text-white/40">designed for real estate</span>
+              <span className="text-white/40">backed by RE leaders</span>
             </h2>
             <p className="text-white/50 max-w-2xl text-lg leading-relaxed mb-16">
               We&apos;re Isaac and Noah—two computer science majors from Northeastern University 
@@ -196,7 +204,39 @@ export default function Home() {
             ))}
           </div>
 
+          {/* Strategic Advisors */}
           <FadeInSection delay={0.3}>
+            <p className="text-[#3ECFA0] text-sm font-medium tracking-wider uppercase mb-4 mt-20">Strategic Advisors</p>
+            <div className="grid md:grid-cols-2 gap-6">
+              {[
+                {
+                  name: "David Shorenstein",
+                  role: "Strategic Advisor",
+                  bio: "15+ years in NYC real estate. Co-founded Silvershore Properties, assembling a $300M+ portfolio across 250+ properties. Former CIO at Forrest Shorenstein Capital, Senior Associate at Marcus & Millichap. NYU Stern graduate."
+                },
+                {
+                  name: "Jordan Karlik",
+                  role: "Strategic Advisor",
+                  bio: "Started in CMBS at Deutsche Bank and Ernst & Young. Led RE development projects in Chicago through market cycles. Now oversees all aspects of JK Equities with focus on construction and sourcing."
+                }
+              ].map((advisor, index) => (
+                <div key={index} className="p-6 bg-white/[0.02] border border-white/5 rounded-2xl">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="w-12 h-12 bg-[#3ECFA0]/10 border border-[#3ECFA0]/20 rounded-xl flex items-center justify-center text-lg font-medium text-[#3ECFA0]">
+                      {advisor.name.split(' ').map(n => n[0]).join('')}
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-medium">{advisor.name}</h3>
+                      <p className="text-[#3ECFA0] text-sm">{advisor.role}</p>
+                    </div>
+                  </div>
+                  <p className="text-white/50 text-sm leading-relaxed">{advisor.bio}</p>
+                </div>
+              ))}
+            </div>
+          </FadeInSection>
+
+          <FadeInSection delay={0.4}>
             <div className="mt-16 p-8 lg:p-12 bg-gradient-to-r from-[#3ECFA0]/5 to-transparent border border-[#3ECFA0]/10 rounded-3xl">
               <div className="flex flex-col lg:flex-row lg:items-center gap-6 lg:gap-12">
                 <div className="flex items-center gap-4">
@@ -230,11 +270,10 @@ export default function Home() {
               
               <div className="relative px-8 py-16 lg:p-20 text-center">
                 <h2 className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight mb-6">
-                  Let&apos;s build something together
+                  Ready to move faster?
                 </h2>
                 <p className="text-white/50 text-lg max-w-xl mx-auto mb-10">
-                  Ready to explore how custom AI tooling can transform your real estate operations? 
-                  Let&apos;s start a conversation.
+                  In 12 months, you&apos;ll either be the firm that figured out AI—or one of the ones asking how they did it.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <a href="mailto:hello@levineweinstein.com">
@@ -243,7 +282,7 @@ export default function Home() {
                       className="bg-[#3ECFA0] hover:bg-[#35b88f] text-black font-semibold px-8 h-14 text-base uppercase tracking-wide w-full sm:w-auto"
                     >
                       <Mail className="w-5 h-5 mr-2" />
-                      Get in touch
+                      Book a Call
                     </Button>
                   </a>
                 </div>
