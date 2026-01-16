@@ -44,6 +44,9 @@ export class NotificationService {
     userId?: string,
     organizationName?: string,
   ): Promise<void> {
+    if (process.env.NOTIFY_DEAL_PROCESSED === 'false') {
+      return;
+    }
     if (this.notificationLevel === 'errors-only') {
       return;
     }
