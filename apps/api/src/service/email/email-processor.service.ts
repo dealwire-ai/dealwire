@@ -12,6 +12,7 @@ import { DealDetectionService } from '../deal/deal-detection.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { S3Service } from '../s3/s3.service';
 import { MetricsService } from '../metrics/metrics.service';
+import { NotificationService } from '../notifications/notification.service';
 import { aiConfig } from '../../config/ai.config';
 import { NormalizedEmailEvent } from '../../dto/normalized-email-event.dto';
 
@@ -48,6 +49,7 @@ export class EmailProcessorService {
     private readonly prismaService: PrismaService,
     private readonly s3Service: S3Service,
     private readonly metricsService: MetricsService,
+    private readonly notificationService: NotificationService,
   ) {}
 
   /**
@@ -71,6 +73,8 @@ export class EmailProcessorService {
           `Skipping non-deal email: ${event.messageId} - "${event.subject}" (${detection.reason})`,
         );
         this.metricsService.recordDealSkipped(detection.reason || 'unknown');
+        this.metricsService.recordEmailEvent(false, null, false);
+        
         return { processed: false, skippedReason: detection.reason };
       }
 
@@ -79,6 +83,8 @@ export class EmailProcessorService {
       if (extractedTexts.length === 0) {
         this.logger.log(`No text extracted from email ${event.messageId}`);
         this.metricsService.recordDealSkipped('No text extracted');
+        this.metricsService.recordEmailEvent(false, null, false);
+        
         return { processed: false, skippedReason: 'No text extracted' };
       }
 
@@ -101,8 +107,45 @@ export class EmailProcessorService {
 
       // Step 6: Save deal to database and upload attachments
       let dealId: string | undefined;
+      let organizationName: string | undefined;
       if (organizationId) {
-        dealId = await this.saveDeal(ctx, summary, decision.decision as 'yes' | 'no', accessToken);
+        // Get organization name for notifications
+        const org = await this.prismaService.organization.findUnique({
+          where: { id: organizationId },
+          select: { name: true },
+        });
+        organizationName = org?.name;
+
+        dealId = await this.saveDeal(
+          ctx,
+          summary,
+          decision.decision as 'yes' | 'no',
+          detection,
+          accessToken,
+        );
+
+        // Notify about deal processed (only for actual deals)
+        if (dealId) {
+          // Get email body text (prefer plain text, fallback to HTML stripped)
+          const emailBodyText = event.bodyText || this.htmlToText(event.bodyHtml || '');
+          
+          // Get S3 keys for attachments
+          const attachmentS3Keys = event.attachments
+            .filter((att) => att.s3Key)
+            .map((att) => att.s3Key!);
+          
+          await this.notificationService.notifyDealProcessed(
+            dealId,
+            event.subject || 'No subject',
+            event.from || 'Unknown',
+            decision.decision as 'yes' | 'no',
+            decision.reason,
+            emailBodyText,
+            attachmentS3Keys,
+            receivedByUserId,
+            organizationName,
+          );
+        }
       } else {
         this.logger.warn(`User ${receivedByUserId} has no organization - deal will not be saved`);
       }
@@ -125,13 +168,22 @@ export class EmailProcessorService {
         );
 
         // Step 8: Move passed deals to folder
-        if (decision.decision === 'no') {
+        if (decision.decision === 'no' && dealId) {
           const folderName = clientPrefs.passedFolderName || DEFAULT_PASSED_FOLDER;
           await this.microsoftGraphService.moveMessageToPassedFolder(
             accessToken,
             event.messageId,
             folderName,
           );
+          
+          // Update Deal record with folder name
+          await this.prismaService.deal.update({
+            where: { id: dealId },
+            data: { folderMovedTo: folderName },
+          });
+
+          // Record metrics
+          this.metricsService.recordFolderMove(folderName);
         }
       }
 
@@ -142,6 +194,7 @@ export class EmailProcessorService {
         decision.decision as 'yes' | 'no',
         event.source,
       );
+      this.metricsService.recordEmailEvent(true, decision.decision as 'yes' | 'no', false);
 
       this.logger.log(
         `Deal processed in ${durationSeconds.toFixed(2)}s: ${event.messageId} → ${decision.decision}`,
@@ -155,7 +208,20 @@ export class EmailProcessorService {
       };
     } catch (error: unknown) {
       const errorType = error instanceof Error ? error.constructor.name : 'Unknown';
+      const errorMessage = error instanceof Error ? error.message : String(error);
       this.metricsService.recordProcessingError(errorType, 'processing');
+      
+      // Record metrics
+      this.metricsService.recordEmailEvent(true, null, true);
+
+      // Notify about processing error
+      await this.notificationService.notifyError(
+        ctx.event.messageId,
+        ctx.event.subject || 'No subject',
+        errorMessage,
+        'processing',
+      );
+      
       throw error;
     }
   }
@@ -214,6 +280,7 @@ export class EmailProcessorService {
     ctx: ProcessDealContext,
     summary: string,
     decision: 'yes' | 'no',
+    detection: { isDeal: boolean; confidence: string; reason: string },
     accessToken?: string,
   ): Promise<string | undefined> {
     const { event, organizationId, receivedByUserId, dealId } = ctx;
@@ -232,6 +299,8 @@ export class EmailProcessorService {
           initialScreeningDecision: decision.toUpperCase() as 'YES' | 'NO',
           initialScreeningSummary: summary,
           initialScreeningAt: new Date(),
+          detectionConfidence: detection.confidence,
+          detectionReason: detection.reason,
         },
         select: { id: true },
       });

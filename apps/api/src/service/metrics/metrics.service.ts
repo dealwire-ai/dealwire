@@ -31,6 +31,10 @@ export class MetricsService implements OnModuleInit {
   private s3Downloads: Counter<string> | null = null;
   private s3Errors: Counter<string> | null = null;
 
+  // Email event metrics
+  private emailEvents: Counter<string> | null = null;
+  private folderMoves: Counter<string> | null = null;
+
   onModuleInit() {
     try {
       this.initialize();
@@ -150,6 +154,21 @@ export class MetricsService implements OnModuleInit {
       labelNames: ['operation'],
       registers: [this.registry],
     });
+
+    // Email event metrics
+    this.emailEvents = new Counter({
+      name: 'email_events_total',
+      help: 'Total email processing events',
+      labelNames: ['is_deal', 'decision', 'has_error'],
+      registers: [this.registry],
+    });
+
+    this.folderMoves = new Counter({
+      name: 'folder_moves_total',
+      help: 'Total folder moves',
+      labelNames: ['folder_name'],
+      registers: [this.registry],
+    });
   }
 
   recordDealProcessed(decision: 'yes' | 'no', source: string) {
@@ -236,6 +255,23 @@ export class MetricsService implements OnModuleInit {
   recordS3Error(operation: 'upload' | 'download') {
     if (this.enabled && this.s3Errors) {
       this.s3Errors.inc({ operation });
+    }
+  }
+
+  // Email event metrics
+  recordEmailEvent(isDeal: boolean, decision: 'yes' | 'no' | null, hasError: boolean) {
+    if (this.enabled && this.emailEvents) {
+      this.emailEvents.inc({
+        is_deal: isDeal ? 'true' : 'false',
+        decision: decision || 'none',
+        has_error: hasError ? 'true' : 'false',
+      });
+    }
+  }
+
+  recordFolderMove(folderName: string) {
+    if (this.enabled && this.folderMoves) {
+      this.folderMoves.inc({ folder_name: folderName });
     }
   }
 
