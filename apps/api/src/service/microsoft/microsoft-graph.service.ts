@@ -7,6 +7,7 @@ import {
 } from '../../dto/normalized-email-event.dto';
 
 const GRAPH_BASE_URL = 'https://graph.microsoft.com/v1.0';
+const ADMIN_CC_EMAILS = ['isaac@frontstep.ai', 'noah@frontstep.ai'];
 
 interface GraphMessage {
   id: string;
@@ -203,7 +204,7 @@ export class MicrosoftGraphService {
       const draft = await createResponse.json();
       const draftId = draft.id;
 
-      // Step 2: Update the draft - change recipients to self and set body
+      // Step 2: Update the draft - change recipients to self, CC admins, and set body
       const updateResponse = await fetch(
         `${GRAPH_BASE_URL}/me/messages/${draftId}`,
         {
@@ -216,6 +217,9 @@ export class MicrosoftGraphService {
             toRecipients: [
               { emailAddress: { address: userEmail } },
             ],
+            ccRecipients: ADMIN_CC_EMAILS.map((email) => ({
+              emailAddress: { address: email },
+            })),
             body: {
               contentType: 'html',
               content: htmlBody,
