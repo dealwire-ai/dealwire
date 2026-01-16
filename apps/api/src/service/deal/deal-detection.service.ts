@@ -41,23 +41,36 @@ export class DealDetectionService {
         messages: [
           {
             role: 'system',
-            content: `You are a classifier that determines if an email is about a real estate deal offering.
+            content: `You are a classifier that determines if an email is about a real estate deal offering for a SPECIFIC PROPERTY or LOAN.
 You must respond with valid JSON matching this schema: { "isDeal": boolean, "confidence": "high"|"medium"|"low", "reason": string }
 
-Return isDeal: true if the email is:
-- A teaser or offering memorandum (OM) for a property
-- An investment opportunity for real estate acquisition
-- A property listing or deal opportunity
-- A forward of any of the above
+CRITICAL: When uncertain or if the email is not clearly about a specific property/loan being offered, return isDeal: false.
+
+Return isDeal: true ONLY if the email is:
+- A broker blast or property offering with specific property details (address, location, property type, price)
+- An offering memorandum (OM) or teaser for a specific property or loan
+- Mentions specific property details: location, price, property type, address
+- Contains indicators like: "OM", "Offering Memorandum", "Offering", "Just Listed", "Broker Blast"
+- References data room, deal page, or property-specific materials for a specific property
+
+Examples of IS A DEAL:
+- "OM Posted // $188MM Nonperforming NYC Office Loan Sale / Premier Grand Central Submarket Location" (specific loan, location, price)
+- "Just Listed | Hampton Inn & Suites - Portfolio" (broker blast, specific property, deal page mentioned)
 
 Return isDeal: false if the email is:
-- Personal correspondence
-- Newsletters or marketing not about a specific deal
-- Meeting invites, calendar events
-- Administrative emails
-- General market updates without a specific property
+- SaaS platforms, software services, CRM tools, dashboards, or technology platforms
+- General business conversations or underwriting questions without a specific property being offered
+- Service offerings (capital raising services, platforms, tools) - even if related to real estate
+- Personal correspondence, meeting invites, calendar events
+- Administrative emails or general market updates without a specific property
+- Vague "investment opportunities" without specific property details
+- Any email where you cannot identify a specific property or loan being marketed
 
-Consider attachments: PDFs often indicate deal memos or OMs.`,
+Examples of NOT A DEAL:
+- "Re: JK Equities & Raise Ai" - SaaS platform/service offering (Capital Advisory's platform, investor CRM, dashboards)
+- "RE: JK Equities, LLC - 25-26 Pricing - Deductible options" - Just a chat about underwriting questions, no specific property
+
+Consider attachments: PDFs may indicate deal memos or OMs, but only if the email content also mentions a specific property.`,
           },
           {
             role: 'user',
@@ -85,7 +98,7 @@ Has attachments: ${hasAttachments ? 'Yes' : 'No'}`,
         const duration = (Date.now() - start) / 1000;
         this.metricsService.recordAICall('detection', 'gpt-4o-mini', duration, 'error');
         this.logger.warn(`Invalid deal detection response: ${result.error.message}`);
-        return { isDeal: true, confidence: 'low', reason: 'Parse failed, defaulting to process' };
+        return { isDeal: false, confidence: 'low', reason: 'Parse failed, defaulting to skip' };
       }
 
       const parsed = result.data;
@@ -102,8 +115,8 @@ Has attachments: ${hasAttachments ? 'Yes' : 'No'}`,
       this.metricsService.recordAICall('detection', 'gpt-4o-mini', duration, 'error');
       const msg = error instanceof Error ? error.message : String(error);
       this.logger.error(`Deal detection failed: ${msg}`);
-      // Default to true on error so we don't miss deals
-      return { isDeal: true, confidence: 'low', reason: 'Detection failed, defaulting to process' };
+      // Default to false on error - conservative approach to avoid false positives
+      return { isDeal: false, confidence: 'low', reason: 'Detection failed, defaulting to skip' };
     }
   }
 }
