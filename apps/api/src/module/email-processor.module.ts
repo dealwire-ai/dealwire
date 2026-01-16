@@ -8,6 +8,7 @@ import { EmailModule as EmailServicesModule } from './email.module'; // Email se
 import { PrismaModule } from './prisma.module';
 import { MicrosoftModule } from './microsoft.module';
 import { S3Module } from './s3.module';
+import { NotificationsModule } from './notifications.module';
 import { sqsConfig } from '../config/sqs.config';
 
 @Module({
@@ -16,6 +17,7 @@ import { sqsConfig } from '../config/sqs.config';
     EmailServicesModule,
     PrismaModule,
     S3Module,
+    NotificationsModule,
     SqsModule.register({
       consumers: [
         {

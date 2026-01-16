@@ -70,6 +70,11 @@ model Deal {
   initialScreeningSummary  String?   @db.Text
   initialScreeningAt       DateTime?
 
+  // Detection metadata
+  detectionConfidence String? // high/medium/low
+  detectionReason     String? @db.Text // Why it was classified as a deal
+  folderMovedTo       String? // Folder name if moved (e.g., "Passed Deals")
+
   // Relationships
   asset     Asset?     @relation(fields: [assetId], references: [id])
   assetId   String?
