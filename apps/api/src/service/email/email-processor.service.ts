@@ -8,7 +8,7 @@ import {
 } from '../preferences/client-preferences.service';
 import { DealSummaryService } from '../deal/deal-summary.service';
 import { DealDecisionService } from '../deal/deal-decision.service';
-import { DealDetectionService } from '../deal/deal-detection.service';
+import { DealDetection } from '../deal/deal-detection.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { S3Service } from '../s3/s3.service';
 import { MetricsService } from '../metrics/metrics.service';
@@ -23,6 +23,7 @@ export interface ProcessDealContext {
   receivedByUserId?: string;
   organizationId?: string;
   dealId?: string; // Pre-generated dealId for S3 organization
+  detection: DealDetection; // Deal detection result (done in webhook)
 }
 
 export interface ProcessDealResult {
@@ -45,7 +46,6 @@ export class EmailProcessorService {
     private readonly clientPreferencesService: ClientPreferencesService,
     private readonly dealSummaryService: DealSummaryService,
     private readonly dealDecisionService: DealDecisionService,
-    private readonly dealDetectionService: DealDetectionService,
     private readonly prismaService: PrismaService,
     private readonly s3Service: S3Service,
     private readonly metricsService: MetricsService,
@@ -54,23 +54,17 @@ export class EmailProcessorService {
 
   /**
    * Process an incoming email from any source (Microsoft, Resend, etc.)
+   * Note: Deal detection is now done in the webhook handler before this is called.
    */
   async process(ctx: ProcessDealContext): Promise<ProcessDealResult> {
-    const { event, accessToken, inboxOwnerEmail, receivedByUserId, organizationId } = ctx;
+    const { event, accessToken, inboxOwnerEmail, receivedByUserId, organizationId, detection } = ctx;
     const startTime = Date.now();
 
     try {
-      // Step 1: Quick deal detection
-      const bodyText = event.bodyText || this.htmlToText(event.bodyHtml || '');
-      const detection = await this.dealDetectionService.isDealEmail(
-        event.subject,
-        bodyText,
-        event.attachments.length > 0,
-      );
-
+      // Deal detection is done in webhook - if we get here, it's already a deal
       if (!detection.isDeal) {
-        this.logger.log(
-          `Skipping non-deal email: ${event.messageId} - "${event.subject}" (${detection.reason})`,
+        this.logger.warn(
+          `Received non-deal email in processor: ${event.messageId} - "${event.subject}" (${detection.reason})`,
         );
         this.metricsService.recordDealSkipped(detection.reason || 'unknown');
         this.metricsService.recordEmailEvent(false, null, false);
@@ -78,7 +72,7 @@ export class EmailProcessorService {
         return { processed: false, skippedReason: detection.reason };
       }
 
-      // Step 2: Extract text from email and attachments
+      // Step 1: Extract text from email and attachments
       const extractedTexts = await this.extractAllText(event, accessToken);
       if (extractedTexts.length === 0) {
         this.logger.log(`No text extracted from email ${event.messageId}`);
@@ -90,22 +84,22 @@ export class EmailProcessorService {
 
       const combinedText = extractedTexts.join('\n\n');
 
-      // Step 3: Get client preferences
+      // Step 2: Get client preferences
       const clientPrefs = this.clientPreferencesService.getPreferences(inboxOwnerEmail);
 
-      // Step 4: Generate AI summary
+      // Step 3: Generate AI summary
       const summary = await this.dealSummaryService.summarizeDeal(
         combinedText,
         clientPrefs.dealCriteria,
       );
 
-      // Step 5: Make AI decision
+      // Step 4: Make AI decision
       const decision = await this.dealDecisionService.makeDecision(
         summary,
         clientPrefs.dealCriteria,
       );
 
-      // Step 6: Save deal to database and upload attachments
+      // Step 5: Save deal to database (attachments already in S3 from webhook)
       let dealId: string | undefined;
       let organizationName: string | undefined;
       if (organizationId) {
@@ -167,7 +161,7 @@ export class EmailProcessorService {
           htmlEmail,
         );
 
-        // Step 8: Move passed deals to folder
+        // Step 7: Move passed deals to folder
         if (decision.decision === 'no' && dealId) {
           const folderName = clientPrefs.passedFolderName || DEFAULT_PASSED_FOLDER;
           await this.microsoftGraphService.moveMessageToPassedFolder(

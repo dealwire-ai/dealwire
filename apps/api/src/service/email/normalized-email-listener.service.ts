@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { SqsMessageHandler, SqsConsumerEventHandler } from '@ssut/nestjs-sqs';
 import { Message } from '@aws-sdk/client-sqs';
 import { EmailProcessorService, ProcessDealContext } from './email-processor.service';
+import { DealDetection } from '../deal/deal-detection.service';
 import { NormalizedEmailEvent } from '../../dto/normalized-email-event.dto';
 import { MicrosoftGraphService } from '../microsoft/microsoft-graph.service';
 import { PrismaService } from '../prisma/prisma.service';
@@ -14,6 +15,7 @@ interface QueuedEmailMessage {
   receivedByUserId: string;
   organizationId: string | null;
   dealId: string; // Pre-generated dealId for S3 organization
+  detection: DealDetection; // Deal detection result (done in webhook)
 }
 
 @Injectable()
@@ -76,6 +78,12 @@ export class NormalizedEmailListenerService {
       }
 
       // Process the email
+      // Detection is required - must be provided from webhook
+      if (!queuedMessage.detection) {
+        this.logger.error(`Missing detection result for email ${queuedMessage.event.messageId}`);
+        throw new Error('Missing detection result - deal detection must be done in webhook');
+      }
+
       const ctx: ProcessDealContext = {
         event: queuedMessage.event,
         accessToken,
@@ -83,6 +91,7 @@ export class NormalizedEmailListenerService {
         receivedByUserId: queuedMessage.receivedByUserId,
         organizationId: organizationId ?? undefined,
         dealId: queuedMessage.dealId, // Pre-generated dealId for S3 organization
+        detection: queuedMessage.detection, // Deal detection result from webhook
       };
 
       await this.emailProcessor.process(ctx);

@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { SqsService } from '@ssut/nestjs-sqs';
 import { NormalizedEmailEvent } from '../../dto/normalized-email-event.dto';
 import { MetricsService } from '../metrics/metrics.service';
+import { DealDetection } from '../deal/deal-detection.service';
 
 interface QueuedEmailMessage {
   event: NormalizedEmailEvent;
@@ -10,6 +11,7 @@ interface QueuedEmailMessage {
   receivedByUserId: string;
   organizationId: string | null;
   dealId: string;
+  detection: DealDetection; // Deal detection result (done in webhook)
 }
 
 @Injectable()
