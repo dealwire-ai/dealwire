@@ -127,8 +127,10 @@ export class MicrosoftWebhookService {
           `Skipping self-sent email: ${emailEvent.messageId} - "${emailEvent.subject}"`,
         );
         const durationSeconds = (Date.now() - startTime) / 1000;
-        this.metricsService.recordMicrosoftWebhookRequest(userEmail, 'success');
-        this.metricsService.recordMicrosoftWebhookLatency(userEmail, durationSeconds);
+        if (userEmail) {
+          this.metricsService.recordMicrosoftWebhookRequest(userEmail, 'success');
+          this.metricsService.recordMicrosoftWebhookLatency(userEmail, durationSeconds);
+        }
         return;
       }
 
@@ -150,8 +152,10 @@ export class MicrosoftWebhookService {
         );
         this.metricsService.recordDealSkipped(detection.reason || 'unknown');
         const durationSeconds = (Date.now() - startTime) / 1000;
-        this.metricsService.recordMicrosoftWebhookRequest(userEmail, 'success');
-        this.metricsService.recordMicrosoftWebhookLatency(userEmail, durationSeconds);
+        if (userEmail) {
+          this.metricsService.recordMicrosoftWebhookRequest(userEmail, 'success');
+          this.metricsService.recordMicrosoftWebhookLatency(userEmail, durationSeconds);
+        }
         return;
       }
 
@@ -174,8 +178,10 @@ export class MicrosoftWebhookService {
       });
 
       const durationSeconds = (Date.now() - startTime) / 1000;
-      this.metricsService.recordMicrosoftWebhookRequest(userEmail, 'success');
-      this.metricsService.recordMicrosoftWebhookLatency(userEmail, durationSeconds);
+      if (userEmail) {
+        this.metricsService.recordMicrosoftWebhookRequest(userEmail, 'success');
+        this.metricsService.recordMicrosoftWebhookLatency(userEmail, durationSeconds);
+      }
     } catch (error) {
       const durationSeconds = (Date.now() - startTime) / 1000;
       if (userEmail) {

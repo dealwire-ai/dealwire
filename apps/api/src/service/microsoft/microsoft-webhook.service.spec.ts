@@ -46,7 +46,7 @@ describe('MicrosoftWebhookService', () => {
                 organizationId: 'org123',
               }),
             },
-          },
+          } as any,
         },
         {
           provide: SQSService,
