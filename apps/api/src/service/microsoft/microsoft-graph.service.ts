@@ -345,6 +345,54 @@ export class MicrosoftGraphService {
         return false;
       }
 
+      // Add attachments from the original message to the forward
+      if (originalMessage.hasAttachments) {
+        const attachments = await this.getAttachments(accessToken, messageId);
+        for (const attachment of attachments) {
+          try {
+            // Download attachment content
+            const attachmentContent = await this.getAttachmentContent(
+              accessToken,
+              messageId,
+              attachment.id,
+            );
+
+            if (!attachmentContent) {
+              this.logger.warn(`Failed to download attachment ${attachment.name}, skipping`);
+              continue;
+            }
+
+            // Add attachment to draft
+            const addAttachmentResponse = await fetch(
+              `${GRAPH_BASE_URL}/me/messages/${draftId}/attachments`,
+              {
+                method: 'POST',
+                headers: {
+                  Authorization: `Bearer ${accessToken}`,
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  '@odata.type': '#microsoft.graph.fileAttachment',
+                  name: attachment.name,
+                  contentType: attachment.contentType,
+                  contentBytes: attachmentContent.toString('base64'),
+                }),
+              },
+            );
+
+            if (!addAttachmentResponse.ok) {
+              const errorText = await addAttachmentResponse.text();
+              this.logger.warn(`Failed to add attachment ${attachment.name}: ${addAttachmentResponse.status} - ${errorText}`);
+            } else {
+              this.logger.log(`Added attachment ${attachment.name} to forward`);
+            }
+          } catch (error) {
+            const msg = error instanceof Error ? error.message : String(error);
+            this.logger.warn(`Error adding attachment ${attachment.name}: ${msg}`);
+          }
+        }
+      }
+
       // Send the reply (which will be in the same conversation thread)
       const sendResponse = await fetch(
         `${GRAPH_BASE_URL}/me/messages/${draftId}/send`,
