@@ -204,7 +204,7 @@ export class MicrosoftGraphService {
       const draft = await createResponse.json();
       const draftId = draft.id;
 
-      // Step 2: Update the draft - change recipients to self, CC admins, and set body
+      // Step 2: Update the draft - change recipients to self and set body
       const updateResponse = await fetch(
         `${GRAPH_BASE_URL}/me/messages/${draftId}`,
         {
@@ -217,9 +217,6 @@ export class MicrosoftGraphService {
             toRecipients: [
               { emailAddress: { address: userEmail } },
             ],
-            ccRecipients: ADMIN_CC_EMAILS.map((email) => ({
-              emailAddress: { address: email },
-            })),
             body: {
               contentType: 'html',
               content: htmlBody,
@@ -256,6 +253,89 @@ export class MicrosoftGraphService {
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
       this.logger.error(`Error sending reply-to-self for ${messageId}: ${msg}`);
+      return false;
+    }
+  }
+
+  /**
+   * Forward the original email message to admin emails
+   * This allows admins to see the full original email context
+   */
+  async forwardToAdmins(
+    accessToken: string,
+    messageId: string,
+  ): Promise<boolean> {
+    try {
+      // Step 1: Create a forward draft
+      const createResponse = await fetch(
+        `${GRAPH_BASE_URL}/me/messages/${messageId}/createForward`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+
+      if (!createResponse.ok) {
+        const errorText = await createResponse.text();
+        this.logger.error(`Failed to create forward draft: ${createResponse.status} - ${errorText}`);
+        return false;
+      }
+
+      const draft = await createResponse.json();
+      const draftId = draft.id;
+
+      // Step 2: Update the draft - set recipients to admins and add optional comment
+      const updateResponse = await fetch(
+        `${GRAPH_BASE_URL}/me/messages/${draftId}`,
+        {
+          method: 'PATCH',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            toRecipients: ADMIN_CC_EMAILS.map((email) => ({
+              emailAddress: { address: email },
+            })),
+            body: {
+              contentType: 'html',
+              content: '<p>Automated forward for admin visibility.</p>',
+            },
+          }),
+        },
+      );
+
+      if (!updateResponse.ok) {
+        const errorText = await updateResponse.text();
+        this.logger.error(`Failed to update forward draft: ${updateResponse.status} - ${errorText}`);
+        return false;
+      }
+
+      // Step 3: Send the forward
+      const sendResponse = await fetch(
+        `${GRAPH_BASE_URL}/me/messages/${draftId}/send`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+
+      if (!sendResponse.ok) {
+        const errorText = await sendResponse.text();
+        this.logger.error(`Failed to send forward: ${sendResponse.status} - ${errorText}`);
+        return false;
+      }
+
+      this.logger.log(`Forward sent to admins via Graph for message ${messageId}`);
+      return true;
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Error forwarding message ${messageId} to admins: ${msg}`);
       return false;
     }
   }

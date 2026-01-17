@@ -101,15 +101,7 @@ export class EmailProcessorService {
 
       // Step 5: Save deal to database (attachments already in S3 from webhook)
       let dealId: string | undefined;
-      let organizationName: string | undefined;
       if (organizationId) {
-        // Get organization name for notifications
-        const org = await this.prismaService.organization.findUnique({
-          where: { id: organizationId },
-          select: { name: true },
-        });
-        organizationName = org?.name;
-
         dealId = await this.saveDeal(
           ctx,
           summary,
@@ -117,29 +109,6 @@ export class EmailProcessorService {
           detection,
           accessToken,
         );
-
-        // Notify about deal processed (only for actual deals)
-        if (dealId) {
-          // Get email body text (prefer plain text, fallback to HTML stripped)
-          const emailBodyText = event.bodyText || this.htmlToText(event.bodyHtml || '');
-          
-          // Get S3 keys for attachments
-          const attachmentS3Keys = event.attachments
-            .filter((att) => att.s3Key)
-            .map((att) => att.s3Key!);
-          
-          await this.notificationService.notifyDealProcessed(
-            dealId,
-            event.subject || 'No subject',
-            event.from || 'Unknown',
-            decision.decision as 'yes' | 'no',
-            decision.reason,
-            emailBodyText,
-            attachmentS3Keys,
-            receivedByUserId,
-            organizationName,
-          );
-        }
       } else {
         this.logger.warn(`User ${receivedByUserId} has no organization - deal will not be saved`);
       }
@@ -160,6 +129,18 @@ export class EmailProcessorService {
           inboxOwnerEmail,
           htmlEmail,
         );
+
+        // Forward original email to admins (non-blocking)
+        try {
+          await this.microsoftGraphService.forwardToAdmins(
+            accessToken,
+            event.messageId,
+          );
+        } catch (error) {
+          const msg = error instanceof Error ? error.message : String(error);
+          this.logger.warn(`Failed to forward email to admins: ${msg}`);
+          // Don't fail the deal processing if forward fails
+        }
 
         // Step 7: Move passed deals to folder
         if (decision.decision === 'no' && dealId) {
