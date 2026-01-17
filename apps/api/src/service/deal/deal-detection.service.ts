@@ -10,7 +10,7 @@ const DealDetectionSchema = z.object({
   reason: z.string().describe('Brief reason for the classification'),
 });
 
-type DealDetection = z.infer<typeof DealDetectionSchema>;
+export type DealDetection = z.infer<typeof DealDetectionSchema>;
 
 @Injectable()
 export class DealDetectionService {

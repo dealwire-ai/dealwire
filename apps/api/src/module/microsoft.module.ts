@@ -8,6 +8,7 @@ import { MicrosoftWebhookController } from '../controller/webhook/microsoft-webh
 import { PrismaModule } from './prisma.module';
 import { EmailProcessorModule } from './email-processor.module';
 import { S3Module } from './s3.module';
+import { AIModule } from './ai.module';
 import { ClientPreferencesService } from '../service/preferences/client-preferences.service';
 
 @Module({
@@ -16,6 +17,7 @@ import { ClientPreferencesService } from '../service/preferences/client-preferen
     ScheduleModule.forRoot(),
     EmailProcessorModule, // For SQSService
     S3Module, // For S3Service
+    AIModule, // For DealDetectionService
   ],
   controllers: [MicrosoftWebhookController],
   providers: [
