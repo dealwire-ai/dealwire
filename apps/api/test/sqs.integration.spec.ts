@@ -16,7 +16,24 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { SqsModule } from '@ssut/nestjs-sqs';
 import { SQSService } from '../src/service/sqs/sqs.service';
 import { SQSClient, ReceiveMessageCommand, PurgeQueueCommand } from '@aws-sdk/client-sqs';
-import { setupLocalStackQueue, getLocalStackConfig } from './setup-localstack';
+// LocalStack setup helpers (inline for simplicity)
+const getLocalStackConfig = () => ({
+  endpoint: process.env.AWS_ENDPOINT_URL || 'http://localhost:4566',
+  region: 'us-east-1',
+  credentials: {
+    accessKeyId: 'test',
+    secretAccessKey: 'test',
+  },
+});
+
+const setupLocalStackQueue = async (): Promise<string> => {
+  const sqsClient = new SQSClient(getLocalStackConfig());
+  const queueName = `test-normalized-email-${Date.now()}`;
+  
+  // Create queue (LocalStack will auto-create, but we can be explicit)
+  // For LocalStack, we'll just return the queue URL format
+  return `${process.env.AWS_ENDPOINT_URL || 'http://localhost:4566'}/000000000000/${queueName}`;
+};
 
 describe('SQS Integration Tests (LocalStack)', () => {
   let sqsService: SQSService;
@@ -88,6 +105,11 @@ describe('SQS Integration Tests (LocalStack)', () => {
       receivedByUserId: 'test-user-id',
       organizationId: null,
       dealId: 'test-deal-id',
+      detection: {
+        isDeal: true,
+        confidence: 'high' as const,
+        reason: 'Test integration deal',
+      },
     };
 
     await sqsService.enqueueNormalizedEmail(messageBody);
