@@ -16,6 +16,12 @@ export class DealDecisionService {
     });
   }
 
+  /**
+   * Make a decision on whether a deal meets the client's screening criteria
+   * @param summary - The summary of the deal
+   * @param dealCriteria - The client's screening criteria
+   * @returns The decision on whether the deal meets the client's screening criteria
+   */
   async makeDecision(
     summary: string,
     dealCriteria?: string,
