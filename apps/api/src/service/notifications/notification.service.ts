@@ -30,8 +30,10 @@ export class NotificationService {
     }
   }
 
+  
   /**
    * Notify about a new deal processed
+   * @deprecated No longer used - admins now receive the original email via forward and analysis via reply
    */
   async notifyDealProcessed(
     dealId: string,
