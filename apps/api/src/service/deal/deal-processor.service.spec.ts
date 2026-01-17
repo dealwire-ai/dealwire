@@ -99,7 +99,7 @@ describe('EmailProcessorService', () => {
             organization: {
               findUnique: jest.fn().mockResolvedValue({ name: 'Test Org' }),
             },
-          },
+          } as any,
         },
         {
           provide: S3Service,
