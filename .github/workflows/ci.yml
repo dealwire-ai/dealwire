@@ -40,11 +40,17 @@ jobs:
 
       - name: Generate Prisma Client
         run: pnpm --filter @analyzer/api db:generate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://dummy:dummy@localhost:5432/dummy' }}
 
       - name: Run unit tests
         run: pnpm --filter @analyzer/api test
         env:
           CI: true
+          DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://dummy:dummy@localhost:5432/dummy' }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY || 'dummy-key-for-tests' }}
+          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY || 'dummy-clerk-key' }}
+          CLERK_WEBHOOK_SECRET: ${{ secrets.CLERK_WEBHOOK_SECRET || 'dummy-webhook-secret' }}
 
   lint:
     name: Lint
@@ -75,6 +81,8 @@ jobs:
 
       - name: Generate Prisma Client
         run: pnpm --filter @analyzer/api db:generate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://dummy:dummy@localhost:5432/dummy' }}
 
       - name: Run linter
         run: pnpm --filter @analyzer/api lint || true
