@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
-export interface ClientPreferences {
+export interface ScreeningPreferences {
   dealCriteria?: string;
   logoUrl?: string;
   companyName?: string;
@@ -15,17 +15,17 @@ export interface ClientPreferences {
 export const DEFAULT_PASSED_FOLDER = 'Passed Deals';
 
 @Injectable()
-export class ClientPreferencesService {
-  private readonly logger = new Logger(ClientPreferencesService.name);
+export class ScreeningPreferencesService {
+  private readonly logger = new Logger(ScreeningPreferencesService.name);
 
   constructor(private readonly prisma: PrismaService) {}
 
   /**
    * Get preferences for an organization
    * @param organizationId - The organization ID
-   * @returns ClientPreferences or empty object if not found
+   * @returns ScreeningPreferences or empty object if not found
    */
-  async getPreferences(organizationId: string | null | undefined): Promise<ClientPreferences> {
+  async getPreferences(organizationId: string | null | undefined): Promise<ScreeningPreferences> {
     if (!organizationId) {
       this.logger.debug('No organizationId provided, returning empty preferences');
       return {};
@@ -58,4 +58,3 @@ export class ClientPreferencesService {
     }
   }
 }
-

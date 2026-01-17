@@ -48,10 +48,15 @@ MICROSOFT_WEBHOOK_SECRET=your-secret
 
 ## Client Preferences
 
-Edit `apps/api/src/data/preferences.json` to configure per-client:
+Preferences are stored in the database in the `ScreeningPreferences` table, with a one-to-one relation to `Organization`. Each organization has exactly one ScreeningPreferences record.
 
-- `deal_criteria` - AI evaluates deals against these requirements
-- `logo_url`, `company_name`, `brand_color` - Email branding
+Configure per-organization preferences in the database:
+- `dealCriteria` - AI evaluates deals against these requirements
+- `logoUrl`, `companyName`, `brandColor` - Email branding
+- `passedFolderName` - Folder name for passed/rejected deals
+- `alwaysSkip` - Criteria for deals to always skip (checked via AI in deal detection)
+
+Preferences are automatically created when an Organization is created via Clerk webhooks.
 - `passedFolderName` - Folder for rejected deals
 
 ## Deployment

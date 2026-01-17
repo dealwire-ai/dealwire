@@ -49,7 +49,7 @@ pnpm exec tsx test-webhook.ts my_email_id isaac@frontstep.ai
 You should see:
 1. Console output showing the webhook was processed
 2. An email sent to the sender address with the deal summary and decision
-3. The email will be branded according to the client preferences in `src/data/preferences.json`
+3. The email will be branded according to the client preferences stored in the database (ScreeningPreferences table)
 
 ## Troubleshooting
 
@@ -64,13 +64,14 @@ You should see:
 ### "No email received"
 - Check the console logs to see if there were errors
 - Verify your `RESEND_API_KEY` is valid
-- Make sure the sender email has preferences configured in `src/data/preferences.json`
+- Make sure the sender email's user has an organizationId and that organization has ScreeningPreferences configured in the database
 
 ## Client Preferences
 
-The test will use client preferences based on the sender email. You can configure these in:
-```
-src/data/preferences.json
-```
+The test will use client preferences based on the sender email's organization. Preferences are stored in the `ScreeningPreferences` table in the database, linked to the user's organization via `organizationId`.
 
-For example, `isaac@frontstep.ai` will use Isaac's preferences (NY deals only), while `Dshorenstein@hildrethadvisors.com` will use different criteria.
+To configure preferences:
+1. Ensure the user has an `organizationId` set
+2. Create or update the `ScreeningPreferences` record for that organization in the database
+
+Preferences include: `dealCriteria`, `logoUrl`, `companyName`, `brandColor`, `passedFolderName`, and `alwaysSkip`.
