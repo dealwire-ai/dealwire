@@ -59,58 +59,29 @@ git add <file1> <file2> ... && git commit -m "<msg>" && git push
 - bullet 2
 ```
 
-**Note:** When creating the PR body, populate the template sections:
-- **Description**: Use the TLDR and bullets from above
-- **Type of Change**: Check the appropriate box
-- **Changes Made**: List key changes
-- **Testing**: Describe testing done (e.g., "All unit tests pass", "Manual testing completed")
+**Note:** When creating the PR body, use the template from `.github/pull_request_template.md`. Read it first:
+```bash
+cat .github/pull_request_template.md
+```
+
+Then populate the template sections:
+- **Changes**: Use the bullets from above
+- **Testing**: Check the appropriate boxes (e.g., "Unit tests", "All existing tests pass")
 - **Related Issues**: Link any related issues using `Closes #123` or `Fixes #456`
 
-**Template format for body:**
-```markdown
-## Description
-
-<TLDR and bullets here>
-
-## Type of Change
-
-- [ ] 🐛 Bug fix
-- [ ] ✨ New feature
-- [ ] 💥 Breaking change
-- [ ] 📝 Documentation update
-- [ ] 🔧 Refactoring
-- [ ] ⚡ Performance improvement
-- [ ] 🧪 Test updates
-- [ ] 🔨 Build/config changes
-
-## Changes Made
-
-- <bullet 1>
-- <bullet 2>
-
-## Testing
-
-- [x] Unit tests added/updated
-- [x] All existing tests pass
-- [ ] Integration tests added/updated
-- [ ] Manual testing completed
-
-## Related Issues
-
-Closes #<issue_number>
-```
+**Format the PR body** by filling in the template structure with your information.
 
 **Without skip-review:**
 ```bash
-gh pr create --title "<title>" --body "<formatted_body_with_template>"
+gh pr create --title "<title>" --body "<formatted_body_using_template>"
 ```
 
 **With skip-review** (user says "skip review", "#skipreview", etc.):
 ```bash
-gh pr create --title "<title>" --body "<formatted_body_with_template>" && gh pr comment $(gh pr view --json number -q .number) --body "#skipreview"
+gh pr create --title "<title>" --body "<formatted_body_using_template>" && gh pr comment $(gh pr view --json number -q .number) --body "#skipreview"
 ```
 
-**Note:** GitHub will automatically use `.github/pull_request_template.md` when creating PRs through the web UI. For CLI, format the body using the template structure above.
+**Note:** GitHub will automatically use `.github/pull_request_template.md` when creating PRs through the web UI. For CLI, read the template file and format the body accordingly.
 
 Display the returned PR URL as a markdown link on its own line, formatted as: `[PR #<number>](<url>)` so it's clickable.
 Display the name of the branch you created.
