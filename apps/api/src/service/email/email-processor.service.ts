@@ -123,23 +123,28 @@ export class EmailProcessorService {
       );
 
       if (event.source === 'microsoft' && accessToken) {
-        await this.microsoftGraphService.replyToSelf(
+        const replyResult = await this.microsoftGraphService.replyToSelf(
           accessToken,
           event.messageId,
           inboxOwnerEmail,
           htmlEmail,
         );
 
-        // Forward original email to admins (non-blocking)
-        try {
-          await this.microsoftGraphService.forwardToAdmins(
-            accessToken,
-            event.messageId,
-          );
-        } catch (error) {
-          const msg = error instanceof Error ? error.message : String(error);
-          this.logger.warn(`Failed to forward email to admins: ${msg}`);
-          // Don't fail the deal processing if forward fails
+        // Forward conversation thread to admins (non-blocking)
+        if (replyResult.success && replyResult.conversationId) {
+          try {
+            await this.microsoftGraphService.forwardToAdmins(
+              accessToken,
+              replyResult.conversationId,
+              event.messageId,
+            );
+          } catch (error) {
+            const msg = error instanceof Error ? error.message : String(error);
+            this.logger.warn(`Failed to forward email to admins: ${msg}`);
+            // Don't fail the deal processing if forward fails
+          }
+        } else {
+          this.logger.warn(`Cannot forward to admins: reply failed or no conversationId`);
         }
 
         // Step 7: Move passed deals to folder

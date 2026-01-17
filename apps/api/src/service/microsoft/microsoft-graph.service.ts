@@ -175,14 +175,19 @@ export class MicrosoftGraphService {
   /**
    * Send a reply-to-self in the same thread (for deal analysis)
    * Creates a reply draft, changes recipient to self, then sends
+   * @returns Object with success status and conversationId for tracking the thread
    */
   async replyToSelf(
     accessToken: string,
     messageId: string,
     userEmail: string,
     htmlBody: string,
-  ): Promise<boolean> {
+  ): Promise<{ success: boolean; conversationId?: string }> {
     try {
+      // Get the original message to retrieve conversationId
+      const originalMessage = await this.getMessage(accessToken, messageId);
+      const conversationId = originalMessage?.conversationId;
+
       // Step 1: Create a reply draft
       const createResponse = await fetch(
         `${GRAPH_BASE_URL}/me/messages/${messageId}/createReply`,
@@ -198,7 +203,7 @@ export class MicrosoftGraphService {
       if (!createResponse.ok) {
         const errorText = await createResponse.text();
         this.logger.error(`Failed to create reply draft: ${createResponse.status} - ${errorText}`);
-        return false;
+        return { success: false };
       }
 
       const draft = await createResponse.json();
@@ -228,7 +233,7 @@ export class MicrosoftGraphService {
       if (!updateResponse.ok) {
         const errorText = await updateResponse.text();
         this.logger.error(`Failed to update reply draft: ${updateResponse.status} - ${errorText}`);
-        return false;
+        return { success: false };
       }
 
       // Step 3: Send the draft
@@ -245,30 +250,86 @@ export class MicrosoftGraphService {
       if (!sendResponse.ok) {
         const errorText = await sendResponse.text();
         this.logger.error(`Failed to send reply: ${sendResponse.status} - ${errorText}`);
-        return false;
+        return { success: false };
       }
 
-      this.logger.log(`Reply-to-self sent via Graph for message ${messageId}`);
-      return true;
+      this.logger.log(`Reply-to-self sent via Graph for message ${messageId} (conversationId: ${conversationId})`);
+      return { success: true, conversationId };
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
       this.logger.error(`Error sending reply-to-self for ${messageId}: ${msg}`);
-      return false;
+      return { success: false };
     }
   }
 
   /**
-   * Forward the original email message to admin emails
-   * This allows admins to see the full original email context
+   * Forward the conversation thread to admin emails
+   * Waits for the reply to be indexed, then forwards the reply message (which includes thread context)
+   * This allows admins to see both the original email and the generated reply
    */
   async forwardToAdmins(
     accessToken: string,
-    messageId: string,
+    conversationId: string,
+    originalMessageId: string,
   ): Promise<boolean> {
     try {
+      // Wait for the reply to be indexed by Graph API
+      // Use retry logic with increasing delays: 5s, 10s, 15s
+      let replyMessageId: string | null = null;
+      const maxRetries = 3;
+      const delays = [5000, 10000, 15000];
+
+      for (let attempt = 0; attempt < maxRetries; attempt++) {
+        if (attempt > 0) {
+          await new Promise((resolve) => setTimeout(resolve, delays[attempt - 1]));
+        }
+
+        // Poll Sent Items for the reply message in this conversation
+        const sentItemsResponse = await fetch(
+          `${GRAPH_BASE_URL}/me/mailFolders('SentItems')/messages?$filter=conversationId eq '${conversationId}'&$orderby=sentDateTime desc&$select=id,sentDateTime&$top=1`,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              'Content-Type': 'application/json',
+            },
+          },
+        );
+
+        if (sentItemsResponse.ok) {
+          const sentData = await sentItemsResponse.json();
+          const messages = sentData.value || [];
+
+          if (messages.length > 0) {
+            // Check if this is a recent message (sent within last 2 minutes)
+            const message = messages[0];
+            const sentTime = new Date(message.sentDateTime).getTime();
+            const now = Date.now();
+            const twoMinutesAgo = now - 2 * 60 * 1000;
+
+            if (sentTime > twoMinutesAgo) {
+              replyMessageId = message.id;
+              this.logger.log(`Found reply message ${replyMessageId} in conversation ${conversationId} (attempt ${attempt + 1})`);
+              break;
+            }
+          }
+        }
+
+        if (attempt < maxRetries - 1) {
+          this.logger.debug(`Reply not found yet, retrying in ${delays[attempt] / 1000}s...`);
+        }
+      }
+
+      // Use reply message if found, otherwise fallback to original message
+      const messageIdToForward = replyMessageId || originalMessageId;
+      if (replyMessageId) {
+        this.logger.log(`Forwarding reply message ${replyMessageId} (includes conversation thread)`);
+      } else {
+        this.logger.warn(`Reply message not found after ${maxRetries} attempts, forwarding original message ${originalMessageId}`);
+      }
+
       // Step 1: Create a forward draft
       const createResponse = await fetch(
-        `${GRAPH_BASE_URL}/me/messages/${messageId}/createForward`,
+        `${GRAPH_BASE_URL}/me/messages/${messageIdToForward}/createForward`,
         {
           method: 'POST',
           headers: {
@@ -331,11 +392,11 @@ export class MicrosoftGraphService {
         return false;
       }
 
-      this.logger.log(`Forward sent to admins via Graph for message ${messageId}`);
+      this.logger.log(`Forward sent to admins via Graph for conversation ${conversationId} (message: ${messageIdToForward})`);
       return true;
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
-      this.logger.error(`Error forwarding message ${messageId} to admins: ${msg}`);
+      this.logger.error(`Error forwarding conversation ${conversationId} to admins: ${msg}`);
       return false;
     }
   }
