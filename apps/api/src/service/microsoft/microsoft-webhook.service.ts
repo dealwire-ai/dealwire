@@ -65,7 +65,6 @@ export class MicrosoftWebhookService {
   private async processEmailNotification(
     notification: GraphNotification,
   ): Promise<void> {
-    const startTime = Date.now();
     const { subscriptionId, resourceData } = notification;
     const messageId = resourceData.id;
     let userEmail: string | null = null;
@@ -126,10 +125,8 @@ export class MicrosoftWebhookService {
         this.logger.debug(
           `Skipping self-sent email: ${emailEvent.messageId} - "${emailEvent.subject}"`,
         );
-        const durationSeconds = (Date.now() - startTime) / 1000;
         if (userEmail) {
           this.metricsService.recordMicrosoftWebhookRequest(userEmail, 'success');
-          this.metricsService.recordMicrosoftWebhookLatency(userEmail, durationSeconds);
         }
         return;
       }
@@ -144,6 +141,8 @@ export class MicrosoftWebhookService {
         emailEvent.subject,
         bodyText,
         emailEvent.attachments.length > 0,
+        userId,
+        inboxOwner.organizationId,
       );
 
       if (!detection.isDeal) {
@@ -151,10 +150,8 @@ export class MicrosoftWebhookService {
           `Skipping non-deal email: ${emailEvent.messageId} - "${emailEvent.subject}" (${detection.reason})`,
         );
         this.metricsService.recordDealSkipped(detection.reason || 'unknown');
-        const durationSeconds = (Date.now() - startTime) / 1000;
         if (userEmail) {
           this.metricsService.recordMicrosoftWebhookRequest(userEmail, 'success');
-          this.metricsService.recordMicrosoftWebhookLatency(userEmail, durationSeconds);
         }
         return;
       }
@@ -177,16 +174,12 @@ export class MicrosoftWebhookService {
         detection,
       });
 
-      const durationSeconds = (Date.now() - startTime) / 1000;
       if (userEmail) {
         this.metricsService.recordMicrosoftWebhookRequest(userEmail, 'success');
-        this.metricsService.recordMicrosoftWebhookLatency(userEmail, durationSeconds);
       }
     } catch (error) {
-      const durationSeconds = (Date.now() - startTime) / 1000;
       if (userEmail) {
         this.metricsService.recordMicrosoftWebhookRequest(userEmail, 'error');
-        this.metricsService.recordMicrosoftWebhookLatency(userEmail, durationSeconds);
       }
       const msg = error instanceof Error ? error.message : String(error);
       this.logger.error(`Error processing email notification ${messageId}: ${msg}`);

@@ -54,7 +54,7 @@ describe('EmailProcessorService', () => {
         {
           provide: ClientPreferencesService,
           useValue: {
-            getPreferences: jest.fn().mockReturnValue({
+            getPreferences: jest.fn().mockResolvedValue({
               dealCriteria: 'Test criteria',
               passedFolderName: 'Passed Deals',
             }),

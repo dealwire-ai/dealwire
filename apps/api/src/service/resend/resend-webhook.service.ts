@@ -6,6 +6,7 @@ import { ClientPreferencesService } from '../preferences/client-preferences.serv
 import { DealSummaryService } from '../deal/deal-summary.service';
 import { DealDecisionService } from '../deal/deal-decision.service';
 import { MetricsService } from '../metrics/metrics.service';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class ResendWebhookService {
@@ -19,6 +20,7 @@ export class ResendWebhookService {
     private readonly dealSummary: DealSummaryService,
     private readonly dealDecision: DealDecisionService,
     private readonly metricsService: MetricsService,
+    private readonly prisma: PrismaService,
   ) {}
 
   async handleEmailReceived(emailData: any): Promise<void> {
@@ -46,7 +48,22 @@ export class ResendWebhookService {
 
     // Look up client preferences for personalized analysis
     const forwarderEmail = emailData.from || '';
-    const clientPrefs = this.clientPreferences.getPreferences(forwarderEmail);
+    let organizationId: string | null = null;
+    
+    if (forwarderEmail) {
+      try {
+        const user = await this.prisma.user.findUnique({
+          where: { email: forwarderEmail },
+          select: { organizationId: true },
+        });
+        organizationId = user?.organizationId || null;
+      } catch (error) {
+        const msg = error instanceof Error ? error.message : String(error);
+        this.logger.warn(`Failed to lookup user for ${forwarderEmail}: ${msg}`);
+      }
+    }
+    
+    const clientPrefs = await this.clientPreferences.getPreferences(organizationId);
 
     // Generate AI summary with client-specific criteria
     const summary = await this.dealSummary.summarizeDeal(

@@ -62,6 +62,8 @@ export class EmailProcessorService {
         event.subject,
         bodyText,
         event.attachments.length > 0,
+        receivedByUserId,
+        organizationId,
       );
 
       if (!detection.isDeal) {
@@ -83,7 +85,7 @@ export class EmailProcessorService {
       const combinedText = extractedTexts.join('\n\n');
 
       // Step 3: Get client preferences
-      const clientPrefs = this.clientPreferencesService.getPreferences(inboxOwnerEmail);
+      const clientPrefs = await this.clientPreferencesService.getPreferences(organizationId);
 
       // Step 4: Generate AI summary
       const summary = await this.dealSummaryService.summarizeDeal(

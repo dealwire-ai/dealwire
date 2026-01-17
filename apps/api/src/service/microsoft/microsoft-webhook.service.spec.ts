@@ -66,7 +66,7 @@ describe('MicrosoftWebhookService', () => {
             recordEmailReceived: jest.fn(),
             recordDealSkipped: jest.fn(),
             recordMicrosoftWebhookRequest: jest.fn(),
-            recordMicrosoftWebhookLatency: jest.fn(),
+            recordRestApiCallDuration: jest.fn(),
           },
         },
         {
@@ -138,7 +138,13 @@ describe('MicrosoftWebhookService', () => {
     await service['processEmailNotification'](notification);
 
     // Assert
-    expect(dealDetectionService.isDealEmail).toHaveBeenCalled();
+    expect(dealDetectionService.isDealEmail).toHaveBeenCalledWith(
+      'Not a deal',
+      'Just a regular email',
+      true,
+      'user123',
+      'org123',
+    );
     expect(s3Service.uploadDealAttachment).not.toHaveBeenCalled();
     expect(sqsService.enqueueNormalizedEmail).not.toHaveBeenCalled();
     expect(metricsService.recordDealSkipped).toHaveBeenCalledWith('Not a deal email');
@@ -193,7 +199,13 @@ describe('MicrosoftWebhookService', () => {
     await service['processEmailNotification'](notification);
 
     // Assert
-    expect(dealDetectionService.isDealEmail).toHaveBeenCalled();
+    expect(dealDetectionService.isDealEmail).toHaveBeenCalledWith(
+      'Deal Opportunity',
+      'Check out this property',
+      true,
+      'user123',
+      'org123',
+    );
     expect(s3Service.uploadDealAttachment).toHaveBeenCalled();
     expect(sqsService.enqueueNormalizedEmail).toHaveBeenCalledWith(
       expect.objectContaining({
