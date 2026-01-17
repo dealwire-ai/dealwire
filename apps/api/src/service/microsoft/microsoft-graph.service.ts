@@ -258,10 +258,70 @@ export class MicrosoftGraphService {
   }
 
   /**
-   * Forward the original email message to admin emails
-   * This allows admins to see the full original email context
+   * Forward the email conversation thread to admin emails
+   * Waits for the reply to be indexed, then forwards the conversation so admins see both
+   * the original email and the generated reply
    */
   async forwardToAdmins(
+    accessToken: string,
+    messageId: string,
+  ): Promise<boolean> {
+    try {
+      // Wait for the reply we just sent to be indexed by Graph API
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+
+      // Get the original message to find the conversation ID
+      const originalMessage = await this.getMessage(accessToken, messageId);
+      if (!originalMessage?.conversationId) {
+        this.logger.warn(`No conversation ID found for message ${messageId}, forwarding single message`);
+        // Fallback: forward the single message
+        return this.forwardSingleMessage(accessToken, messageId);
+      }
+
+      // Find all messages in the conversation (including the reply we just sent)
+      const conversationResponse = await fetch(
+        `${GRAPH_BASE_URL}/me/messages?$filter=conversationId eq '${originalMessage.conversationId}'&$orderby=receivedDateTime desc&$select=id,receivedDateTime,parentFolderId`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+
+      if (!conversationResponse.ok) {
+        const errorText = await conversationResponse.text();
+        this.logger.error(`Failed to fetch conversation: ${conversationResponse.status} - ${errorText}`);
+        // Fallback: forward the single message
+        return this.forwardSingleMessage(accessToken, messageId);
+      }
+
+      const conversationData = await conversationResponse.json();
+      const messages = conversationData.value || [];
+
+      if (messages.length === 0) {
+        this.logger.warn(`No messages found in conversation ${originalMessage.conversationId}`);
+        return this.forwardSingleMessage(accessToken, messageId);
+      }
+
+      // Forward the most recent message in the conversation (should include thread context)
+      // This will include both the original email and our reply
+      const mostRecentMessageId = messages[0].id;
+      this.logger.log(`Forwarding conversation thread (${messages.length} messages) to admins via message ${mostRecentMessageId}`);
+      
+      return this.forwardSingleMessage(accessToken, mostRecentMessageId);
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Error forwarding conversation to admins: ${msg}`);
+      // Fallback: try to forward the single message
+      return this.forwardSingleMessage(accessToken, messageId);
+    }
+  }
+
+  /**
+   * Forward a single message to admin emails
+   */
+  private async forwardSingleMessage(
     accessToken: string,
     messageId: string,
   ): Promise<boolean> {
