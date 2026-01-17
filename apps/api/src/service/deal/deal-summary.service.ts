@@ -68,6 +68,7 @@ export class DealSummaryService {
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt },
         ],
+        user: 'deal-summary',
       });
 
       const summary = response.choices[0]?.message?.content || '';
