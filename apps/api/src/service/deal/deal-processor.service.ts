@@ -3,9 +3,9 @@ import { EmailProcessingService } from '../email/email-processing.service';
 import { EmailTemplateService } from '../email/email-template.service';
 import { MicrosoftGraphService } from '../microsoft/microsoft-graph.service';
 import {
-  ClientPreferencesService,
+  ScreeningPreferencesService,
   DEFAULT_PASSED_FOLDER,
-} from '../preferences/client-preferences.service';
+} from '../preferences/screening-preferences.service';
 import { DealSummaryService } from '../deal/deal-summary.service';
 import { DealDecisionService } from '../deal/deal-decision.service';
 import { DealDetectionService } from '../deal/deal-detection.service';
@@ -40,7 +40,7 @@ export class EmailProcessorService {
     private readonly emailProcessingService: EmailProcessingService,
     private readonly emailTemplateService: EmailTemplateService,
     private readonly microsoftGraphService: MicrosoftGraphService,
-    private readonly clientPreferencesService: ClientPreferencesService,
+    private readonly screeningPreferencesService: ScreeningPreferencesService,
     private readonly dealSummaryService: DealSummaryService,
     private readonly dealDecisionService: DealDecisionService,
     private readonly dealDetectionService: DealDetectionService,
@@ -85,19 +85,19 @@ export class EmailProcessorService {
       const combinedText = extractedTexts.join('\n\n');
 
       // Step 3: Get client preferences
-      const clientPrefs = await this.clientPreferencesService.getPreferences(organizationId);
+      const prefs = await this.screeningPreferencesService.getPreferences(organizationId);
 
       // Step 4: Generate AI summary
       const summary = await this.dealSummaryService.summarizeDeal(
         combinedText,
-        clientPrefs.dealCriteria,
+        prefs.dealCriteria,
       );
       this.logger.log(`Generated summary for ${event.messageId} (${summary.length} chars)`);
 
       // Step 5: Make AI decision
       const decision = await this.dealDecisionService.makeDecision(
         summary,
-        clientPrefs.dealCriteria,
+        prefs.dealCriteria,
       );
       this.logger.log(`Decision for ${event.messageId}: ${decision.decision} - ${decision.reason}`);
 
@@ -113,9 +113,9 @@ export class EmailProcessorService {
       const htmlEmail = this.emailTemplateService.formatSummaryAsHtml(
         summary,
         decision,
-        clientPrefs.logoUrl,
-        clientPrefs.companyName,
-        clientPrefs.brandColor,
+        prefs.logoUrl,
+        prefs.companyName,
+        prefs.brandColor,
       );
 
       if (event.source === 'microsoft' && accessToken) {
@@ -129,7 +129,7 @@ export class EmailProcessorService {
 
         // Step 8: Move passed deals to folder
         if (decision.decision === 'no') {
-          const folderName = clientPrefs.passedFolderName || DEFAULT_PASSED_FOLDER;
+          const folderName = prefs.passedFolderName || DEFAULT_PASSED_FOLDER;
           await this.microsoftGraphService.moveMessageToPassedFolder(
             accessToken,
             event.messageId,

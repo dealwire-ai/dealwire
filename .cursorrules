@@ -106,32 +106,24 @@ Analyzer is a monorepo that provides automated real estate deal analysis. When u
 | Service | Purpose |
 |---------|---------|
 | `ClerkWebhookService` | User creation → create Graph subscription; User deletion → cleanup |
-| `ClientPreferencesService` | Load client preferences from `src/data/preferences.json` |
+| `ScreeningPreferencesService` | Load screening preferences from database (ScreeningPreferences table) |
 | `PrismaService` | Database access (PostgreSQL via Supabase) |
 
 ---
 
-## Client Preferences (`src/data/preferences.json`)
+## Client Preferences (Database)
 
-JSON file mapping user emails to their preferences:
+Preferences are stored in the `ScreeningPreferences` table, with a required one-to-one relation to `Organization`. Each organization has exactly one ScreeningPreferences record.
 
-```json
-{
-  "user@example.com": {
-    "deal_criteria": "I only want deals in New York state.",
-    "logo_url": "https://...",
-    "company_name": "Acme Investments",
-    "brand_color": "#2A4A7C",
-    "passedFolderName": "Passed Deals"
-  },
-  "_default": {
-    "deal_criteria": null,
-    ...
-  }
-}
-```
+Fields:
+- `companyName` - Company name for email branding
+- `brandColor` - Hex color code for email branding
+- `passedFolderName` - Folder name for passed/rejected deals (default: "Passed Deals")
+- `dealCriteria` - Criteria for AI to evaluate deals against
+- `logoUrl` - Logo URL for email branding
+- `alwaysSkip` - Criteria for deals to always skip (checked via AI in deal detection)
 
-**Note:** JSON uses snake_case keys, service converts to camelCase.
+Preferences are automatically created when an Organization is created via Clerk webhooks. The `ScreeningPreferencesService` loads preferences by `organizationId`.
 
 ---
 
