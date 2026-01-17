@@ -113,6 +113,7 @@ Has attachments: ${hasAttachments ? 'Yes' : 'No'}`,
           },
         ],
         response_format: { type: 'json_object' },
+        user: 'deal-detection',
       });
 
       const content = response.choices[0]?.message?.content;

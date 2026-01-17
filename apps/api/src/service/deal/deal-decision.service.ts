@@ -33,16 +33,16 @@ export class DealDecisionService {
 
       if (dealCriteria) {
         systemPrompt =
-          'You are a real estate deal screener. Your ONLY job is to check if this deal ' +
-          "meets the client's specific screening criteria. This is SCREENING, not underwriting - " +
+          'You are a real estate deal screener speaking directly to the client. Your ONLY job is to check if this deal ' +
+          "meets their specific screening requirements. This is SCREENING, not underwriting - " +
           "do NOT evaluate deal quality, financial viability, or investment metrics.\n\n" +
-          `CLIENT SCREENING CRITERIA (check ONLY these requirements):\n${dealCriteria}\n\n` +
-          "Return 'yes' if the deal meets ALL of the client's criteria listed above. " +
-          "Return 'no' ONLY if the deal clearly violates one or more of the client's criteria. " +
+          `YOUR SCREENING REQUIREMENTS (check ONLY these):\n${dealCriteria}\n\n` +
+          "Return 'yes' if the deal meets ALL of your requirements listed above. " +
+          "Return 'no' ONLY if the deal clearly violates one or more of your requirements. " +
           "Do NOT reject deals for missing financial metrics, incomplete information, or subjective quality concerns - " +
           "those are not part of screening. Be strict about geography and property requirements - " +
           'a property in New Jersey does NOT satisfy a "New York only" requirement. ' +
-          'Provide a one-sentence reason for your decision, citing which criterion was not met if applicable. ' +
+          'Provide a one-sentence reason for your decision, written as if speaking directly to the client, citing which requirement was not met if applicable. ' +
           'Respond with JSON in the format: {"decision": "yes" or "no", "reason": "your reason"}.';
       } else {
         systemPrompt =
@@ -61,6 +61,7 @@ export class DealDecisionService {
           { role: 'user', content: `Deal Summary:\n\n${summary}` },
         ],
         response_format: { type: 'json_object' },
+        user: 'deal-decision',
       });
 
       const content = response.choices[0]?.message?.content;
