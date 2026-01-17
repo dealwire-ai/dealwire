@@ -88,6 +88,10 @@ describe('MicrosoftWebhookService', () => {
     prismaService = module.get(PrismaService);
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('should skip S3 upload if deal detection returns false', async () => {
     // Arrange
     const emailEvent: NormalizedEmailEvent = {
