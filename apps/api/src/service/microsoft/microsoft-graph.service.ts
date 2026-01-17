@@ -261,17 +261,45 @@ export class MicrosoftGraphService {
   }
 
   /**
-   * Forward the original email message to admin emails
-   * Admins will also be CC'd on the reply, so they'll see both the original and the reply in the conversation thread
+   * Send the original email content to admins as a reply in the conversation thread
+   * This ensures everything appears in one thread for admins (original + our reply)
    */
   async forwardToAdmins(
     accessToken: string,
     messageId: string,
   ): Promise<boolean> {
     try {
-      // Step 1: Create a forward draft
-      const createResponse = await fetch(
-        `${GRAPH_BASE_URL}/me/messages/${messageId}/createForward`,
+      // Get the original message to include its content
+      const originalMessage = await this.getMessage(accessToken, messageId);
+      if (!originalMessage) {
+        this.logger.error(`Failed to fetch original message ${messageId} for forward`);
+        return false;
+      }
+
+      // Extract original message content
+      const originalBody = originalMessage.body?.content || '';
+      const originalSubject = originalMessage.subject || 'No subject';
+      const originalFrom = originalMessage.from?.emailAddress?.address || 'Unknown';
+      const originalFromName = originalMessage.from?.emailAddress?.name || originalFrom;
+      const receivedDate = new Date(originalMessage.receivedDateTime).toLocaleString();
+
+      // Construct body with original message content
+      const forwardBody = `
+        <p><em>Original email forwarded for admin visibility:</em></p>
+        <hr style="border: none; border-top: 1px solid #ccc; margin: 20px 0;">
+        <div style="font-family: Arial, sans-serif;">
+          <p><strong>From:</strong> ${originalFromName} &lt;${originalFrom}&gt;</p>
+          <p><strong>Subject:</strong> ${originalSubject}</p>
+          <p><strong>Date:</strong> ${receivedDate}</p>
+          <hr style="border: none; border-top: 1px solid #ccc; margin: 20px 0;">
+          <div style="white-space: pre-wrap;">${originalBody}</div>
+        </div>
+      `;
+
+      // Create a reply in the same conversation thread (not a forward)
+      // This ensures it appears in the same thread as our analysis reply
+      const createReplyResponse = await fetch(
+        `${GRAPH_BASE_URL}/me/messages/${messageId}/createReply`,
         {
           method: 'POST',
           headers: {
@@ -281,16 +309,16 @@ export class MicrosoftGraphService {
         },
       );
 
-      if (!createResponse.ok) {
-        const errorText = await createResponse.text();
-        this.logger.error(`Failed to create forward draft: ${createResponse.status} - ${errorText}`);
+      if (!createReplyResponse.ok) {
+        const errorText = await createReplyResponse.text();
+        this.logger.error(`Failed to create reply draft for forward: ${createReplyResponse.status} - ${errorText}`);
         return false;
       }
 
-      const draft = await createResponse.json();
+      const draft = await createReplyResponse.json();
       const draftId = draft.id;
 
-      // Step 2: Update the draft - set recipients to admins and add optional comment
+      // Update the draft - change recipients to admins and set body with original content
       const updateResponse = await fetch(
         `${GRAPH_BASE_URL}/me/messages/${draftId}`,
         {
@@ -305,7 +333,7 @@ export class MicrosoftGraphService {
             })),
             body: {
               contentType: 'html',
-              content: '<p>Automated forward for admin visibility.</p>',
+              content: forwardBody,
             },
           }),
         },
@@ -313,11 +341,11 @@ export class MicrosoftGraphService {
 
       if (!updateResponse.ok) {
         const errorText = await updateResponse.text();
-        this.logger.error(`Failed to update forward draft: ${updateResponse.status} - ${errorText}`);
+        this.logger.error(`Failed to update reply draft: ${updateResponse.status} - ${errorText}`);
         return false;
       }
 
-      // Step 3: Send the forward
+      // Send the reply (which will be in the same conversation thread)
       const sendResponse = await fetch(
         `${GRAPH_BASE_URL}/me/messages/${draftId}/send`,
         {
