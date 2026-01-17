@@ -139,6 +139,10 @@ describe('EmailProcessorService', () => {
     dealDecisionService = module.get(DealDecisionService);
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('should create Document records for attachments already in S3', async () => {
     // Arrange
     const s3Key = 'deals/deal123/1234567890-test.pdf';

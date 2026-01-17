@@ -139,6 +139,10 @@ describe('EmailProcessorService', () => {
     dealDecisionService = module.get(DealDecisionService);
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('should create Document records for attachments already in S3', async () => {
     // Arrange
     const s3Key = 'deals/deal123/1234567890-test.pdf';
@@ -271,6 +275,8 @@ describe('EmailProcessorService', () => {
 
   it('should skip processing if detection indicates not a deal', async () => {
     // Arrange
+    jest.clearAllMocks(); // Ensure clean state
+    
     const emailEvent: NormalizedEmailEvent = {
       source: 'microsoft',
       messageId: 'msg123',
@@ -303,5 +309,8 @@ describe('EmailProcessorService', () => {
     expect(result.processed).toBe(false);
     expect(result.skippedReason).toBe('Not a deal email');
     expect(prismaService.deal.create).not.toHaveBeenCalled();
+    expect(prismaService.document.create).not.toHaveBeenCalled();
+    expect(dealSummaryService.summarizeDeal).not.toHaveBeenCalled();
+    expect(dealDecisionService.makeDecision).not.toHaveBeenCalled();
   });
 });
