@@ -285,7 +285,6 @@ export class MicrosoftGraphService {
 
       // Construct body with original message content
       const forwardBody = `
-        <p><em>Original email forwarded for admin visibility:</em></p>
         <hr style="border: none; border-top: 1px solid #ccc; margin: 20px 0;">
         <div style="font-family: Arial, sans-serif;">
           <p><strong>From:</strong> ${originalFromName} &lt;${originalFrom}&gt;</p>
@@ -681,16 +680,23 @@ export class MicrosoftGraphService {
 
     const attachments: NormalizedEmailAttachment[] = [];
 
-    if (message.hasAttachments) {
-      const graphAttachments = await this.getAttachments(accessToken, messageId);
-      for (const att of graphAttachments) {
-        attachments.push({
-          filename: att.name,
-          contentType: att.contentType,
-          size: att.size,
-          contentId: att.id,
-        });
-      }
+    // Always try to fetch attachments, even if hasAttachments is false
+    // (hasAttachments can be unreliable, especially for inline images)
+    const graphAttachments = await this.getAttachments(accessToken, messageId);
+    this.logger.debug(
+      `Message ${messageId} hasAttachments: ${message.hasAttachments}, fetched ${graphAttachments.length} attachments`,
+    );
+
+    for (const att of graphAttachments) {
+      this.logger.debug(
+        `Attachment: ${att.name} (${att.contentType}, ${att.size} bytes)`,
+      );
+      attachments.push({
+        filename: att.name,
+        contentType: att.contentType,
+        size: att.size,
+        contentId: att.id,
+      });
     }
 
     return {
