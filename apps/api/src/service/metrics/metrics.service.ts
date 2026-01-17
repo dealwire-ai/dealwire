@@ -37,7 +37,9 @@ export class MetricsService implements OnModuleInit {
 
   // Webhook metrics
   private microsoftWebhookRequests: Counter<string> | null = null;
-  private microsoftWebhookLatency: Histogram<string> | null = null;
+
+  // REST API metrics
+  private restApiCallDuration: Histogram<string> | null = null;
 
   onModuleInit() {
     try {
@@ -182,11 +184,12 @@ export class MetricsService implements OnModuleInit {
       registers: [this.registry],
     });
 
-    this.microsoftWebhookLatency = new Histogram({
-      name: 'microsoft_webhook_latency_seconds',
-      help: 'Microsoft webhook processing latency in seconds',
-      labelNames: ['user_email'],
-      buckets: [0.1, 0.5, 1, 2, 5, 10, 30],
+    // REST API call duration metric
+    this.restApiCallDuration = new Histogram({
+      name: 'rest_api_call_duration_seconds',
+      help: 'Duration of REST API calls in seconds',
+      labelNames: ['service', 'method', 'status'],
+      buckets: [0.01, 0.05, 0.1, 0.5, 1, 2, 5, 10, 30],
       registers: [this.registry],
     });
   }
@@ -302,9 +305,14 @@ export class MetricsService implements OnModuleInit {
     }
   }
 
-  recordMicrosoftWebhookLatency(userEmail: string, durationSeconds: number) {
-    if (this.enabled && this.microsoftWebhookLatency) {
-      this.microsoftWebhookLatency.observe({ user_email: userEmail }, durationSeconds);
+  recordRestApiCallDuration(
+    service: string,
+    method: string,
+    status: 'success' | 'error',
+    durationSeconds: number,
+  ) {
+    if (this.enabled && this.restApiCallDuration) {
+      this.restApiCallDuration.observe({ service, method, status }, durationSeconds);
     }
   }
 
