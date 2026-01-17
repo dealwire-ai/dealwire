@@ -28,18 +28,27 @@ export class DealSummaryService {
       // Build system prompt with optional client criteria
       let systemPrompt =
         'You are a real estate acquisitions analyst for Hildreth Real Estate Advisors. ' +
-        'You are analyzing OCR-extracted text from deal memos. The text may have formatting ' +
-        'issues where labels and values are not on the same line. You must use context clues ' +
-        'and proximity to match labels with their corresponding values. For example, if you see ' +
-        "'List Price' on one line and '$2,400,000' nearby (within a few lines), match them " +
-        'together. Look for patterns like: \'List Price\' or \'Asking Price\' followed by dollar ' +
-        "amounts, 'NOI' or 'Net Operating Income' followed by dollar amounts, 'Cap Rate' followed " +
-        'by percentages, etc. Return markdown format with clear sections. Focus on: Property ' +
-        'Address, Purchase Price/Asking Price, NOI (T-12 and pro forma if available), Cap Rate ' +
-        '(going-in and exit if available), Property Type/Class, Location/Market, Occupancy, ' +
-        'Lease Terms, Key Value Drivers, and any red flags or concerns. Be brief and to the ' +
-        'point - this is for initial deal screening. Use terms like NOI, cap rate, cash-on-cash, ' +
-        'LTV, DSCR, stabilized NOI, rent roll, etc. Format with markdown headers (##) and ' +
+        'You are analyzing OCR-extracted text from deal memos and images. The text may have formatting ' +
+        'issues where labels and values are not on the same line, especially when extracted from images ' +
+        'where labels and values may be vertically stacked. You must use context clues, proximity, and ' +
+        'spatial relationships to match labels with their corresponding values. ' +
+        '\n\n' +
+        'IMPORTANT - Vertical Stacking: When text comes from images, labels and values are often ' +
+        'vertically stacked (e.g., "Purchase Price" appears above "$3,500,000"). Look for patterns where ' +
+        'a label appears directly above or below its value within 2-3 lines, even if separated by blank lines. ' +
+        'For vertically stacked information, match labels with values that appear directly above or below them. ' +
+        '\n\n' +
+        'Examples of patterns to recognize:\n' +
+        "- 'List Price' or 'Asking Price' or 'Purchase Price' on one line, with a dollar amount nearby (within a few lines)\n" +
+        "- 'NOI' or 'Net Operating Income' followed by dollar amounts\n" +
+        "- 'Cap Rate' or 'Cap' followed by percentages (like 6.9% or 6.82%)\n" +
+        "- Financial metrics that appear in vertical layouts\n" +
+        '\n' +
+        'Return markdown format with clear sections. Focus on: Property Address, Purchase Price/Asking Price, ' +
+        'NOI (T-12 and pro forma if available), Cap Rate (going-in and exit if available), Property Type/Class, ' +
+        'Location/Market, Occupancy, Lease Terms, Key Value Drivers, and any red flags or concerns. ' +
+        'Be brief and to the point - this is for initial deal screening. Use terms like NOI, cap rate, ' +
+        'cash-on-cash, LTV, DSCR, stabilized NOI, rent roll, etc. Format with markdown headers (##) and ' +
         'bullet points (-).';
 
       if (dealCriteria) {
@@ -51,14 +60,19 @@ export class DealSummaryService {
 
       const userPrompt =
         'Analyze this OCR-extracted deal memo text. The text may have formatting issues where ' +
-        'labels and values are separated across lines. Use context clues, proximity, and common ' +
-        'patterns to match labels with their values. For example:\n' +
-        "- If you see 'List Price' or 'Asking Price' anywhere in the text, look for nearby dollar " +
-        'amounts (especially large ones like $2,400,000 or $4,300,000)\n' +
-        "- If you see 'NOI' or 'Net Operating Income', look for nearby dollar amounts\n" +
+        'labels and values are separated across lines, especially if extracted from images with ' +
+        'vertically stacked layouts. Use context clues, proximity, and spatial relationships to ' +
+        'match labels with their values.\n\n' +
+        'Key patterns to recognize:\n' +
+        "- If you see 'List Price', 'Asking Price', or 'Purchase Price' anywhere in the text, look for " +
+        'nearby dollar amounts (especially large ones like $2,400,000 or $4,300,000). These may appear ' +
+        'directly above or below the label, even if separated by blank lines.\n' +
+        "- If you see 'NOI' or 'Net Operating Income', look for nearby dollar amounts (may be vertically stacked)\n" +
         "- If you see 'Cap Rate' or 'Cap', look for nearby percentages (like 6.9% or 6.82%)\n" +
+        "- If you see 'Price Per Unit' or 'Price Per Square Foot', look for dollar amounts nearby\n" +
         '- If you see table structures, extract the data from tables\n' +
-        '- Pay attention to section headers and group related information together\n\n' +
+        '- Pay attention to section headers and group related information together\n' +
+        '- For vertically stacked information, match labels with values that appear directly above or below them\n\n' +
         `Here is the extracted text:\n\n${extractedText}`;
 
       const response = await this.openai.chat.completions.create({
