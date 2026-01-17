@@ -7,12 +7,12 @@ import { EmailModule } from './email.module';
 import { AIModule } from './ai.module';
 import { PrismaModule } from './prisma.module';
 import { MicrosoftModule } from './microsoft.module';
-import { ClientPreferencesService } from '../service/preferences/client-preferences.service';
+import { ScreeningPreferencesService } from '../service/preferences/screening-preferences.service';
 
 @Module({
   imports: [EmailModule, AIModule, PrismaModule, MicrosoftModule],
   controllers: [ClerkWebhookController, ResendWebhookController],
-  providers: [ClerkWebhookService, ResendWebhookService, ClientPreferencesService],
+  providers: [ClerkWebhookService, ResendWebhookService, ScreeningPreferencesService],
 })
 export class WebhookModule {}
 

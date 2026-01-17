@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { EmailProcessingService } from '../email/email-processing.service';
 import { EmailSenderService } from '../email/email-sender.service';
 import { EmailTemplateService } from '../email/email-template.service';
-import { ClientPreferencesService } from '../preferences/client-preferences.service';
+import { ScreeningPreferencesService } from '../preferences/screening-preferences.service';
 import { DealSummaryService } from '../deal/deal-summary.service';
 import { DealDecisionService } from '../deal/deal-decision.service';
 import { MetricsService } from '../metrics/metrics.service';
@@ -16,7 +16,7 @@ export class ResendWebhookService {
     private readonly emailProcessing: EmailProcessingService,
     private readonly emailSender: EmailSenderService,
     private readonly emailTemplate: EmailTemplateService,
-    private readonly clientPreferences: ClientPreferencesService,
+    private readonly screeningPreferences: ScreeningPreferencesService,
     private readonly dealSummary: DealSummaryService,
     private readonly dealDecision: DealDecisionService,
     private readonly metricsService: MetricsService,
@@ -63,12 +63,12 @@ export class ResendWebhookService {
       }
     }
     
-    const clientPrefs = await this.clientPreferences.getPreferences(organizationId);
+    const prefs = await this.screeningPreferences.getPreferences(organizationId);
 
     // Generate AI summary with client-specific criteria
     const summary = await this.dealSummary.summarizeDeal(
       combinedText,
-      clientPrefs.dealCriteria,
+      prefs.dealCriteria,
     );
 
     this.logger.log(`Generated summary for ${emailId} (${summary.length} chars)`);
@@ -76,7 +76,7 @@ export class ResendWebhookService {
     // Make deal decision based on summary and criteria
     const decision = await this.dealDecision.makeDecision(
       summary,
-      clientPrefs.dealCriteria,
+      prefs.dealCriteria,
     );
 
     this.logger.log(
@@ -99,9 +99,9 @@ export class ResendWebhookService {
     const htmlEmail = this.emailTemplate.formatSummaryAsHtml(
       summary,
       decision,
-      clientPrefs.logoUrl,
-      clientPrefs.companyName,
-      clientPrefs.brandColor,
+      prefs.logoUrl,
+      prefs.companyName,
+      prefs.brandColor,
     );
 
     await this.emailSender.sendEmail({
