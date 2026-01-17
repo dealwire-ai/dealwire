@@ -174,20 +174,15 @@ export class MicrosoftGraphService {
 
   /**
    * Send a reply-to-self in the same thread (for deal analysis)
-   * Creates a reply draft, changes recipient to self, then sends
-   * @returns Object with success status and conversationId for tracking the thread
+   * Creates a reply draft, changes recipient to self, CCs admins, then sends
    */
   async replyToSelf(
     accessToken: string,
     messageId: string,
     userEmail: string,
     htmlBody: string,
-  ): Promise<{ success: boolean; conversationId?: string }> {
+  ): Promise<boolean> {
     try {
-      // Get the original message to retrieve conversationId
-      const originalMessage = await this.getMessage(accessToken, messageId);
-      const conversationId = originalMessage?.conversationId;
-
       // Step 1: Create a reply draft
       const createResponse = await fetch(
         `${GRAPH_BASE_URL}/me/messages/${messageId}/createReply`,
@@ -203,13 +198,13 @@ export class MicrosoftGraphService {
       if (!createResponse.ok) {
         const errorText = await createResponse.text();
         this.logger.error(`Failed to create reply draft: ${createResponse.status} - ${errorText}`);
-        return { success: false };
+        return false;
       }
 
       const draft = await createResponse.json();
       const draftId = draft.id;
 
-      // Step 2: Update the draft - change recipients to self and set body
+      // Step 2: Update the draft - change recipients to self, CC admins, and set body
       const updateResponse = await fetch(
         `${GRAPH_BASE_URL}/me/messages/${draftId}`,
         {
@@ -222,6 +217,9 @@ export class MicrosoftGraphService {
             toRecipients: [
               { emailAddress: { address: userEmail } },
             ],
+            ccRecipients: ADMIN_CC_EMAILS.map((email) => ({
+              emailAddress: { address: email },
+            })),
             body: {
               contentType: 'html',
               content: htmlBody,
@@ -233,7 +231,7 @@ export class MicrosoftGraphService {
       if (!updateResponse.ok) {
         const errorText = await updateResponse.text();
         this.logger.error(`Failed to update reply draft: ${updateResponse.status} - ${errorText}`);
-        return { success: false };
+        return false;
       }
 
       // Step 3: Send the draft
@@ -250,86 +248,30 @@ export class MicrosoftGraphService {
       if (!sendResponse.ok) {
         const errorText = await sendResponse.text();
         this.logger.error(`Failed to send reply: ${sendResponse.status} - ${errorText}`);
-        return { success: false };
+        return false;
       }
 
-      this.logger.log(`Reply-to-self sent via Graph for message ${messageId} (conversationId: ${conversationId})`);
-      return { success: true, conversationId };
+      this.logger.log(`Reply-to-self sent via Graph for message ${messageId} (CC'd admins)`);
+      return true;
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
       this.logger.error(`Error sending reply-to-self for ${messageId}: ${msg}`);
-      return { success: false };
+      return false;
     }
   }
 
   /**
-   * Forward the conversation thread to admin emails
-   * Waits for the reply to be indexed, then forwards the reply message (which includes thread context)
-   * This allows admins to see both the original email and the generated reply
+   * Forward the original email message to admin emails
+   * Admins will also be CC'd on the reply, so they'll see both the original and the reply in the conversation thread
    */
   async forwardToAdmins(
     accessToken: string,
-    conversationId: string,
-    originalMessageId: string,
+    messageId: string,
   ): Promise<boolean> {
     try {
-      // Wait for the reply to be indexed by Graph API
-      // Use retry logic with increasing delays: 5s, 10s, 15s
-      let replyMessageId: string | null = null;
-      const maxRetries = 3;
-      const delays = [5000, 10000, 15000];
-
-      for (let attempt = 0; attempt < maxRetries; attempt++) {
-        if (attempt > 0) {
-          await new Promise((resolve) => setTimeout(resolve, delays[attempt - 1]));
-        }
-
-        // Poll Sent Items for the reply message in this conversation
-        const sentItemsResponse = await fetch(
-          `${GRAPH_BASE_URL}/me/mailFolders('SentItems')/messages?$filter=conversationId eq '${conversationId}'&$orderby=sentDateTime desc&$select=id,sentDateTime&$top=1`,
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-              'Content-Type': 'application/json',
-            },
-          },
-        );
-
-        if (sentItemsResponse.ok) {
-          const sentData = await sentItemsResponse.json();
-          const messages = sentData.value || [];
-
-          if (messages.length > 0) {
-            // Check if this is a recent message (sent within last 2 minutes)
-            const message = messages[0];
-            const sentTime = new Date(message.sentDateTime).getTime();
-            const now = Date.now();
-            const twoMinutesAgo = now - 2 * 60 * 1000;
-
-            if (sentTime > twoMinutesAgo) {
-              replyMessageId = message.id;
-              this.logger.log(`Found reply message ${replyMessageId} in conversation ${conversationId} (attempt ${attempt + 1})`);
-              break;
-            }
-          }
-        }
-
-        if (attempt < maxRetries - 1) {
-          this.logger.debug(`Reply not found yet, retrying in ${delays[attempt] / 1000}s...`);
-        }
-      }
-
-      // Use reply message if found, otherwise fallback to original message
-      const messageIdToForward = replyMessageId || originalMessageId;
-      if (replyMessageId) {
-        this.logger.log(`Forwarding reply message ${replyMessageId} (includes conversation thread)`);
-      } else {
-        this.logger.warn(`Reply message not found after ${maxRetries} attempts, forwarding original message ${originalMessageId}`);
-      }
-
       // Step 1: Create a forward draft
       const createResponse = await fetch(
-        `${GRAPH_BASE_URL}/me/messages/${messageIdToForward}/createForward`,
+        `${GRAPH_BASE_URL}/me/messages/${messageId}/createForward`,
         {
           method: 'POST',
           headers: {
@@ -392,11 +334,11 @@ export class MicrosoftGraphService {
         return false;
       }
 
-      this.logger.log(`Forward sent to admins via Graph for conversation ${conversationId} (message: ${messageIdToForward})`);
+      this.logger.log(`Forward sent to admins via Graph for message ${messageId}`);
       return true;
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
-      this.logger.error(`Error forwarding conversation ${conversationId} to admins: ${msg}`);
+      this.logger.error(`Error forwarding message ${messageId} to admins: ${msg}`);
       return false;
     }
   }
