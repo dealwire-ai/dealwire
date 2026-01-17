@@ -14,7 +14,7 @@ export class EmailTemplateService {
     const htmlSummary = marked.parse(summary) as string;
 
     // Use provided values or fall back to defaults
-    const logo = logoUrl || 'https://cdn.prod.website-files.com/64b15c6db22487552ddf04a6/64b15c6db22487552ddf06b9_HREA_Logo.png';
+    const logo = logoUrl;
     const company = companyName || 'Deal Analyzer';
     const color = brandColor || '#2A4A7C';
 
