@@ -10,6 +10,7 @@ import { DealDetectionService } from '../deal/deal-detection.service';
 import { MetricsService } from '../metrics/metrics.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { S3Service } from '../s3/s3.service';
+import { NotificationService } from '../notifications/notification.service';
 import { NormalizedEmailEvent } from '../../dto/normalized-email-event.dto';
 
 // Mock marked module to avoid ES module issues
@@ -89,10 +90,14 @@ describe('EmailProcessorService', () => {
           useValue: {
             deal: {
               create: jest.fn(),
+              update: jest.fn(),
             },
             document: {
               create: jest.fn(),
               createMany: jest.fn(),
+            },
+            organization: {
+              findUnique: jest.fn().mockResolvedValue({ name: 'Test Org' }),
             },
           },
         },
@@ -100,6 +105,7 @@ describe('EmailProcessorService', () => {
           provide: S3Service,
           useValue: {
             uploadDealAttachment: jest.fn(),
+            downloadDealAttachment: jest.fn(),
           },
         },
         {
@@ -109,6 +115,16 @@ describe('EmailProcessorService', () => {
             recordDealSkipped: jest.fn(),
             recordDealProcessed: jest.fn(),
             recordProcessingError: jest.fn(),
+            recordEmailEvent: jest.fn(),
+            recordDealProcessingDuration: jest.fn(),
+            recordFolderMove: jest.fn(),
+          },
+        },
+        {
+          provide: NotificationService,
+          useValue: {
+            notifyDealProcessed: jest.fn().mockResolvedValue(undefined),
+            notifyError: jest.fn().mockResolvedValue(undefined),
           },
         },
       ],
@@ -123,10 +139,14 @@ describe('EmailProcessorService', () => {
     dealDecisionService = module.get(DealDecisionService);
   });
 
-  it('should upload attachments to S3 and create Document records', async () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should create Document records for attachments already in S3', async () => {
     // Arrange
-    const attachmentContent = Buffer.from('fake pdf content');
     const s3Key = 'deals/deal123/1234567890-test.pdf';
+    const attachmentContent = Buffer.from('fake pdf content');
 
     const emailEvent: NormalizedEmailEvent = {
       source: 'microsoft',
@@ -142,6 +162,7 @@ describe('EmailProcessorService', () => {
           contentType: 'application/pdf',
           size: 1024,
           contentId: 'att123',
+          s3Key: s3Key, // Already uploaded to S3 in webhook
         },
       ],
       receivedAt: new Date(),
@@ -153,6 +174,12 @@ describe('EmailProcessorService', () => {
       inboxOwnerEmail: 'user@example.com',
       receivedByUserId: 'user123',
       organizationId: 'org123',
+      dealId: 'deal123',
+      detection: {
+        isDeal: true,
+        confidence: 'high' as const,
+        reason: 'Contains deal offering',
+      },
     };
 
     // Mock Prisma deal creation
@@ -160,13 +187,8 @@ describe('EmailProcessorService', () => {
       id: 'deal123',
     });
 
-    // Mock Microsoft Graph attachment download
-    (microsoftGraphService.getAttachmentContent as jest.Mock).mockResolvedValue(
-      attachmentContent,
-    );
-
-    // Mock S3 upload
-    (s3Service.uploadDealAttachment as jest.Mock).mockResolvedValue(s3Key);
+    // Mock S3 download (for text extraction)
+    (s3Service.downloadDealAttachment as jest.Mock) = jest.fn().mockResolvedValue(attachmentContent);
 
     // Mock Document creation
     (prismaService.document.create as jest.Mock).mockResolvedValue({
@@ -180,14 +202,7 @@ describe('EmailProcessorService', () => {
     expect(result.processed).toBe(true);
     expect(result.dealId).toBe('deal123');
 
-    // Verify S3 upload was called
-    expect(s3Service.uploadDealAttachment).toHaveBeenCalledWith(
-      attachmentContent,
-      'test.pdf',
-      'deal123',
-    );
-
-    // Verify Document was created with S3 key
+    // Verify Document was created with S3 key (attachments already in S3 from webhook)
     expect(prismaService.document.create).toHaveBeenCalledWith({
       data: {
         dealId: 'deal123',
@@ -226,6 +241,11 @@ describe('EmailProcessorService', () => {
       inboxOwnerEmail: 'user@example.com',
       receivedByUserId: 'user123',
       organizationId: 'org123',
+      detection: {
+        isDeal: true,
+        confidence: 'high' as const,
+        reason: 'Contains deal offering',
+      },
     };
 
     (prismaService.deal.create as jest.Mock).mockResolvedValue({ id: 'deal123' });
@@ -251,5 +271,46 @@ describe('EmailProcessorService', () => {
         sizeBytes: 1024,
       },
     });
+  });
+
+  it('should skip processing if detection indicates not a deal', async () => {
+    // Arrange
+    jest.clearAllMocks(); // Ensure clean state
+    
+    const emailEvent: NormalizedEmailEvent = {
+      source: 'microsoft',
+      messageId: 'msg123',
+      userId: 'user123',
+      from: 'broker@example.com',
+      to: ['user@example.com'],
+      subject: 'Not a deal',
+      bodyText: 'Just a regular email',
+      attachments: [],
+      receivedAt: new Date(),
+    };
+
+    const ctx = {
+      event: emailEvent,
+      accessToken: 'token123',
+      inboxOwnerEmail: 'user@example.com',
+      receivedByUserId: 'user123',
+      organizationId: 'org123',
+      detection: {
+        isDeal: false,
+        confidence: 'high' as const,
+        reason: 'Not a deal email',
+      },
+    };
+
+    // Act
+    const result = await service.process(ctx);
+
+    // Assert
+    expect(result.processed).toBe(false);
+    expect(result.skippedReason).toBe('Not a deal email');
+    expect(prismaService.deal.create).not.toHaveBeenCalled();
+    expect(prismaService.document.create).not.toHaveBeenCalled();
+    expect(dealSummaryService.summarizeDeal).not.toHaveBeenCalled();
+    expect(dealDecisionService.makeDecision).not.toHaveBeenCalled();
   });
 });

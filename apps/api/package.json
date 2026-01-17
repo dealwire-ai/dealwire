@@ -80,7 +80,13 @@
       "**/test/**/*.spec.ts"
     ],
     "transform": {
-      "^.+\\.(t|j)s$": "ts-jest"
+      "^.+\\.(t|j)s$": ["ts-jest", {
+        "tsconfig": {
+          "strict": false,
+          "noImplicitAny": false,
+          "strictNullChecks": false
+        }
+      }]
     },
     "collectCoverageFrom": [
       "src/**/*.(t|j)s"

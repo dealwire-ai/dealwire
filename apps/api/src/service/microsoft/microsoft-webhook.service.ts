@@ -5,6 +5,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { SQSService } from '../sqs/sqs.service';
 import { S3Service } from '../s3/s3.service';
 import { MetricsService } from '../metrics/metrics.service';
+import { DealDetectionService } from '../deal/deal-detection.service';
 
 interface GraphNotification {
   subscriptionId: string;
@@ -38,6 +39,7 @@ export class MicrosoftWebhookService {
     private readonly sqsService: SQSService,
     private readonly s3Service: S3Service,
     private readonly metricsService: MetricsService,
+    private readonly dealDetectionService: DealDetectionService,
   ) {}
 
   /**
@@ -63,85 +65,133 @@ export class MicrosoftWebhookService {
   private async processEmailNotification(
     notification: GraphNotification,
   ): Promise<void> {
+    const startTime = Date.now();
     const { subscriptionId, resourceData } = notification;
     const messageId = resourceData.id;
+    let userEmail: string | null = null;
 
-    // Dedup check - skip if we've already processed this message recently
-    const now = Date.now();
-    if (this.processedMessages.has(messageId)) {
-      this.logger.debug(`Skipping duplicate notification for ${messageId}`);
-      return;
-    }
-    // Mark as processed and clean up old entries
-    this.processedMessages.set(messageId, now);
-    this.cleanupProcessedMessages();
+    try {
+      // Dedup check - skip if we've already processed this message recently
+      const now = Date.now();
+      if (this.processedMessages.has(messageId)) {
+        this.logger.debug(`Skipping duplicate notification for ${messageId}`);
+        return;
+      }
+      // Mark as processed and clean up old entries
+      this.processedMessages.set(messageId, now);
+      this.cleanupProcessedMessages();
 
-    // Find which user this subscription belongs to
-    const userId =
-      await this.subscriptionService.getUserBySubscriptionId(subscriptionId);
-    if (!userId) {
-      this.logger.warn(`Unknown subscription ${subscriptionId}`);
-      return;
-    }
+      // Find which user this subscription belongs to
+      const userId =
+        await this.subscriptionService.getUserBySubscriptionId(subscriptionId);
+      if (!userId) {
+        this.logger.warn(`Unknown subscription ${subscriptionId}`);
+        return;
+      }
 
-    // Get access token for this user
-    const accessToken = await this.microsoftGraphService.getMicrosoftOAuthTokenFromClerk(userId);
-    if (!accessToken) {
-      this.logger.error(`No access token for user ${userId}`);
-      return;
-    }
+      // Get access token for this user
+      const accessToken = await this.microsoftGraphService.getMicrosoftOAuthTokenFromClerk(userId);
+      if (!accessToken) {
+        this.logger.error(`No access token for user ${userId}`);
+        return;
+      }
 
-    // Fetch the email and convert to normalized format
-    const emailEvent = await this.microsoftGraphService.toNormalizedEvent(
-      userId,
-      accessToken,
-      messageId,
-    );
-
-    if (!emailEvent) {
-      this.logger.error(`Failed to fetch email ${messageId} for user ${userId}`);
-      return;
-    }
-
-    // Get inbox owner's email and org
-    const inboxOwner = await this.prismaService.user.findUnique({
-      where: { id: userId },
-      select: { email: true, organizationId: true },
-    });
-
-    if (!inboxOwner?.email) {
-      this.logger.error(`No email found for user ${userId}`);
-      return;
-    }
-
-    // Skip emails from the user themselves (prevents infinite loop from reply-to-self)
-    if (emailEvent.from.toLowerCase() === inboxOwner.email.toLowerCase()) {
-      this.logger.debug(
-        `Skipping self-sent email: ${emailEvent.messageId} - "${emailEvent.subject}"`,
+      // Fetch the email and convert to normalized format
+      const emailEvent = await this.microsoftGraphService.toNormalizedEvent(
+        userId,
+        accessToken,
+        messageId,
       );
-      return;
+
+      if (!emailEvent) {
+        this.logger.error(`Failed to fetch email ${messageId} for user ${userId}`);
+        return;
+      }
+
+      // Get inbox owner's email and org
+      const inboxOwner = await this.prismaService.user.findUnique({
+        where: { id: userId },
+        select: { email: true, organizationId: true },
+      });
+
+      if (!inboxOwner?.email) {
+        this.logger.error(`No email found for user ${userId}`);
+        return;
+      }
+
+      userEmail = inboxOwner.email;
+
+      // Skip emails from the user themselves (prevents infinite loop from reply-to-self)
+      if (emailEvent.from.toLowerCase() === inboxOwner.email.toLowerCase()) {
+        this.logger.debug(
+          `Skipping self-sent email: ${emailEvent.messageId} - "${emailEvent.subject}"`,
+        );
+        const durationSeconds = (Date.now() - startTime) / 1000;
+        if (userEmail) {
+          this.metricsService.recordMicrosoftWebhookRequest(userEmail, 'success');
+          this.metricsService.recordMicrosoftWebhookLatency(userEmail, durationSeconds);
+        }
+        return;
+      }
+
+      this.logger.log(
+        `Processing Microsoft email: ${emailEvent.messageId} from ${emailEvent.from} to ${inboxOwner.email} - "${emailEvent.subject}"`,
+      );
+
+      // Deal detection - must happen before S3 upload
+      const bodyText = emailEvent.bodyText || this.htmlToText(emailEvent.bodyHtml || '');
+      const detection = await this.dealDetectionService.isDealEmail(
+        emailEvent.subject,
+        bodyText,
+        emailEvent.attachments.length > 0,
+      );
+
+      if (!detection.isDeal) {
+        this.logger.log(
+          `Skipping non-deal email: ${emailEvent.messageId} - "${emailEvent.subject}" (${detection.reason})`,
+        );
+        this.metricsService.recordDealSkipped(detection.reason || 'unknown');
+        const durationSeconds = (Date.now() - startTime) / 1000;
+        if (userEmail) {
+          this.metricsService.recordMicrosoftWebhookRequest(userEmail, 'success');
+          this.metricsService.recordMicrosoftWebhookLatency(userEmail, durationSeconds);
+        }
+        return;
+      }
+
+      const dealId = this.generateDealId();
+
+      // Upload attachments to S3 only if it's a deal
+      if (emailEvent.attachments.length > 0) {
+        await this.uploadAttachmentsToS3(emailEvent, accessToken, dealId);
+      }
+
+      // Enqueue to SQS for async processing (attachments already in S3, detection already done)
+      await this.sqsService.enqueueNormalizedEmail({
+        event: emailEvent,
+        accessToken,
+        inboxOwnerEmail: inboxOwner.email,
+        receivedByUserId: userId,
+        organizationId: inboxOwner.organizationId ?? null,
+        dealId,
+        detection,
+      });
+
+      const durationSeconds = (Date.now() - startTime) / 1000;
+      if (userEmail) {
+        this.metricsService.recordMicrosoftWebhookRequest(userEmail, 'success');
+        this.metricsService.recordMicrosoftWebhookLatency(userEmail, durationSeconds);
+      }
+    } catch (error) {
+      const durationSeconds = (Date.now() - startTime) / 1000;
+      if (userEmail) {
+        this.metricsService.recordMicrosoftWebhookRequest(userEmail, 'error');
+        this.metricsService.recordMicrosoftWebhookLatency(userEmail, durationSeconds);
+      }
+      const msg = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Error processing email notification ${messageId}: ${msg}`);
+      throw error;
     }
-
-    this.logger.log(
-      `Processing Microsoft email: ${emailEvent.messageId} from ${emailEvent.from} to ${inboxOwner.email} - "${emailEvent.subject}"`,
-    );
-
-    const dealId = this.generateDealId();
-
-    // Upload attachments to S3 before enqueueing
-    if (emailEvent.attachments.length > 0) {
-      await this.uploadAttachmentsToS3(emailEvent, accessToken, dealId);
-    }
-
-    // Enqueue to SQS for async processing (attachments already in S3)
-    await this.sqsService.enqueueNormalizedEmail({
-      event: emailEvent,
-      accessToken,
-      inboxOwnerEmail: inboxOwner.email,
-      receivedByUserId: userId,
-      organizationId: inboxOwner.organizationId ?? null,
-      dealId,
-    });
   }
 
   /**
@@ -196,5 +246,14 @@ export class MicrosoftWebhookService {
         this.processedMessages.delete(messageId);
       }
     }
+  }
+
+  private htmlToText(html: string): string {
+    return html
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+      .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
   }
 }

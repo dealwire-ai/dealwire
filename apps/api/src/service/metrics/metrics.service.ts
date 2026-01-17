@@ -35,6 +35,10 @@ export class MetricsService implements OnModuleInit {
   private emailEvents: Counter<string> | null = null;
   private folderMoves: Counter<string> | null = null;
 
+  // Webhook metrics
+  private microsoftWebhookRequests: Counter<string> | null = null;
+  private microsoftWebhookLatency: Histogram<string> | null = null;
+
   onModuleInit() {
     try {
       this.initialize();
@@ -169,6 +173,22 @@ export class MetricsService implements OnModuleInit {
       labelNames: ['folder_name'],
       registers: [this.registry],
     });
+
+    // Webhook metrics
+    this.microsoftWebhookRequests = new Counter({
+      name: 'microsoft_webhook_requests_total',
+      help: 'Total Microsoft webhook requests',
+      labelNames: ['user_email', 'status'],
+      registers: [this.registry],
+    });
+
+    this.microsoftWebhookLatency = new Histogram({
+      name: 'microsoft_webhook_latency_seconds',
+      help: 'Microsoft webhook processing latency in seconds',
+      labelNames: ['user_email'],
+      buckets: [0.1, 0.5, 1, 2, 5, 10, 30],
+      registers: [this.registry],
+    });
   }
 
   recordDealProcessed(decision: 'yes' | 'no', source: string) {
@@ -272,6 +292,19 @@ export class MetricsService implements OnModuleInit {
   recordFolderMove(folderName: string) {
     if (this.enabled && this.folderMoves) {
       this.folderMoves.inc({ folder_name: folderName });
+    }
+  }
+
+  // Webhook metrics
+  recordMicrosoftWebhookRequest(userEmail: string, status: 'success' | 'error') {
+    if (this.enabled && this.microsoftWebhookRequests) {
+      this.microsoftWebhookRequests.inc({ user_email: userEmail, status });
+    }
+  }
+
+  recordMicrosoftWebhookLatency(userEmail: string, durationSeconds: number) {
+    if (this.enabled && this.microsoftWebhookLatency) {
+      this.microsoftWebhookLatency.observe({ user_email: userEmail }, durationSeconds);
     }
   }
 
