@@ -73,7 +73,7 @@ export class JsonLogger implements LoggerService {
     const color = levelColors[level] || colors.reset;
     // Map 'log' to 'INFO' for display, keep others as-is
     const displayLevel = level === 'log' ? 'INFO' : level.toUpperCase();
-    const levelUpper = displayLevel.padEnd(7);
+    const levelUpper = displayLevel.padEnd(7); // Pad to vertically align the log levels
 
     // Colorize the output: [LEVEL] timestamp [Context] message
     console.log(
