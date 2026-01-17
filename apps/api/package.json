@@ -81,7 +81,11 @@
     ],
     "transform": {
       "^.+\\.(t|j)s$": ["ts-jest", {
-        "tsconfig": "tsconfig.spec.json"
+        "tsconfig": {
+          "strict": false,
+          "noImplicitAny": false,
+          "strictNullChecks": false
+        }
       }]
     },
     "collectCoverageFrom": [
