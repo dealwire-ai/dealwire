@@ -1,6 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { readFileSync, existsSync } from 'fs';
-import { join } from 'path';
+import { PrismaService } from '../prisma/prisma.service';
 
 export interface ClientPreferences {
   dealCriteria?: string;
@@ -9,6 +8,8 @@ export interface ClientPreferences {
   brandColor?: string;
   /** Folder name for passed/rejected deals (default: "Passed Deals") */
   passedFolderName?: string;
+  /** Criteria for deals to always skip */
+  alwaysSkip?: string;
 }
 
 export const DEFAULT_PASSED_FOLDER = 'Passed Deals';
@@ -16,91 +17,45 @@ export const DEFAULT_PASSED_FOLDER = 'Passed Deals';
 @Injectable()
 export class ClientPreferencesService {
   private readonly logger = new Logger(ClientPreferencesService.name);
-  private preferences: Map<string, ClientPreferences> = new Map();
 
-  constructor() {
-    this.loadPreferences();
-  }
+  constructor(private readonly prisma: PrismaService) {}
 
-  private loadPreferences(): void {
-    // Use process.cwd() to get project root, works in both dev and production
-    const preferencesPath = join(
-      process.cwd(),
-      'src',
-      'data',
-      'preferences.json',
-    );
-
-    if (!existsSync(preferencesPath)) {
-      this.logger.warn(
-        `Preferences file not found at ${preferencesPath}`,
-      );
-      return;
+  /**
+   * Get preferences for an organization
+   * @param organizationId - The organization ID
+   * @returns ClientPreferences or empty object if not found
+   */
+  async getPreferences(organizationId: string | null | undefined): Promise<ClientPreferences> {
+    if (!organizationId) {
+      this.logger.debug('No organizationId provided, returning empty preferences');
+      return {};
     }
 
     try {
-      const rawData = readFileSync(preferencesPath, 'utf-8');
-      const data = JSON.parse(rawData);
+      const prefs = await this.prisma.screeningPreferences.findUnique({
+        where: { organizationId },
+      });
 
-      for (const [key, value] of Object.entries(data)) {
-        // Convert snake_case JSON keys to camelCase
-        const raw = value as Record<string, unknown>;
-        const prefs: ClientPreferences = {
-          dealCriteria: raw.deal_criteria as string | undefined,
-          logoUrl: raw.logo_url as string | undefined,
-          companyName: raw.company_name as string | undefined,
-          brandColor: raw.brand_color as string | undefined,
-          passedFolderName: raw.passedFolderName as string | undefined,
-        };
-        this.preferences.set(key.toLowerCase(), prefs);
+      if (!prefs) {
+        this.logger.warn(`No preferences found for organization ${organizationId}`);
+        return {};
       }
 
-      this.logger.log(
-        `Loaded ${this.preferences.size} client preferences from ${preferencesPath}`,
-      );
+      return {
+        dealCriteria: prefs.dealCriteria || undefined,
+        logoUrl: prefs.logoUrl || undefined,
+        companyName: prefs.companyName || undefined,
+        brandColor: prefs.brandColor || undefined,
+        passedFolderName: prefs.passedFolderName || undefined,
+        alwaysSkip: prefs.alwaysSkip || undefined,
+      };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      const errorStack = error instanceof Error ? error.stack : undefined;
       this.logger.error(
-        `Failed to load preferences: ${errorMessage}`,
-        errorStack,
+        `Failed to load preferences for organization ${organizationId}: ${errorMessage}`,
       );
+      return {};
     }
-  }
-
-  getPreferences(email: string): ClientPreferences {
-    const emailLower = email.toLowerCase().trim();
-
-    // Exact match
-    if (this.preferences.has(emailLower)) {
-      this.logger.debug(`Preferences match for ${email}: exact`);
-      return this.preferences.get(emailLower)!;
-    }
-
-    // Domain wildcard (*@domain.com)
-    if (emailLower.includes('@')) {
-      const domain = emailLower.split('@')[1];
-      const wildcardKey = `*@${domain}`;
-      if (this.preferences.has(wildcardKey)) {
-        this.logger.debug(`Preferences match for ${email}: domain wildcard`);
-        return this.preferences.get(wildcardKey)!;
-      }
-    }
-
-    // Default
-    if (this.preferences.has('_default')) {
-      this.logger.debug(`Preferences match for ${email}: default`);
-      return this.preferences.get('_default')!;
-    }
-
-    // No preferences found
-    this.logger.debug(`No preferences found for ${email}`);
-    return {};
-  }
-
-  reload(): void {
-    this.preferences.clear();
-    this.loadPreferences();
   }
 }
 

@@ -23,14 +23,15 @@ model User {
 }
 
 model Organization {
-  id        String   @id
-  name      String
-  slug      String?  @unique
-  imageUrl  String?
-  users     User[]
-  deals     Deal[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                  String                @id
+  name                String
+  slug                String?                @unique
+  imageUrl            String?
+  users               User[]
+  deals               Deal[]
+  screeningPreferences ScreeningPreferences?
+  createdAt           DateTime               @default(now())
+  updatedAt           DateTime               @updatedAt
 }
 
 model MicrosoftSubscription {
@@ -120,4 +121,21 @@ model Document {
   s3Key String?
 
   createdAt DateTime @default(now())
+}
+
+// ============================================
+// SCREENING PREFERENCES - Organization settings
+// ============================================
+model ScreeningPreferences {
+  id              String       @id @default(cuid())
+  organizationId  String       @unique
+  organization    Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  companyName     String?
+  brandColor      String? // Hex code
+  passedFolderName String?
+  dealCriteria    String?       @db.Text
+  logoUrl         String?
+  alwaysSkip      String?       @db.Text // Criteria for deals to always skip
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
 }

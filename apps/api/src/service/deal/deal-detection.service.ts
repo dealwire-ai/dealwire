@@ -3,6 +3,7 @@ import OpenAI from 'openai';
 import { z } from 'zod';
 import { aiConfig } from '../../config/ai.config';
 import { MetricsService } from '../metrics/metrics.service';
+import { PrismaService } from '../prisma/prisma.service';
 
 const DealDetectionSchema = z.object({
   isDeal: z.boolean().describe('Whether this email is about a real estate deal offering'),
@@ -18,7 +19,10 @@ export class DealDetectionService {
   private readonly aiConfig = aiConfig();
   private openai: OpenAI;
 
-  constructor(private readonly metricsService: MetricsService) {
+  constructor(
+    private readonly metricsService: MetricsService,
+    private readonly prisma: PrismaService,
+  ) {
     this.openai = new OpenAI({
       apiKey: this.aiConfig.openaiApiKey,
     });
@@ -27,21 +31,34 @@ export class DealDetectionService {
   /**
    * Quickly determine if an email is about a real estate deal offering
    * Uses structured output for fast, reliable classification
+   * Also checks alwaysSkip criteria if provided
    */
   async isDealEmail(
     subject: string,
     bodyPreview: string,
     hasAttachments: boolean,
+    userId?: string,
+    organizationId?: string | null,
   ): Promise<DealDetection> {
     const start = Date.now();
     try {
-      const response = await this.openai.chat.completions.create({
-        model: 'gpt-4o-mini', // we should keep this as something fast and cheap for deal classification
-        temperature: 0,
-        messages: [
-          {
-            role: 'system',
-            content: `You are a classifier that determines if an email is about a real estate deal offering for a SPECIFIC PROPERTY or LOAN.
+      // Load preferences if organizationId is provided
+      let alwaysSkip: string | null = null;
+      if (organizationId) {
+        try {
+          const prefs = await this.prisma.screeningPreferences.findUnique({
+            where: { organizationId },
+            select: { alwaysSkip: true },
+          });
+          alwaysSkip = prefs?.alwaysSkip || null;
+        } catch (error) {
+          const msg = error instanceof Error ? error.message : String(error);
+          this.logger.warn(`Failed to load preferences for org ${organizationId}: ${msg}`);
+        }
+      }
+
+      // Build system prompt
+      let systemPrompt = `You are a classifier that determines if an email is about a real estate deal offering for a SPECIFIC PROPERTY or LOAN.
 You must respond with valid JSON matching this schema: { "isDeal": boolean, "confidence": "high"|"medium"|"low", "reason": string }
 
 CRITICAL: When uncertain or if the email is not clearly about a specific property/loan being offered, return isDeal: false.
@@ -70,7 +87,20 @@ Examples of NOT A DEAL:
 - "Re: JK Equities & Raise Ai" - SaaS platform/service offering (Capital Advisory's platform, investor CRM, dashboards)
 - "RE: JK Equities, LLC - 25-26 Pricing - Deductible options" - Just a chat about underwriting questions, no specific property
 
-Consider attachments: PDFs may indicate deal memos or OMs, but only if the email content also mentions a specific property.`,
+Consider attachments: PDFs may indicate deal memos or OMs, but only if the email content also mentions a specific property.`;
+
+      // Add alwaysSkip check if configured
+      if (alwaysSkip && alwaysSkip.trim()) {
+        systemPrompt += `\n\nCRITICAL SKIP RULE: If this email mentions, references, or is about "${alwaysSkip.trim()}", you MUST return isDeal: false with reason indicating it matches the alwaysSkip criteria (e.g., "Matches alwaysSkip criteria: ${alwaysSkip.trim()}"). This takes precedence over all other classification rules.`;
+      }
+
+      const response = await this.openai.chat.completions.create({
+        model: 'gpt-4o-mini', // we should keep this as something fast and cheap for deal classification
+        temperature: 0,
+        messages: [
+          {
+            role: 'system',
+            content: systemPrompt,
           },
           {
             role: 'user',
