@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { load } from 'cheerio';
 import { EmailSenderService } from './email-sender.service';
 import { extractPdfText } from '../../util/pdf-parser';
+import { ImageProcessorService } from './image-processor.service';
 
 interface AttachmentMetadata {
   filename: string;
@@ -15,7 +16,10 @@ interface AttachmentMetadata {
 export class EmailProcessingService {
   private readonly logger = new Logger(EmailProcessingService.name);
 
-  constructor(private readonly emailSender: EmailSenderService) {}
+  constructor(
+    private readonly emailSender: EmailSenderService,
+    private readonly imageProcessorService: ImageProcessorService,
+  ) {}
 
   async extractEmailBody(emailId: string): Promise<{ text: string; images: string[] }> {
     try {
@@ -128,9 +132,17 @@ export class EmailProcessingService {
         return this.processPdfBuffer(Buffer.from(buffer), attachmentInfo.filename);
       }
 
-      // For non-PDF attachments, return empty for now
+      // Process images using OpenAI Vision API
+      if (this.isImageType(attachmentInfo.contentType, attachmentInfo.filename)) {
+        return this.imageProcessorService.extractTextFromImage(
+          Buffer.from(buffer),
+          attachmentInfo.filename,
+        );
+      }
+
+      // For other attachment types, return empty for now
       this.logger.debug(
-        `Skipping non-PDF attachment: ${attachmentInfo.filename} (${attachmentInfo.contentType})`,
+        `Skipping unsupported attachment: ${attachmentInfo.filename} (${attachmentInfo.contentType})`,
       );
       return '';
     } catch (error) {
@@ -165,6 +177,15 @@ export class EmailProcessingService {
       this.logger.error(`PDF parsing failed for ${name}: ${errorMessage}`);
       return '';
     }
+  }
+
+  /**
+   * Process an image buffer and extract text using OpenAI Vision API
+   * Exposed for use by Microsoft webhook service
+   */
+  async processImageBuffer(buffer: Buffer, filename?: string): Promise<string> {
+    const name = filename || 'attachment.png';
+    return this.imageProcessorService.extractTextFromImage(buffer, name);
   }
 
   async extractAllText(
@@ -203,6 +224,25 @@ export class EmailProcessingService {
     }
 
     return allExtractedText;
+  }
+
+  /**
+   * Check if attachment is an image type
+   */
+  private isImageType(contentType: string, filename: string): boolean {
+    const imageContentTypes = [
+      'image/png',
+      'image/jpeg',
+      'image/jpg',
+      'image/gif',
+      'image/webp',
+    ];
+    const imageExtensions = /\.(png|jpg|jpeg|gif|webp)$/i;
+
+    return (
+      imageContentTypes.includes(contentType) ||
+      imageExtensions.test(filename)
+    );
   }
 }
 

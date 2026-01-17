@@ -217,7 +217,12 @@ export class EmailProcessorService {
     // Process attachments (prefer S3, fallback to Microsoft Graph)
     if (event.attachments.length > 0) {
       for (const att of event.attachments) {
-        if (att.contentType === 'application/pdf' || att.filename.toLowerCase().endsWith('.pdf')) {
+        const isPdf =
+          att.contentType === 'application/pdf' ||
+          att.filename.toLowerCase().endsWith('.pdf');
+        const isImage = this.isImageType(att.contentType, att.filename);
+
+        if (isPdf || isImage) {
           let content: Buffer | null = null;
 
           // Prefer S3 if available (already uploaded)
@@ -226,7 +231,9 @@ export class EmailProcessorService {
               content = await this.s3Service.downloadDealAttachment(att.s3Key);
             } catch (error) {
               const msg = error instanceof Error ? error.message : String(error);
-              this.logger.warn(`Failed to download ${att.filename} from S3 (${att.s3Key}): ${msg}, falling back to Graph API`);
+              this.logger.warn(
+                `Failed to download ${att.filename} from S3 (${att.s3Key}): ${msg}, falling back to Graph API`,
+              );
             }
           }
 
@@ -240,7 +247,19 @@ export class EmailProcessorService {
           }
 
           if (content) {
-            const text = await this.emailProcessingService.processPdfBuffer(content, att.filename);
+            let text = '';
+            if (isPdf) {
+              text = await this.emailProcessingService.processPdfBuffer(
+                content,
+                att.filename,
+              );
+            } else if (isImage) {
+              text = await this.emailProcessingService.processImageBuffer(
+                content,
+                att.filename,
+              );
+            }
+
             if (text) {
               texts.push(`--- ${att.filename} ---\n${text}`);
             }
@@ -331,5 +350,24 @@ export class EmailProcessorService {
       .replace(/<[^>]+>/g, ' ')
       .replace(/\s+/g, ' ')
       .trim();
+  }
+
+  /**
+   * Check if attachment is an image type
+   */
+  private isImageType(contentType: string, filename: string): boolean {
+    const imageContentTypes = [
+      'image/png',
+      'image/jpeg',
+      'image/jpg',
+      'image/gif',
+      'image/webp',
+    ];
+    const imageExtensions = /\.(png|jpg|jpeg|gif|webp)$/i;
+
+    return (
+      imageContentTypes.includes(contentType) ||
+      imageExtensions.test(filename)
+    );
   }
 }
