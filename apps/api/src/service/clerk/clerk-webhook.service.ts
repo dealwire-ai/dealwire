@@ -214,13 +214,18 @@ export class ClerkWebhookService {
         name: data.name,
         slug: data.slug,
         imageUrl: data.image_url,
+        screeningPreferences: {
+          create: {
+            // Default empty preferences
+          },
+        },
       },
     });
-    this.logger.log(`Organization created: ${data.id}`);
+    this.logger.log(`Organization created: ${data.id} with default screening preferences`);
   }
 
   private async upsertOrganization(data: any): Promise<void> {
-    await this.prisma.organization.upsert({
+    const org = await this.prisma.organization.upsert({
       where: { id: data.id },
       update: {
         name: data.name,
@@ -232,8 +237,28 @@ export class ClerkWebhookService {
         name: data.name,
         slug: data.slug,
         imageUrl: data.image_url,
+        screeningPreferences: {
+          create: {
+            // Default empty preferences
+          },
+        },
       },
     });
+
+    // Ensure screening preferences exist (in case org was created before this migration)
+    const existingPrefs = await this.prisma.screeningPreferences.findUnique({
+      where: { organizationId: data.id },
+    });
+
+    if (!existingPrefs) {
+      await this.prisma.screeningPreferences.create({
+        data: {
+          organizationId: data.id,
+        },
+      });
+      this.logger.log(`Created default screening preferences for organization ${data.id}`);
+    }
+
     this.logger.log(`Organization updated: ${data.id}`);
   }
 
@@ -256,7 +281,7 @@ export class ClerkWebhookService {
 
     // Ensure organization exists first (race condition: membership.created can fire before organization.created)
     if (organization) {
-      await this.prisma.organization.upsert({
+      const org = await this.prisma.organization.upsert({
         where: { id: organizationId },
         update: {
           name: organization.name,
@@ -268,8 +293,27 @@ export class ClerkWebhookService {
           name: organization.name,
           slug: organization.slug,
           imageUrl: organization.image_url,
+          screeningPreferences: {
+            create: {
+              // Default empty preferences
+            },
+          },
         },
       });
+
+      // Ensure screening preferences exist (in case org was created before this migration)
+      const existingPrefs = await this.prisma.screeningPreferences.findUnique({
+        where: { organizationId },
+      });
+
+      if (!existingPrefs) {
+        await this.prisma.screeningPreferences.create({
+          data: {
+            organizationId,
+          },
+        });
+        this.logger.log(`Created default screening preferences for organization ${organizationId}`);
+      }
     }
 
     // Ensure user exists before updating

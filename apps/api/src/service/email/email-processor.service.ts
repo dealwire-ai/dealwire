@@ -85,7 +85,7 @@ export class EmailProcessorService {
       const combinedText = extractedTexts.join('\n\n');
 
       // Step 2: Get client preferences
-      const clientPrefs = this.clientPreferencesService.getPreferences(inboxOwnerEmail);
+      const clientPrefs = await this.clientPreferencesService.getPreferences(organizationId);
 
       // Step 3: Generate AI summary
       const summary = await this.dealSummaryService.summarizeDeal(
