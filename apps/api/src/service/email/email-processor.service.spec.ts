@@ -3,7 +3,7 @@ import { EmailProcessorService } from '../email/email-processor.service';
 import { EmailProcessingService } from '../email/email-processing.service';
 import { EmailTemplateService } from '../email/email-template.service';
 import { MicrosoftGraphService } from '../microsoft/microsoft-graph.service';
-import { ClientPreferencesService } from '../preferences/client-preferences.service';
+import { ScreeningPreferencesService } from '../preferences/screening-preferences.service';
 import { DealSummaryService } from '../deal/deal-summary.service';
 import { DealDecisionService } from '../deal/deal-decision.service';
 import { DealDetectionService } from '../deal/deal-detection.service';
@@ -52,7 +52,7 @@ describe('EmailProcessorService', () => {
           },
         },
         {
-          provide: ClientPreferencesService,
+          provide: ScreeningPreferencesService,
           useValue: {
             getPreferences: jest.fn().mockResolvedValue({
               dealCriteria: 'Test criteria',

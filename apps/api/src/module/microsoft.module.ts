@@ -9,7 +9,7 @@ import { PrismaModule } from './prisma.module';
 import { EmailProcessorModule } from './email-processor.module';
 import { S3Module } from './s3.module';
 import { AIModule } from './ai.module';
-import { ClientPreferencesService } from '../service/preferences/client-preferences.service';
+import { ScreeningPreferencesService } from '../service/preferences/screening-preferences.service';
 
 @Module({
   imports: [
@@ -25,9 +25,9 @@ import { ClientPreferencesService } from '../service/preferences/client-preferen
     MicrosoftSubscriptionService,
     MicrosoftWebhookService,
     MicrosoftRenewalSchedulerService,
-    ClientPreferencesService,
+    ScreeningPreferencesService,
   ],
-  exports: [MicrosoftGraphService, MicrosoftSubscriptionService, ClientPreferencesService],
+  exports: [MicrosoftGraphService, MicrosoftSubscriptionService, ScreeningPreferencesService],
 })
 export class MicrosoftModule {}
 
