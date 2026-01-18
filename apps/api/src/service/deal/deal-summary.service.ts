@@ -27,7 +27,7 @@ export class DealSummaryService {
     try {
       // Build system prompt with optional client criteria
       let systemPrompt =
-        'You are a real estate acquisitions analyst for Hildreth Real Estate Advisors. ' +
+        'You are a real estate acquisitions analyst. ' +
         'You are analyzing OCR-extracted text from deal memos and images. The text may have formatting ' +
         'issues where labels and values are not on the same line, especially when extracted from images ' +
         'where labels and values may be vertically stacked. You must use context clues, proximity, and ' +
