@@ -42,6 +42,12 @@ export class DealDecisionService {
           "Do NOT reject deals for missing financial metrics, incomplete information, or subjective quality concerns - " +
           "those are not part of screening. Be strict about geography and property requirements - " +
           'a property in New Jersey does NOT satisfy a "New York only" requirement. ' +
+          '\n\nIMPORTANT - Missing Price Handling: If the purchase price is missing but you can infer the deal size ' +
+          'from the number of units (e.g., a 200-unit apartment building), and you can reasonably determine that ' +
+          'the deal size is definitely above their minimum floor requirement, do NOT reject the deal solely because ' +
+          'the price is missing. Use your knowledge of typical price per unit ranges to estimate deal size when ' +
+          'the number of units is provided. Only reject for missing price if you cannot reasonably infer that the ' +
+          'deal meets the minimum size requirement. ' +
           'Provide a one-sentence reason for your decision, written as if speaking directly to the client, citing which requirement was not met if applicable. ' +
           'Respond with JSON in the format: {"decision": "yes" or "no", "reason": "your reason"}.';
       } else {
