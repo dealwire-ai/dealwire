@@ -18,6 +18,7 @@ interface GraphMessage {
   receivedDateTime: string;
   hasAttachments: boolean;
   conversationId?: string;
+  internetMessageId?: string;
 }
 
 interface GraphAttachment {
@@ -76,7 +77,7 @@ export class MicrosoftGraphService {
   ): Promise<GraphMessage | null> {
     try {
       const response = await fetch(
-        `${GRAPH_BASE_URL}/me/messages/${messageId}?$select=id,subject,from,toRecipients,body,receivedDateTime,hasAttachments,conversationId`,
+        `${GRAPH_BASE_URL}/me/messages/${messageId}?$select=id,subject,from,toRecipients,body,receivedDateTime,hasAttachments,conversationId,internetMessageId`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -203,8 +204,35 @@ export class MicrosoftGraphService {
 
       const draft = await createResponse.json();
       const draftId = draft.id;
+      const draftSubject = draft.subject || '';
+      const draftConversationId = draft.conversationId;
 
-      // Step 2: Update the draft - change recipients to self, CC admins, and set body
+      // Fetch original message to get internetMessageId for verification/logging
+      const originalMessage = await this.getMessage(accessToken, messageId);
+      const originalInternetMessageId = originalMessage?.internetMessageId;
+
+      // Step 2: Update the draft - change recipients to self, CC admins, set body, and preserve threading properties
+      // Preserving subject and conversationId is critical for threading in older Outlook versions
+      // Note: In-Reply-To and References headers are automatically set by createReply and should be preserved by PATCH
+      const updateBody: any = {
+        subject: draftSubject, // Preserve subject from createReply (includes "Re: " prefix)
+        toRecipients: [
+          { emailAddress: { address: userEmail } },
+        ],
+        ccRecipients: ADMIN_CC_EMAILS.map((email) => ({
+          emailAddress: { address: email },
+        })),
+        body: {
+          contentType: 'html',
+          content: htmlBody,
+        },
+      };
+
+      // Preserve conversationId if available (helps with threading in older Outlook)
+      if (draftConversationId) {
+        updateBody.conversationId = draftConversationId;
+      }
+
       const updateResponse = await fetch(
         `${GRAPH_BASE_URL}/me/messages/${draftId}`,
         {
@@ -213,18 +241,7 @@ export class MicrosoftGraphService {
             Authorization: `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            toRecipients: [
-              { emailAddress: { address: userEmail } },
-            ],
-            ccRecipients: ADMIN_CC_EMAILS.map((email) => ({
-              emailAddress: { address: email },
-            })),
-            body: {
-              contentType: 'html',
-              content: htmlBody,
-            },
-          }),
+          body: JSON.stringify(updateBody),
         },
       );
 
@@ -233,6 +250,11 @@ export class MicrosoftGraphService {
         this.logger.error(`Failed to update reply draft: ${updateResponse.status} - ${errorText}`);
         return false;
       }
+
+      // Log threading properties for debugging threading issues
+      this.logger.debug(
+        `Reply draft updated with subject: "${draftSubject}", conversationId: ${draftConversationId || 'N/A'}, original Message-ID: ${originalInternetMessageId || 'N/A'}`,
+      );
 
       // Step 3: Send the draft
       const sendResponse = await fetch(
@@ -317,8 +339,10 @@ export class MicrosoftGraphService {
 
       const draft = await createReplyResponse.json();
       const draftId = draft.id;
+      const draftSubject = draft.subject || '';
 
-      // Update the draft - change recipients to admins and set body with original content
+      // Update the draft - change recipients to admins, set body with original content, and preserve subject
+      // Preserving the subject is critical for threading in older Outlook versions
       const updateResponse = await fetch(
         `${GRAPH_BASE_URL}/me/messages/${draftId}`,
         {
@@ -328,6 +352,7 @@ export class MicrosoftGraphService {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
+            subject: draftSubject, // Preserve subject from createReply (includes "Re: " prefix)
             toRecipients: ADMIN_CC_EMAILS.map((email) => ({
               emailAddress: { address: email },
             })),
