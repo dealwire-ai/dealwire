@@ -610,10 +610,14 @@ export class MicrosoftGraphService {
     folderId: string,
   ): Promise<boolean> {
     try {
-      // Wait a bit for Graph API to index the reply we just sent
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      // Wait for Graph API to index the replies we just sent
+      // Note: This is called after an 8s wait in email-processor, but we add extra wait here for safety
+      await new Promise((resolve) => setTimeout(resolve, 3000));
 
-      // Find all messages in this conversation from Inbox
+      // Find all messages in this conversation from multiple sources
+      const allMessages: Array<{ id: string; parentFolderId: string; source: string }> = [];
+
+      // Check Inbox folder
       const inboxResponse = await fetch(
         `${GRAPH_BASE_URL}/me/messages?$filter=conversationId eq '${conversationId}'&$select=id,parentFolderId`,
         {
@@ -624,7 +628,19 @@ export class MicrosoftGraphService {
         },
       );
 
-      // Also check Sent Items for the reply message
+      if (inboxResponse.ok) {
+        const inboxData = await inboxResponse.json();
+        const inboxMessages = (inboxData.value || []).map((msg: { id: string; parentFolderId: string }) => ({
+          ...msg,
+          source: 'Inbox',
+        }));
+        allMessages.push(...inboxMessages);
+        this.logger.debug(`Found ${inboxMessages.length} messages in Inbox for conversation ${conversationId}`);
+      } else {
+        this.logger.warn(`Failed to fetch Inbox messages: ${inboxResponse.status}`);
+      }
+
+      // Check Sent Items for the reply-to-self and forward messages
       const sentItemsResponse = await fetch(
         `${GRAPH_BASE_URL}/me/mailFolders('SentItems')/messages?$filter=conversationId eq '${conversationId}'&$select=id,parentFolderId`,
         {
@@ -635,16 +651,37 @@ export class MicrosoftGraphService {
         },
       );
 
-      const allMessages: Array<{ id: string; parentFolderId: string }> = [];
-
-      if (inboxResponse.ok) {
-        const inboxData = await inboxResponse.json();
-        allMessages.push(...(inboxData.value || []));
-      }
-
       if (sentItemsResponse.ok) {
         const sentData = await sentItemsResponse.json();
-        allMessages.push(...(sentData.value || []));
+        const sentMessages = (sentData.value || []).map((msg: { id: string; parentFolderId: string }) => ({
+          ...msg,
+          source: 'SentItems',
+        }));
+        allMessages.push(...sentMessages);
+        this.logger.debug(`Found ${sentMessages.length} messages in Sent Items for conversation ${conversationId}`);
+      } else {
+        this.logger.warn(`Failed to fetch Sent Items messages: ${sentItemsResponse.status}`);
+      }
+
+      // Also check the target folder to see if any messages are already there
+      const targetFolderResponse = await fetch(
+        `${GRAPH_BASE_URL}/me/mailFolders('${folderId}')/messages?$filter=conversationId eq '${conversationId}'&$select=id,parentFolderId`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+
+      if (targetFolderResponse.ok) {
+        const targetData = await targetFolderResponse.json();
+        const targetMessages = (targetData.value || []).map((msg: { id: string; parentFolderId: string }) => ({
+          ...msg,
+          source: 'TargetFolder',
+        }));
+        allMessages.push(...targetMessages);
+        this.logger.debug(`Found ${targetMessages.length} messages already in target folder for conversation ${conversationId}`);
       }
 
       // Deduplicate by message ID (reply appears in both Inbox and Sent Items)
@@ -652,38 +689,56 @@ export class MicrosoftGraphService {
         new Map(allMessages.map((msg) => [msg.id, msg])).values(),
       );
 
-      this.logger.log(`Found ${uniqueMessages.length} messages in conversation ${conversationId}`);
+      this.logger.log(
+        `Found ${uniqueMessages.length} unique messages in conversation ${conversationId} (sources: ${[...new Set(uniqueMessages.map(m => m.source))].join(', ')})`,
+      );
+
+      // Log each message found
+      for (const msg of uniqueMessages) {
+        this.logger.debug(`Message ${msg.id} in ${msg.source} (parentFolderId: ${msg.parentFolderId})`);
+      }
 
       // Move each message that isn't already in the target folder
       let movedCount = 0;
       let skippedCount = 0;
+      const movedMessageIds: string[] = [];
+      const skippedMessageIds: string[] = [];
+
       for (const msg of uniqueMessages) {
         if (msg.parentFolderId === folderId) {
           skippedCount++;
-          this.logger.debug(`Message ${msg.id} already in target folder, skipping`);
+          skippedMessageIds.push(msg.id);
+          this.logger.debug(`Message ${msg.id} already in target folder (${msg.source}), skipping`);
         } else {
-          // Retry logic for messages that might not be indexed yet
+          // Retry logic with exponential backoff for messages that might not be indexed yet
           let success = false;
           for (let attempt = 0; attempt < 3; attempt++) {
             success = await this.moveMessage(accessToken, msg.id, folderId);
-            if (success) break;
+            if (success) {
+              movedCount++;
+              movedMessageIds.push(msg.id);
+              this.logger.log(`Moved message ${msg.id} from ${msg.source} to target folder (attempt ${attempt + 1})`);
+              break;
+            }
 
-            // If 404 and not last attempt, wait and retry
+            // Exponential backoff: 2s, 4s, 8s delays
             if (attempt < 2) {
-              await new Promise((resolve) => setTimeout(resolve, 1000 * (attempt + 1)));
+              const delayMs = 2000 * Math.pow(2, attempt);
+              this.logger.debug(`Message ${msg.id} move failed, retrying in ${delayMs}ms (attempt ${attempt + 2}/3)`);
+              await new Promise((resolve) => setTimeout(resolve, delayMs));
             }
           }
 
-          if (success) {
-            movedCount++;
-          } else {
+          if (!success) {
             skippedCount++;
+            skippedMessageIds.push(msg.id);
+            this.logger.warn(`Failed to move message ${msg.id} from ${msg.source} after 3 attempts`);
           }
         }
       }
 
       this.logger.log(
-        `Conversation move complete: ${movedCount} moved, ${skippedCount} skipped (already in folder or not found)`,
+        `Conversation move complete for ${conversationId}: ${movedCount} moved (${movedMessageIds.join(', ')}), ${skippedCount} skipped (${skippedMessageIds.join(', ')})`,
       );
       return movedCount > 0; // Success if we moved at least one message
     } catch (error) {
