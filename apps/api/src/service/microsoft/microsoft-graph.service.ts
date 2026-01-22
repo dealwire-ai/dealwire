@@ -286,6 +286,7 @@ export class MicrosoftGraphService {
       // Construct body with original message content
       const forwardBody = `
         <hr style="border: none; border-top: 1px solid #ccc; margin: 20px 0;">
+        <p>Forwarded message for Admin visibility.</p>
         <div style="font-family: Arial, sans-serif;">
           <p><strong>From:</strong> ${originalFromName} &lt;${originalFrom}&gt;</p>
           <p><strong>Subject:</strong> ${originalSubject}</p>
