@@ -113,6 +113,18 @@ export class EmailProcessorService {
         this.logger.warn(`User ${receivedByUserId} has no organization - deal will not be saved`);
       }
 
+      // Step 6: Handle NO decisions - move original email immediately to skip inbox
+      if (event.source === 'microsoft' && accessToken && decision.decision === 'no' && dealId) {
+        const folderName = prefs.passedFolderName || DEFAULT_PASSED_FOLDER;
+        const folderId = await this.microsoftGraphService.getOrCreateFolder(accessToken, folderName);
+        
+        if (folderId) {
+          // Move original email immediately (before sending replies) to skip inbox entirely
+          await this.microsoftGraphService.moveMessage(accessToken, event.messageId, folderId);
+          this.logger.log(`Moved original email ${event.messageId} to ${folderName} immediately (skipping inbox)`);
+        }
+      }
+
       // Step 7: Send reply
       const htmlEmail = this.emailTemplateService.formatSummaryAsHtml(
         summary,
@@ -143,9 +155,14 @@ export class EmailProcessorService {
           // Don't fail the deal processing if forward fails
         }
 
-        // Step 7: Move passed deals to folder
+        // Step 8: Move entire conversation for NO decisions (to catch reply-to-self and forward)
         if (decision.decision === 'no' && dealId) {
           const folderName = prefs.passedFolderName || DEFAULT_PASSED_FOLDER;
+          
+          // Wait for Graph API to index the replies we just sent
+          await new Promise((resolve) => setTimeout(resolve, 8000));
+          
+          // Move entire conversation (this will catch reply-to-self and forward emails)
           await this.microsoftGraphService.moveMessageToPassedFolder(
             accessToken,
             event.messageId,
