@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { EmailProcessingService } from '../email/email-processing.service';
 import { EmailTemplateService } from '../email/email-template.service';
+import { EmailSenderService } from '../email/email-sender.service';
 import { MicrosoftGraphService } from '../microsoft/microsoft-graph.service';
 import {
   ScreeningPreferencesService,
@@ -42,6 +43,7 @@ export class EmailProcessorService {
   constructor(
     private readonly emailProcessingService: EmailProcessingService,
     private readonly emailTemplateService: EmailTemplateService,
+    private readonly emailSenderService: EmailSenderService,
     private readonly microsoftGraphService: MicrosoftGraphService,
     private readonly screeningPreferencesService: ScreeningPreferencesService,
     private readonly dealSummaryService: DealSummaryService,
@@ -87,21 +89,17 @@ export class EmailProcessorService {
       // Step 2: Get client preferences
       const prefs = await this.screeningPreferencesService.getPreferences(organizationId);
 
-      // Step 3: Generate AI summary
-      const summary = await this.dealSummaryService.summarizeDeal(
+      // Step 3: Make AI decision on raw extracted text (BEFORE summary generation)
+      const decision = await this.dealDecisionService.makeDecision(
         combinedText,
         prefs.dealCriteria,
       );
 
-      // Step 4: Make AI decision
-      const decision = await this.dealDecisionService.makeDecision(
-        summary,
-        prefs.dealCriteria,
-      );
-
-      // Step 5: Save deal to database (attachments already in S3 from webhook)
+      // Step 4: Save deal to database (attachments already in S3 from webhook)
       let dealId: string | undefined;
       if (organizationId) {
+        // For "no" decisions, save without summary
+        const summary = null;
         dealId = await this.saveDeal(
           ctx,
           summary,
@@ -113,7 +111,76 @@ export class EmailProcessorService {
         this.logger.warn(`User ${receivedByUserId} has no organization - deal will not be saved`);
       }
 
-      // Step 6: Send reply (must happen BEFORE moving message, as moving changes the message ID)
+      // Step 5: Handle "no" decisions - skip summary and reply, just move folder (Microsoft only)
+      if (decision.decision === 'no') {
+        if (event.source === 'microsoft' && accessToken && dealId) {
+          const folderName = prefs.passedFolderName || DEFAULT_PASSED_FOLDER;
+          const folderId = await this.microsoftGraphService.getOrCreateFolder(accessToken, folderName);
+          
+          if (folderId) {
+            // Get conversation ID BEFORE moving (message ID changes after move)
+            const originalMessage = await this.microsoftGraphService.getMessage(accessToken, event.messageId);
+            const conversationId = originalMessage?.conversationId;
+            
+            // Move original email immediately
+            await this.microsoftGraphService.moveMessage(accessToken, event.messageId, folderId);
+            this.logger.log(`Moved original email ${event.messageId} to ${folderName} (no summary/reply for "no" decision)`);
+            
+            // Move entire conversation (wait for Graph API to index)
+            await new Promise((resolve) => setTimeout(resolve, 8000));
+            
+            if (conversationId && folderId) {
+              await this.microsoftGraphService.moveConversation(accessToken, conversationId, folderId);
+            }
+            
+            // Update Deal record with folder name
+            await this.prismaService.deal.update({
+              where: { id: dealId },
+              data: { folderMovedTo: folderName },
+            });
+
+            // Record metrics
+            this.metricsService.recordFolderMove(folderName);
+          }
+        }
+
+        // Record metrics and return early (no summary, no reply)
+        const durationSeconds = (Date.now() - startTime) / 1000;
+        this.metricsService.recordDealProcessed(decision.decision as 'yes' | 'no', event.source);
+        this.metricsService.recordDealProcessingDuration(
+          durationSeconds,
+          decision.decision as 'yes' | 'no',
+          event.source,
+        );
+        this.metricsService.recordEmailEvent(true, decision.decision as 'yes' | 'no', false);
+
+        this.logger.log(
+          `Deal processed in ${durationSeconds.toFixed(2)}s: ${event.messageId} → ${decision.decision} (no summary/reply)`,
+        );
+
+        return {
+          processed: true,
+          dealId,
+          decision: decision.decision as 'yes' | 'no',
+          reason: decision.reason,
+        };
+      }
+
+      // Step 6: For "yes" decisions, generate summary
+      const summary = await this.dealSummaryService.summarizeDeal(
+        combinedText,
+        prefs.dealCriteria,
+      );
+
+      // Update deal with summary
+      if (dealId) {
+        await this.prismaService.deal.update({
+          where: { id: dealId },
+          data: { initialScreeningSummary: summary },
+        });
+      }
+
+      // Step 7: Send reply (must happen BEFORE moving message, as moving changes the message ID)
       const htmlEmail = this.emailTemplateService.formatSummaryAsHtml(
         summary,
         decision,
@@ -143,48 +210,17 @@ export class EmailProcessorService {
           this.logger.warn(`Failed to forward email to admins: ${msg}`);
           // Don't fail the deal processing if forward fails
         }
-
-        // Step 7: Handle NO decisions - move original email immediately after sending replies
-        if (decision.decision === 'no' && dealId) {
-          const folderName = prefs.passedFolderName || DEFAULT_PASSED_FOLDER;
-          const folderId = await this.microsoftGraphService.getOrCreateFolder(accessToken, folderName);
-          
-          // Get conversation ID BEFORE moving (message ID changes after move)
-          const originalMessage = await this.microsoftGraphService.getMessage(accessToken, event.messageId);
-          const conversationId = originalMessage?.conversationId;
-          
-          if (folderId) {
-            // Move original email immediately (after sending replies) to skip inbox
-            // Note: Moving changes the message ID, so we must send replies first
-            await this.microsoftGraphService.moveMessage(accessToken, event.messageId, folderId);
-            this.logger.log(`Moved original email ${event.messageId} to ${folderName} immediately (skipping inbox)`);
-          }
-
-          // Step 8: Move entire conversation (to catch reply-to-self and forward)
-          // Wait for Graph API to index the replies we just sent
-          await new Promise((resolve) => setTimeout(resolve, 8000));
-          
-          // Move entire conversation using conversation ID (works even after message is moved)
-          if (conversationId && folderId) {
-            await this.microsoftGraphService.moveConversation(accessToken, conversationId, folderId);
-          } else {
-            // Fallback: try to move using message ID (may fail if message already moved)
-            await this.microsoftGraphService.moveMessageToPassedFolder(
-              accessToken,
-              event.messageId,
-              folderName,
-            );
-          }
-          
-          // Update Deal record with folder name
-          await this.prismaService.deal.update({
-            where: { id: dealId },
-            data: { folderMovedTo: folderName },
-          });
-
-          // Record metrics
-          this.metricsService.recordFolderMove(folderName);
-        }
+      } else if (event.source === 'resend') {
+        // Send reply via Resend API
+        const replySubject = event.subject ? `Re: ${event.subject}` : 'Deal Summary';
+        await this.emailSenderService.sendEmail({
+          to: [inboxOwnerEmail],
+          subject: replySubject,
+          html: htmlEmail,
+          text: summary,
+          replyToMessageId: event.messageId,
+        });
+        this.logger.log(`Reply sent via Resend for ${event.messageId} to ${inboxOwnerEmail}`);
       }
 
       const durationSeconds = (Date.now() - startTime) / 1000;
@@ -270,6 +306,21 @@ export class EmailProcessorService {
             );
           }
 
+          // Fallback to Resend API if S3 not available (shouldn't happen, but be defensive)
+          if (!content && event.source === 'resend') {
+            // For Resend, contentId is the downloadUrl
+            try {
+              const response = await fetch(att.contentId);
+              if (response.ok) {
+                const arrayBuffer = await response.arrayBuffer();
+                content = Buffer.from(arrayBuffer);
+              }
+            } catch (error) {
+              const msg = error instanceof Error ? error.message : String(error);
+              this.logger.warn(`Failed to download Resend attachment ${att.filename}: ${msg}`);
+            }
+          }
+
           if (content) {
             let text = '';
             if (isPdf) {
@@ -297,7 +348,7 @@ export class EmailProcessorService {
 
   private async saveDeal(
     ctx: ProcessDealContext,
-    summary: string,
+    summary: string | null,
     decision: 'yes' | 'no',
     detection: { isDeal: boolean; confidence: string; reason: string },
     accessToken?: string,
@@ -306,6 +357,7 @@ export class EmailProcessorService {
 
     try {
       // Step 1: Create deal (use pre-generated dealId if provided, otherwise Prisma generates one)
+      // Summary may be null for "no" decisions
       const savedDeal = await this.prismaService.deal.create({
         data: {
           id: dealId, // Use pre-generated dealId from webhook (for S3 organization)

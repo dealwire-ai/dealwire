@@ -18,12 +18,12 @@ export class DealDecisionService {
 
   /**
    * Make a decision on whether a deal meets the client's screening criteria
-   * @param summary - The summary of the deal
+   * @param extractedText - Raw extracted text from email and attachments (may have formatting issues from OCR)
    * @param dealCriteria - The client's screening criteria
    * @returns The decision on whether the deal meets the client's screening criteria
    */
   async makeDecision(
-    summary: string,
+    extractedText: string,
     dealCriteria?: string,
   ): Promise<DealDecision> {
     const start = Date.now();
@@ -48,6 +48,8 @@ export class DealDecisionService {
           'the price is missing. Use your knowledge of typical price per unit ranges to estimate deal size when ' +
           'the number of units is provided. Only reject for missing price if you cannot reasonably infer that the ' +
           'deal meets the minimum size requirement. ' +
+          '\n\nThe text below is raw extracted text from emails and PDFs (may have OCR formatting issues, vertical stacking, etc.). ' +
+          'Use context clues and proximity to match labels with values. ' +
           'Provide a one-sentence reason for your decision, written as if speaking directly to the client, citing which requirement was not met if applicable. ' +
           'Respond with JSON in the format: {"decision": "yes" or "no", "reason": "your reason"}.';
       } else {
@@ -55,6 +57,8 @@ export class DealDecisionService {
           'You are a real estate acquisitions analyst. Evaluate whether this is a ' +
           'good deal opportunity and make a yes/no decision. ' +
           "Return 'yes' if it's a good opportunity, 'no' otherwise. " +
+          '\n\nThe text below is raw extracted text from emails and PDFs (may have OCR formatting issues, vertical stacking, etc.). ' +
+          'Use context clues and proximity to match labels with values. ' +
           'Provide a one-sentence reason for your decision. ' +
           'Respond with JSON in the format: {"decision": "yes" or "no", "reason": "your reason"}.';
       }
@@ -64,7 +68,7 @@ export class DealDecisionService {
         temperature: this.aiConfig.openaiTemperature,
         messages: [
           { role: 'system', content: systemPrompt },
-          { role: 'user', content: `Deal Summary:\n\n${summary}` },
+          { role: 'user', content: `Raw Extracted Text:\n\n${extractedText}` },
         ],
         response_format: { type: 'json_object' },
         user: 'deal-decision',
