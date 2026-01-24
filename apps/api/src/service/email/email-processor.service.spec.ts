@@ -11,6 +11,7 @@ import { MetricsService } from '../metrics/metrics.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { S3Service } from '../s3/s3.service';
 import { NotificationService } from '../notifications/notification.service';
+import { EmailSenderService } from '../email/email-sender.service';
 import { NormalizedEmailEvent } from '../../dto/normalized-email-event.dto';
 
 // Mock marked module to avoid ES module issues
@@ -44,11 +45,21 @@ describe('EmailProcessorService', () => {
           },
         },
         {
+          provide: EmailSenderService,
+          useValue: {
+            sendEmail: jest.fn().mockResolvedValue('email-id-123'),
+          },
+        },
+        {
           provide: MicrosoftGraphService,
           useValue: {
             getAttachmentContent: jest.fn(),
             replyToSelf: jest.fn().mockResolvedValue(true),
-            moveMessageToPassedFolder: jest.fn().mockResolvedValue(true),
+            getOrCreateFolder: jest.fn().mockResolvedValue('folder-id-123'),
+            getMessage: jest.fn().mockResolvedValue({ conversationId: 'conv-123' }),
+            moveMessage: jest.fn().mockResolvedValue(true),
+            moveConversation: jest.fn().mockResolvedValue(true),
+            forwardToAdmins: jest.fn().mockResolvedValue(true),
           },
         },
         {
