@@ -40,8 +40,7 @@ export class DealDecisionService {
           "Return 'yes' if the deal meets ALL of your requirements listed above. " +
           "Return 'no' ONLY if the deal clearly violates one or more of your requirements. " +
           "Do NOT reject deals for missing financial metrics, incomplete information, or subjective quality concerns - " +
-          "those are not part of screening. Be strict about geography and property requirements - " +
-          'a property in New Jersey does NOT satisfy a "New York only" requirement. ' +
+          "those are not part of screening. Be strict about geography and property requirements if there are any. " +
           '\n\nIMPORTANT - Missing Price Handling: If the purchase price is missing but you can infer the deal size ' +
           'from the number of units (e.g., a 200-unit apartment building), and you can reasonably determine that ' +
           'the deal size is definitely above their minimum floor requirement, do NOT reject the deal solely because ' +
