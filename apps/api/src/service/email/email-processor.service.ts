@@ -146,7 +146,12 @@ export class EmailProcessorService {
 
         // Record metrics and return early (no summary, no reply)
         const durationSeconds = (Date.now() - startTime) / 1000;
-        this.metricsService.recordDealProcessed(decision.decision as 'yes' | 'no', event.source);
+        this.metricsService.recordDealProcessed(
+          decision.decision as 'yes' | 'no',
+          event.source,
+          organizationId,
+          inboxOwnerEmail,
+        );
         this.metricsService.recordDealProcessingDuration(
           durationSeconds,
           decision.decision as 'yes' | 'no',
@@ -224,7 +229,12 @@ export class EmailProcessorService {
       }
 
       const durationSeconds = (Date.now() - startTime) / 1000;
-      this.metricsService.recordDealProcessed(decision.decision as 'yes' | 'no', event.source);
+      this.metricsService.recordDealProcessed(
+        decision.decision as 'yes' | 'no',
+        event.source,
+        organizationId,
+        inboxOwnerEmail,
+      );
       this.metricsService.recordDealProcessingDuration(
         durationSeconds,
         decision.decision as 'yes' | 'no',

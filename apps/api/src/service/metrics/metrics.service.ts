@@ -60,7 +60,7 @@ export class MetricsService implements OnModuleInit {
     this.dealsProcessed = new Counter({
       name: 'deals_processed_total',
       help: 'Total number of deals processed',
-      labelNames: ['decision', 'source'],
+      labelNames: ['decision', 'source', 'organization_id', 'inbox_owner_email'],
       registers: [this.registry],
     });
 
@@ -194,9 +194,19 @@ export class MetricsService implements OnModuleInit {
     });
   }
 
-  recordDealProcessed(decision: 'yes' | 'no', source: string) {
+  recordDealProcessed(
+    decision: 'yes' | 'no',
+    source: string,
+    organizationId?: string,
+    inboxOwnerEmail?: string,
+  ) {
     if (this.enabled && this.dealsProcessed) {
-      this.dealsProcessed.inc({ decision, source });
+      this.dealsProcessed.inc({
+        decision,
+        source,
+        organization_id: organizationId || 'unknown',
+        inbox_owner_email: inboxOwnerEmail || 'unknown',
+      });
     }
   }
 
