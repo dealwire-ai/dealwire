@@ -22,7 +22,7 @@ export interface ProcessDealContext {
   accessToken?: string;
   inboxOwnerEmail: string;
   receivedByUserId?: string;
-  organizationId?: string;
+  organizationId: string; // Required - deals must be associated with an organization
   dealId?: string; // Pre-generated dealId for S3 organization
   detection: DealDetection; // Deal detection result (done in webhook)
 }
@@ -96,19 +96,16 @@ export class EmailProcessorService {
       );
 
       // Step 4: Save deal to database (attachments already in S3 from webhook)
+      // For "no" decisions, save without summary initially
       let dealId: string | undefined;
-      if (organizationId) {
-        // For "no" decisions, save without summary
-        const summary = null;
+      if (decision.decision === 'no') {
         dealId = await this.saveDeal(
           ctx,
-          summary,
+          null,
           decision.decision as 'yes' | 'no',
           detection,
           accessToken,
         );
-      } else {
-        this.logger.warn(`User ${receivedByUserId} has no organization - deal will not be saved`);
       }
 
       // Step 5: Handle "no" decisions - skip summary and reply, just move folder (Microsoft only)
@@ -171,19 +168,20 @@ export class EmailProcessorService {
         };
       }
 
-      // Step 6: For "yes" decisions, generate summary
+      // Step 6: For "yes" decisions, generate summary and save deal
       const summary = await this.dealSummaryService.summarizeDeal(
         combinedText,
         prefs.dealCriteria,
       );
 
-      // Update deal with summary
-      if (dealId) {
-        await this.prismaService.deal.update({
-          where: { id: dealId },
-          data: { initialScreeningSummary: summary },
-        });
-      }
+      // Save deal with summary for "yes" decisions
+      dealId = await this.saveDeal(
+        ctx,
+        summary,
+        decision.decision as 'yes' | 'no',
+        detection,
+        accessToken,
+      );
 
       // Step 7: Send reply (must happen BEFORE moving message, as moving changes the message ID)
       const htmlEmail = this.emailTemplateService.formatSummaryAsHtml(
@@ -371,7 +369,7 @@ export class EmailProcessorService {
       const savedDeal = await this.prismaService.deal.create({
         data: {
           id: dealId, // Use pre-generated dealId from webhook (for S3 organization)
-          organizationId: organizationId!,
+          organizationId,
           receivedByUserId,
           sourceMessageId: event.messageId,
           sourceFrom: event.from,

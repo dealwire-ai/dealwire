@@ -197,14 +197,14 @@ export class MetricsService implements OnModuleInit {
   recordDealProcessed(
     decision: 'yes' | 'no',
     source: string,
-    organizationId?: string,
+    organizationId: string,
     inboxOwnerEmail?: string,
   ) {
     if (this.enabled && this.dealsProcessed) {
       this.dealsProcessed.inc({
         decision,
         source,
-        organization_id: organizationId || 'unknown',
+        organization_id: organizationId,
         inbox_owner_email: inboxOwnerEmail || 'unknown',
       });
     }
