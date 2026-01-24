@@ -66,7 +66,7 @@ export class NormalizedEmailListenerService {
         accessToken = token;
       }
 
-      // OrganizationId is now always provided (may be null)
+      // OrganizationId is required for deal processing
       let organizationId = queuedMessage.organizationId;
       if (!organizationId && queuedMessage.receivedByUserId) {
         // Fallback: try to fetch if null (shouldn't happen, but be defensive)
@@ -84,12 +84,20 @@ export class NormalizedEmailListenerService {
         throw new Error('Missing detection result - deal detection must be done in webhook');
       }
 
+      // OrganizationId is required - skip processing if missing
+      if (!organizationId) {
+        this.logger.warn(
+          `Skipping deal processing for email ${queuedMessage.event.messageId} - user ${queuedMessage.receivedByUserId} has no organization`,
+        );
+        return;
+      }
+
       const ctx: ProcessDealContext = {
         event: queuedMessage.event,
         accessToken,
         inboxOwnerEmail: queuedMessage.inboxOwnerEmail,
         receivedByUserId: queuedMessage.receivedByUserId,
-        organizationId: organizationId ?? undefined,
+        organizationId,
         dealId: queuedMessage.dealId, // Pre-generated dealId for S3 organization
         detection: queuedMessage.detection, // Deal detection result from webhook
       };
