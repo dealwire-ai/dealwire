@@ -44,7 +44,7 @@ export class DealDecisionService {
           '=== DECISION RULES ===\n' +
           '1. Return "yes" ONLY if the deal meets ALL requirements listed above\n' +
           '2. Return "no" if the deal clearly violates one or more requirements\n' +
-          '3. Be strict about geography and property requirements - if a requirement says "New York only", then New Jersey = automatic "no"\n' +
+          '3. Be strict about geography and property requirements \n' +
           '4. Missing Price Handling: If the purchase price is missing but you can infer deal size from units (e.g., 200-unit building), ' +
           'use typical price-per-unit ranges to estimate. Only reject for missing price if you cannot reasonably infer the deal meets minimum size requirements\n\n' +
           '=== INPUT FORMAT ===\n' +
