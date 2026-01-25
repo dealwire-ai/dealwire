@@ -60,7 +60,7 @@ export class MetricsService implements OnModuleInit {
     this.dealsProcessed = new Counter({
       name: 'deals_processed_total',
       help: 'Total number of deals processed',
-      labelNames: ['initial-screening', 'source', 'organization_id', 'inbox_owner_email'],
+      labelNames: ['initial_screening', 'source', 'organization_id', 'inbox_owner_email'],
       registers: [this.registry],
     });
 
@@ -74,7 +74,7 @@ export class MetricsService implements OnModuleInit {
     this.dealProcessingDuration = new Histogram({
       name: 'deal_processing_duration_seconds',
       help: 'End-to-end duration of deal processing in seconds',
-      labelNames: ['initial-screening', 'source'],
+      labelNames: ['initial_screening', 'source'],
       buckets: [1, 5, 10, 30, 60, 120, 300],
       registers: [this.registry],
     });
@@ -165,7 +165,7 @@ export class MetricsService implements OnModuleInit {
     this.emailEvents = new Counter({
       name: 'email_events_total',
       help: 'Total email processing events',
-      labelNames: ['is_deal', 'initial-screening', 'has_error'],
+      labelNames: ['is_deal', 'initial_screening', 'has_error'],
       registers: [this.registry],
     });
 
@@ -202,7 +202,7 @@ export class MetricsService implements OnModuleInit {
   ) {
     if (this.enabled && this.dealsProcessed) {
       this.dealsProcessed.inc({
-        decision,
+        initial_screening: decision,
         source,
         organization_id: organizationId,
         inbox_owner_email: inboxOwnerEmail || 'unknown',
@@ -246,7 +246,7 @@ export class MetricsService implements OnModuleInit {
     source: string,
   ) {
     if (this.enabled && this.dealProcessingDuration) {
-      this.dealProcessingDuration.observe({ decision, source }, durationSeconds);
+      this.dealProcessingDuration.observe({ initial_screening: decision, source }, durationSeconds);
     }
   }
 
@@ -296,7 +296,7 @@ export class MetricsService implements OnModuleInit {
     if (this.enabled && this.emailEvents) {
       this.emailEvents.inc({
         is_deal: isDeal ? 'true' : 'false',
-        decision: decision || 'none',
+        initial_screening: decision || 'none',
         has_error: hasError ? 'true' : 'false',
       });
     }

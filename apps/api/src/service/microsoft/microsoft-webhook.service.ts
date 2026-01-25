@@ -47,9 +47,13 @@ export class MicrosoftWebhookService {
    */
   async handleNotifications(payload: GraphNotificationPayload): Promise<void> {
     if (!payload?.value || !Array.isArray(payload.value)) {
-      this.logger.debug('Received non-notification payload (lifecycle event or empty)');
+      this.logger.log(
+        `Received non-notification payload (lifecycle event or empty). Payload: ${JSON.stringify(payload)}`,
+      );
       return;
     }
+
+    this.logger.log(`Processing ${payload.value.length} notification(s) from Microsoft Graph`);
 
     for (const notification of payload.value) {
       if (notification.changeType !== 'created') {
@@ -69,11 +73,15 @@ export class MicrosoftWebhookService {
     const messageId = resourceData.id;
     let userEmail: string | null = null;
 
+    this.logger.log(
+      `Processing email notification: messageId=${messageId}, subscriptionId=${subscriptionId}, changeType=${notification.changeType}`,
+    );
+
     try {
       // Dedup check - skip if we've already processed this message recently
       const now = Date.now();
       if (this.processedMessages.has(messageId)) {
-        this.logger.debug(`Skipping duplicate notification for ${messageId}`);
+        this.logger.log(`Skipping duplicate notification for ${messageId}`);
         return;
       }
       // Mark as processed and clean up old entries
@@ -84,16 +92,20 @@ export class MicrosoftWebhookService {
       const userId =
         await this.subscriptionService.getUserBySubscriptionId(subscriptionId);
       if (!userId) {
-        this.logger.warn(`Unknown subscription ${subscriptionId}`);
+        this.logger.warn(`Unknown subscription ${subscriptionId} - no user found`);
         return;
       }
+
+      this.logger.log(`Found user ${userId} for subscription ${subscriptionId}`);
 
       // Get access token for this user
       const accessToken = await this.microsoftGraphService.getMicrosoftOAuthTokenFromClerk(userId);
       if (!accessToken) {
-        this.logger.error(`No access token for user ${userId}`);
+        this.logger.error(`No access token for user ${userId} - cannot fetch email`);
         return;
       }
+
+      this.logger.log(`Retrieved access token for user ${userId}, fetching email ${messageId}`);
 
       // Fetch the email and convert to normalized format
       const emailEvent = await this.microsoftGraphService.toNormalizedEvent(
