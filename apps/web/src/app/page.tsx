@@ -47,7 +47,7 @@ export default function Home() {
           </div>
           <Link href="/book">
             <Button className="bg-[#3ECFA0] hover:bg-[#35b88f] text-black font-medium px-6">
-              Talk to Us
+               Let's Talk
             </Button>
           </Link>
         </div>
@@ -68,10 +68,10 @@ export default function Home() {
             transition={{ duration: 1, ease: [0.25, 0.4, 0.25, 1] }}
             className="max-w-4xl"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#3ECFA0]/10 border border-[#3ECFA0]/20 rounded-full mb-8">
+            {/* <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#3ECFA0]/10 border border-[#3ECFA0]/20 rounded-full mb-8">
               <TrendingUp className="w-4 h-4 text-[#3ECFA0]" />
               <span className="text-sm text-[#3ECFA0] font-medium">AI employees that pay for themselves in 90 days</span>
-            </div>
+            </div> */}
             
             <h1 className="text-5xl md:text-7xl lg:text-[5.5rem] font-normal tracking-tight leading-[0.95] mb-8">
               Your next hire works<br />
@@ -93,7 +93,7 @@ export default function Home() {
                   size="lg"
                   className="bg-[#3ECFA0] hover:bg-[#35b88f] text-black font-semibold px-8 h-14 text-base"
                 >
-                  See What We Can Build
+                  Book Your Call
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </Link>
@@ -225,7 +225,7 @@ export default function Home() {
                 icon: Sparkles,
                 title: "Market Intelligence",
                 tagline: "Know what others don't.",
-                description: "An AI analyst that monitors market trends, tracks comp sales, analyzes rent growth patterns, and delivers insights that give you an edge—automatically, before you grab coffee."
+                description: "An AI analyst that monitors market trends, tracks comp sales and zoning changes and delivers insights before you grab coffee."
               }
             ].map((service, index) => (
               <FadeInSection key={index} delay={index * 0.05}>
@@ -278,7 +278,7 @@ export default function Home() {
             ].map((item, index) => (
               <FadeInSection key={index} delay={index * 0.1}>
                 <div className="relative">
-                  <div className="text-7xl font-light text-[#3ECFA0]/10 mb-4">{item.step}</div>
+                  <div className="text-7xl font-light text-[#3ECFA0]/30 mb-4">{item.step}</div>
                   <h3 className="text-xl font-medium mb-3">{item.title}</h3>
                   <p className="text-white/50 leading-relaxed">{item.description}</p>
                 </div>
@@ -294,7 +294,7 @@ export default function Home() {
           <FadeInSection>
             <p className="text-[#3ECFA0] text-sm font-medium tracking-wider uppercase mb-4">Who We Are</p>
             <h2 className="text-4xl md:text-5xl font-normal tracking-tight mb-6">
-              Built by engineers,
+              Built by engineers.
               <br />
               <span className="text-white/40">Backed by RE titans.</span>
             </h2>
@@ -309,12 +309,16 @@ export default function Home() {
               {
                 name: "Isaac Levine",
                 role: "Co-Founder",
-                bio: "Computer Science @ Northeastern. Built frontstep.ai. Obsessed with turning messy RE workflows into elegant automation."
+                bio: "Computer Science @ Northeastern. Previously co-founded frontstep.ai.",
+                linkedin: "https://www.linkedin.com/in/isaac-levine/",
+                email: "isaac@frontstep.ai"
               },
               {
                 name: "Noah Weinstein",
                 role: "Co-Founder",
-                bio: "Computer Science @ Northeastern. Built frontstep.ai. Focused on building AI that actually works in production, not just demos."
+                bio: "Computer Science @ Northeastern. Previously co-founded frontstep.ai.",
+                linkedin: "https://www.linkedin.com/in/noahweinstein/",
+                email: "noah@frontstep.ai"
               }
             ].map((founder, index) => (
               <FadeInSection key={index} delay={index * 0.15}>
@@ -326,10 +330,10 @@ export default function Home() {
                         {founder.name.split(' ').map(n => n[0]).join('')}
                       </div>
                       <div className="flex gap-2">
-                        <a href="#" className="p-2 bg-white/5 rounded-lg hover:bg-white/10 transition-colors">
+                        <a href={founder.linkedin} target="_blank" rel="noopener noreferrer" className="p-2 bg-white/5 rounded-lg hover:bg-white/10 transition-colors">
                           <Linkedin className="w-4 h-4 text-white/50" />
                         </a>
-                        <a href="#" className="p-2 bg-white/5 rounded-lg hover:bg-white/10 transition-colors">
+                        <a href={`mailto:${founder.email}`} className="p-2 bg-white/5 rounded-lg hover:bg-white/10 transition-colors">
                           <Mail className="w-4 h-4 text-white/50" />
                         </a>
                       </div>
@@ -409,14 +413,10 @@ export default function Home() {
               <div className="relative px-8 py-16 lg:p-20">
                 <div className="max-w-2xl">
                   <h2 className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight mb-6">
-                    The question isn&apos;t <em className="text-[#3ECFA0] not-italic">if</em>.<br />
-                    It&apos;s who gets there first.
+                    Ready to see what we can build?
                   </h2>
-                  <p className="text-white/50 text-lg mb-4">
-                    In 12 months, your competitors will either be running AI—or scrambling to catch up.
-                  </p>
                   <p className="text-white/70 text-lg mb-10">
-                    30 minutes. No pitch deck. Just an honest conversation about whether AI can actually help your firm.
+                    30 minutes. No pitch deck. Just an honest conversation about whether AI can help your firm.
                   </p>
                   <Link href="/book">
                     <Button 
