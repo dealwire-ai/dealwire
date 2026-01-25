@@ -3,7 +3,7 @@
 import React, { useRef } from 'react';
 import Link from 'next/link';
 import { motion, useInView } from 'framer-motion';
-import { Building2, Brain, Workflow, Sparkles, Linkedin, Mail } from 'lucide-react';
+import { Building2, Brain, Workflow, Sparkles, Linkedin, Mail, TrendingUp, Clock, Users, DollarSign, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { Button } from "../components/ui/button";
 
 const FadeInSection = ({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) => {
@@ -41,20 +41,20 @@ export default function Home() {
             <span className="text-xl font-semibold tracking-tight">Levine & Weinstein</span>
           </div>
           <div className="hidden md:flex items-center gap-8 text-sm text-white/60">
-            <button onClick={() => document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-white transition-colors">Services</button>
+            <button onClick={() => document.getElementById('problem')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-white transition-colors">The Problem</button>
+            <button onClick={() => document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-white transition-colors">Solutions</button>
             <button onClick={() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-white transition-colors">About</button>
-            <button onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-white transition-colors">Contact</button>
           </div>
           <Link href="/book">
             <Button className="bg-[#3ECFA0] hover:bg-[#35b88f] text-black font-medium px-6">
-              Book a Call
+              Talk to Us
             </Button>
           </Link>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="relative z-10 px-6 lg:px-16 pt-20 pb-32 lg:pt-32 lg:pb-48" style={{
+      <section className="relative z-10 px-6 lg:px-16 pt-20 pb-24 lg:pt-28 lg:pb-36" style={{
         backgroundImage: `
           linear-gradient(to right, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
           linear-gradient(to bottom, rgba(255, 255, 255, 0.08) 1px, transparent 1px)
@@ -68,49 +68,140 @@ export default function Home() {
             transition={{ duration: 1, ease: [0.25, 0.4, 0.25, 1] }}
             className="max-w-4xl"
           >
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#3ECFA0]/10 border border-[#3ECFA0]/20 rounded-full mb-8">
+              <TrendingUp className="w-4 h-4 text-[#3ECFA0]" />
+              <span className="text-sm text-[#3ECFA0] font-medium">AI employees that pay for themselves in 90 days</span>
+            </div>
             
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-normal tracking-tight leading-[0.95] mb-8">
-              Bespoke AI for<br />
-              Real Estate teams.
+            <h1 className="text-5xl md:text-7xl lg:text-[5.5rem] font-normal tracking-tight leading-[0.95] mb-8">
+              Your next hire works<br />
+              <span className="text-[#3ECFA0]">24/7.</span> Never quits.<br />
+              Costs 90% less.
             </h1>
             
-            <p className="text-lg md:text-xl text-white/50 max-w-xl leading-relaxed mb-12">
-              While competitors manually screen OMs and build proformas, your team closes.
-              We build custom tools around your strategy and scale with your pipeline.
+            <p className="text-xl md:text-2xl text-white/60 max-w-2xl leading-relaxed mb-6">
+              We build custom AI employees for real estate firms. They screen deals, build proformas, handle investor reports—and free your team to do what actually moves the needle.
+            </p>
+
+            <p className="text-lg text-white/40 max-w-xl mb-12">
+              The firms adopting AI now will outperform. The rest will wonder what happened.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4">
               <Link href="/book">
                 <Button 
                   size="lg"
-                  className="bg-[#3ECFA0] hover:bg-[#35b88f] text-black font-semibold px-8 h-14 text-base uppercase tracking-wide"
+                  className="bg-[#3ECFA0] hover:bg-[#35b88f] text-black font-semibold px-8 h-14 text-base"
                 >
-                  Let&apos;s Talk
+                  See What We Can Build
+                  <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </Link>
-              <Button 
-                size="lg"
-                variant="outline"
-                className="border-white/20 bg-transparent text-white hover:bg-white/5 px-8 h-14 text-base uppercase tracking-wide"
-                onClick={() => document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' })}
-              >
-                View Services
-              </Button>
             </div>
           </motion.div>
         </div>
       </section>
 
+      {/* The Problem Section */}
+      <section id="problem" className="relative z-10 px-6 lg:px-16 py-20 lg:py-28 border-t border-white/5">
+        <div className="max-w-7xl mx-auto">
+          <FadeInSection>
+            <p className="text-[#3ECFA0] text-sm font-medium tracking-wider uppercase mb-4">The Reality</p>
+            <h2 className="text-4xl md:text-5xl font-normal tracking-tight mb-6 max-w-3xl">
+              Your best people are drowning in work that doesn&apos;t require their talent.
+            </h2>
+          </FadeInSection>
+          
+          <div className="grid md:grid-cols-2 gap-8 mt-12">
+            <FadeInSection delay={0.1}>
+              <div className="p-8 bg-white/[0.02] border border-white/5 rounded-2xl">
+                <div className="text-5xl font-light text-white/20 mb-4">01</div>
+                <h3 className="text-xl font-medium mb-3">Analysts buried in busywork</h3>
+                <p className="text-white/50 leading-relaxed">
+                  Your $150K analysts spend 60% of their time on data entry, formatting reports, and chasing documents. That&apos;s $90K/year in wasted salary—per person.
+                </p>
+              </div>
+            </FadeInSection>
+            
+            <FadeInSection delay={0.2}>
+              <div className="p-8 bg-white/[0.02] border border-white/5 rounded-2xl">
+                <div className="text-5xl font-light text-white/20 mb-4">02</div>
+                <h3 className="text-xl font-medium mb-3">Deals slipping through</h3>
+                <p className="text-white/50 leading-relaxed">
+                  While your team manually screens OMs, faster firms are already sending LOIs. Every hour of delay costs you leverage—or the deal entirely.
+                </p>
+              </div>
+            </FadeInSection>
+            
+            <FadeInSection delay={0.3}>
+              <div className="p-8 bg-white/[0.02] border border-white/5 rounded-2xl">
+                <div className="text-5xl font-light text-white/20 mb-4">03</div>
+                <h3 className="text-xl font-medium mb-3">Scaling means hiring</h3>
+                <p className="text-white/50 leading-relaxed">
+                  Want to evaluate 2x the deals? That means 2x the headcount, 2x the overhead, and months of recruiting and training. The math doesn&apos;t work.
+                </p>
+              </div>
+            </FadeInSection>
+            
+            <FadeInSection delay={0.4}>
+              <div className="p-8 bg-white/[0.02] border border-white/5 rounded-2xl">
+                <div className="text-5xl font-light text-white/20 mb-4">04</div>
+                <h3 className="text-xl font-medium mb-3">Competitors are moving</h3>
+                <p className="text-white/50 leading-relaxed">
+                  The top PE firms already have AI in production. They&apos;re not talking about it—they&apos;re using it. Every quarter you wait, they pull further ahead.
+                </p>
+              </div>
+            </FadeInSection>
+          </div>
+        </div>
+      </section>
+
+      {/* Value Proposition Section */}
+      <section className="relative z-10 px-6 lg:px-16 py-20 lg:py-28 border-t border-white/5">
+        <div className="max-w-7xl mx-auto">
+          <FadeInSection>
+            <div className="max-w-3xl">
+              <p className="text-[#3ECFA0] text-sm font-medium tracking-wider uppercase mb-4">The Solution</p>
+              <h2 className="text-4xl md:text-5xl font-normal tracking-tight mb-6">
+                Hire AI employees.<br />
+                <span className="text-white/40">Not more headcount.</span>
+              </h2>
+              <p className="text-white/50 text-xl leading-relaxed mb-12">
+                We don&apos;t sell software. We deliver working AI employees—custom-built for your firm, trained on your criteria, deployed in weeks.
+              </p>
+            </div>
+          </FadeInSection>
+          
+          <div className="grid md:grid-cols-4 gap-6 mt-8">
+            {[
+              { icon: Clock, value: "24/7", label: "Always on", desc: "Works nights, weekends, holidays" },
+              { icon: DollarSign, value: "90%", label: "Cost reduction", desc: "vs. equivalent human labor" },
+              { icon: TrendingUp, value: "10x", label: "Throughput", desc: "Screen 10x more deals" },
+              { icon: Users, value: "0", label: "Management overhead", desc: "No HR, no training, no turnover" },
+            ].map((stat, index) => (
+              <FadeInSection key={index} delay={index * 0.1}>
+                <div className="p-6 bg-white/[0.02] border border-white/5 rounded-2xl text-center">
+                  <stat.icon className="w-6 h-6 text-[#3ECFA0] mx-auto mb-4" />
+                  <div className="text-4xl font-light text-white mb-1">{stat.value}</div>
+                  <div className="text-white font-medium mb-1">{stat.label}</div>
+                  <div className="text-white/40 text-sm">{stat.desc}</div>
+                </div>
+              </FadeInSection>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Services Section */}
-      <section id="services" className="relative z-10 px-6 lg:px-16 py-24 lg:py-32">
+      <section id="services" className="relative z-10 px-6 lg:px-16 py-20 lg:py-28 border-t border-white/5">
         <div className="max-w-7xl mx-auto">
           <FadeInSection>
             <p className="text-[#3ECFA0] text-sm font-medium tracking-wider uppercase mb-4">What We Build</p>
             <h2 className="text-4xl md:text-5xl font-normal tracking-tight mb-6">
-              Your grunt work, handled.
+              AI employees for every function.
             </h2>
             <p className="text-white/50 text-lg max-w-2xl mb-16">
-              From teasers hitting your inbox to K-1s going out the door— we build AI that handles the work you hate but can&apos;t ignore.
+              From teasers hitting your inbox to K-1s going out the door—we build AI that handles the work your team shouldn&apos;t be doing manually.
             </p>
           </FadeInSection>
           
@@ -118,21 +209,36 @@ export default function Home() {
             {[
               {
                 icon: Building2,
-                title: "Acquisitions",
-                tagline: "Screen 100 deals. Underwrite 10. Close the best.",
-                description: "Auto-parse OMs and teasers. Run comps against your buy box. Generate proformas and LOIs before your competitors open the email."
+                title: "Deal Screening",
+                tagline: "From 500 emails to 5 qualified leads.",
+                points: [
+                  "Auto-parse every OM and teaser",
+                  "Match against your buy box instantly",
+                  "Generate preliminary underwriting",
+                  "Draft LOIs before competitors respond"
+                ]
               },
               {
                 icon: Workflow,
                 title: "Operations",
-                tagline: "Operations that scale.",
-                description: "Lease abstracts in seconds. CAM reconciliations without the headache. Tenant notices, rent rolls, and NOI tracking that runs itself."
+                tagline: "Back office that runs itself.",
+                points: [
+                  "Lease abstracts in seconds",
+                  "CAM reconciliations automated",
+                  "Tenant notices on autopilot",
+                  "NOI tracking in real-time"
+                ]
               },
               {
                 icon: Brain,
-                title: "Capital & Investors",
-                tagline: "Your LPs will notice.",
-                description: "Automated quarterly reports, waterfall distributions, and K-1 prep. Keep your investors informed without the manual lift."
+                title: "Investor Relations",
+                tagline: "LPs impressed. CFO relieved.",
+                points: [
+                  "Quarterly reports generated automatically",
+                  "Waterfall distributions calculated",
+                  "K-1 prep without the scramble",
+                  "Ad-hoc LP queries answered instantly"
+                ]
               }
             ].map((service, index) => (
               <FadeInSection key={index} delay={index * 0.1}>
@@ -141,8 +247,56 @@ export default function Home() {
                     <service.icon className="w-6 h-6 text-[#3ECFA0]" />
                   </div>
                   <h3 className="text-xl font-medium mb-2">{service.title}</h3>
-                  <p className="text-[#3ECFA0] text-sm font-medium mb-3">{service.tagline}</p>
-                  <p className="text-white/50 leading-relaxed">{service.description}</p>
+                  <p className="text-[#3ECFA0] text-sm font-medium mb-4">{service.tagline}</p>
+                  <ul className="space-y-2">
+                    {service.points.map((point, i) => (
+                      <li key={i} className="flex items-start gap-2 text-white/50 text-sm">
+                        <CheckCircle2 className="w-4 h-4 text-[#3ECFA0]/50 mt-0.5 shrink-0" />
+                        {point}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </FadeInSection>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section className="relative z-10 px-6 lg:px-16 py-20 lg:py-28 border-t border-white/5">
+        <div className="max-w-7xl mx-auto">
+          <FadeInSection>
+            <p className="text-[#3ECFA0] text-sm font-medium tracking-wider uppercase mb-4">The Process</p>
+            <h2 className="text-4xl md:text-5xl font-normal tracking-tight mb-16">
+              From call to deployed.<br />
+              <span className="text-white/40">In weeks, not months.</span>
+            </h2>
+          </FadeInSection>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                step: "01",
+                title: "Discovery Call",
+                description: "30 minutes. We learn your workflows, pain points, and criteria. You learn if we're the right fit. No pressure, no pitch deck."
+              },
+              {
+                step: "02",
+                title: "We Build",
+                description: "Custom AI employee, trained on your specific criteria and workflows. We handle the technical complexity—you provide the domain expertise."
+              },
+              {
+                step: "03",
+                title: "Deploy & Iterate",
+                description: "Your AI employee goes live. We monitor, refine, and improve. You see ROI within 90 days or we keep working until you do."
+              }
+            ].map((item, index) => (
+              <FadeInSection key={index} delay={index * 0.1}>
+                <div className="relative">
+                  <div className="text-7xl font-light text-[#3ECFA0]/10 mb-4">{item.step}</div>
+                  <h3 className="text-xl font-medium mb-3">{item.title}</h3>
+                  <p className="text-white/50 leading-relaxed">{item.description}</p>
                 </div>
               </FadeInSection>
             ))}
@@ -151,10 +305,10 @@ export default function Home() {
       </section>
 
       {/* About Section */}
-      <section id="about" className="relative z-10 px-6 lg:px-16 py-24 lg:py-32">
+      <section id="about" className="relative z-10 px-6 lg:px-16 py-20 lg:py-28 border-t border-white/5">
         <div className="max-w-7xl mx-auto">
           <FadeInSection>
-            <p className="text-[#3ECFA0] text-sm font-medium tracking-wider uppercase mb-4">The Team</p>
+            <p className="text-[#3ECFA0] text-sm font-medium tracking-wider uppercase mb-4">Who We Are</p>
             <h2 className="text-4xl md:text-5xl font-normal tracking-tight mb-6">
               Built by engineers,
               <br />
@@ -171,12 +325,12 @@ export default function Home() {
               {
                 name: "Isaac Levine",
                 role: "Co-Founder",
-                bio: "Computer Science @ Northeastern University. Cofounded frontstep.ai and now focuses on creating AI solutions that solve real problems for RE professionals."
+                bio: "Computer Science @ Northeastern. Built frontstep.ai. Obsessed with turning messy RE workflows into elegant automation."
               },
               {
                 name: "Noah Weinstein",
                 role: "Co-Founder",
-                bio: "Computer Science @ Northeastern University. Cofounded frontstep.ai and brings a passion for clean architecture and scalable systems to every project."
+                bio: "Computer Science @ Northeastern. Built frontstep.ai. Focused on building AI that actually works in production, not just demos."
               }
             ].map((founder, index) => (
               <FadeInSection key={index} delay={index * 0.15}>
@@ -251,9 +405,8 @@ export default function Home() {
                 </div>
                 <div className="lg:border-l lg:border-white/10 lg:pl-12">
                   <p className="text-white/60 leading-relaxed">
-                    Our experience building frontstep.ai gave us deep insight into what real estate 
-                    professionals actually need—not just flashy features, but tools that genuinely 
-                    make their work easier.
+                    Our experience building frontstep.ai taught us what actually works in RE tech—
+                    and more importantly, what doesn&apos;t. We only build what delivers real ROI.
                   </p>
                 </div>
               </div>
@@ -262,27 +415,32 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Contact CTA Section */}
-      <section id="contact" className="relative z-10 px-6 lg:px-16 py-24 lg:py-32">
+      {/* Final CTA Section */}
+      <section id="contact" className="relative z-10 px-6 lg:px-16 py-20 lg:py-28 border-t border-white/5">
         <div className="max-w-7xl mx-auto">
           <FadeInSection>
             <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#111111] to-black border border-white/5">
               <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#3ECFA0]/10 rounded-full blur-[150px] -translate-y-1/2 translate-x-1/4" />
               
-              <div className="relative px-8 py-16 lg:p-20 text-center">
-                <h2 className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight mb-6">
-                  Ready to move faster?
-                </h2>
-                <p className="text-white/50 text-lg max-w-xl mx-auto mb-10">
-                  In 12 months, you&apos;ll either be the firm that figured out AI—or one of the ones asking how they did it.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <div className="relative px-8 py-16 lg:p-20">
+                <div className="max-w-2xl">
+                  <h2 className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight mb-6">
+                    The question isn&apos;t <em className="text-[#3ECFA0] not-italic">if</em>.<br />
+                    It&apos;s who gets there first.
+                  </h2>
+                  <p className="text-white/50 text-lg mb-4">
+                    In 12 months, your competitors will either be running AI—or scrambling to catch up.
+                  </p>
+                  <p className="text-white/70 text-lg mb-10">
+                    30 minutes. No pitch deck. Just an honest conversation about whether AI can actually help your firm.
+                  </p>
                   <Link href="/book">
                     <Button 
                       size="lg"
-                      className="bg-[#3ECFA0] hover:bg-[#35b88f] text-black font-semibold px-8 h-14 text-base uppercase tracking-wide w-full sm:w-auto"
+                      className="bg-[#3ECFA0] hover:bg-[#35b88f] text-black font-semibold px-8 h-14 text-base"
                     >
-                      Book a Call
+                      Book Your Call
+                      <ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
                   </Link>
                 </div>
