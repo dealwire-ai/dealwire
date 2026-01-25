@@ -66,7 +66,7 @@ model Deal {
   sourceSubject    String?
   sourceReceivedAt DateTime?
 
-  // Initial Screening (inline for now)
+  // Initial Screening (inline for now - deprecated, use InitialScreening relation)
   initialScreeningDecision Decision?
   initialScreeningSummary  String?   @db.Text
   initialScreeningAt       DateTime?
@@ -77,9 +77,10 @@ model Deal {
   folderMovedTo       String? // Folder name if moved (e.g., "Passed Deals")
 
   // Relationships
-  asset     Asset?     @relation(fields: [assetId], references: [id])
-  assetId   String?
-  documents Document[]
+  asset             Asset?             @relation(fields: [assetId], references: [id])
+  assetId           String?
+  documents         Document[]
+  initialScreening  InitialScreening?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -88,6 +89,34 @@ model Deal {
 enum Decision {
   YES
   NO
+}
+
+// ============================================
+// INITIAL SCREENING - Screening result for a deal
+// ============================================
+model InitialScreening {
+  id String @id @default(cuid())
+
+  // One-to-one with Deal
+  dealId String @unique
+  deal   Deal   @relation(fields: [dealId], references: [id], onDelete: Cascade)
+
+  // Screening result
+  decision Decision // YES or NO
+  reason   String   @db.Text // One-sentence reason from screening
+
+  // When screening was performed
+  screenedAt DateTime @default(now())
+
+  // Digest tracking
+  digestSent   Boolean   @default(false) // Whether this screening has been included in a digest
+  digestSentAt DateTime? // Timestamp when digest was sent (optional, for audit)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([dealId, digestSent, digestSentAt])
+  @@index([dealId, digestSent, screenedAt])
 }
 
 // ============================================
@@ -136,6 +165,8 @@ model ScreeningPreferences {
   dealCriteria    String?       @db.Text
   logoUrl         String?
   alwaysSkip      String?       @db.Text // Criteria for deals to always skip
+  digestSchedule  String? // CRON expression (e.g., "0 12 * * *" for daily at noon)
+  digestTimeZone  String?  @default("America/New_York") // Timezone for schedule
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
 }

@@ -96,7 +96,7 @@ export class DealDecisionService {
       };
 
       const duration = (Date.now() - start) / 1000;
-      this.metricsService.recordAICall('decision', this.aiConfig.openaiModel, duration, 'success');
+      this.metricsService.recordAICall('initial-screening', this.aiConfig.openaiModel, duration, 'success');
 
       this.logger.log(
         `Deal decision made: ${decision.decision} (model: ${this.aiConfig.openaiModel}) for deal criteria: ${dealCriteria}`,
@@ -105,7 +105,7 @@ export class DealDecisionService {
       return decision;
     } catch (error) {
       const duration = (Date.now() - start) / 1000;
-      this.metricsService.recordAICall('decision', this.aiConfig.openaiModel, duration, 'error');
+      this.metricsService.recordAICall('initial-screening', this.aiConfig.openaiModel, duration, 'error');
       const errorMessage = error instanceof Error ? error.message : String(error);
       const errorType = error instanceof Error ? error.constructor.name : 'Unknown';
       this.logger.error(
