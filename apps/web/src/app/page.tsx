@@ -158,7 +158,7 @@ export default function Home() {
             <h2 className="text-4xl md:text-5xl font-normal tracking-tight mb-6">
               Built by engineers,
               <br />
-              <span className="text-white/40">backed by RE veterans.</span>
+              <span className="text-white/40">Backed by RE titans.</span>
             </h2>
             <p className="text-white/50 max-w-2xl text-lg leading-relaxed mb-16">
               We&apos;re Isaac and Noah—two computer science majors from Northeastern University 
@@ -211,14 +211,14 @@ export default function Home() {
             <div className="grid md:grid-cols-2 gap-6">
               {[
                 {
-                  name: "David Shorenstein",
+                  name: "Advisor 1",
                   role: "Advisor",
-                  bio: "15+ years in NYC real estate. Co-founded Silvershore Properties, assembling a $300M+ portfolio across 250+ properties. Former CIO at Forrest Shorenstein Capital, Senior Associate at Marcus & Millichap."
+                  bio: "bio for advisor 1."
                 },
                 {
-                  name: "Jordan Karlik",
+                  name: "Advisor 2",
                   role: "Advisor",
-                  bio: "Started in CMBS at Deutsche Bank and Ernst & Young. Led RE development projects in Chicago through market cycles. Now oversees all aspects of JK Equities, which has collectively participated in $1.5 billion of real estate transactions over 40 years."
+                  bio: "bio for advisor 2."
                 }
               ].map((advisor, index) => (
                 <div key={index} className="p-6 bg-white/[0.02] border border-white/5 rounded-2xl">
