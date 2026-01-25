@@ -17,9 +17,9 @@ export class DealDigestService {
 
   /**
    * Check and send digests for all organizations with configured schedules
-   * Runs every hour to check per-organization schedules
+   * Runs every 30 minutes to check per-organization schedules
    */
-  @Cron('0 * * * *', {
+  @Cron('*/30 * * * *', {
     name: 'deal-digest-check',
     timeZone: 'UTC',
   })
