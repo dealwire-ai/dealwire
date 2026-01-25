@@ -98,12 +98,3 @@ sum(emails_received_total)
 - Check if Railway requires authentication (add headers if needed)
 - Verify the `/metrics` path is correct
 
-## Free Tier Limits
-
-Grafana Cloud free tier includes:
-- 10,000 metrics
-- 50GB logs
-- 50GB traces
-- 3 users
-
-This should be plenty for your use case!
