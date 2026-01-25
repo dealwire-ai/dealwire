@@ -311,14 +311,14 @@ export default function Home() {
                 role: "Co-Founder",
                 bio: "Computer Science @ Northeastern. Previously co-founded frontstep.ai.",
                 linkedin: "https://www.linkedin.com/in/isaac-levine/",
-                email: "isaac@frontstep.ai"
+                email: "isaac@frontstep.ai",
               },
               {
                 name: "Noah Weinstein",
                 role: "Co-Founder",
                 bio: "Computer Science @ Northeastern. Previously co-founded frontstep.ai.",
                 linkedin: "https://www.linkedin.com/in/noahweinstein/",
-                email: "noah@frontstep.ai"
+                email: "noah@frontstep.ai",
               }
             ].map((founder, index) => (
               <FadeInSection key={index} delay={index * 0.15}>
