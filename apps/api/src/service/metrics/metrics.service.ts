@@ -60,7 +60,7 @@ export class MetricsService implements OnModuleInit {
     this.dealsProcessed = new Counter({
       name: 'deals_processed_total',
       help: 'Total number of deals processed',
-      labelNames: ['decision', 'source', 'organization_id', 'inbox_owner_email'],
+      labelNames: ['initial-screening', 'source', 'organization_id', 'inbox_owner_email'],
       registers: [this.registry],
     });
 
@@ -74,7 +74,7 @@ export class MetricsService implements OnModuleInit {
     this.dealProcessingDuration = new Histogram({
       name: 'deal_processing_duration_seconds',
       help: 'End-to-end duration of deal processing in seconds',
-      labelNames: ['decision', 'source'],
+      labelNames: ['initial-screening', 'source'],
       buckets: [1, 5, 10, 30, 60, 120, 300],
       registers: [this.registry],
     });
@@ -165,7 +165,7 @@ export class MetricsService implements OnModuleInit {
     this.emailEvents = new Counter({
       name: 'email_events_total',
       help: 'Total email processing events',
-      labelNames: ['is_deal', 'decision', 'has_error'],
+      labelNames: ['is_deal', 'initial-screening', 'has_error'],
       registers: [this.registry],
     });
 
@@ -217,7 +217,7 @@ export class MetricsService implements OnModuleInit {
   }
 
   recordAICall(
-    service: 'detection' | 'summary' | 'decision' | 'image-ocr',
+    service: 'detection' | 'summary' | 'initial-screening' | 'image-ocr',
     model: string,
     durationSeconds: number,
     status: 'success' | 'error',

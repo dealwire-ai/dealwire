@@ -1,31 +1,37 @@
 import { Injectable, Logger } from '@nestjs/common';
 import OpenAI from 'openai';
 import { aiConfig } from '../../config/ai.config';
-import { DealDecision } from '../../model/deal-decision.model';
+import { InitialScreeningResult } from '../../model/initial-screening.model';
 import { MetricsService } from '../metrics/metrics.service';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
-export class DealDecisionService {
-  private readonly logger = new Logger(DealDecisionService.name);
+export class InitialScreeningService {
+  private readonly logger = new Logger(InitialScreeningService.name);
   private readonly aiConfig = aiConfig();
   private openai: OpenAI;
 
-  constructor(private readonly metricsService: MetricsService) {
+  constructor(
+    private readonly metricsService: MetricsService,
+    private readonly prismaService: PrismaService,
+  ) {
     this.openai = new OpenAI({
       apiKey: this.aiConfig.openaiApiKey,
     });
   }
 
   /**
-   * Make a decision on whether a deal meets the client's screening criteria
+   * Screen a deal and persist the result to the database
+   * @param dealId - The ID of the deal being screened
    * @param extractedText - Raw extracted text from email and attachments (may have formatting issues from OCR)
    * @param dealCriteria - The client's screening criteria
-   * @returns The decision on whether the deal meets the client's screening criteria
+   * @returns The screening result
    */
-  async makeDecision(
+  async screen(
+    dealId: string,
     extractedText: string,
     dealCriteria?: string,
-  ): Promise<DealDecision> {
+  ): Promise<InitialScreeningResult> {
     const start = Date.now();
     try {
       // Build prompt based on whether criteria is provided
@@ -80,7 +86,7 @@ export class DealDecisionService {
           { role: 'user', content: `Raw Extracted Text:\n\n${extractedText}` },
         ],
         response_format: { type: 'json_object' },
-        user: 'deal-decision',
+        user: 'initial-screening',
       });
 
       const content = response.choices[0]?.message?.content;
@@ -90,29 +96,45 @@ export class DealDecisionService {
       }
 
       const parsedContent = JSON.parse(content);
-      const decision: DealDecision = {
+      const result: InitialScreeningResult = {
         decision: parsedContent.decision as 'yes' | 'no',
         reason: parsedContent.reason,
       };
+
+      // Persist the screening result to the database
+      await this.prismaService.initialScreening.upsert({
+        where: { dealId },
+        create: {
+          dealId,
+          decision: result.decision.toUpperCase() as 'YES' | 'NO',
+          reason: result.reason,
+          screenedAt: new Date(),
+        },
+        update: {
+          decision: result.decision.toUpperCase() as 'YES' | 'NO',
+          reason: result.reason,
+          screenedAt: new Date(),
+          updatedAt: new Date(),
+        },
+      });
 
       const duration = (Date.now() - start) / 1000;
       this.metricsService.recordAICall('initial-screening', this.aiConfig.openaiModel, duration, 'success');
 
       this.logger.log(
-        `Deal decision made: ${decision.decision} (model: ${this.aiConfig.openaiModel}) for deal criteria: ${dealCriteria}`,
+        `Initial screening completed: ${result.decision} (model: ${this.aiConfig.openaiModel}) for deal ${dealId}`,
       );
 
-      return decision;
+      return result;
     } catch (error) {
       const duration = (Date.now() - start) / 1000;
       this.metricsService.recordAICall('initial-screening', this.aiConfig.openaiModel, duration, 'error');
       const errorMessage = error instanceof Error ? error.message : String(error);
       const errorType = error instanceof Error ? error.constructor.name : 'Unknown';
       this.logger.error(
-        `Deal decision failed: ${errorMessage} (type: ${errorType})`,
+        `Initial screening failed for deal ${dealId}: ${errorMessage} (type: ${errorType})`,
       );
-      throw new Error(`Failed to make deal decision: ${errorMessage}`);
+      throw new Error(`Failed to perform initial screening: ${errorMessage}`);
     }
   }
 }
-

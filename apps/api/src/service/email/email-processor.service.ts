@@ -8,7 +8,7 @@ import {
   DEFAULT_PASSED_FOLDER,
 } from '../preferences/screening-preferences.service';
 import { DealSummaryService } from '../deal/deal-summary.service';
-import { DealDecisionService } from '../deal/deal-decision.service';
+import { InitialScreeningService } from '../deal/initial-screening.service';
 import { DealDetection } from '../deal/deal-detection.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { S3Service } from '../s3/s3.service';
@@ -47,7 +47,7 @@ export class EmailProcessorService {
     private readonly microsoftGraphService: MicrosoftGraphService,
     private readonly screeningPreferencesService: ScreeningPreferencesService,
     private readonly dealSummaryService: DealSummaryService,
-    private readonly dealDecisionService: DealDecisionService,
+    private readonly initialScreeningService: InitialScreeningService,
     private readonly prismaService: PrismaService,
     private readonly s3Service: S3Service,
     private readonly metricsService: MetricsService,
@@ -89,24 +89,20 @@ export class EmailProcessorService {
       // Step 2: Get client preferences
       const prefs = await this.screeningPreferencesService.getPreferences(organizationId);
 
-      // Step 3: Make AI decision on raw extracted text (BEFORE summary generation)
-      const decision = await this.dealDecisionService.makeDecision(
+      // Step 3: Save deal to database first (without screening fields - screening service handles that)
+      // Attachments already in S3 from webhook
+      const dealId = await this.saveDeal(ctx, detection, accessToken);
+      
+      if (!dealId) {
+        throw new Error('Failed to save deal');
+      }
+
+      // Step 4: Perform initial screening (service handles AI call AND persistence)
+      const decision = await this.initialScreeningService.screen(
+        dealId,
         combinedText,
         prefs.dealCriteria,
       );
-
-      // Step 4: Save deal to database (attachments already in S3 from webhook)
-      // For "no" decisions, save without summary initially
-      let dealId: string | undefined;
-      if (decision.decision === 'no') {
-        dealId = await this.saveDeal(
-          ctx,
-          null,
-          decision.decision as 'yes' | 'no',
-          detection,
-          accessToken,
-        );
-      }
 
       // Step 5: Handle "no" decisions - skip summary and reply, just move folder (Microsoft only)
       if (decision.decision === 'no') {
@@ -168,19 +164,10 @@ export class EmailProcessorService {
         };
       }
 
-      // Step 6: For "yes" decisions, generate summary and save deal
+      // Step 6: For "yes" decisions, generate summary
       const summary = await this.dealSummaryService.summarizeDeal(
         combinedText,
         prefs.dealCriteria,
-      );
-
-      // Save deal with summary for "yes" decisions
-      dealId = await this.saveDeal(
-        ctx,
-        summary,
-        decision.decision as 'yes' | 'no',
-        detection,
-        accessToken,
       );
 
       // Step 7: Send reply (must happen BEFORE moving message, as moving changes the message ID)
@@ -356,16 +343,14 @@ export class EmailProcessorService {
 
   private async saveDeal(
     ctx: ProcessDealContext,
-    summary: string | null,
-    decision: 'yes' | 'no',
     detection: { isDeal: boolean; confidence: string; reason: string },
     accessToken?: string,
   ): Promise<string | undefined> {
     const { event, organizationId, receivedByUserId, dealId } = ctx;
 
     try {
-      // Step 1: Create deal (use pre-generated dealId if provided, otherwise Prisma generates one)
-      // Summary may be null for "no" decisions
+      // Create deal (use pre-generated dealId if provided, otherwise Prisma generates one)
+      // Note: Screening fields are no longer saved here - InitialScreeningService handles that
       const savedDeal = await this.prismaService.deal.create({
         data: {
           id: dealId, // Use pre-generated dealId from webhook (for S3 organization)
@@ -375,9 +360,6 @@ export class EmailProcessorService {
           sourceFrom: event.from,
           sourceSubject: event.subject,
           sourceReceivedAt: event.receivedAt,
-          initialScreeningDecision: decision.toUpperCase() as 'YES' | 'NO',
-          initialScreeningSummary: summary,
-          initialScreeningAt: new Date(),
           detectionConfidence: detection.confidence,
           detectionReason: detection.reason,
         },
@@ -385,7 +367,7 @@ export class EmailProcessorService {
       });
       this.logger.log(`Deal saved: ${savedDeal.id}`);
 
-      // Step 2: Create Document records (attachments already in S3 from webhook)
+      // Create Document records (attachments already in S3 from webhook)
       if (event.attachments.length > 0) {
         await this.createDocumentRecords(savedDeal.id, event);
       }
