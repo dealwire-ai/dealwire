@@ -41,11 +41,18 @@ export class MicrosoftWebhookController {
       return validationToken;
     }
 
+    // Log incoming webhook for debugging
+    this.logger.log(
+      `Microsoft webhook received: ${body?.value?.length || 0} notification(s)`,
+    );
+
     // Validate clientState to ensure notification is from our subscription
     if (body?.value) {
       for (const notification of body.value) {
         if (notification.clientState !== this.microsoftConfig.webhookSecret) {
-          this.logger.warn('Invalid clientState in notification');
+          this.logger.warn(
+            `Invalid clientState in notification. Expected: ${this.microsoftConfig.webhookSecret?.substring(0, 8)}..., Got: ${notification.clientState?.substring(0, 8)}...`,
+          );
           throw new BadRequestException('Invalid clientState');
         }
       }
