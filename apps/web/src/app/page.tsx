@@ -41,8 +41,8 @@ export default function Home() {
             <span className="text-xl font-semibold tracking-tight">Levine & Weinstein</span>
           </div>
           <div className="hidden md:flex items-center gap-8 text-sm text-white/60">
-            <button onClick={() => document.getElementById('problem')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-white transition-colors">The Problem</button>
-            <button onClick={() => document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-white transition-colors">Solutions</button>
+            <button onClick={() => document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-white transition-colors">Services</button>
+            <button onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-white transition-colors">How It Works</button>
             <button onClick={() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-white transition-colors">About</button>
           </div>
           <Link href="/book">
@@ -199,9 +199,6 @@ export default function Home() {
             <h2 className="text-4xl md:text-5xl font-normal tracking-tight mb-6">
               AI employees for every function.
             </h2>
-            <p className="text-white/50 text-lg max-w-2xl mb-16">
-              From sourcing off-market deals to keeping your LPs happy—we build AI that handles the work your team shouldn&apos;t be doing manually.
-            </p>
           </FadeInSection>
           
           <div className="space-y-4">
@@ -223,12 +220,6 @@ export default function Home() {
                 title: "Operations",
                 tagline: "Back office that runs itself.",
                 description: "Lease abstracts in seconds. CAM reconciliations automated. Tenant notices on autopilot. NOI tracking in real-time. Your ops team focuses on exceptions, not data entry."
-              },
-              {
-                icon: Brain,
-                title: "Investor Relations",
-                tagline: "LPs impressed. CFO relieved.",
-                description: "Quarterly reports generated automatically. Waterfall distributions calculated. K-1 prep without the scramble. Ad-hoc LP queries answered instantly with full context."
               },
               {
                 icon: Sparkles,
@@ -257,7 +248,7 @@ export default function Home() {
       </section>
 
       {/* How It Works Section */}
-      <section className="relative z-10 px-6 lg:px-16 py-20 lg:py-28 border-t border-white/5">
+      <section id="how-it-works" className="relative z-10 px-6 lg:px-16 py-20 lg:py-28 border-t border-white/5">
         <div className="max-w-7xl mx-auto">
           <FadeInSection>
             <p className="text-[#3ECFA0] text-sm font-medium tracking-wider uppercase mb-4">The Process</p>
@@ -398,7 +389,7 @@ export default function Home() {
                 </div>
                 <div className="lg:border-l lg:border-white/10 lg:pl-12">
                   <p className="text-white/60 leading-relaxed">
-                    Our experience building frontstep.ai taught us what actually works in RE tech—
+                    Our experience building, scaling, and exiting frontstep.ai taught us what actually works in RE tech—
                     and more importantly, what doesn&apos;t. We only build what delivers real ROI.
                   </p>
                 </div>
