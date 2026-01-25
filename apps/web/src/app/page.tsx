@@ -80,12 +80,12 @@ export default function Home() {
             </h1>
             
             <p className="text-xl md:text-2xl text-white/60 max-w-2xl leading-relaxed mb-6">
-              We build custom AI employees for real estate firms. They screen deals, build proformas, handle investor reports—and free your team to do what actually moves the needle.
+              We build custom AI employees for real estate firms. They find off market deals, screen deals, handle investor reports, and free your team to do what actually moves the needle.
             </p>
 
-            <p className="text-lg text-white/40 max-w-xl mb-12">
+            {/* <p className="text-lg text-white/40 max-w-xl mb-12">
               The firms adopting AI now will outperform. The rest will wonder what happened.
-            </p>
+            </p> */}
             
             <div className="flex flex-col sm:flex-row gap-4">
               <Link href="/book">
@@ -102,7 +102,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* The Problem Section */}
+      {/* The Problem Section
       <section id="problem" className="relative z-10 px-6 lg:px-16 py-20 lg:py-28 border-t border-white/5">
         <div className="max-w-7xl mx-auto">
           <FadeInSection>
@@ -154,14 +154,14 @@ export default function Home() {
             </FadeInSection>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Value Proposition Section */}
       <section className="relative z-10 px-6 lg:px-16 py-20 lg:py-28 border-t border-white/5">
         <div className="max-w-7xl mx-auto">
           <FadeInSection>
             <div className="max-w-3xl">
-              <p className="text-[#3ECFA0] text-sm font-medium tracking-wider uppercase mb-4">The Solution</p>
+              {/* <p className="text-[#3ECFA0] text-sm font-medium tracking-wider uppercase mb-4">The Solution</p> */}
               <h2 className="text-4xl md:text-5xl font-normal tracking-tight mb-6">
                 Hire AI employees.<br />
                 <span className="text-white/40">Not more headcount.</span>
@@ -172,12 +172,11 @@ export default function Home() {
             </div>
           </FadeInSection>
           
-          <div className="grid md:grid-cols-4 gap-6 mt-8">
+          <div className="grid md:grid-cols-3 gap-6 mt-8">
             {[
               { icon: Clock, value: "24/7", label: "Always on", desc: "Works nights, weekends, holidays" },
               { icon: DollarSign, value: "90%", label: "Cost reduction", desc: "vs. equivalent human labor" },
-              { icon: TrendingUp, value: "10x", label: "Throughput", desc: "Screen 10x more deals" },
-              { icon: Users, value: "0", label: "Management overhead", desc: "No HR, no training, no turnover" },
+              { icon: Sparkles, value: "Weeks", label: "Time to deploy", desc: "vs. months of hiring and training" },
             ].map((stat, index) => (
               <FadeInSection key={index} delay={index * 0.1}>
                 <div className="p-6 bg-white/[0.02] border border-white/5 rounded-2xl text-center">
