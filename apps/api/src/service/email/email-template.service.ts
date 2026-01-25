@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { marked } from 'marked';
-import { DealDecision } from '../../model/deal-decision.model';
+import { InitialScreeningResult, DealDecision } from '../../model/initial-screening.model';
 
 @Injectable()
 export class EmailTemplateService {

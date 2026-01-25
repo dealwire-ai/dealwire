@@ -5,7 +5,7 @@ import { EmailTemplateService } from '../email/email-template.service';
 import { MicrosoftGraphService } from '../microsoft/microsoft-graph.service';
 import { ScreeningPreferencesService } from '../preferences/screening-preferences.service';
 import { DealSummaryService } from '../deal/deal-summary.service';
-import { DealDecisionService } from '../deal/deal-decision.service';
+import { InitialScreeningService } from '../deal/initial-screening.service';
 import { DealDetectionService } from '../deal/deal-detection.service';
 import { MetricsService } from '../metrics/metrics.service';
 import { PrismaService } from '../prisma/prisma.service';
@@ -26,7 +26,7 @@ describe('EmailProcessorService', () => {
   let microsoftGraphService: jest.Mocked<MicrosoftGraphService>;
   let dealDetectionService: jest.Mocked<DealDetectionService>;
   let dealSummaryService: jest.Mocked<DealSummaryService>;
-  let dealDecisionService: jest.Mocked<DealDecisionService>;
+  let initialScreeningService: jest.Mocked<InitialScreeningService>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -78,9 +78,9 @@ describe('EmailProcessorService', () => {
           },
         },
         {
-          provide: DealDecisionService,
+          provide: InitialScreeningService,
           useValue: {
-            makeDecision: jest.fn().mockResolvedValue({
+            screen: jest.fn().mockResolvedValue({
               decision: 'yes',
               reason: 'Good deal',
             }),
@@ -147,7 +147,7 @@ describe('EmailProcessorService', () => {
     microsoftGraphService = module.get(MicrosoftGraphService);
     dealDetectionService = module.get(DealDetectionService);
     dealSummaryService = module.get(DealSummaryService);
-    dealDecisionService = module.get(DealDecisionService);
+    initialScreeningService = module.get(InitialScreeningService);
   });
 
   afterEach(() => {
@@ -213,6 +213,13 @@ describe('EmailProcessorService', () => {
     expect(result.processed).toBe(true);
     expect(result.dealId).toBe('deal123');
 
+    // Verify InitialScreeningService.screen() was called with dealId
+    expect(initialScreeningService.screen).toHaveBeenCalledWith(
+      'deal123',
+      expect.stringContaining('extracted pdf text'),
+      'Test criteria',
+    );
+
     // Verify Document was created with S3 key (attachments already in S3 from webhook)
     expect(prismaService.document.create).toHaveBeenCalledWith({
       data: {
@@ -273,6 +280,8 @@ describe('EmailProcessorService', () => {
 
     // Assert
     expect(result.processed).toBe(true);
+    // Verify InitialScreeningService.screen() was called
+    expect(initialScreeningService.screen).toHaveBeenCalled();
     // Should still create Document record without S3 key
     expect(prismaService.document.create).toHaveBeenCalledWith({
       data: {
@@ -322,6 +331,6 @@ describe('EmailProcessorService', () => {
     expect(prismaService.deal.create).not.toHaveBeenCalled();
     expect(prismaService.document.create).not.toHaveBeenCalled();
     expect(dealSummaryService.summarizeDeal).not.toHaveBeenCalled();
-    expect(dealDecisionService.makeDecision).not.toHaveBeenCalled();
+      expect(initialScreeningService.screen).not.toHaveBeenCalled();
   });
 });

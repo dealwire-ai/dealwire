@@ -10,6 +10,10 @@ export interface ScreeningPreferences {
   passedFolderName?: string;
   /** Criteria for deals to always skip */
   alwaysSkip?: string;
+  /** CRON expression for digest schedule (e.g., "0 12 * * *" for daily at noon) */
+  digestSchedule?: string;
+  /** Timezone for digest schedule (default: "America/New_York") */
+  digestTimeZone?: string;
 }
 
 export const DEFAULT_PASSED_FOLDER = 'Passed Deals';
@@ -48,6 +52,8 @@ export class ScreeningPreferencesService {
         brandColor: prefs.brandColor || undefined,
         passedFolderName: prefs.passedFolderName || undefined,
         alwaysSkip: prefs.alwaysSkip || undefined,
+        digestSchedule: prefs.digestSchedule || undefined,
+        digestTimeZone: prefs.digestTimeZone || undefined,
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);

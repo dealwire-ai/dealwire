@@ -5,7 +5,7 @@ import { EmailTemplateService } from '../email/email-template.service';
 import { MicrosoftGraphService } from '../microsoft/microsoft-graph.service';
 import { ScreeningPreferencesService } from '../preferences/screening-preferences.service';
 import { DealSummaryService } from '../deal/deal-summary.service';
-import { DealDecisionService } from '../deal/deal-decision.service';
+import { InitialScreeningService } from '../deal/initial-screening.service';
 import { DealDetectionService } from '../deal/deal-detection.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { S3Service } from '../s3/s3.service';
@@ -26,7 +26,7 @@ describe('EmailProcessorService', () => {
   let microsoftGraphService: jest.Mocked<MicrosoftGraphService>;
   let dealDetectionService: jest.Mocked<DealDetectionService>;
   let dealSummaryService: jest.Mocked<DealSummaryService>;
-  let dealDecisionService: jest.Mocked<DealDecisionService>;
+  let initialScreeningService: jest.Mocked<InitialScreeningService>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -78,9 +78,9 @@ describe('EmailProcessorService', () => {
           },
         },
         {
-          provide: DealDecisionService,
+          provide: InitialScreeningService,
           useValue: {
-            makeDecision: jest.fn().mockResolvedValue({
+            screen: jest.fn().mockResolvedValue({
               decision: 'yes',
               reason: 'Good deal',
             }),
@@ -147,7 +147,7 @@ describe('EmailProcessorService', () => {
     microsoftGraphService = module.get(MicrosoftGraphService);
     dealDetectionService = module.get(DealDetectionService);
     dealSummaryService = module.get(DealSummaryService);
-    dealDecisionService = module.get(DealDecisionService);
+    initialScreeningService = module.get(InitialScreeningService);
   });
 
   afterEach(() => {

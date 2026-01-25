@@ -9,9 +9,10 @@ import { WebhookModule } from './module/webhook.module';
 import { MetricsModule } from './module/metrics.module';
 import { EmailProcessorModule } from './module/email-processor.module';
 import { NotificationsModule } from './module/notifications.module';
+import { DealDigestModule } from './module/deal-digest.module';
 
 @Module({
-  imports: [PrismaModule, WebhookModule, MetricsModule, EmailProcessorModule, NotificationsModule],
+  imports: [PrismaModule, WebhookModule, MetricsModule, EmailProcessorModule, NotificationsModule, DealDigestModule],
   controllers: [AppController, MetricsController, DealController, EmailEventController],
   providers: [AppService],
 })
