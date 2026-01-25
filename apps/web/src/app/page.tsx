@@ -200,61 +200,55 @@ export default function Home() {
               AI employees for every function.
             </h2>
             <p className="text-white/50 text-lg max-w-2xl mb-16">
-              From teasers hitting your inbox to K-1s going out the door—we build AI that handles the work your team shouldn&apos;t be doing manually.
+              From sourcing off-market deals to keeping your LPs happy—we build AI that handles the work your team shouldn&apos;t be doing manually.
             </p>
           </FadeInSection>
           
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="space-y-4">
             {[
+              {
+                icon: TrendingUp,
+                title: "Off-Market Deal Sourcing",
+                tagline: "Deals your competitors will never see.",
+                description: "An AI agent that continuously scans public records, monitors ownership changes, identifies distressed assets, and surfaces off-market opportunities that match your criteria—before they hit the market."
+              },
               {
                 icon: Building2,
                 title: "Deal Screening",
                 tagline: "From 500 emails to 5 qualified leads.",
-                points: [
-                  "Auto-parse every OM and teaser",
-                  "Match against your buy box instantly",
-                  "Generate preliminary underwriting",
-                  "Draft LOIs before competitors respond"
-                ]
+                description: "Auto-parse every OM and teaser that hits your inbox. Screen against your buy box instantly. Generate preliminary underwriting and draft LOIs before competitors even open the email."
               },
               {
                 icon: Workflow,
                 title: "Operations",
                 tagline: "Back office that runs itself.",
-                points: [
-                  "Lease abstracts in seconds",
-                  "CAM reconciliations automated",
-                  "Tenant notices on autopilot",
-                  "NOI tracking in real-time"
-                ]
+                description: "Lease abstracts in seconds. CAM reconciliations automated. Tenant notices on autopilot. NOI tracking in real-time. Your ops team focuses on exceptions, not data entry."
               },
               {
                 icon: Brain,
                 title: "Investor Relations",
                 tagline: "LPs impressed. CFO relieved.",
-                points: [
-                  "Quarterly reports generated automatically",
-                  "Waterfall distributions calculated",
-                  "K-1 prep without the scramble",
-                  "Ad-hoc LP queries answered instantly"
-                ]
+                description: "Quarterly reports generated automatically. Waterfall distributions calculated. K-1 prep without the scramble. Ad-hoc LP queries answered instantly with full context."
+              },
+              {
+                icon: Sparkles,
+                title: "Market Intelligence",
+                tagline: "Know what others don't.",
+                description: "An AI analyst that monitors market trends, tracks comp sales, analyzes rent growth patterns, and delivers insights that give you an edge—automatically, before you grab coffee."
               }
             ].map((service, index) => (
-              <FadeInSection key={index} delay={index * 0.1}>
-                <div className="group p-8 bg-white/[0.02] border border-white/5 rounded-2xl hover:bg-white/[0.04] hover:border-white/10 transition-all duration-500 h-full">
-                  <div className="w-12 h-12 bg-[#3ECFA0]/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-[#3ECFA0]/20 transition-colors">
-                    <service.icon className="w-6 h-6 text-[#3ECFA0]" />
+              <FadeInSection key={index} delay={index * 0.05}>
+                <div className="group flex flex-col md:flex-row md:items-center gap-6 p-6 md:p-8 bg-white/[0.02] border border-white/5 rounded-2xl hover:bg-white/[0.04] hover:border-white/10 transition-all duration-500">
+                  <div className="flex items-center gap-5 md:w-80 shrink-0">
+                    <div className="w-12 h-12 bg-[#3ECFA0]/10 rounded-xl flex items-center justify-center group-hover:bg-[#3ECFA0]/20 transition-colors shrink-0">
+                      <service.icon className="w-6 h-6 text-[#3ECFA0]" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-medium">{service.title}</h3>
+                      <p className="text-[#3ECFA0] text-sm">{service.tagline}</p>
+                    </div>
                   </div>
-                  <h3 className="text-xl font-medium mb-2">{service.title}</h3>
-                  <p className="text-[#3ECFA0] text-sm font-medium mb-4">{service.tagline}</p>
-                  <ul className="space-y-2">
-                    {service.points.map((point, i) => (
-                      <li key={i} className="flex items-start gap-2 text-white/50 text-sm">
-                        <CheckCircle2 className="w-4 h-4 text-[#3ECFA0]/50 mt-0.5 shrink-0" />
-                        {point}
-                      </li>
-                    ))}
-                  </ul>
+                  <p className="text-white/50 leading-relaxed">{service.description}</p>
                 </div>
               </FadeInSection>
             ))}
