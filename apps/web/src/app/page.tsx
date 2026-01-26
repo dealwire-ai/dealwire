@@ -80,7 +80,7 @@ export default function Home() {
             </h1>
             
             <p className="text-xl md:text-2xl text-white/60 max-w-2xl leading-relaxed mb-6">
-              We build custom AI employees for real estate firms. They source off market opportunities, screen dealswhile you sleep, and handle investor reports— so you can focus on what actually moves the needle.
+              We build custom AI employees for real estate firms. They source off market opportunities, screen deals while you sleep, and handle investor reports— so you can focus on what actually moves the needle.
             </p>
 
             {/* <p className="text-lg text-white/40 max-w-xl mb-12">
