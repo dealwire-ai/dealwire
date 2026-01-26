@@ -10,8 +10,8 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "Analyzer",
-  description: "Analyzer app",
+  title: "Levine & Weinstein",
+  description: "AI Employees for Real Estate",
 };
 
 export default function RootLayout({
