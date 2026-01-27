@@ -129,18 +129,7 @@ Preferences are automatically created when an Organization is created via Clerk 
 
 ## Database Schema (Prisma)
 
-### User
-- `id` (Clerk user ID)
-- `email`
-- `firstName`, `lastName`
-- Timestamps
-
-### MicrosoftSubscription
-- Links user to their Graph subscription
-- Stores `subscriptionId`, `resource`, `expiresAt`
-- Used for renewal cron job
-
----
+Any time make changes to the Prisma schema, generate a dev migration using cd apps/api && npx prisma migrate dev
 
 ## Environment Variables
 
