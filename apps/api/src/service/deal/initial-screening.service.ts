@@ -5,6 +5,7 @@ import { InitialScreeningResult } from '../../model/initial-screening.model';
 import { MetricsService } from '../metrics/metrics.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { AddressNormalizationService } from './address-normalization.service';
+import { ContactNormalizationService } from './contact-normalization.service';
 
 @Injectable()
 export class InitialScreeningService {
@@ -16,6 +17,7 @@ export class InitialScreeningService {
     private readonly metricsService: MetricsService,
     private readonly prismaService: PrismaService,
     private readonly addressNormalizationService: AddressNormalizationService,
+    private readonly contactNormalizationService: ContactNormalizationService,
   ) {
     this.openai = new OpenAI({
       apiKey: this.aiConfig.openaiApiKey,
@@ -27,12 +29,14 @@ export class InitialScreeningService {
    * @param dealId - The ID of the deal being screened
    * @param extractedText - Raw extracted text from email and attachments (may have formatting issues from OCR)
    * @param dealCriteria - The client's screening criteria
+   * @param senderEmail - Email address of the sender (for contact normalization)
    * @returns The screening result
    */
   async screen(
     dealId: string,
     extractedText: string,
     dealCriteria?: string,
+    senderEmail?: string,
   ): Promise<InitialScreeningResult> {
     const start = Date.now();
     try {
@@ -123,10 +127,25 @@ export class InitialScreeningService {
         }
       }
 
+      // Find or create contact from sender email
+      let contactId: string | null = null;
+      if (senderEmail) {
+        try {
+          contactId = await this.contactNormalizationService.findOrCreateContact(senderEmail);
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : String(error);
+          this.logger.warn(
+            `Failed to process contact for deal ${dealId}: ${errorMessage}. Continuing without contact association.`,
+          );
+          // Continue without contact - don't fail the screening
+        }
+      }
+
       const result: InitialScreeningResult = {
         decision: parsedContent.decision as 'yes' | 'no',
         reason: parsedContent.reason,
         assetId,
+        contactId,
       };
 
       // Persist the screening result to the database
@@ -150,7 +169,7 @@ export class InitialScreeningService {
       this.metricsService.recordAICall('initial-screening', this.aiConfig.openaiModel, duration, 'success');
 
       this.logger.log(
-        `Initial screening completed: ${result.decision} (model: ${this.aiConfig.openaiModel}) for deal ${dealId}${assetId ? ` with asset ${assetId}` : ' (no asset)'}`,
+        `Initial screening completed: ${result.decision} (model: ${this.aiConfig.openaiModel}) for deal ${dealId}${assetId ? ` with asset ${assetId}` : ' (no asset)'}${contactId ? ` with contact ${contactId}` : ' (no contact)'}`,
       );
 
       return result;
