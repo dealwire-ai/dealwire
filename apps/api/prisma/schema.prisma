@@ -130,9 +130,13 @@ model Asset {
   state   String?
   country String? @default("USA")
 
+  normalizedAddress String? @unique // Normalized address for matching (e.g., "123 MAIN ST, NEW YORK, NY, USA")
+
   deals     Deal[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([normalizedAddress])
 }
 
 // ============================================
