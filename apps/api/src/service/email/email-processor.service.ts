@@ -102,6 +102,7 @@ export class EmailProcessorService {
         dealId,
         combinedText,
         prefs.dealCriteria,
+        event.from, // Pass sender email for contact normalization
       );
 
       // Step 4.5: Associate asset with deal if one was found/created
@@ -111,6 +112,15 @@ export class EmailProcessorService {
           data: { assetId: decision.assetId },
         });
         this.logger.log(`Associated deal ${dealId} with asset ${decision.assetId}`);
+      }
+
+      // Step 4.6: Associate contact with deal if one was found/created
+      if (decision.contactId) {
+        await this.prismaService.deal.update({
+          where: { id: dealId },
+          data: { contactId: decision.contactId },
+        });
+        this.logger.log(`Associated deal ${dealId} with contact ${decision.contactId}`);
       }
 
       // Step 5: Handle "no" decisions - skip summary and reply, just move folder (Microsoft only)

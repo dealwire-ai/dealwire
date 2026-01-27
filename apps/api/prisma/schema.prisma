@@ -79,6 +79,8 @@ model Deal {
   // Relationships
   asset             Asset?             @relation(fields: [assetId], references: [id])
   assetId           String?
+  contact           Contact?           @relation(fields: [contactId], references: [id])
+  contactId         String?
   documents         Document[]
   initialScreening  InitialScreening?
 
@@ -137,6 +139,21 @@ model Asset {
   updatedAt DateTime @updatedAt
 
   @@index([normalizedAddress])
+}
+
+// ============================================
+// CONTACT - Broker/contact who sent the deal
+// ============================================
+model Contact {
+  id String @id @default(cuid())
+
+  email String @unique // Normalized email (lowercase, trimmed) - used as unique key
+
+  deals     Deal[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
 }
 
 // ============================================

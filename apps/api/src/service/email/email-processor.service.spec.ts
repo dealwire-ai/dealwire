@@ -213,11 +213,12 @@ describe('EmailProcessorService', () => {
     expect(result.processed).toBe(true);
     expect(result.dealId).toBe('deal123');
 
-    // Verify InitialScreeningService.screen() was called with dealId
+    // Verify InitialScreeningService.screen() was called with dealId, text, criteria, and sender email
     expect(initialScreeningService.screen).toHaveBeenCalledWith(
       'deal123',
       expect.stringContaining('extracted pdf text'),
       'Test criteria',
+      'broker@example.com', // sender email
     );
 
     // Verify Document was created with S3 key (attachments already in S3 from webhook)
