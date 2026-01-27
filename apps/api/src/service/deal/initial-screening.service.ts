@@ -4,6 +4,7 @@ import { aiConfig } from '../../config/ai.config';
 import { InitialScreeningResult } from '../../model/initial-screening.model';
 import { MetricsService } from '../metrics/metrics.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { AddressNormalizationService } from './address-normalization.service';
 
 @Injectable()
 export class InitialScreeningService {
@@ -14,6 +15,7 @@ export class InitialScreeningService {
   constructor(
     private readonly metricsService: MetricsService,
     private readonly prismaService: PrismaService,
+    private readonly addressNormalizationService: AddressNormalizationService,
   ) {
     this.openai = new OpenAI({
       apiKey: this.aiConfig.openaiApiKey,
@@ -61,12 +63,14 @@ export class InitialScreeningService {
           'Use context clues and proximity to match labels with values. Look for information near related terms.\n\n' +
           '=== OUTPUT FORMAT ===\n' +
           'Respond with JSON in this exact format:\n' +
-          '{"decision": "yes" or "no", "reason": "your reason"}\n\n' +
+          '{"decision": "yes" or "no", "reason": "your reason", "address": {"street": "123 Main St", "city": "New York", "state": "NY", "country": "USA"}}\n\n' +
           'The reason should be:\n' +
           '- One sentence\n' +
           '- Written as if speaking directly to the client\n' +
           '- Cite which specific requirement was not met (if "no")\n' +
-          '- Be clear and specific';
+          '- Be clear and specific\n\n' +
+          'The address field should contain the property address if available. If no address is found or the deal is not about a specific property, set address to null. ' +
+          'Extract the street address, city, state (use 2-letter abbreviation if possible), and country (default to "USA" if not specified).';
       } else {
         systemPrompt =
           'You are a real estate acquisitions analyst. Evaluate whether this is a ' +
@@ -75,7 +79,10 @@ export class InitialScreeningService {
           '\n\nThe text below is raw extracted text from emails and PDFs (may have OCR formatting issues, vertical stacking, etc.). ' +
           'Use context clues and proximity to match labels with values. ' +
           'Provide a one-sentence reason for your decision. ' +
-          'Respond with JSON in the format: {"decision": "yes" or "no", "reason": "your reason"}.';
+          'Also extract the property address if available. ' +
+          'Respond with JSON in the format: {"decision": "yes" or "no", "reason": "your reason", "address": {"street": "123 Main St", "city": "New York", "state": "NY", "country": "USA"}}. ' +
+          'If no address is found or the deal is not about a specific property, set address to null. ' +
+          'Extract the street address, city, state (use 2-letter abbreviation if possible), and country (default to "USA" if not specified).';
       }
 
       const response = await this.openai.chat.completions.create({
@@ -96,9 +103,30 @@ export class InitialScreeningService {
       }
 
       const parsedContent = JSON.parse(content);
+      
+      // Extract address components from AI response
+      let assetId: string | null = null;
+      if (parsedContent.address && typeof parsedContent.address === 'object') {
+        try {
+          assetId = await this.addressNormalizationService.findOrCreateAsset({
+            street: parsedContent.address.street || undefined,
+            city: parsedContent.address.city || undefined,
+            state: parsedContent.address.state || undefined,
+            country: parsedContent.address.country || undefined,
+          });
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : String(error);
+          this.logger.warn(
+            `Failed to process address for deal ${dealId}: ${errorMessage}. Continuing without asset association.`,
+          );
+          // Continue without asset - don't fail the screening
+        }
+      }
+
       const result: InitialScreeningResult = {
         decision: parsedContent.decision as 'yes' | 'no',
         reason: parsedContent.reason,
+        assetId,
       };
 
       // Persist the screening result to the database
@@ -122,7 +150,7 @@ export class InitialScreeningService {
       this.metricsService.recordAICall('initial-screening', this.aiConfig.openaiModel, duration, 'success');
 
       this.logger.log(
-        `Initial screening completed: ${result.decision} (model: ${this.aiConfig.openaiModel}) for deal ${dealId}`,
+        `Initial screening completed: ${result.decision} (model: ${this.aiConfig.openaiModel}) for deal ${dealId}${assetId ? ` with asset ${assetId}` : ' (no asset)'}`,
       );
 
       return result;
