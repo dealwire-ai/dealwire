@@ -1,6 +1,7 @@
 export interface InitialScreeningResult {
   decision: 'yes' | 'no';
   reason: string;
+  assetId?: string | null; // Asset ID if address was extracted and normalized
 }
 
 // Keep DealDecision for backward compatibility during migration

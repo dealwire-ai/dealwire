@@ -104,6 +104,15 @@ export class EmailProcessorService {
         prefs.dealCriteria,
       );
 
+      // Step 4.5: Associate asset with deal if one was found/created
+      if (decision.assetId) {
+        await this.prismaService.deal.update({
+          where: { id: dealId },
+          data: { assetId: decision.assetId },
+        });
+        this.logger.log(`Associated deal ${dealId} with asset ${decision.assetId}`);
+      }
+
       // Step 5: Handle "no" decisions - skip summary and reply, just move folder (Microsoft only)
       if (decision.decision === 'no') {
         if (event.source === 'microsoft' && accessToken && dealId) {
