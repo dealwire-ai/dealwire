@@ -3,6 +3,8 @@ import { Cron } from '@nestjs/schedule';
 import { PrismaService } from '../prisma/prisma.service';
 import { EmailSenderService } from '../email/email-sender.service';
 import { ScreeningPreferencesService } from '../preferences/screening-preferences.service';
+import { MicrosoftGraphService } from '../microsoft/microsoft-graph.service';
+import { ADMIN_EMAILS } from '../../config/email.config';
 import CronExpressionParser from 'cron-parser';
 
 @Injectable()
@@ -13,6 +15,7 @@ export class DealDigestService {
     private readonly prismaService: PrismaService,
     private readonly emailSenderService: EmailSenderService,
     private readonly screeningPreferencesService: ScreeningPreferencesService,
+    private readonly microsoftGraphService: MicrosoftGraphService,
   ) {}
 
   /**
@@ -103,7 +106,7 @@ export class DealDigestService {
    */
   private async sendDigestForOrganization(organizationId: string): Promise<void> {
     try {
-      // Get organization with users
+      // Get organization with users and Microsoft subscriptions
       const org = await this.prismaService.organization.findUnique({
         where: { id: organizationId },
         select: {
@@ -111,7 +114,17 @@ export class DealDigestService {
           imageUrl: true,
           users: {
             select: {
+              id: true,
               email: true,
+              createdAt: true,
+              microsoftSubscription: {
+                select: {
+                  id: true,
+                },
+              },
+            },
+            orderBy: {
+              createdAt: 'asc',
             },
           },
         },
@@ -208,21 +221,79 @@ export class DealDigestService {
         return;
       }
 
+      // Find a user with Microsoft subscription (prefer first user by createdAt)
+      type UserType = typeof org.users[0];
+      const userWithMicrosoft = org.users.find(
+        (u: UserType) => u.microsoftSubscription !== null,
+      ) || org.users[0]; // Fallback to first user if none have Microsoft
+
+      // Get Microsoft access token for the selected user
+      const accessToken = userWithMicrosoft
+        ? await this.microsoftGraphService.getMicrosoftOAuthTokenFromClerk(
+            userWithMicrosoft.id,
+            'debug',
+          )
+        : null;
+
       // Send email
       type ScreeningType = typeof screenings[0];
       const yesCount = screenings.filter((s: ScreeningType) => s.decision === 'YES').length;
       const noCount = screenings.filter((s: ScreeningType) => s.decision === 'NO').length;
       const subject = `Deal Digest: ${screenings.length} Deal${screenings.length > 1 ? 's' : ''} Screened (${yesCount} Yes, ${noCount} No)`;
 
-      await this.emailSenderService.sendEmail({
-        to: userEmails,
-        subject,
-        html: emailHtml,
-      });
+      if (accessToken && userWithMicrosoft.email) {
+        // Send via Microsoft Graph from user's Outlook account
+        const success = await this.microsoftGraphService.sendMail(
+          accessToken,
+          userWithMicrosoft.email,
+          userEmails,
+          subject,
+          emailHtml,
+          ADMIN_EMAILS,
+        );
 
-      this.logger.log(
-        `Sent deal digest to ${userEmails.length} user(s) in organization ${organizationId}: ${screenings.length} screenings`,
-      );
+        if (success) {
+          this.logger.log(
+            `Sent deal digest via Microsoft Graph from ${userWithMicrosoft.email} to ${userEmails.length} user(s) in organization ${organizationId}: ${screenings.length} screenings`,
+          );
+        } else {
+          // Fallback to Resend if Microsoft Graph send failed
+          this.logger.warn(
+            `Microsoft Graph send failed, falling back to Resend for organization ${organizationId}`,
+          );
+          await this.emailSenderService.sendEmail({
+            to: [...userEmails, ...ADMIN_EMAILS],
+            subject,
+            html: emailHtml,
+          });
+          this.logger.log(
+            `Sent deal digest via Resend to ${userEmails.length + ADMIN_EMAILS.length} recipient(s) in organization ${organizationId}: ${screenings.length} screenings`,
+          );
+        }
+      } else {
+        // Fallback to Resend if no Microsoft token available
+        await this.emailSenderService.sendEmail({
+          to: [...userEmails, ...ADMIN_EMAILS],
+          subject,
+          html: emailHtml,
+        });
+        this.logger.log(
+          `Sent deal digest via Resend to ${userEmails.length + ADMIN_EMAILS.length} recipient(s) in organization ${organizationId}: ${screenings.length} screenings`,
+        );
+      }
+
+      // Mark all included screenings as sent
+      const screeningIds = screenings.map((s: ScreeningType) => s.id);
+      const digestSentAt = new Date();
+      await this.prismaService.initialScreening.updateMany({
+        where: {
+          id: { in: screeningIds },
+        },
+        data: {
+          digestSent: true,
+          digestSentAt,
+        },
+      });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       const errorStack = error instanceof Error ? error.stack : undefined;

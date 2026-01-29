@@ -1,13 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { createClerkClient } from '@clerk/backend';
 import { clerkConfig } from '../../config/clerk.config';
+import { ADMIN_EMAILS } from '../../config/email.config';
 import {
   NormalizedEmailEvent,
   NormalizedEmailAttachment,
 } from '../../dto/normalized-email-event.dto';
 
 const GRAPH_BASE_URL = 'https://graph.microsoft.com/v1.0';
-const ADMIN_CC_EMAILS = ['isaac@frontstep.ai', 'noah@frontstep.ai'];
 
 interface GraphMessage {
   id: string;
@@ -219,7 +219,7 @@ export class MicrosoftGraphService {
         toRecipients: [
           { emailAddress: { address: userEmail } },
         ],
-        ccRecipients: ADMIN_CC_EMAILS.map((email) => ({
+        ccRecipients: ADMIN_EMAILS.map((email) => ({
           emailAddress: { address: email },
         })),
         body: {
@@ -278,6 +278,82 @@ export class MicrosoftGraphService {
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
       this.logger.error(`Error sending reply-to-self for ${messageId}: ${msg}`);
+      return false;
+    }
+  }
+
+  /**
+   * Send a new email (not a reply) via Microsoft Graph
+   * @param accessToken - Microsoft OAuth access token
+   * @param fromEmail - Email address to send from (user's own email)
+   * @param toEmails - Array of recipient email addresses
+   * @param subject - Email subject
+   * @param htmlBody - HTML email body
+   * @param ccEmails - Optional array of CC email addresses
+   */
+  async sendMail(
+    accessToken: string,
+    fromEmail: string,
+    toEmails: string[],
+    subject: string,
+    htmlBody: string,
+    ccEmails?: string[],
+  ): Promise<boolean> {
+    try {
+      // Step 1: Create a draft message
+      const createResponse = await fetch(`${GRAPH_BASE_URL}/me/messages`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          subject,
+          toRecipients: toEmails.map((email) => ({
+            emailAddress: { address: email },
+          })),
+          ccRecipients: ccEmails
+            ? ccEmails.map((email) => ({
+                emailAddress: { address: email },
+              }))
+            : [],
+          body: {
+            contentType: 'html',
+            content: htmlBody,
+          },
+        }),
+      });
+
+      if (!createResponse.ok) {
+        const errorText = await createResponse.text();
+        this.logger.error(`Failed to create draft: ${createResponse.status} - ${errorText}`);
+        return false;
+      }
+
+      const draft = await createResponse.json();
+      const draftId = draft.id;
+
+      // Step 2: Send the draft
+      const sendResponse = await fetch(`${GRAPH_BASE_URL}/me/messages/${draftId}/send`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (!sendResponse.ok) {
+        const errorText = await sendResponse.text();
+        this.logger.error(`Failed to send email: ${sendResponse.status} - ${errorText}`);
+        return false;
+      }
+
+      this.logger.log(
+        `Email sent via Graph from ${fromEmail} to ${toEmails.join(', ')}${ccEmails ? ` (CC: ${ccEmails.join(', ')})` : ''}`,
+      );
+      return true;
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Error sending email: ${msg}`);
       return false;
     }
   }
@@ -353,7 +429,7 @@ export class MicrosoftGraphService {
           },
           body: JSON.stringify({
             subject: draftSubject, // Preserve subject from createReply (includes "Re: " prefix)
-            toRecipients: ADMIN_CC_EMAILS.map((email) => ({
+            toRecipients: ADMIN_EMAILS.map((email) => ({
               emailAddress: { address: email },
             })),
             body: {

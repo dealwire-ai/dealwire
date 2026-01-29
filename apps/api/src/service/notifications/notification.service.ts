@@ -1,9 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { EmailSenderService } from '../email/email-sender.service';
+import { ADMIN_EMAILS } from '../../config/email.config';
 
 export type NotificationLevel = 'all' | 'errors-only' | 'digest-only';
-
-const ADMIN_EMAILS = ['isaac@frontstep.ai', 'noah@frontstep.ai'];
 
 @Injectable()
 export class NotificationService {
