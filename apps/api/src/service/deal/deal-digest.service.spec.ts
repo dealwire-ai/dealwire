@@ -3,12 +3,15 @@ import { DealDigestService } from './deal-digest.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { EmailSenderService } from '../email/email-sender.service';
 import { ScreeningPreferencesService } from '../preferences/screening-preferences.service';
+import { MicrosoftGraphService } from '../microsoft/microsoft-graph.service';
+import { ADMIN_EMAILS } from '../../config/email.config';
 
 describe('DealDigestService', () => {
   let service: DealDigestService;
   let prismaService: jest.Mocked<PrismaService>;
   let emailSenderService: jest.Mocked<EmailSenderService>;
   let screeningPreferencesService: jest.Mocked<ScreeningPreferencesService>;
+  let microsoftGraphService: jest.Mocked<MicrosoftGraphService>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -40,6 +43,13 @@ describe('DealDigestService', () => {
             getPreferences: jest.fn(),
           },
         },
+        {
+          provide: MicrosoftGraphService,
+          useValue: {
+            getMicrosoftOAuthTokenFromClerk: jest.fn().mockResolvedValue(null),
+            sendMail: jest.fn().mockResolvedValue(false),
+          },
+        },
       ],
     }).compile();
 
@@ -47,6 +57,7 @@ describe('DealDigestService', () => {
     prismaService = module.get(PrismaService);
     emailSenderService = module.get(EmailSenderService);
     screeningPreferencesService = module.get(ScreeningPreferencesService);
+    microsoftGraphService = module.get(MicrosoftGraphService);
   });
 
   afterEach(() => {
@@ -60,7 +71,10 @@ describe('DealDigestService', () => {
       const mockOrg = {
         id: orgId,
         name: 'Test Org',
-        users: [{ email: 'user1@example.com' }, { email: 'user2@example.com' }],
+        users: [
+          { id: 'user1', email: 'user1@example.com', createdAt: new Date(), microsoftSubscription: null },
+          { id: 'user2', email: 'user2@example.com', createdAt: new Date(), microsoftSubscription: null },
+        ],
       };
 
       const mockScreenings = [
@@ -115,7 +129,7 @@ describe('DealDigestService', () => {
 
       // Assert
       expect(emailSenderService.sendEmail).toHaveBeenCalledWith({
-        to: ['user1@example.com', 'user2@example.com'],
+        to: ['user1@example.com', 'user2@example.com', ...ADMIN_EMAILS],
         subject: 'Deal Digest: 2 Deals Screened (1 Yes, 1 No)',
         html: expect.stringContaining('Deal Digest'),
       });
@@ -138,7 +152,7 @@ describe('DealDigestService', () => {
       const mockOrg = {
         id: orgId,
         name: 'Test Org',
-        users: [{ email: 'user@example.com' }],
+        users: [{ id: 'user1', email: 'user@example.com', createdAt: new Date(), microsoftSubscription: null }],
       };
 
       (prismaService.organization.findUnique as jest.Mock).mockResolvedValue(mockOrg);
@@ -159,7 +173,10 @@ describe('DealDigestService', () => {
       const mockOrg = {
         id: orgId,
         name: 'Test Org',
-        users: [{ email: null }, { email: null }],
+        users: [
+          { id: 'user1', email: null, createdAt: new Date(), microsoftSubscription: null },
+          { id: 'user2', email: null, createdAt: new Date(), microsoftSubscription: null },
+        ],
       };
 
       (prismaService.organization.findUnique as jest.Mock).mockResolvedValue(mockOrg);
