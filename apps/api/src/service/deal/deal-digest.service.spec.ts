@@ -115,7 +115,7 @@ describe('DealDigestService', () => {
       const mockPreferences = {
         companyName: 'Test Company',
         brandColor: '#FF0000',
-        logoUrl: 'https://example.com/logo.png',
+        organizationImageUrl: 'https://example.com/logo.png',
       };
 
       (prismaService.organization.findUnique as jest.Mock).mockResolvedValue(mockOrg);
@@ -241,7 +241,7 @@ describe('DealDigestService', () => {
       const preferences = {
         companyName: 'Test Company',
         brandColor: '#FF0000',
-        logoUrl: 'https://example.com/logo.png',
+        organizationImageUrl: 'https://example.com/logo.png',
       };
 
       // Act
@@ -281,7 +281,7 @@ describe('DealDigestService', () => {
       const preferences = {
         companyName: 'Test Company',
         brandColor: '#FF0000',
-        logoUrl: null,
+        organizationImageUrl: null,
       };
 
       // Act
