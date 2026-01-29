@@ -106,14 +106,30 @@ describe('DealDigestService', () => {
 
       (prismaService.organization.findUnique as jest.Mock).mockResolvedValue(mockOrg);
       (prismaService.initialScreening.findFirst as jest.Mock).mockResolvedValue(null); // No previous digest
+      // First updateMany atomically marks screenings as sent
+      (prismaService.initialScreening.updateMany as jest.Mock).mockResolvedValue({ count: 2 });
+      // Then findMany fetches the screenings we just marked
       (prismaService.initialScreening.findMany as jest.Mock).mockResolvedValue(mockScreenings);
       (screeningPreferencesService.getPreferences as jest.Mock).mockResolvedValue(mockPreferences);
-      (prismaService.initialScreening.updateMany as jest.Mock).mockResolvedValue({ count: 2 });
 
       // Act
       await (service as any).sendDigestForOrganization(orgId);
 
       // Assert
+      expect(prismaService.initialScreening.updateMany).toHaveBeenCalledWith({
+        where: {
+          deal: { organizationId: orgId },
+          digestSent: false,
+          screenedAt: {
+            gte: expect.any(Date),
+          },
+        },
+        data: {
+          digestSent: true,
+          digestSentAt: expect.any(Date),
+        },
+      });
+
       expect(emailSenderService.sendEmail).toHaveBeenCalledWith({
         to: ['user1@example.com', 'user2@example.com'],
         subject: 'Deal Digest: 2 Deals Screened (1 Yes, 1 No)',
@@ -121,15 +137,6 @@ describe('DealDigestService', () => {
       });
 
       expect(emailSenderService.sendEmail).toHaveBeenCalledTimes(1);
-      expect(prismaService.initialScreening.updateMany).toHaveBeenCalledWith({
-        where: {
-          id: { in: ['screening1', 'screening2'] },
-        },
-        data: {
-          digestSent: true,
-          digestSentAt: expect.any(Date),
-        },
-      });
     });
 
     it('should skip when no screenings found', async () => {
@@ -143,14 +150,16 @@ describe('DealDigestService', () => {
 
       (prismaService.organization.findUnique as jest.Mock).mockResolvedValue(mockOrg);
       (prismaService.initialScreening.findFirst as jest.Mock).mockResolvedValue(null);
-      (prismaService.initialScreening.findMany as jest.Mock).mockResolvedValue([]);
+      // updateMany returns count 0 when no screenings exist
+      (prismaService.initialScreening.updateMany as jest.Mock).mockResolvedValue({ count: 0 });
 
       // Act
       await (service as any).sendDigestForOrganization(orgId);
 
       // Assert
       expect(emailSenderService.sendEmail).not.toHaveBeenCalled();
-      expect(prismaService.initialScreening.updateMany).not.toHaveBeenCalled();
+      expect(prismaService.initialScreening.updateMany).toHaveBeenCalled();
+      expect(prismaService.initialScreening.findMany).not.toHaveBeenCalled();
     });
 
     it('should skip when no valid emails', async () => {
@@ -164,6 +173,9 @@ describe('DealDigestService', () => {
 
       (prismaService.organization.findUnique as jest.Mock).mockResolvedValue(mockOrg);
       (prismaService.initialScreening.findFirst as jest.Mock).mockResolvedValue(null);
+      // updateMany marks screenings as sent
+      (prismaService.initialScreening.updateMany as jest.Mock).mockResolvedValue({ count: 1 });
+      // findMany fetches the screenings
       (prismaService.initialScreening.findMany as jest.Mock).mockResolvedValue([
         {
           id: 'screening1',
