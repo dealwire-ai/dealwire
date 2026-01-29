@@ -76,6 +76,7 @@ export class DealDigestService {
 
   /**
    * Check if current time matches the CRON schedule in the given timezone
+   * Only checks if we're within 5 minutes AFTER the scheduled time to prevent double-sending
    */
   private isTimeToSend(schedule: string, timeZone: string, now: Date): boolean {
     try {
@@ -85,14 +86,12 @@ export class DealDigestService {
 
       // Get the previous scheduled time
       const prev = interval.prev();
-      const next = interval.next();
 
-      // Check if we're within 5 minutes of the scheduled time
+      // Check if we're within 5 minutes AFTER the scheduled time
       const timeSincePrev = now.getTime() - prev.getTime();
-      const timeUntilNext = next.getTime() - now.getTime();
       const fiveMinutes = 5 * 60 * 1000;
 
-      return timeSincePrev < fiveMinutes || timeUntilNext < fiveMinutes;
+      return timeSincePrev < fiveMinutes;
     } catch (error) {
       this.logger.error(`Invalid CRON expression: ${schedule}`, error);
       return false;
@@ -138,14 +137,35 @@ export class DealDigestService {
       const sinceDate =
         lastDigest?.digestSentAt || new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
-      // Find all unsent screenings since last digest (both YES and NO)
-      const screenings = await this.prismaService.initialScreening.findMany({
+      // Atomically mark unsent screenings as sent to prevent race conditions
+      // This ensures only one process can claim the screenings
+      const now = new Date();
+      const updateResult = await this.prismaService.initialScreening.updateMany({
         where: {
           deal: { organizationId },
           digestSent: false,
           screenedAt: {
             gte: sinceDate,
           },
+        },
+        data: {
+          digestSent: true,
+          digestSentAt: now,
+        },
+      });
+
+      // Skip if no screenings were updated (either none exist or another process claimed them)
+      if (updateResult.count === 0) {
+        this.logger.log(`No new screenings for organization ${organizationId} since last digest`);
+        return;
+      }
+
+      // Fetch the screenings we just marked as sent (now guaranteed to be unique to this process)
+      const screenings = await this.prismaService.initialScreening.findMany({
+        where: {
+          deal: { organizationId },
+          digestSent: true,
+          digestSentAt: now,
         },
         include: {
           deal: {
@@ -171,12 +191,6 @@ export class DealDigestService {
           screenedAt: 'desc',
         },
       });
-
-      // Skip if no new screenings
-      if (screenings.length === 0) {
-        this.logger.log(`No new screenings for organization ${organizationId} since last digest`);
-        return;
-      }
 
       // Get organization preferences for email branding
       const preferences = await this.screeningPreferencesService.getPreferences(organizationId);
@@ -209,19 +223,6 @@ export class DealDigestService {
       this.logger.log(
         `Sent deal digest to ${userEmails.length} user(s) in organization ${organizationId}: ${screenings.length} screenings`,
       );
-
-      // Mark all included screenings as sent
-      const screeningIds = screenings.map((s: ScreeningType) => s.id);
-      const now = new Date();
-      await this.prismaService.initialScreening.updateMany({
-        where: {
-          id: { in: screeningIds },
-        },
-        data: {
-          digestSent: true,
-          digestSentAt: now,
-        },
-      });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       const errorStack = error instanceof Error ? error.stack : undefined;
