@@ -193,7 +193,7 @@ export class EmailProcessorService {
       const htmlEmail = this.emailTemplateService.formatSummaryAsHtml(
         summary,
         decision,
-        prefs.logoUrl,
+        prefs.organizationImageUrl,
         prefs.companyName,
         prefs.brandColor,
       );
