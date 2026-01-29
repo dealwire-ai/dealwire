@@ -3,6 +3,7 @@ import { DealDigestService } from './deal-digest.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { EmailSenderService } from '../email/email-sender.service';
 import { ScreeningPreferencesService } from '../preferences/screening-preferences.service';
+import { MicrosoftGraphService } from '../microsoft/microsoft-graph.service';
 
 describe('DealDigestService', () => {
   let service: DealDigestService;
@@ -39,6 +40,10 @@ describe('DealDigestService', () => {
           useValue: {
             getPreferences: jest.fn(),
           },
+        },
+        {
+          provide: MicrosoftGraphService,
+          useValue: {},
         },
       ],
     }).compile();
