@@ -284,14 +284,14 @@ export class DealDigestService {
 
       // Mark all included screenings as sent
       const screeningIds = screenings.map((s: ScreeningType) => s.id);
-      const now = new Date();
+      const digestSentAt = new Date();
       await this.prismaService.initialScreening.updateMany({
         where: {
           id: { in: screeningIds },
         },
         data: {
           digestSent: true,
-          digestSentAt: now,
+          digestSentAt,
         },
       });
     } catch (error) {
