@@ -74,4 +74,4 @@ To configure preferences:
 1. Ensure the user has an `organizationId` set
 2. Create or update the `ScreeningPreferences` record for that organization in the database
 
-Preferences include: `dealCriteria`, `logoUrl`, `companyName`, `brandColor`, `passedFolderName`, and `alwaysSkip`.
+Preferences include: `dealCriteria`, `companyName`, `brandColor`, `passedFolderName`, and `alwaysSkip`. The organization logo is automatically pulled from the Clerk organization's `imageUrl` field.

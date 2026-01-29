@@ -59,7 +59,7 @@ describe('DealDigestService', () => {
       const orgId = 'org123';
       const mockOrg = {
         id: orgId,
-        name: 'Test Org',
+        imageUrl: 'https://example.com/org-logo.png',
         users: [{ email: 'user1@example.com' }, { email: 'user2@example.com' }],
       };
 
@@ -101,7 +101,7 @@ describe('DealDigestService', () => {
       const mockPreferences = {
         companyName: 'Test Company',
         brandColor: '#FF0000',
-        logoUrl: 'https://example.com/logo.png',
+        organizationImageUrl: 'https://example.com/logo.png',
       };
 
       (prismaService.organization.findUnique as jest.Mock).mockResolvedValue(mockOrg);
@@ -137,7 +137,7 @@ describe('DealDigestService', () => {
       const orgId = 'org123';
       const mockOrg = {
         id: orgId,
-        name: 'Test Org',
+        imageUrl: null,
         users: [{ email: 'user@example.com' }],
       };
 
@@ -158,7 +158,7 @@ describe('DealDigestService', () => {
       const orgId = 'org123';
       const mockOrg = {
         id: orgId,
-        name: 'Test Org',
+        imageUrl: null,
         users: [{ email: null }, { email: null }],
       };
 
@@ -224,7 +224,7 @@ describe('DealDigestService', () => {
       const preferences = {
         companyName: 'Test Company',
         brandColor: '#FF0000',
-        logoUrl: 'https://example.com/logo.png',
+        organizationImageUrl: 'https://example.com/logo.png',
       };
 
       // Act
@@ -264,7 +264,7 @@ describe('DealDigestService', () => {
       const preferences = {
         companyName: 'Test Company',
         brandColor: '#FF0000',
-        logoUrl: null,
+        organizationImageUrl: null,
       };
 
       // Act
