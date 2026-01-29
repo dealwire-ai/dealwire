@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 
 export interface ScreeningPreferences {
   dealCriteria?: string;
-  logoUrl?: string;
+  organizationImageUrl?: string;
   companyName?: string;
   brandColor?: string;
   /** Folder name for passed/rejected deals (default: "Passed Deals") */
@@ -38,6 +38,13 @@ export class ScreeningPreferencesService {
     try {
       const prefs = await this.prisma.screeningPreferences.findUnique({
         where: { organizationId },
+        include: {
+          organization: {
+            select: {
+              imageUrl: true,
+            },
+          },
+        },
       });
 
       if (!prefs) {
@@ -47,7 +54,7 @@ export class ScreeningPreferencesService {
 
       return {
         dealCriteria: prefs.dealCriteria || undefined,
-        logoUrl: prefs.logoUrl || undefined,
+        organizationImageUrl: prefs.organization.imageUrl || undefined,
         companyName: prefs.companyName || undefined,
         brandColor: prefs.brandColor || undefined,
         passedFolderName: prefs.passedFolderName || undefined,

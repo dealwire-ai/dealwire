@@ -110,7 +110,9 @@ export class DealDigestService {
       // Get organization with users and Microsoft subscriptions
       const org = await this.prismaService.organization.findUnique({
         where: { id: organizationId },
-        include: {
+        select: {
+          id: true,
+          imageUrl: true,
           users: {
             select: {
               id: true,
@@ -192,7 +194,7 @@ export class DealDigestService {
       // Get organization preferences for email branding
       const preferences = await this.screeningPreferencesService.getPreferences(organizationId);
 
-      // Format email
+      // Format email (use organization imageUrl from preferences, which comes from the organization record)
       const emailHtml = this.formatDigestEmail(screenings, preferences);
 
       // Get user emails
@@ -312,15 +314,15 @@ export class DealDigestService {
     preferences: {
       companyName?: string | null;
       brandColor?: string | null;
-      logoUrl?: string | null;
+      organizationImageUrl?: string | null;
     } | null,
   ): string {
     const companyName = preferences?.companyName || 'Deal Analyzer';
     const brandColor = preferences?.brandColor || '#2A4A7C';
-    const logoUrl = preferences?.logoUrl;
+    const organizationImageUrl = preferences?.organizationImageUrl;
 
-    const logoImgTag = logoUrl
-      ? `<img src="${logoUrl}" alt="${companyName}" style="max-width: 180px; height: auto; display: block; margin: 0 auto;" />`
+    const logoImgTag = organizationImageUrl
+      ? `<img src="${organizationImageUrl}" alt="${companyName}" style="max-width: 180px; height: auto; display: block; margin: 0 auto;" />`
       : '';
 
     // Separate YES and NO deals

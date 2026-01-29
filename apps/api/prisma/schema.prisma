@@ -184,7 +184,6 @@ model ScreeningPreferences {
   brandColor      String? // Hex code
   passedFolderName String?
   dealCriteria    String?       @db.Text
-  logoUrl         String?
   alwaysSkip      String?       @db.Text // Criteria for deals to always skip
   digestSchedule  String? // CRON expression (e.g., "0 12 * * *" for daily at noon)
   digestTimeZone  String?  @default("America/New_York") // Timezone for schedule
