@@ -145,6 +145,7 @@ Any time make changes to the Prisma schema, generate a dev migration using cd ap
 | `RESEND_API_KEY` | Email sending (fallback) |
 | `API_BASE_URL` | Production URL (https://api.deals.frontstep.ai) |
 | `MICROSOFT_WEBHOOK_SECRET` | Graph webhook clientState validation |
+| `REQUIRE_AUTH` | Optional. Set to `true` to require Clerk JWT on protected routes even when not in production (default: auth required only when `NODE_ENV === 'production'`) |
 
 ---
 
@@ -159,6 +160,33 @@ Any time make changes to the Prisma schema, generate a dev migration using cd ap
 - OAuth provider for Microsoft login
 - Backend SDK used to fetch user's Microsoft access token
 - Webhooks for user lifecycle events
+
+---
+
+## API Authentication (Clerk JWT)
+
+Protected API routes (e.g. `/deals`, and future `/contacts`, `/assets`, `/screening-preferences`) use **Clerk JWT verification** so the Next.js frontend can call the API with the logged-in user's session.
+
+### How it works
+
+1. **Guard**: `ClerkAuthGuard` ([apps/api/src/guard/clerk-auth.guard.ts](apps/api/src/guard/clerk-auth.guard.ts)) runs on controllers that use `@UseGuards(ClerkAuthGuard)`.
+2. **Token**: The frontend sends `Authorization: Bearer <sessionToken>`. The session token comes from Clerk (e.g. `getToken()` from `@clerk/nextjs` in Server Components or API routes).
+3. **Verification**: The guard extracts the token, calls Clerk's `verifyToken()` from `@clerk/backend`, and looks up the user in our DB to get `organizationId`. It attaches `req.auth = { userId, organizationId }`.
+4. **Controllers**: Use the `@AuthUser()` decorator ([apps/api/src/decorator/auth-user.decorator.ts](apps/api/src/decorator/auth-user.decorator.ts)) to read `userId` or `organizationId` (e.g. `@AuthUser('organizationId') organizationId: string | null`). Scope list/single endpoints by this org when present so users only see their org's data.
+
+### When auth is required vs optional
+
+- **Local / development**: Auth is **not** required. When `NODE_ENV !== 'production'`, the guard allows requests without a token (no 401). If a token is sent, it is still verified and `req.auth` is set. This lets you hit the API from curl or the frontend without logging in when running locally.
+- **Production**: Auth **is** required. When `NODE_ENV === 'production'`, missing or invalid token returns 401.
+- **Override**: Set `REQUIRE_AUTH=true` to require auth even in development (e.g. to test the full flow locally).
+
+Config lives in [apps/api/src/config/clerk.config.ts](apps/api/src/config/clerk.config.ts) (`requireAuth`).
+
+### Applying the guard
+
+- Add `@UseGuards(ClerkAuthGuard)` to any controller that should be protected (e.g. DealController, and future Contact, Asset, ScreeningPreferences controllers).
+- Register `ClerkAuthGuard` in the same module's `providers` (it depends on `PrismaService`); AppModule already does this.
+- Do **not** put the guard on webhook controllers, health, or metrics (they use their own auth or none).
 
 ### OpenAI
 - Model: `gpt-4o-mini` (configurable)
