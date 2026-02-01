@@ -213,12 +213,13 @@ describe('EmailProcessorService', () => {
     expect(result.processed).toBe(true);
     expect(result.dealId).toBe('deal123');
 
-    // Verify InitialScreeningService.screen() was called with dealId, text, criteria, and sender email
+    // Verify InitialScreeningService.screen() was called with dealId, text, criteria, sender email, and sender name
     expect(initialScreeningService.screen).toHaveBeenCalledWith(
       'deal123',
       expect.stringContaining('extracted pdf text'),
       'Test criteria',
-      'broker@example.com', // sender email
+      'broker@example.com',
+      undefined, // event has no fromName in this test
     );
 
     // Verify Document was created with S3 key (attachments already in S3 from webhook)
@@ -231,6 +232,47 @@ describe('EmailProcessorService', () => {
         s3Key: s3Key,
       },
     });
+  });
+
+  it('should pass fromName to initial screening when present', async () => {
+    // Arrange
+    const emailEvent: NormalizedEmailEvent = {
+      source: 'microsoft',
+      messageId: 'msg123',
+      userId: 'user123',
+      from: 'broker@example.com',
+      fromName: 'John Smith',
+      to: ['user@example.com'],
+      subject: 'Deal Opportunity',
+      bodyText: 'Deal text',
+      attachments: [],
+      receivedAt: new Date(),
+    };
+    const ctx = {
+      event: emailEvent,
+      accessToken: 'token123',
+      inboxOwnerEmail: 'user@example.com',
+      receivedByUserId: 'user123',
+      organizationId: 'org123',
+      detection: {
+        isDeal: true,
+        confidence: 'high' as const,
+        reason: 'Deal',
+      },
+    };
+    (prismaService.deal.create as jest.Mock).mockResolvedValue({ id: 'deal123' });
+
+    // Act
+    await service.process(ctx);
+
+    // Assert
+    expect(initialScreeningService.screen).toHaveBeenCalledWith(
+      'deal123',
+      expect.any(String),
+      'Test criteria',
+      'broker@example.com',
+      'John Smith',
+    );
   });
 
   it('should handle S3 upload failure gracefully', async () => {

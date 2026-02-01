@@ -103,6 +103,18 @@ export class ResendWebhookService {
   }
 
   /**
+   * Parse From header: "Display Name <email@example.com>" -> { email, name }; else { email: value, name: undefined }
+   */
+  private parseFromHeader(value: string): { email: string; name?: string } {
+    const trimmed = value.trim();
+    const match = trimmed.match(/^(.+?)\s*<([^>]+)>$/);
+    if (match) {
+      return { email: match[2].trim().toLowerCase(), name: match[1].trim() || undefined };
+    }
+    return { email: trimmed || '', name: undefined };
+  }
+
+  /**
    * Convert Resend webhook payload to NormalizedEmailEvent format
    */
   private async toNormalizedEvent(emailData: any): Promise<NormalizedEmailEvent | null> {
@@ -129,10 +141,13 @@ export class ResendWebhookService {
         }
       }
 
+      const { email: fromEmail, name: fromName } = this.parseFromHeader(emailData.from || '');
+
       return {
         source: 'resend',
         messageId: emailId,
-        from: emailData.from || '',
+        from: fromEmail,
+        fromName: fromName || undefined,
         to: Array.isArray(emailData.to) ? emailData.to : [emailData.to || ''],
         subject: emailData.subject || '',
         bodyHtml: emailHtml,
