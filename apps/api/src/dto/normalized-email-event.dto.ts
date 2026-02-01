@@ -17,6 +17,8 @@ export interface NormalizedEmailEvent {
   /** User ID in our system (for Microsoft - identifies whose mailbox) */
   userId?: string;
   from: string;
+  /** Sender display name if available (e.g. from Graph or "Name <email>" header) */
+  fromName?: string;
   to: string[];
   subject: string;
   /** HTML body if available */

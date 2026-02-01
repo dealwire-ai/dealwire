@@ -767,6 +767,7 @@ export class MicrosoftGraphService {
       messageId: message.id,
       userId,
       from: message.from?.emailAddress?.address || '',
+      fromName: message.from?.emailAddress?.name || undefined,
       to: message.toRecipients?.map((r) => r.emailAddress.address) || [],
       subject: message.subject || '',
       bodyHtml: message.body?.contentType === 'html' ? message.body.content : undefined,
