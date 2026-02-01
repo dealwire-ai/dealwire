@@ -104,7 +104,8 @@ export class EmailProcessorService {
         dealId,
         combinedText,
         prefs.dealCriteria,
-        event.from, // Pass sender email for contact normalization
+        event.from,
+        event.fromName,
       );
 
       // Step 4.5: Associate asset with deal if one was found/created

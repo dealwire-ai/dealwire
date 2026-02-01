@@ -148,6 +148,8 @@ model Contact {
   id String @id @default(cuid())
 
   email String @unique // Normalized email (lowercase, trimmed) - used as unique key
+  firstName String?
+  lastName  String?
 
   deals     Deal[]
   createdAt DateTime @default(now())
