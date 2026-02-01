@@ -295,7 +295,7 @@ export class EmailProcessorService {
 
     if (event.source === 'microsoft' && accessToken) {
       // Send replies FIRST while message is still in inbox (message ID is still valid)
-      await this.microsoftGraphService.replyToSelf(
+      await this.microsoftGraphService.replyInThreadToSelf(
         accessToken,
         event.messageId,
         inboxOwnerEmail,
