@@ -54,7 +54,7 @@ describe('EmailProcessorService', () => {
           provide: MicrosoftGraphService,
           useValue: {
             getAttachmentContent: jest.fn(),
-            replyToSelf: jest.fn().mockResolvedValue(true),
+            replyInThreadToSelf: jest.fn().mockResolvedValue(true),
             getOrCreateFolder: jest.fn().mockResolvedValue('folder-id-123'),
             getMessage: jest.fn().mockResolvedValue({ conversationId: 'conv-123' }),
             moveMessage: jest.fn().mockResolvedValue(true),

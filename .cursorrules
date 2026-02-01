@@ -55,7 +55,7 @@ Analyzer is a monorepo that provides automated real estate deal analysis. When u
    - Returns yes/no decision with reasoning
    - Criteria are non-negotiable (e.g., "New York only" means NJ = automatic no)
 
-6. **Reply via Graph** (`MicrosoftGraphService.replyToSelf`)
+6. **Reply via Graph** (`MicrosoftGraphService.replyInThreadToSelf`)
    - Creates reply draft, sets recipient to user's own email
    - Sends reply in same conversation thread
    - Prevents infinite loops by skipping self-sent emails
