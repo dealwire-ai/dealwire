@@ -30,6 +30,7 @@ export class InitialScreeningService {
    * @param extractedText - Raw extracted text from email and attachments (may have formatting issues from OCR)
    * @param dealCriteria - The client's screening criteria
    * @param senderEmail - Email address of the sender (for contact normalization)
+   * @param senderName - Sender display name if available (for contact firstName/lastName)
    * @returns The screening result
    */
   async screen(
@@ -37,6 +38,7 @@ export class InitialScreeningService {
     extractedText: string,
     dealCriteria?: string,
     senderEmail?: string,
+    senderName?: string,
   ): Promise<InitialScreeningResult> {
     const start = Date.now();
     try {
@@ -127,11 +129,14 @@ export class InitialScreeningService {
         }
       }
 
-      // Find or create contact from sender email
+      // Find or create contact from sender email (and optional display name)
       let contactId: string | null = null;
       if (senderEmail) {
         try {
-          contactId = await this.contactNormalizationService.findOrCreateContact(senderEmail);
+          contactId = await this.contactNormalizationService.findOrCreateContact(
+            senderEmail,
+            senderName,
+          );
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : String(error);
           this.logger.warn(
