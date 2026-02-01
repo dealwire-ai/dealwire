@@ -5,6 +5,7 @@ import { EmailSenderService } from '../email/email-sender.service';
 import { MicrosoftGraphService } from '../microsoft/microsoft-graph.service';
 import {
   ScreeningPreferencesService,
+  ScreeningPreferences,
   DEFAULT_PASSED_FOLDER,
 } from '../preferences/screening-preferences.service';
 import { DealSummaryService } from '../deal/deal-summary.service';
@@ -16,6 +17,7 @@ import { MetricsService } from '../metrics/metrics.service';
 import { NotificationService } from '../notifications/notification.service';
 import { aiConfig } from '../../config/ai.config';
 import { NormalizedEmailEvent } from '../../dto/normalized-email-event.dto';
+import { InitialScreeningResult } from '../../model/initial-screening.model';
 
 export interface ProcessDealContext {
   event: NormalizedEmailEvent;
@@ -125,62 +127,16 @@ export class EmailProcessorService {
 
       // Step 5: Handle "no" decisions - skip summary and reply, just move folder (Microsoft only)
       if (decision.decision === 'no') {
-        if (event.source === 'microsoft' && accessToken && dealId) {
-          const folderName = prefs.passedFolderName || DEFAULT_PASSED_FOLDER;
-          const folderId = await this.microsoftGraphService.getOrCreateFolder(accessToken, folderName);
-          
-          if (folderId) {
-            // Get conversation ID BEFORE moving (message ID changes after move)
-            const originalMessage = await this.microsoftGraphService.getMessage(accessToken, event.messageId);
-            const conversationId = originalMessage?.conversationId;
-            
-            // Move original email immediately
-            await this.microsoftGraphService.moveMessage(accessToken, event.messageId, folderId);
-            this.logger.log(`Moved original email ${event.messageId} to ${folderName} (no summary/reply for "no" decision)`);
-            
-            // Move entire conversation (wait for Graph API to index)
-            await new Promise((resolve) => setTimeout(resolve, 8000));
-            
-            if (conversationId && folderId) {
-              await this.microsoftGraphService.moveConversation(accessToken, conversationId, folderId);
-            }
-            
-            // Update Deal record with folder name
-            await this.prismaService.deal.update({
-              where: { id: dealId },
-              data: { folderMovedTo: folderName },
-            });
-
-            // Record metrics
-            this.metricsService.recordFolderMove(folderName);
-          }
-        }
-
-        // Record metrics and return early (no summary, no reply)
-        const durationSeconds = (Date.now() - startTime) / 1000;
-        this.metricsService.recordDealProcessed(
-          decision.decision as 'yes' | 'no',
-          event.source,
+        return this.handleDealDecisionNo(
+          event,
+          accessToken,
+          dealId,
+          prefs,
+          decision,
+          startTime,
           organizationId,
           inboxOwnerEmail,
         );
-        this.metricsService.recordDealProcessingDuration(
-          durationSeconds,
-          decision.decision as 'yes' | 'no',
-          event.source,
-        );
-        this.metricsService.recordEmailEvent(true, decision.decision as 'yes' | 'no', false);
-
-        this.logger.log(
-          `Deal processed in ${durationSeconds.toFixed(2)}s: ${event.messageId} → ${decision.decision} (no summary/reply)`,
-        );
-
-        return {
-          processed: true,
-          dealId,
-          decision: decision.decision as 'yes' | 'no',
-          reason: decision.reason,
-        };
       }
 
       // Step 6: For "yes" decisions, generate summary
@@ -190,47 +146,14 @@ export class EmailProcessorService {
       );
 
       // Step 7: Send reply (must happen BEFORE moving message, as moving changes the message ID)
-      const htmlEmail = this.emailTemplateService.formatSummaryAsHtml(
+      await this.sendDealAnalysisReply(
+        event,
+        accessToken,
+        inboxOwnerEmail,
         summary,
         decision,
-        prefs.organizationImageUrl,
-        prefs.companyName,
-        prefs.brandColor,
+        prefs,
       );
-
-      if (event.source === 'microsoft' && accessToken) {
-        // Send replies FIRST while message is still in inbox (message ID is still valid)
-        await this.microsoftGraphService.replyToSelf(
-          accessToken,
-          event.messageId,
-          inboxOwnerEmail,
-          htmlEmail,
-        );
-
-        // Forward original email to admins (non-blocking)
-        // Admins are also CC'd on the reply, so they'll see both in the conversation thread
-        try {
-          await this.microsoftGraphService.forwardToAdmins(
-            accessToken,
-            event.messageId,
-          );
-        } catch (error) {
-          const msg = error instanceof Error ? error.message : String(error);
-          this.logger.warn(`Failed to forward email to admins: ${msg}`);
-          // Don't fail the deal processing if forward fails
-        }
-      } else if (event.source === 'resend') {
-        // Send reply via Resend API
-        const replySubject = event.subject ? `Re: ${event.subject}` : 'Deal Summary';
-        await this.emailSenderService.sendEmail({
-          to: [inboxOwnerEmail],
-          subject: replySubject,
-          html: htmlEmail,
-          text: summary,
-          replyToMessageId: event.messageId,
-        });
-        this.logger.log(`Reply sent via Resend for ${event.messageId} to ${inboxOwnerEmail}`);
-      }
 
       const durationSeconds = (Date.now() - startTime) / 1000;
       this.metricsService.recordDealProcessed(
@@ -273,6 +196,135 @@ export class EmailProcessorService {
       );
       
       throw error;
+    }
+  }
+
+  /**
+   * Handle "no" deal decision: move to passed folder (Microsoft only), record metrics, return early.
+   * No summary or reply is generated.
+   */
+  private async handleDealDecisionNo(
+    event: NormalizedEmailEvent,
+    accessToken: string | undefined,
+    dealId: string,
+    prefs: ScreeningPreferences,
+    decision: InitialScreeningResult,
+    startTime: number,
+    organizationId: string,
+    inboxOwnerEmail: string,
+  ): Promise<ProcessDealResult> {
+    if (event.source === 'microsoft' && accessToken && dealId) {
+      const folderName = prefs.passedFolderName || DEFAULT_PASSED_FOLDER;
+      const folderId = await this.microsoftGraphService.getOrCreateFolder(accessToken, folderName);
+
+      if (folderId) {
+        // Get conversation ID BEFORE moving (message ID changes after move)
+        const originalMessage = await this.microsoftGraphService.getMessage(accessToken, event.messageId);
+        const conversationId = originalMessage?.conversationId;
+
+        // Move original email immediately
+        await this.microsoftGraphService.moveMessage(accessToken, event.messageId, folderId);
+        this.logger.log(`Moved original email ${event.messageId} to ${folderName} (no summary/reply for "no" decision)`);
+
+        // Move entire conversation (wait for Graph API to index)
+        await new Promise((resolve) => setTimeout(resolve, 8000));
+
+        if (conversationId && folderId) {
+          await this.microsoftGraphService.moveConversation(accessToken, conversationId, folderId);
+        }
+
+        // Update Deal record with folder name
+        await this.prismaService.deal.update({
+          where: { id: dealId },
+          data: { folderMovedTo: folderName },
+        });
+
+        // Record metrics
+        this.metricsService.recordFolderMove(folderName);
+      }
+    }
+
+    // Record metrics and return (no summary, no reply)
+    const durationSeconds = (Date.now() - startTime) / 1000;
+    this.metricsService.recordDealProcessed(
+      decision.decision as 'yes' | 'no',
+      event.source,
+      organizationId,
+      inboxOwnerEmail,
+    );
+    this.metricsService.recordDealProcessingDuration(
+      durationSeconds,
+      decision.decision as 'yes' | 'no',
+      event.source,
+    );
+    this.metricsService.recordEmailEvent(true, decision.decision as 'yes' | 'no', false);
+
+    this.logger.log(
+      `Deal processed in ${durationSeconds.toFixed(2)}s: ${event.messageId} → ${decision.decision} (no summary/reply)`,
+    );
+
+    return {
+      processed: true,
+      dealId,
+      decision: decision.decision as 'yes' | 'no',
+      reason: decision.reason,
+    };
+  }
+
+  /**
+   * Send deal analysis reply (for "yes" decisions).
+   * Formats HTML email and sends via Microsoft Graph or Resend API.
+   * Must be called BEFORE moving message, as moving changes the message ID.
+   */
+  private async sendDealAnalysisReply(
+    event: NormalizedEmailEvent,
+    accessToken: string | undefined,
+    inboxOwnerEmail: string,
+    summary: string,
+    decision: InitialScreeningResult,
+    prefs: ScreeningPreferences,
+  ): Promise<void> {
+    // Format HTML email
+    const htmlEmail = this.emailTemplateService.formatSummaryAsHtml(
+      summary,
+      decision,
+      prefs.organizationImageUrl,
+      prefs.companyName,
+      prefs.brandColor,
+    );
+
+    if (event.source === 'microsoft' && accessToken) {
+      // Send replies FIRST while message is still in inbox (message ID is still valid)
+      await this.microsoftGraphService.replyToSelf(
+        accessToken,
+        event.messageId,
+        inboxOwnerEmail,
+        htmlEmail,
+      );
+
+      // Forward original email to admins (non-blocking)
+      // Admins are also CC'd on the reply, so they'll see both in the conversation thread
+      try {
+        await this.microsoftGraphService.forwardToAdmins(
+          accessToken,
+          event.messageId,
+        );
+      } catch (error) {
+        const msg = error instanceof Error ? error.message : String(error);
+        this.logger.warn(`Failed to forward email to admins: ${msg}`);
+        // Don't fail the deal processing if forward fails
+      }
+    } else if (event.source === 'resend') {
+      // Send reply via Resend API
+      const replySubject = event.subject ? `Re: ${event.subject}` : 'Deal Summary';
+      await this.emailSenderService.sendEmail({
+        to: [inboxOwnerEmail],
+        subject: replySubject,
+        html: htmlEmail,
+        text: summary,
+        replyToMessageId: event.messageId,
+      });
+      this.logger.log(`Reply sent via Resend for ${event.messageId} to ${inboxOwnerEmail}`);
     }
   }
 
