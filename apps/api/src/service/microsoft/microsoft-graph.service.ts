@@ -306,6 +306,7 @@ export class MicrosoftGraphService {
 
   /**
    * Send the original email content to admins as a reply in the conversation thread
+   * Uses reply() endpoint to preserve threading headers atomically (fixes threading issues)
    * This ensures everything appears in one thread for admins (original + our reply)
    */
   async forwardToAdmins(
@@ -340,62 +341,17 @@ export class MicrosoftGraphService {
         </div>
       `;
 
-      // Create a reply in the same conversation thread (not a forward)
-      // This ensures it appears in the same thread as our analysis reply
-      const createReplyResponse = await fetch(
-        `${GRAPH_BASE_URL}/me/messages/${messageId}/createReply`,
-        {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-          },
-        },
-      );
+      // Prepare attachments array (if any)
+      const attachments: Array<{
+        '@odata.type': string;
+        name: string;
+        contentType: string;
+        contentBytes: string;
+      }> = [];
 
-      if (!createReplyResponse.ok) {
-        const errorText = await createReplyResponse.text();
-        this.logger.error(`Failed to create reply draft for forward: ${createReplyResponse.status} - ${errorText}`);
-        return false;
-      }
-
-      const draft = await createReplyResponse.json();
-      const draftId = draft.id;
-      const draftSubject = draft.subject || '';
-
-      // Update the draft - change recipients to admins, set body with original content, and preserve subject
-      // Preserving the subject is critical for threading in older Outlook versions
-      const updateResponse = await fetch(
-        `${GRAPH_BASE_URL}/me/messages/${draftId}`,
-        {
-          method: 'PATCH',
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            subject: draftSubject, // Preserve subject from createReply (includes "Re: " prefix)
-            toRecipients: ADMIN_EMAILS.map((email) => ({
-              emailAddress: { address: email },
-            })),
-            body: {
-              contentType: 'html',
-              content: forwardBody,
-            },
-          }),
-        },
-      );
-
-      if (!updateResponse.ok) {
-        const errorText = await updateResponse.text();
-        this.logger.error(`Failed to update reply draft: ${updateResponse.status} - ${errorText}`);
-        return false;
-      }
-
-      // Add attachments from the original message to the forward
       if (originalMessage.hasAttachments) {
-        const attachments = await this.getAttachments(accessToken, messageId);
-        for (const attachment of attachments) {
+        const graphAttachments = await this.getAttachments(accessToken, messageId);
+        for (const attachment of graphAttachments) {
           try {
             // Download attachment content
             const attachmentContent = await this.getAttachmentContent(
@@ -409,55 +365,59 @@ export class MicrosoftGraphService {
               continue;
             }
 
-            // Add attachment to draft
-            const addAttachmentResponse = await fetch(
-              `${GRAPH_BASE_URL}/me/messages/${draftId}/attachments`,
-              {
-                method: 'POST',
-                headers: {
-                  Authorization: `Bearer ${accessToken}`,
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                  '@odata.type': '#microsoft.graph.fileAttachment',
-                  name: attachment.name,
-                  contentType: attachment.contentType,
-                  contentBytes: attachmentContent.toString('base64'),
-                }),
-              },
-            );
+            attachments.push({
+              '@odata.type': '#microsoft.graph.fileAttachment',
+              name: attachment.name,
+              contentType: attachment.contentType,
+              contentBytes: attachmentContent.toString('base64'),
+            });
 
-            if (!addAttachmentResponse.ok) {
-              const errorText = await addAttachmentResponse.text();
-              this.logger.warn(`Failed to add attachment ${attachment.name}: ${addAttachmentResponse.status} - ${errorText}`);
-            } else {
-              this.logger.log(`Added attachment ${attachment.name} to forward`);
-            }
+            this.logger.log(`Prepared attachment ${attachment.name} for forward`);
           } catch (error) {
             const msg = error instanceof Error ? error.message : String(error);
-            this.logger.warn(`Error adding attachment ${attachment.name}: ${msg}`);
+            this.logger.warn(`Error preparing attachment ${attachment.name}: ${msg}`);
           }
         }
       }
 
-      // Send the reply (which will be in the same conversation thread)
-      const sendResponse = await fetch(
-        `${GRAPH_BASE_URL}/me/messages/${draftId}/send`,
+      // Use reply() endpoint with custom recipients, body, and attachments
+      // This preserves In-Reply-To and References headers atomically, fixing threading issues
+      const replyBody: any = {
+        message: {
+          toRecipients: ADMIN_EMAILS.map((email) => ({
+            emailAddress: { address: email },
+          })),
+          body: {
+            contentType: 'html',
+            content: forwardBody,
+          },
+        },
+      };
+
+      // Add attachments if any
+      if (attachments.length > 0) {
+        replyBody.message.attachments = attachments;
+      }
+
+      const replyResponse = await fetch(
+        `${GRAPH_BASE_URL}/me/messages/${messageId}/reply`,
         {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
           },
+          body: JSON.stringify(replyBody),
         },
       );
 
-      if (!sendResponse.ok) {
-        const errorText = await sendResponse.text();
-        this.logger.error(`Failed to send forward: ${sendResponse.status} - ${errorText}`);
+      if (!replyResponse.ok) {
+        const errorText = await replyResponse.text();
+        this.logger.error(`Failed to send forward: ${replyResponse.status} - ${errorText}`);
         return false;
       }
 
-      this.logger.log(`Forward sent to admins via Graph for message ${messageId}`);
+      this.logger.log(`Forward sent to admins via Graph for message ${messageId} (threaded, ${attachments.length} attachments)`);
       return true;
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
