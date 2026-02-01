@@ -175,105 +175,51 @@ export class MicrosoftGraphService {
 
   /**
    * Send a reply-to-self in the same thread (for deal analysis)
-   * Creates a reply draft, changes recipient to self, CCs admins, then sends
+   * Uses reply() endpoint to preserve threading headers atomically (fixes threading issues)
    */
-  async replyToSelf(
+  async replyInThreadToSelf(
     accessToken: string,
     messageId: string,
     userEmail: string,
     htmlBody: string,
   ): Promise<boolean> {
     try {
-      // Step 1: Create a reply draft
-      const createResponse = await fetch(
-        `${GRAPH_BASE_URL}/me/messages/${messageId}/createReply`,
-        {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
+      // Use reply() endpoint with custom recipients and body
+      // This preserves In-Reply-To and References headers atomically, fixing threading issues
+      const replyBody = {
+        message: {
+          toRecipients: [
+            { emailAddress: { address: userEmail } },
+          ],
+          ccRecipients: ADMIN_EMAILS.map((email) => ({
+            emailAddress: { address: email },
+          })),
+          body: {
+            contentType: 'html',
+            content: htmlBody,
           },
-        },
-      );
-
-      if (!createResponse.ok) {
-        const errorText = await createResponse.text();
-        this.logger.error(`Failed to create reply draft: ${createResponse.status} - ${errorText}`);
-        return false;
-      }
-
-      const draft = await createResponse.json();
-      const draftId = draft.id;
-      const draftSubject = draft.subject || '';
-      const draftConversationId = draft.conversationId;
-
-      // Fetch original message to get internetMessageId for verification/logging
-      const originalMessage = await this.getMessage(accessToken, messageId);
-      const originalInternetMessageId = originalMessage?.internetMessageId;
-
-      // Step 2: Update the draft - change recipients to self, CC admins, set body, and preserve threading properties
-      // Preserving subject and conversationId is critical for threading in older Outlook versions
-      // Note: In-Reply-To and References headers are automatically set by createReply and should be preserved by PATCH
-      const updateBody: any = {
-        subject: draftSubject, // Preserve subject from createReply (includes "Re: " prefix)
-        toRecipients: [
-          { emailAddress: { address: userEmail } },
-        ],
-        ccRecipients: ADMIN_EMAILS.map((email) => ({
-          emailAddress: { address: email },
-        })),
-        body: {
-          contentType: 'html',
-          content: htmlBody,
         },
       };
 
-      // Preserve conversationId if available (helps with threading in older Outlook)
-      if (draftConversationId) {
-        updateBody.conversationId = draftConversationId;
-      }
-
-      const updateResponse = await fetch(
-        `${GRAPH_BASE_URL}/me/messages/${draftId}`,
-        {
-          method: 'PATCH',
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(updateBody),
-        },
-      );
-
-      if (!updateResponse.ok) {
-        const errorText = await updateResponse.text();
-        this.logger.error(`Failed to update reply draft: ${updateResponse.status} - ${errorText}`);
-        return false;
-      }
-
-      // Log threading properties for debugging threading issues
-      this.logger.debug(
-        `Reply draft updated with subject: "${draftSubject}", conversationId: ${draftConversationId || 'N/A'}, original Message-ID: ${originalInternetMessageId || 'N/A'}`,
-      );
-
-      // Step 3: Send the draft
-      const sendResponse = await fetch(
-        `${GRAPH_BASE_URL}/me/messages/${draftId}/send`,
+      const replyResponse = await fetch(
+        `${GRAPH_BASE_URL}/me/messages/${messageId}/reply`,
         {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
           },
+          body: JSON.stringify(replyBody),
         },
       );
 
-      if (!sendResponse.ok) {
-        const errorText = await sendResponse.text();
-        this.logger.error(`Failed to send reply: ${sendResponse.status} - ${errorText}`);
+      if (!replyResponse.ok) {
+        const errorText = await replyResponse.text();
+        this.logger.error(`Failed to send reply: ${replyResponse.status} - ${errorText}`);
         return false;
       }
 
-      this.logger.log(`Reply-to-self sent via Graph for message ${messageId} (CC'd admins)`);
+      this.logger.log(`Reply-to-self sent via Graph for message ${messageId} (CC'd admins, threaded)`);
       return true;
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
