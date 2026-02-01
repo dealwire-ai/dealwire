@@ -7,10 +7,13 @@ import {
   DefaultValuePipe,
   HttpException,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import { PrismaService } from '../service/prisma/prisma.service';
+import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
 
 @Controller('deals')
+@UseGuards(ClerkAuthGuard)
 export class DealController {
   constructor(private readonly prismaService: PrismaService) {}
 
@@ -142,6 +145,8 @@ export class DealController {
           },
         },
         asset: true,
+        contact: true,
+        initialScreening: true,
       },
     });
 
