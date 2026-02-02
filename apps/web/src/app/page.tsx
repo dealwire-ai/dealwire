@@ -2,8 +2,9 @@
 
 import React, { useRef } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion, useInView } from 'framer-motion';
-import { Building2, Brain, Workflow, Sparkles, Linkedin, Mail, TrendingUp, Clock, Users, DollarSign, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Building2, Workflow, Sparkles, Linkedin, Mail, TrendingUp, Clock, DollarSign, ArrowRight } from 'lucide-react';
 import { Button } from "../components/ui/button";
 
 const FadeInSection = ({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) => {
@@ -47,7 +48,7 @@ export default function Home() {
           </div>
           <Link href="/book">
             <Button className="bg-[#3ECFA0] hover:bg-[#35b88f] text-black font-medium px-6">
-               Let's Talk
+               Let&apos;s Talk
             </Button>
           </Link>
         </div>
@@ -309,16 +310,18 @@ export default function Home() {
               {
                 name: "Isaac Levine",
                 role: "Co-Founder",
-                bio: "Computer Science @ Northeastern. Previously co-founded frontstep.ai.",
+                bio: "Computer Science at Northeastern. Previously co-founded frontstep.ai. Software Engineer at CarGurus",
                 linkedin: "https://www.linkedin.com/in/isaac-levine/",
                 email: "isaac@frontstep.ai",
+                headshot: "/headshots/isaac.webp",
               },
               {
                 name: "Noah Weinstein",
                 role: "Co-Founder",
-                bio: "Computer Science @ Northeastern. Previously co-founded frontstep.ai.",
+                bio: "Computer Science at Northeastern. Previously co-founded frontstep.ai. Previous Software Engineer at Flexcar.",
                 linkedin: "https://www.linkedin.com/in/noahweinstein/",
                 email: "noah@frontstep.ai",
+                headshot: "/headshots/noah.webp",
               }
             ].map((founder, index) => (
               <FadeInSection key={index} delay={index * 0.15}>
@@ -326,8 +329,13 @@ export default function Home() {
                   <div className="absolute inset-0 bg-gradient-to-br from-[#3ECFA0]/10 to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   <div className="relative p-8 lg:p-10 bg-gradient-to-br from-white/[0.03] to-transparent border border-white/5 rounded-3xl">
                     <div className="flex items-start justify-between mb-6">
-                      <div className="w-16 h-16 bg-[#3ECFA0]/10 border border-[#3ECFA0]/20 rounded-2xl flex items-center justify-center text-2xl font-medium text-[#3ECFA0]">
-                        {founder.name.split(' ').map(n => n[0]).join('')}
+                      <div className="relative w-16 h-16 rounded-2xl overflow-hidden border border-[#3ECFA0]/20">
+                        <Image
+                          src={founder.headshot}
+                          alt={founder.name}
+                          fill
+                          className="object-cover"
+                        />
                       </div>
                       <div className="flex gap-2">
                         <a href={founder.linkedin} target="_blank" rel="noopener noreferrer" className="p-2 bg-white/5 rounded-lg hover:bg-white/10 transition-colors">
@@ -353,27 +361,44 @@ export default function Home() {
             <div className="grid md:grid-cols-2 gap-6">
               {[
                 {
-                  name: "Advisor 1",
+                  name: "David Shorenstein",
                   role: "Advisor",
-                  bio: "bio for advisor 1."
+                  headshot: "/headshots/david.png",
+                  linkedin: "https://www.linkedin.com/in/davidshorenstein/",
+                  bio: "Principal at Hildreth Real Estate Advisors. Previously co-founded Silvershore Properties and assembled a $300M+ NYC portfolio across 250+ properties. Former CIO at Forrest Shorenstein Capital Partners, and Senior Associate at Marcus & Millichap with $250M+ in sales."
                 },
                 {
-                  name: "Advisor 2",
+                  name: "Jordan Karlik",
                   role: "Advisor",
-                  bio: "bio for advisor 2."
+                  headshot: "/headshots/jordan.jpeg",
+                  linkedin: "https://www.linkedin.com/in/jordan-karlik-b546b83/",
+                  bio: "Principal at JK Equities. Began his real estate career at Deutsche Bank and Ernst & Young in CMBS. Currently oversees all aspects of JK Equities, which has owned, operated and developed property in more than 15 states valued at nearly $2 billion."
                 }
               ].map((advisor, index) => (
-                <div key={index} className="p-6 bg-white/[0.02] border border-white/5 rounded-2xl">
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="w-12 h-12 bg-[#3ECFA0]/10 border border-[#3ECFA0]/20 rounded-xl flex items-center justify-center text-lg font-medium text-[#3ECFA0]">
-                      {advisor.name.split(' ').map(n => n[0]).join('')}
+                <div key={index} className="relative group">
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#3ECFA0]/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="relative p-6 bg-white/[0.02] border border-white/5 rounded-2xl">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-4">
+                        <div className="relative w-12 h-12 rounded-xl overflow-hidden border border-[#3ECFA0]/20 shrink-0">
+                          <Image
+                            src={advisor.headshot}
+                            alt={advisor.name}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-medium">{advisor.name}</h3>
+                          <p className="text-[#3ECFA0] text-sm">{advisor.role}</p>
+                        </div>
+                      </div>
+                      <a href={advisor.linkedin} target="_blank" rel="noopener noreferrer" className="p-2 bg-white/5 rounded-lg hover:bg-white/10 transition-colors shrink-0">
+                        <Linkedin className="w-4 h-4 text-white/50" />
+                      </a>
                     </div>
-                    <div>
-                      <h3 className="text-lg font-medium">{advisor.name}</h3>
-                      <p className="text-[#3ECFA0] text-sm">{advisor.role}</p>
-                    </div>
+                    <p className="text-white/50 text-sm leading-relaxed">{advisor.bio}</p>
                   </div>
-                  <p className="text-white/50 text-sm leading-relaxed">{advisor.bio}</p>
                 </div>
               ))}
             </div>
