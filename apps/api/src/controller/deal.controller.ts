@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../service/prisma/prisma.service';
 import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
+import { AuthUser } from '../decorator/auth-user.decorator';
 
 @Controller('deals')
 @UseGuards(ClerkAuthGuard)
@@ -19,22 +20,26 @@ export class DealController {
 
   @Get()
   async getDeals(
+    @AuthUser('organizationId') organizationId: string | null,
+    @AuthUser('userId') userId: string | null,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number,
-    @Query('organizationId') organizationId?: string,
-    @Query('userId') userId?: string,
     @Query('decision') decision?: 'YES' | 'NO',
     @Query('search') search?: string,
   ) {
-    const skip = (page - 1) * limit;
-    const where: any = {};
+    console.log('[DealController] GET /deals - userId:', userId, 'organizationId:', organizationId);
+    
+    if (!organizationId) {
+      console.log('[DealController] ❌ Rejecting request - user not in organization');
+      throw new HttpException(
+        'User not in organization. Please ensure: 1) Your user exists in the database (synced via Clerk webhook), and 2) You are added to an organization in Clerk.',
+        HttpStatus.FORBIDDEN,
+      );
+    }
 
-    if (organizationId) {
-      where.organizationId = organizationId;
-    }
-    if (userId) {
-      where.receivedByUserId = userId;
-    }
+    const skip = (page - 1) * limit;
+    const where: any = { organizationId };
+
     if (decision) {
       where.initialScreeningDecision = decision;
     }
@@ -79,16 +84,16 @@ export class DealController {
 
   @Get('stats')
   async getStats(
-    @Query('organizationId') organizationId?: string,
-    @Query('userId') userId?: string,
+    @AuthUser('organizationId') organizationId: string | null,
   ) {
-    const where: any = {};
-    if (organizationId) {
-      where.organizationId = organizationId;
+    if (!organizationId) {
+      throw new HttpException(
+        'User not in organization',
+        HttpStatus.FORBIDDEN,
+      );
     }
-    if (userId) {
-      where.receivedByUserId = userId;
-    }
+
+    const where: any = { organizationId };
 
     const [total, yesCount, noCount, byConfidence, byFolder] = await Promise.all([
       this.prismaService.deal.count({ where }),
@@ -124,7 +129,17 @@ export class DealController {
   }
 
   @Get(':dealId')
-  async getDeal(@Param('dealId') dealId: string) {
+  async getDeal(
+    @AuthUser('organizationId') organizationId: string | null,
+    @Param('dealId') dealId: string,
+  ) {
+    if (!organizationId) {
+      throw new HttpException(
+        'User not in organization',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
     const deal = await this.prismaService.deal.findUnique({
       where: { id: dealId },
       include: {
@@ -151,6 +166,11 @@ export class DealController {
     });
 
     if (!deal) {
+      throw new HttpException('Deal not found', HttpStatus.NOT_FOUND);
+    }
+
+    // Verify deal belongs to user's organization
+    if (deal.organizationId !== organizationId) {
       throw new HttpException('Deal not found', HttpStatus.NOT_FOUND);
     }
 

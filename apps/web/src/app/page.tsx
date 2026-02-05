@@ -46,11 +46,18 @@ export default function Home() {
             <button onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-white transition-colors">How It Works</button>
             <button onClick={() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-white transition-colors">About</button>
           </div>
-          <Link href="/book">
-            <Button className="bg-[#3ECFA0] hover:bg-[#35b88f] text-black font-medium px-6">
-               Let&apos;s Talk
-            </Button>
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link href="/sign-in">
+              <Button className="bg-zinc-800 hover:bg-zinc-700 text-white font-medium px-6">
+                Sign In
+              </Button>
+            </Link>
+            <Link href="/book">
+              <Button className="bg-[#3ECFA0] hover:bg-[#35b88f] text-black font-medium px-6">
+                 Let&apos;s Talk
+              </Button>
+            </Link>
+          </div>
         </div>
       </nav>
 

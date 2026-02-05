@@ -1,13 +1,13 @@
 import {
   Controller,
   Get,
-  Query,
   HttpException,
   HttpStatus,
   UseGuards,
 } from '@nestjs/common';
 import { ScreeningPreferencesService } from '../service/preferences/screening-preferences.service';
 import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
+import { AuthUser } from '../decorator/auth-user.decorator';
 
 @Controller('screening-preferences')
 @UseGuards(ClerkAuthGuard)
@@ -17,11 +17,13 @@ export class ScreeningPreferencesController {
   ) {}
 
   @Get()
-  async getScreeningPreferences(@Query('organizationId') organizationId?: string) {
+  async getScreeningPreferences(
+    @AuthUser('organizationId') organizationId: string | null,
+  ) {
     if (!organizationId) {
       throw new HttpException(
-        'organizationId query parameter is required',
-        HttpStatus.BAD_REQUEST,
+        'User not in organization',
+        HttpStatus.FORBIDDEN,
       );
     }
 
