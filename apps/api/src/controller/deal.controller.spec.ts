@@ -49,7 +49,7 @@ describe('DealController', () => {
       prisma.deal.findUnique.mockResolvedValue(deal);
 
       // Act
-      const result = await controller.getDeal('d1');
+      const result = await controller.getDeal('org-1', 'd1');
 
       // Assert
       expect(prisma.deal.findUnique).toHaveBeenCalledWith(
@@ -69,7 +69,19 @@ describe('DealController', () => {
       prisma.deal.findUnique.mockResolvedValue(null);
 
       // Act / Assert
-      await expect(controller.getDeal('nonexistent')).rejects.toMatchObject({
+      await expect(controller.getDeal('org-1', 'nonexistent')).rejects.toMatchObject({
+        status: HttpStatus.NOT_FOUND,
+        message: 'Deal not found',
+      });
+    });
+
+    it('should throw NOT_FOUND when deal belongs to different org', async () => {
+      // Arrange
+      const deal = { id: 'd1', organizationId: 'org-other' };
+      prisma.deal.findUnique.mockResolvedValue(deal);
+
+      // Act / Assert
+      await expect(controller.getDeal('org-1', 'd1')).rejects.toMatchObject({
         status: HttpStatus.NOT_FOUND,
         message: 'Deal not found',
       });
@@ -83,12 +95,24 @@ describe('DealController', () => {
       prisma.deal.count.mockResolvedValue(1);
 
       // Act
-      const result = await controller.getDeals(1, 20);
+      const result = await controller.getDeals('org-1', 'user-1', 1, 20);
 
       // Assert
+      expect(prisma.deal.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { organizationId: 'org-1' },
+        }),
+      );
       expect(result.data).toHaveLength(1);
       expect(result.pagination.total).toBe(1);
       expect(result.pagination.totalPages).toBe(1);
+    });
+
+    it('should throw FORBIDDEN when user not in organization', async () => {
+      // Act / Assert
+      await expect(controller.getDeals(null, 'user-1', 1, 20)).rejects.toMatchObject({
+        status: HttpStatus.FORBIDDEN,
+      });
     });
   });
 });
