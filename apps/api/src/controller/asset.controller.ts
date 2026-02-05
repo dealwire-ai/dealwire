@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../service/prisma/prisma.service';
 import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
+import { AuthUser } from '../decorator/auth-user.decorator';
 
 @Controller('assets')
 @UseGuards(ClerkAuthGuard)
@@ -19,17 +20,23 @@ export class AssetController {
 
   @Get()
   async getAssets(
+    @AuthUser('organizationId') organizationId: string | null,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number,
-    @Query('organizationId') organizationId?: string,
     @Query('search') search?: string,
   ) {
-    const skip = (page - 1) * limit;
-    const where: Record<string, unknown> = {};
-
-    if (organizationId) {
-      where.deals = { some: { organizationId } };
+    if (!organizationId) {
+      throw new HttpException(
+        'User not in organization',
+        HttpStatus.FORBIDDEN,
+      );
     }
+
+    const skip = (page - 1) * limit;
+    const where: Record<string, unknown> = {
+      deals: { some: { organizationId } },
+    };
+
     if (search) {
       where.OR = [
         { address: { contains: search, mode: 'insensitive' } },
@@ -61,15 +68,39 @@ export class AssetController {
   }
 
   @Get(':assetId')
-  async getAsset(@Param('assetId') assetId: string) {
+  async getAsset(
+    @AuthUser('organizationId') organizationId: string | null,
+    @Param('assetId') assetId: string,
+  ) {
+    if (!organizationId) {
+      throw new HttpException(
+        'User not in organization',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
     const asset = await this.prismaService.asset.findUnique({
       where: { id: assetId },
+      include: {
+        deals: {
+          where: { organizationId },
+          select: { id: true },
+        },
+      },
     });
 
     if (!asset) {
       throw new HttpException('Asset not found', HttpStatus.NOT_FOUND);
     }
 
-    return asset;
+    // Verify asset has at least one deal belonging to user's organization
+    if (asset.deals.length === 0) {
+      throw new HttpException('Asset not found', HttpStatus.NOT_FOUND);
+    }
+
+    // Remove deals array from response (was only used for verification)
+    const { deals, ...assetData } = asset;
+
+    return assetData;
   }
 }
