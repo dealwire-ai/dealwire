@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../service/prisma/prisma.service';
 import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
+import { AuthUser } from '../decorator/auth-user.decorator';
 
 @Controller('contacts')
 @UseGuards(ClerkAuthGuard)
@@ -19,17 +20,23 @@ export class ContactController {
 
   @Get()
   async getContacts(
+    @AuthUser('organizationId') organizationId: string | null,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number,
-    @Query('organizationId') organizationId?: string,
     @Query('search') search?: string,
   ) {
-    const skip = (page - 1) * limit;
-    const where: Record<string, unknown> = {};
-
-    if (organizationId) {
-      where.deals = { some: { organizationId } };
+    if (!organizationId) {
+      throw new HttpException(
+        'User not in organization',
+        HttpStatus.FORBIDDEN,
+      );
     }
+
+    const skip = (page - 1) * limit;
+    const where: Record<string, unknown> = {
+      deals: { some: { organizationId } },
+    };
+
     if (search) {
       where.OR = [
         { email: { contains: search, mode: 'insensitive' } },
@@ -60,15 +67,39 @@ export class ContactController {
   }
 
   @Get(':contactId')
-  async getContact(@Param('contactId') contactId: string) {
+  async getContact(
+    @AuthUser('organizationId') organizationId: string | null,
+    @Param('contactId') contactId: string,
+  ) {
+    if (!organizationId) {
+      throw new HttpException(
+        'User not in organization',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
     const contact = await this.prismaService.contact.findUnique({
       where: { id: contactId },
+      include: {
+        deals: {
+          where: { organizationId },
+          select: { id: true },
+        },
+      },
     });
 
     if (!contact) {
       throw new HttpException('Contact not found', HttpStatus.NOT_FOUND);
     }
 
-    return contact;
+    // Verify contact has at least one deal belonging to user's organization
+    if (contact.deals.length === 0) {
+      throw new HttpException('Contact not found', HttpStatus.NOT_FOUND);
+    }
+
+    // Remove deals array from response (was only used for verification)
+    const { deals, ...contactData } = contact;
+
+    return contactData;
   }
 }
