@@ -36,6 +36,7 @@ export class ClerkAuthGuard implements CanActivate {
     const token = bearer || undefined;
 
     if (!token) {
+      console.log('[ClerkAuthGuard] No token provided');
       if (config.requireAuth) {
         throw new UnauthorizedException('Missing or invalid authorization');
       }
@@ -46,8 +47,15 @@ export class ClerkAuthGuard implements CanActivate {
       const result = await verifyToken(token, {
         secretKey: config.clerkSecretKey,
       });
-      const clerkUserId = (result.data as { sub?: string })?.sub;
+      
+      console.log('[ClerkAuthGuard] Token verification result:', JSON.stringify(result, null, 2));
+      
+      const clerkUserId = result.sub || (result.data as any)?.sub;
+      
+      console.log('[ClerkAuthGuard] Extracted user ID:', clerkUserId);
+      
       if (!clerkUserId) {
+        console.log('[ClerkAuthGuard] No user ID in token. Full result:', result);
         if (config.requireAuth) {
           throw new UnauthorizedException('Invalid token');
         }
@@ -56,15 +64,29 @@ export class ClerkAuthGuard implements CanActivate {
 
       const user = await this.prisma.user.findUnique({
         where: { id: clerkUserId },
-        select: { id: true, organizationId: true },
+        select: { id: true, organizationId: true, email: true },
       });
+
+      console.log('[ClerkAuthGuard] User lookup result:', {
+        found: !!user,
+        userId: user?.id,
+        organizationId: user?.organizationId,
+        email: user?.email,
+      });
+
+      if (!user) {
+        console.log('[ClerkAuthGuard] ⚠️ User not found in database. User needs to be synced via Clerk webhook.');
+      } else if (!user.organizationId) {
+        console.log('[ClerkAuthGuard] ⚠️ User found but has no organizationId. User needs to be added to an organization in Clerk.');
+      }
 
       request.auth = {
         userId: clerkUserId,
         organizationId: user?.organizationId ?? null,
       };
       return true;
-    } catch {
+    } catch (error) {
+      console.log('[ClerkAuthGuard] Token verification failed:', error instanceof Error ? error.message : error);
       if (config.requireAuth) {
         throw new UnauthorizedException('Invalid or expired token');
       }

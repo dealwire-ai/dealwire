@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Optional } from '@nestjs/common';
 import { SqsService } from '@ssut/nestjs-sqs';
 import { NormalizedEmailEvent } from '../../dto/normalized-email-event.dto';
 import { MetricsService } from '../metrics/metrics.service';
@@ -19,14 +19,23 @@ export class SQSService {
   private readonly logger = new Logger(SQSService.name);
 
   constructor(
-    private readonly sqsService: SqsService,
+    @Optional() private readonly sqsService: SqsService,
     private readonly metricsService: MetricsService,
-  ) {}
+  ) {
+    if (!sqsService) {
+      this.logger.warn('SQS is disabled - enqueue operations will fail');
+    }
+  }
 
   /**
    * Enqueue a normalized email event to the queue
    */
   async enqueueNormalizedEmail(messageBody: QueuedEmailMessage): Promise<void> {
+    if (!this.sqsService) {
+      this.logger.warn('SQS is disabled - skipping enqueue');
+      return;
+    }
+
     try {
       this.logger.log(
         `Enqueueing normalized email: ${messageBody.event?.messageId} from ${messageBody.event?.from} to ${messageBody.inboxOwnerEmail} - "${messageBody.event?.subject}"`,

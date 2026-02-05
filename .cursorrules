@@ -145,7 +145,17 @@ Any time make changes to the Prisma schema, generate a dev migration using cd ap
 | `RESEND_API_KEY` | Email sending (fallback) |
 | `API_BASE_URL` | Production URL (https://api.deals.frontstep.ai) |
 | `MICROSOFT_WEBHOOK_SECRET` | Graph webhook clientState validation |
+| `FRONTEND_URL` | Frontend origin for CORS (http://localhost:3000 or production URL) |
 | `REQUIRE_AUTH` | Optional. Set to `true` to require Clerk JWT on protected routes even when not in production (default: auth required only when `NODE_ENV === 'production'`) |
+| `ENABLE_SQS` | Optional. Set to `true` to enable SQS consumer in development (default: only enabled in production) |
+
+### Required for Frontend
+
+| Variable | Purpose |
+|----------|---------|
+| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | Clerk public key for frontend |
+| `NEXT_PUBLIC_API_URL` | Backend API URL (http://localhost:3001 or production URL) |
+| `CLERK_SECRET_KEY` | Clerk secret key for server-side operations |
 
 ---
 
@@ -188,6 +198,116 @@ Config lives in [apps/api/src/config/clerk.config.ts](apps/api/src/config/clerk.
 - Register `ClerkAuthGuard` in the same module's `providers` (it depends on `PrismaService`); AppModule already does this.
 - Do **not** put the guard on webhook controllers, health, or metrics (they use their own auth or none).
 
+### Building Protected API Endpoints
+
+When creating new protected endpoints that should be organization-scoped:
+
+**Backend Pattern:**
+```typescript
+import { Controller, Get, UseGuards } from '@nestjs/common';
+import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
+import { AuthUser } from '../decorator/auth-user.decorator';
+
+@Controller('your-resource')
+@UseGuards(ClerkAuthGuard)
+export class YourController {
+  @Get()
+  async list(@AuthUser('organizationId') organizationId: string | null) {
+    // IMPORTANT: Always check organizationId and throw 403 if null
+    if (!organizationId) {
+      throw new HttpException('User not in organization', HttpStatus.FORBIDDEN);
+    }
+    
+    // Query scoped to user's organization
+    return this.service.findMany({ organizationId });
+  }
+  
+  @Get(':id')
+  async getOne(
+    @AuthUser('organizationId') organizationId: string | null,
+    @Param('id') id: string,
+  ) {
+    if (!organizationId) {
+      throw new HttpException('User not in organization', HttpStatus.FORBIDDEN);
+    }
+    
+    const resource = await this.service.findOne(id);
+    
+    // CRITICAL: Verify resource belongs to user's org
+    if (resource.organizationId !== organizationId) {
+      throw new HttpException('Resource not found', HttpStatus.NOT_FOUND);
+    }
+    
+    return resource;
+  }
+}
+```
+
+**Key Security Rules:**
+1. **NEVER** accept `organizationId` as a query parameter or body param - always get it from `@AuthUser('organizationId')`
+2. **ALWAYS** check if `organizationId` is null and return 403 if user not in an org
+3. **ALWAYS** scope queries to `{ organizationId }` to prevent cross-org data leaks
+4. **ALWAYS** verify individual resource access by checking `resource.organizationId === organizationId`
+5. For relations (contacts, assets), filter by `deals: { some: { organizationId } }` to only show resources tied to org's deals
+
+### Frontend API Clients
+
+**For Server Components:**
+```typescript
+import { apiClient } from '@/lib/api';
+
+export default async function MyPage() {
+  const data = await apiClient('/your-resource');
+  // apiClient automatically includes Clerk JWT token
+  return <div>...</div>;
+}
+```
+
+**For Client Components:**
+```typescript
+'use client';
+import { useApi } from '@/hooks/use-api';
+
+export default function MyComponent() {
+  const { apiCall } = useApi();
+  
+  useEffect(() => {
+    apiCall('/your-resource').then(setData);
+  }, []);
+  
+  return <div>...</div>;
+}
+```
+
+**Both clients:**
+- Automatically include `Authorization: Bearer <jwt>` header
+- Handle token refresh via Clerk
+- Throw errors on non-200 responses
+- Use `NEXT_PUBLIC_API_URL` env var (defaults to `http://localhost:3001`)
+
+### CORS Configuration
+
+CORS is configured in `apps/api/src/main.ts`:
+```typescript
+app.enableCors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  credentials: true,
+});
+```
+
+Required env var in `apps/api/.env`:
+```bash
+FRONTEND_URL=http://localhost:3000  # or https://yourapp.vercel.app in prod
+```
+
+### SQS Optional Loading
+
+SQS consumer is disabled by default in development to prevent crashes without AWS credentials. It only runs when:
+- `ENABLE_SQS=true` env var is set, OR
+- `NODE_ENV=production`
+
+This allows the API to start successfully locally without configuring AWS.
+
 ### OpenAI
 - Model: `gpt-4o-mini` (configurable)
 - Temperature: 0 (deterministic)
@@ -222,6 +342,9 @@ Config lives in [apps/api/src/config/clerk.config.ts](apps/api/src/config/clerk.
 3. **Subscription not working?**: Verify `API_BASE_URL` is HTTPS
 4. **Replies not threaded?**: Must use Graph API's `createReply` endpoint
 5. **Migrations**: Run manually or deploy triggers `prisma migrate deploy`
+6. **API won't start?**: SQS is disabled by default in dev. No AWS credentials needed locally.
+7. **Testing auth locally**: Use curl without token (allowed in dev), or set `REQUIRE_AUTH=true` to test full flow
+8. **CORS issues?**: Verify `FRONTEND_URL` in API .env matches your frontend origin
 
 ---
 

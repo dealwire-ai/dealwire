@@ -45,11 +45,11 @@ describe('ScreeningPreferencesController', () => {
       expect(result).toEqual(prefs);
     });
 
-    it('should throw BAD_REQUEST when organizationId is missing', async () => {
+    it('should throw FORBIDDEN when organizationId is missing', async () => {
       // Act / Assert
-      await expect(controller.getScreeningPreferences(undefined)).rejects.toMatchObject({
-        status: HttpStatus.BAD_REQUEST,
-        message: 'organizationId query parameter is required',
+      await expect(controller.getScreeningPreferences(null)).rejects.toMatchObject({
+        status: HttpStatus.FORBIDDEN,
+        message: 'User not in organization',
       });
       expect(screeningPreferencesService.getPreferences).not.toHaveBeenCalled();
     });
