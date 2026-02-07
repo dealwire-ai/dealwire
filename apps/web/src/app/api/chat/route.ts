@@ -65,33 +65,44 @@ Respond very briefly and directly - do not restate the question or use markdown 
           }),
           execute: async ({ limit = 10 }) => {
             try {
-              // Fetch deals with contact info, limit to reasonable amount for aggregation
-              const response = await apiClient(`/deals?page=1&limit=500`);
-              const deals = response.data || [];
+              // Fetch deals to count by contactId
+              const dealsResponse = await apiClient(`/deals?page=1&limit=500`);
+              const deals = dealsResponse.data || [];
               
-              // Count deals per contact
-              const contactCounts: Record<string, { contact: any; count: number }> = {};
+              // Count deals per contactId
+              const contactCounts: Record<string, number> = {};
               
               for (const deal of deals) {
-                if (deal.contactId && deal.contact) {
-                  const contactId = deal.contactId;
-                  if (!contactCounts[contactId]) {
-                    contactCounts[contactId] = {
-                      contact: deal.contact,
-                      count: 0,
-                    };
-                  }
-                  contactCounts[contactId].count++;
+                if (deal.contactId) {
+                  contactCounts[deal.contactId] = (contactCounts[deal.contactId] || 0) + 1;
                 }
               }
               
-              // Sort by count and return top N
-              const topContacts = Object.values(contactCounts)
-                .sort((a, b) => b.count - a.count)
+              // Get unique contact IDs and fetch contact details
+              const contactIds = Object.keys(contactCounts);
+              if (contactIds.length === 0) {
+                return { topContacts: [], totalAnalyzed: deals.length };
+              }
+              
+              // Fetch all contacts to get details
+              const contactsResponse = await apiClient(`/contacts?page=1&limit=200`);
+              const allContacts = contactsResponse.data || [];
+              
+              // Create a map of contactId -> contact
+              const contactMap = new Map(allContacts.map((c: any) => [c.id, c]));
+              
+              // Build result with contact details
+              const topContacts = contactIds
+                .map((contactId) => ({
+                  contactId,
+                  contact: contactMap.get(contactId) || { id: contactId, email: 'Unknown' },
+                  dealCount: contactCounts[contactId],
+                }))
+                .sort((a, b) => b.dealCount - a.dealCount)
                 .slice(0, limit)
-                .map(({ contact, count }) => ({
+                .map(({ contact, dealCount }) => ({
                   contact,
-                  dealCount: count,
+                  dealCount,
                 }));
               
               return { topContacts, totalAnalyzed: deals.length };
