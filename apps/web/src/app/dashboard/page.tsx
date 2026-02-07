@@ -8,6 +8,7 @@ import { DealsTable } from "@/components/deals-table";
 import { ContactsTable } from "@/components/contacts-table";
 import { AssetsTable } from "@/components/assets-table";
 import { useApi } from "@/hooks/use-api";
+import { Chatbot } from "@/components/chat/chatbot";
 
 interface Deal {
   id: string;
@@ -294,6 +295,8 @@ export default function DashboardPage() {
             </TabsContent>
           </Tabs>
         </div>
+
+        <Chatbot />
       </div>
     </div>
   );
