@@ -1,5 +1,6 @@
 "use client";
 
+import { Fragment } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import {
   Table,
@@ -53,9 +54,8 @@ export function ContactsTable({
         {contacts.map((contact) => {
           const isExpanded = expandedRows.has(contact.id);
           return (
-            <>
+            <Fragment key={contact.id}>
               <TableRow
-                key={contact.id}
                 className="cursor-pointer hover:bg-zinc-900/70"
                 onClick={() => onToggleRow(contact.id)}
               >
@@ -131,7 +131,7 @@ export function ContactsTable({
                   </TableCell>
                 </TableRow>
               )}
-            </>
+            </Fragment>
           );
         })}
       </TableBody>

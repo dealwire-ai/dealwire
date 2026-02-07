@@ -1,5 +1,6 @@
 "use client";
 
+import { Fragment } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import {
   Table,
@@ -56,9 +57,8 @@ export function AssetsTable({
         {assets.map((asset) => {
           const isExpanded = expandedRows.has(asset.id);
           return (
-            <>
+            <Fragment key={asset.id}>
               <TableRow
-                key={asset.id}
                 className="cursor-pointer hover:bg-zinc-900/70"
                 onClick={() => onToggleRow(asset.id)}
               >
@@ -155,7 +155,7 @@ export function AssetsTable({
                   </TableCell>
                 </TableRow>
               )}
-            </>
+            </Fragment>
           );
         })}
       </TableBody>

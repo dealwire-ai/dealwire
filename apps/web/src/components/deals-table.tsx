@@ -1,5 +1,6 @@
 "use client";
 
+import { Fragment } from "react";
 import { ChevronDown, ChevronUp, ArrowRight } from "lucide-react";
 import {
   Table,
@@ -116,9 +117,8 @@ export function DealsTable({
           const contact = getContact(deal.contactId);
 
           return (
-            <>
+            <Fragment key={deal.id}>
               <TableRow
-                key={deal.id}
                 className="cursor-pointer hover:bg-zinc-900/70"
                 onClick={() => onToggleRow(deal.id)}
               >
@@ -275,7 +275,7 @@ export function DealsTable({
                   </TableCell>
                 </TableRow>
               )}
-            </>
+            </Fragment>
           );
         })}
       </TableBody>
