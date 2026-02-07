@@ -32,7 +32,7 @@ Available data:
 - Contacts: Brokers and contacts who have sent deals, with email and name information
 - Assets/Properties: Real estate properties with addresses, cities, states, and countries
 
-When users ask questions, use the available functions to query the data. Be concise, helpful, and format responses clearly. If a user asks about deals, contacts, or properties, use the appropriate function to fetch the data first.`,
+When users ask questions, use the available functions to query the data. Respond very briefly and directly - do not restate the question or use markdown formatting. Just provide the answer in plain text.`,
       messages,
       tools: {
         get_deals: {
