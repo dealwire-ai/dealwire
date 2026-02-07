@@ -1,24 +1,182 @@
-import { auth } from '@clerk/nextjs/server';
-import { redirect } from 'next/navigation';
-import { apiClient } from '@/lib/api';
+"use client";
 
-export default async function DashboardPage() {
-  const { userId } = await auth();
-  
-  // Redirect to sign-in if not authenticated
-  if (!userId) {
-    redirect('/sign-in');
-  }
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { DealsTable } from "@/components/deals-table";
+import { ContactsTable } from "@/components/contacts-table";
+import { AssetsTable } from "@/components/assets-table";
+import { useApi } from "@/hooks/use-api";
 
-  // Fetch deals from API
-  let deals = [];
-  let error = null;
-  
-  try {
-    const response = await apiClient('/deals');
-    deals = response.data || [];
-  } catch (e) {
-    error = e instanceof Error ? e.message : 'Failed to load deals';
+interface Deal {
+  id: string;
+  sourceSubject: string | null;
+  sourceFrom: string | null;
+  sourceReceivedAt: string | null;
+  initialScreeningDecision: "YES" | "NO" | null;
+  initialScreeningSummary: string | null;
+  detectionConfidence: string | null;
+  detectionReason: string | null;
+  folderMovedTo: string | null;
+  sourceMessageId?: string | null;
+  assetId?: string | null;
+  contactId?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  receivedByUser?: {
+    id: string;
+    email: string;
+    firstName: string | null;
+    lastName: string | null;
+  } | null;
+  organization?: {
+    id: string;
+    name: string;
+  } | null;
+  documents?: Array<{
+    id: string;
+    filename: string;
+    contentType: string;
+    sizeBytes: number;
+  }>;
+}
+
+interface Contact {
+  id: string;
+  email: string;
+  firstName: string | null;
+  lastName: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface Asset {
+  id: string;
+  address: string | null;
+  city: string | null;
+  state: string | null;
+  country: string | null;
+  normalizedAddress: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export default function DashboardPage() {
+  const { userId, isLoaded } = useAuth();
+  const router = useRouter();
+  const { apiCall } = useApi();
+
+  const [deals, setDeals] = useState<Deal[]>([]);
+  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [assets, setAssets] = useState<Asset[]>([]);
+  const [loading, setLoading] = useState({
+    deals: true,
+    contacts: true,
+    assets: true,
+  });
+  const [errors, setErrors] = useState({
+    deals: null as string | null,
+    contacts: null as string | null,
+    assets: null as string | null,
+  });
+
+  // Tab and expansion state management
+  const [activeTab, setActiveTab] = useState("deals");
+  const [expandedDeals, setExpandedDeals] = useState<Set<string>>(new Set());
+  const [expandedContacts, setExpandedContacts] = useState<Set<string>>(
+    new Set()
+  );
+  const [expandedAssets, setExpandedAssets] = useState<Set<string>>(new Set());
+
+  // Function to navigate to a tab and expand a specific row
+  const navigateToTabAndExpand = (
+    tab: "deals" | "contacts" | "properties",
+    id: string
+  ) => {
+    setActiveTab(tab);
+    if (tab === "deals") {
+      setExpandedDeals(new Set([id]));
+    } else if (tab === "contacts") {
+      setExpandedContacts(new Set([id]));
+    } else if (tab === "properties") {
+      setExpandedAssets(new Set([id]));
+    }
+  };
+
+  useEffect(() => {
+    if (isLoaded && !userId) {
+      router.push("/sign-in");
+      return;
+    }
+
+    if (!isLoaded || !userId) {
+      return;
+    }
+
+    // Fetch all data on mount
+    const fetchDeals = async () => {
+      try {
+        setLoading((prev) => ({ ...prev, deals: true }));
+        setErrors((prev) => ({ ...prev, deals: null }));
+        const response = await apiCall("/deals?page=1&limit=100");
+        setDeals(response.data || []);
+      } catch (e) {
+        setErrors((prev) => ({
+          ...prev,
+          deals: e instanceof Error ? e.message : "Failed to load deals",
+        }));
+      } finally {
+        setLoading((prev) => ({ ...prev, deals: false }));
+      }
+    };
+
+    const fetchContacts = async () => {
+      try {
+        setLoading((prev) => ({ ...prev, contacts: true }));
+        setErrors((prev) => ({ ...prev, contacts: null }));
+        const response = await apiCall("/contacts?page=1&limit=100");
+        setContacts(response.data || []);
+      } catch (e) {
+        setErrors((prev) => ({
+          ...prev,
+          contacts: e instanceof Error ? e.message : "Failed to load contacts",
+        }));
+      } finally {
+        setLoading((prev) => ({ ...prev, contacts: false }));
+      }
+    };
+
+    const fetchAssets = async () => {
+      try {
+        setLoading((prev) => ({ ...prev, assets: true }));
+        setErrors((prev) => ({ ...prev, assets: null }));
+        const response = await apiCall("/assets?page=1&limit=100");
+        setAssets(response.data || []);
+      } catch (e) {
+        setErrors((prev) => ({
+          ...prev,
+          assets: e instanceof Error ? e.message : "Failed to load properties",
+        }));
+      } finally {
+        setLoading((prev) => ({ ...prev, assets: false }));
+      }
+    };
+
+    fetchDeals();
+    fetchContacts();
+    fetchAssets();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoaded, userId]);
+
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen bg-black text-white p-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center py-12 text-zinc-400">Loading...</div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -35,71 +193,102 @@ export default async function DashboardPage() {
         </div>
 
         <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6">
-          <h2 className="text-xl font-semibold mb-4">Deals</h2>
-          
-          {error && (
-            <div className="p-4 bg-red-900/20 border border-red-900/50 rounded-lg text-red-400 mb-4">
-              {error}
-            </div>
-          )}
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList>
+              <TabsTrigger value="deals">Deals</TabsTrigger>
+              <TabsTrigger value="contacts">Contacts</TabsTrigger>
+              <TabsTrigger value="properties">Properties</TabsTrigger>
+            </TabsList>
 
-          {!error && deals.length === 0 && (
-            <p className="text-zinc-400">No deals found yet.</p>
-          )}
-
-          {!error && deals.length > 0 && (
-            <div className="space-y-4">
-              {deals.map((deal: any) => (
-                <div
-                  key={deal.id}
-                  className="p-4 bg-zinc-800 rounded-lg hover:bg-zinc-750 transition-colors"
-                >
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-semibold">{deal.sourceSubject || 'No Subject'}</h3>
-                    {deal.initialScreeningDecision && (
-                      <span
-                        className={`px-2 py-1 rounded text-xs ${
-                          deal.initialScreeningDecision === 'YES'
-                            ? 'bg-green-900/30 text-green-400 border border-green-900/50'
-                            : 'bg-red-900/30 text-red-400 border border-red-900/50'
-                        }`}
-                      >
-                        {deal.initialScreeningDecision}
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-sm text-zinc-400">From: {deal.sourceFrom || 'Unknown'}</p>
-                  {deal.sourceReceivedAt && (
-                    <p className="text-xs text-zinc-500 mt-1">
-                      {new Date(deal.sourceReceivedAt).toLocaleDateString()}
-                    </p>
-                  )}
+            <TabsContent value="deals" className="mt-6">
+              {errors.deals && (
+                <div className="p-4 bg-red-900/20 border border-red-900/50 rounded-lg text-red-400 mb-4">
+                  {errors.deals}
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
+              )}
+              {loading.deals ? (
+                <div className="text-center py-8 text-zinc-400">
+                  Loading deals...
+                </div>
+              ) : (
+                <DealsTable
+                  deals={deals}
+                  assets={assets}
+                  contacts={contacts}
+                  expandedRows={expandedDeals}
+                  onToggleRow={(id) => {
+                    const newExpanded = new Set(expandedDeals);
+                    if (newExpanded.has(id)) {
+                      newExpanded.delete(id);
+                    } else {
+                      newExpanded.add(id);
+                    }
+                    setExpandedDeals(newExpanded);
+                  }}
+                  onNavigateToAsset={(assetId) =>
+                    navigateToTabAndExpand("properties", assetId)
+                  }
+                  onNavigateToContact={(contactId) =>
+                    navigateToTabAndExpand("contacts", contactId)
+                  }
+                />
+              )}
+            </TabsContent>
 
-        <div className="mt-6 p-4 bg-zinc-900/50 border border-zinc-800 rounded-lg">
-          <p className="text-sm text-zinc-400">
-            <strong>API Response:</strong> Successfully connected to{' '}
-            <code className="px-2 py-1 bg-zinc-800 rounded text-xs">
-              {process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/deals
-            </code>
-          </p>
-          <p className="text-xs text-zinc-500 mt-2">
-            Total deals: {deals.length}
-          </p>
-        </div>
+            <TabsContent value="contacts" className="mt-6">
+              {errors.contacts && (
+                <div className="p-4 bg-red-900/20 border border-red-900/50 rounded-lg text-red-400 mb-4">
+                  {errors.contacts}
+                </div>
+              )}
+              {loading.contacts ? (
+                <div className="text-center py-8 text-zinc-400">
+                  Loading contacts...
+                </div>
+              ) : (
+                <ContactsTable
+                  contacts={contacts}
+                  expandedRows={expandedContacts}
+                  onToggleRow={(id) => {
+                    const newExpanded = new Set(expandedContacts);
+                    if (newExpanded.has(id)) {
+                      newExpanded.delete(id);
+                    } else {
+                      newExpanded.add(id);
+                    }
+                    setExpandedContacts(newExpanded);
+                  }}
+                />
+              )}
+            </TabsContent>
 
-        <div className="mt-6 p-4 bg-blue-900/20 border border-blue-900/50 rounded-lg">
-          <p className="text-sm text-blue-400">
-            💡 Getting a 403 error? Visit{' '}
-            <a href="/debug" className="underline hover:text-blue-300">
-              /debug
-            </a>{' '}
-            to see your user info and sync instructions.
-          </p>
+            <TabsContent value="properties" className="mt-6">
+              {errors.assets && (
+                <div className="p-4 bg-red-900/20 border border-red-900/50 rounded-lg text-red-400 mb-4">
+                  {errors.assets}
+                </div>
+              )}
+              {loading.assets ? (
+                <div className="text-center py-8 text-zinc-400">
+                  Loading properties...
+                </div>
+              ) : (
+                <AssetsTable
+                  assets={assets}
+                  expandedRows={expandedAssets}
+                  onToggleRow={(id) => {
+                    const newExpanded = new Set(expandedAssets);
+                    if (newExpanded.has(id)) {
+                      newExpanded.delete(id);
+                    } else {
+                      newExpanded.add(id);
+                    }
+                    setExpandedAssets(newExpanded);
+                  }}
+                />
+              )}
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>
