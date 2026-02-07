@@ -29,6 +29,10 @@ interface Deal {
     firstName: string | null;
     lastName: string | null;
   } | null;
+  initialScreening?: {
+    decision: "YES" | "NO";
+    reason: string;
+  } | null;
   documents?: Array<{
     id: string;
     filename: string;
@@ -139,15 +143,15 @@ export function DealsTable({
                     : "-"}
                 </TableCell>
                 <TableCell>
-                  {deal.initialScreeningDecision ? (
+                  {(deal.initialScreening?.decision || deal.initialScreeningDecision) ? (
                     <span
                       className={`px-2 py-1 rounded text-xs ${
-                        deal.initialScreeningDecision === "YES"
+                        (deal.initialScreening?.decision || deal.initialScreeningDecision) === "YES"
                           ? "bg-green-900/30 text-green-400 border border-green-900/50"
                           : "bg-red-900/30 text-red-400 border border-red-900/50"
                       }`}
                     >
-                      {deal.initialScreeningDecision}
+                      {deal.initialScreening?.decision || deal.initialScreeningDecision}
                     </span>
                   ) : (
                     "-"
@@ -166,6 +170,16 @@ export function DealsTable({
                           Details
                         </div>
                         <div className="space-y-2">
+                          {deal.initialScreening?.reason && (
+                            <div>
+                              <span className="text-zinc-500">
+                                Screening Reason:{" "}
+                              </span>
+                              <span className="text-zinc-300">
+                                {deal.initialScreening.reason}
+                              </span>
+                            </div>
+                          )}
                           {deal.initialScreeningSummary && (
                             <div>
                               <span className="text-zinc-500">
