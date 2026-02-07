@@ -66,6 +66,9 @@ export class DealController {
           documents: {
             select: { id: true, filename: true, contentType: true, sizeBytes: true },
           },
+          initialScreening: {
+            select: { decision: true, reason: true },
+          },
         },
       }),
       this.prismaService.deal.count({ where }),

@@ -34,6 +34,10 @@ interface Deal {
     id: string;
     name: string;
   } | null;
+  initialScreening?: {
+    decision: "YES" | "NO";
+    reason: string;
+  } | null;
   documents?: Array<{
     id: string;
     filename: string;
