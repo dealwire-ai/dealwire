@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DealsTable } from "@/components/deals-table";
 import { ContactsTable } from "@/components/contacts-table";
 import { AssetsTable } from "@/components/assets-table";
 import { useApi } from "@/hooks/use-api";
 import { Chatbot } from "@/components/chat/chatbot";
+import posthog from "posthog-js";
 
 interface Deal {
   id: string;
@@ -69,6 +70,7 @@ interface Asset {
 
 export default function DashboardPage() {
   const { userId, isLoaded } = useAuth();
+  const { user } = useUser();
   const router = useRouter();
   const { apiCall } = useApi();
 
@@ -101,13 +103,37 @@ export default function DashboardPage() {
   ) => {
     setActiveTab(tab);
     if (tab === "deals") {
+      posthog.capture("deal_navigate_to_contact", { deal_id: id });
       setExpandedDeals(new Set([id]));
     } else if (tab === "contacts") {
+      posthog.capture("deal_navigate_to_contact", { contact_id: id });
       setExpandedContacts(new Set([id]));
     } else if (tab === "properties") {
+      posthog.capture("deal_navigate_to_property", { property_id: id });
       setExpandedAssets(new Set([id]));
     }
   };
+
+  // Handle tab change with tracking
+  const handleTabChange = (tab: string) => {
+    posthog.capture("dashboard_tab_changed", {
+      from_tab: activeTab,
+      to_tab: tab,
+    });
+    setActiveTab(tab);
+  };
+
+  // Identify user in PostHog when they access the dashboard
+  useEffect(() => {
+    if (isLoaded && user) {
+      const email = user.emailAddresses?.[0]?.emailAddress;
+      posthog.identify(userId!, {
+        email: email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      });
+    }
+  }, [isLoaded, user, userId]);
 
   useEffect(() => {
     if (isLoaded && !userId) {
@@ -191,6 +217,10 @@ export default function DashboardPage() {
           <h1 className="text-3xl font-bold">Dashboard</h1>
           <a
             href="/api/auth/signout"
+            onClick={() => {
+              posthog.capture("sign_out_clicked");
+              posthog.reset();
+            }}
             className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-sm transition-colors"
           >
             Sign Out
@@ -198,7 +228,7 @@ export default function DashboardPage() {
         </div>
 
         <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
             <TabsList>
               <TabsTrigger value="deals">Deals</TabsTrigger>
               <TabsTrigger value="contacts">Contacts</TabsTrigger>
@@ -227,6 +257,7 @@ export default function DashboardPage() {
                       newExpanded.delete(id);
                     } else {
                       newExpanded.add(id);
+                      posthog.capture("deal_row_expanded", { deal_id: id });
                     }
                     setExpandedDeals(newExpanded);
                   }}
