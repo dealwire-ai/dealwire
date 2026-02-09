@@ -3,6 +3,7 @@ import { streamText } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { apiClient } from '@/lib/api';
 import { z } from 'zod';
+import { getPostHogClient } from '@/lib/posthog-server';
 
 export async function POST(req: Request) {
   try {
@@ -20,6 +21,18 @@ export async function POST(req: Request) {
         { status: 500, headers: { 'Content-Type': 'application/json' } }
       );
     }
+
+    // Track chat API call server-side
+    const posthog = getPostHogClient();
+    const lastUserMessage = messages.filter((m: { role: string }) => m.role === 'user').pop();
+    posthog.capture({
+      distinctId: userId,
+      event: 'chat_api_called',
+      properties: {
+        messages_count: messages.length,
+        last_message_length: lastUserMessage?.content?.length || 0,
+      },
+    });
 
     // Get user's organizationId by calling the deals endpoint (which requires auth)
     // We'll extract it from the auth context in the functions themselves
