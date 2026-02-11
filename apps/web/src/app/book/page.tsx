@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import Script from 'next/script';
 import Link from 'next/link';
 import { Building2, ArrowLeft } from 'lucide-react';
 import { Button } from "../../components/ui/button";
@@ -13,6 +14,7 @@ export default function BookPage() {
 
   return (
     <div className="min-h-screen bg-black text-white font-sans">
+      <Script src="//embed.typeform.com/next/embed.js" strategy="afterInteractive" />
       {/* Ambient Background */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-[#3ECFA0]/5 rounded-full blur-[150px] -translate-y-1/2 translate-x-1/3" />
@@ -52,16 +54,9 @@ export default function BookPage() {
             </p>
           </div>
 
-          {/* Google Calendar Embed */}
-          <div className="relative rounded-2xl overflow-hidden border border-white/10 bg-white">
-            <iframe
-              src="https://calendar.google.com/calendar/appointments/schedules/AcZssZ3td0Q9gfCME2h4jPFyAzdaciQ4KRazEaPVabIPSllARvS4CMG15Blq48fwHHxfO1QwROdKliYB?gv=true"
-              style={{ border: 0 }}
-              width="100%"
-              height="600"
-              frameBorder="0"
-              title="Schedule a call with Levine & Weinstein"
-            />
+          {/* Typeform Embed */}
+          <div className="relative rounded-2xl overflow-hidden border border-white/10 bg-white/5 min-h-[500px]">
+            <div data-tf-live="01KH5DZ4JXVZX44M5662APZ80D" />
           </div>
         </div>
       </section>
