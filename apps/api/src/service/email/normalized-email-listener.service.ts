@@ -1,12 +1,14 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { SqsMessageHandler, SqsConsumerEventHandler } from '@ssut/nestjs-sqs';
 import { Message } from '@aws-sdk/client-sqs';
+import { marked } from 'marked';
 import { EmailProcessorService, ProcessDealContext } from './email-processor.service';
 import { DealDetection } from '../deal/deal-detection.service';
 import { NormalizedEmailEvent } from '../../dto/normalized-email-event.dto';
 import { MicrosoftGraphService } from '../microsoft/microsoft-graph.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { MetricsService } from '../metrics/metrics.service';
+import { AnalyzerAgentService } from '../agent/analyzer-agent.service';
 
 interface QueuedEmailMessage {
   event: NormalizedEmailEvent;
@@ -18,6 +20,15 @@ interface QueuedEmailMessage {
   detection: DealDetection; // Deal detection result (done in webhook)
 }
 
+interface QueuedUserReplyCommand {
+  type: 'user-reply-command';
+  event: NormalizedEmailEvent;
+  accessToken: string;
+  inboxOwnerEmail: string;
+  receivedByUserId: string;
+  organizationId: string | null;
+}
+
 @Injectable()
 export class NormalizedEmailListenerService {
   private readonly logger = new Logger(NormalizedEmailListenerService.name);
@@ -27,6 +38,7 @@ export class NormalizedEmailListenerService {
     private readonly microsoftGraphService: MicrosoftGraphService,
     private readonly prismaService: PrismaService,
     private readonly metricsService: MetricsService,
+    private readonly analyzerAgent: AnalyzerAgentService,
   ) {}
 
   @SqsMessageHandler('normalized-email', false)
@@ -37,7 +49,14 @@ export class NormalizedEmailListenerService {
     }
 
     try {
-      const queuedMessage: QueuedEmailMessage = JSON.parse(message.Body);
+      const parsed = JSON.parse(message.Body);
+      if (parsed.type === 'user-reply-command') {
+        await this.handleUserReplyCommand(parsed as QueuedUserReplyCommand);
+        this.metricsService.recordSqsMessageReceived('normalized-email', 'success');
+        return;
+      }
+
+      const queuedMessage = parsed as QueuedEmailMessage;
 
       this.logger.log(
         `Received message: messageId=${queuedMessage.event?.messageId}, ` +
@@ -113,6 +132,43 @@ export class NormalizedEmailListenerService {
       // Re-throw to let the library handle retries
       throw error;
     }
+  }
+
+  private async handleUserReplyCommand(cmd: QueuedUserReplyCommand): Promise<void> {
+    const { event, accessToken, inboxOwnerEmail, organizationId } = cmd;
+    if (!organizationId) {
+      this.logger.warn('User reply command missing organizationId, skipping');
+      return;
+    }
+
+    const userMessage =
+      event.bodyText ||
+      (event.bodyHtml
+        ? event.bodyHtml.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
+        : '');
+    if (!userMessage || userMessage.length < 2) {
+      this.logger.warn('User reply has no content, skipping');
+      return;
+    }
+
+    this.logger.log(`Processing user-reply-command: ${event.messageId} - "${userMessage.slice(0, 50)}..."`);
+
+    const responseText = await this.analyzerAgent.generate(
+      { organizationId },
+      userMessage,
+    );
+    const htmlBody = `<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">${(marked.parse(responseText) as string)}</div>`;
+
+    const ok = await this.microsoftGraphService.replyInThreadToSelf(
+      accessToken,
+      event.messageId,
+      inboxOwnerEmail,
+      htmlBody,
+    );
+    if (!ok) {
+      throw new Error(`Failed to send reply for ${event.messageId}`);
+    }
+    this.logger.log(`Replied to user command: ${event.messageId}`);
   }
 
   @SqsConsumerEventHandler('normalized-email', 'processing_error')

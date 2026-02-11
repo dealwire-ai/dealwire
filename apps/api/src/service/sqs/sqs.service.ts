@@ -14,6 +14,16 @@ interface QueuedEmailMessage {
   detection: DealDetection; // Deal detection result (done in webhook)
 }
 
+/** User reply in thread (self-sent) - run agent, update prefs, reply in thread */
+interface QueuedUserReplyCommand {
+  type: 'user-reply-command';
+  event: NormalizedEmailEvent;
+  accessToken: string;
+  inboxOwnerEmail: string;
+  receivedByUserId: string;
+  organizationId: string | null;
+}
+
 @Injectable()
 export class SQSService {
   private readonly logger = new Logger(SQSService.name);
@@ -57,6 +67,40 @@ export class SQSService {
       this.metricsService.recordSqsError('normalized-email', 'send');
       const msg = error instanceof Error ? error.message : String(error);
       this.logger.error(`Failed to send message: ${msg}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Enqueue a user reply command (self-sent email without X-Analyzer-Sent = user replying to our analysis)
+   * Same queue as normalized-email; listener branches on type.
+   */
+  async enqueueUserReplyCommand(messageBody: QueuedUserReplyCommand): Promise<void> {
+    if (!this.sqsService) {
+      this.logger.warn('SQS is disabled - skipping enqueue');
+      return;
+    }
+
+    try {
+      this.logger.log(
+        `Enqueueing user-reply-command: ${messageBody.event?.messageId} from ${messageBody.inboxOwnerEmail} - "${messageBody.event?.subject}"`,
+      );
+
+      const timestamp = Date.now();
+      const random = Math.random().toString(36).substring(2, 10);
+      const id = `user-reply-${timestamp}-${random}`.substring(0, 80);
+
+      await this.sqsService.send('normalized-email', {
+        id,
+        body: messageBody,
+      });
+      this.metricsService.recordSqsMessageSent('normalized-email', 'success');
+      this.logger.debug(`User-reply-command sent to normalized-email queue: ${messageBody.event?.messageId}`);
+    } catch (error) {
+      this.metricsService.recordSqsMessageSent('normalized-email', 'error');
+      this.metricsService.recordSqsError('normalized-email', 'send');
+      const msg = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Failed to send user-reply-command: ${msg}`);
       throw error;
     }
   }

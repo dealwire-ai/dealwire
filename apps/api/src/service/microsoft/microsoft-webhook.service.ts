@@ -132,11 +132,37 @@ export class MicrosoftWebhookService {
 
       userEmail = inboxOwner.email;
 
-      // Skip emails from the user themselves (prevents infinite loop from reply-to-self)
+      // Self-sent: either our bot reply (skip) or user replying to our analysis (run agent)
       if (emailEvent.from.toLowerCase() === inboxOwner.email.toLowerCase()) {
-        this.logger.debug(
-          `Skipping self-sent email: ${emailEvent.messageId} - "${emailEvent.subject}"`,
+        const messageWithHeaders = await this.microsoftGraphService.getMessage(
+          accessToken,
+          messageId,
+          true,
         );
+        if (
+          messageWithHeaders &&
+          this.microsoftGraphService.hasAnalyzerSentHeader(messageWithHeaders)
+        ) {
+          this.logger.debug(
+            `Skipping our own reply: ${emailEvent.messageId} - "${emailEvent.subject}"`,
+          );
+          if (userEmail) {
+            this.metricsService.recordMicrosoftWebhookRequest(userEmail, 'success');
+          }
+          return;
+        }
+        // User reply in thread - enqueue for agent processing
+        this.logger.log(
+          `Enqueueing user-reply-command: ${emailEvent.messageId} - "${emailEvent.subject}"`,
+        );
+        await this.sqsService.enqueueUserReplyCommand({
+          type: 'user-reply-command',
+          event: emailEvent,
+          accessToken,
+          inboxOwnerEmail: inboxOwner.email,
+          receivedByUserId: userId,
+          organizationId: inboxOwner.organizationId ?? null,
+        });
         if (userEmail) {
           this.metricsService.recordMicrosoftWebhookRequest(userEmail, 'success');
         }
