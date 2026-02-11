@@ -4,6 +4,7 @@ import { EmailProcessorService } from '../service/email/email-processor.service'
 import { NormalizedEmailListenerService } from '../service/email/normalized-email-listener.service';
 import { SQSService } from '../service/sqs/sqs.service';
 import { AIModule } from './ai.module';
+import { AgentModule } from './agent.module';
 import { EmailModule as EmailServicesModule } from './email.module'; // Email services (EmailProcessingService, etc.)
 import { PrismaModule } from './prisma.module';
 import { MicrosoftModule } from './microsoft.module';
@@ -38,6 +39,7 @@ const sqsImports = enableSqs
 @Module({
   imports: [
     AIModule,
+    AgentModule,
     EmailServicesModule,
     PrismaModule,
     S3Module,

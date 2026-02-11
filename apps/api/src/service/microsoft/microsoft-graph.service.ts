@@ -9,6 +9,11 @@ import {
 
 const GRAPH_BASE_URL = 'https://graph.microsoft.com/v1.0';
 
+interface InternetMessageHeader {
+  name: string;
+  value: string;
+}
+
 interface GraphMessage {
   id: string;
   subject: string;
@@ -19,6 +24,7 @@ interface GraphMessage {
   hasAttachments: boolean;
   conversationId?: string;
   internetMessageId?: string;
+  internetMessageHeaders?: InternetMessageHeader[];
 }
 
 interface GraphAttachment {
@@ -69,15 +75,41 @@ export class MicrosoftGraphService {
   }
 
   /**
+   * Check if a message has the X-Analyzer-Sent header (our bot fingerprint)
+   */
+  hasAnalyzerSentHeader(message: { internetMessageHeaders?: InternetMessageHeader[] }): boolean {
+    const headers = message.internetMessageHeaders || [];
+    return headers.some(
+      (h) => h.name?.toLowerCase() === 'x-analyzer-sent' && h.value === '1',
+    );
+  }
+
+  /**
    * Fetch a specific email message from Microsoft Graph
+   * @param includeHeaders - When true, includes internetMessageHeaders in the response
    */
   async getMessage(
     accessToken: string,
     messageId: string,
+    includeHeaders = false,
   ): Promise<GraphMessage | null> {
     try {
+      const selectFields = [
+        'id',
+        'subject',
+        'from',
+        'toRecipients',
+        'body',
+        'receivedDateTime',
+        'hasAttachments',
+        'conversationId',
+        'internetMessageId',
+      ];
+      if (includeHeaders) {
+        selectFields.push('internetMessageHeaders');
+      }
       const response = await fetch(
-        `${GRAPH_BASE_URL}/me/messages/${messageId}?$select=id,subject,from,toRecipients,body,receivedDateTime,hasAttachments,conversationId,internetMessageId`,
+        `${GRAPH_BASE_URL}/me/messages/${messageId}?$select=${selectFields.join(',')}`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -175,7 +207,8 @@ export class MicrosoftGraphService {
 
   /**
    * Send a reply-to-self in the same thread (for deal analysis)
-   * Uses reply() endpoint to preserve threading headers atomically (fixes threading issues)
+   * Uses createReply -> PATCH (add X-Analyzer-Sent header) -> send so we can fingerprint our messages.
+   * The X-Analyzer-Sent header lets the webhook distinguish our replies from user replies.
    */
   async replyInThreadToSelf(
     accessToken: string,
@@ -184,13 +217,10 @@ export class MicrosoftGraphService {
     htmlBody: string,
   ): Promise<boolean> {
     try {
-      // Use reply() endpoint with custom recipients and body
-      // This preserves In-Reply-To and References headers atomically, fixing threading issues
-      const replyBody = {
+      // Step 1: Create reply draft (internetMessageHeaders in create = set at creation, more reliable than PATCH)
+      const createReplyBody = {
         message: {
-          toRecipients: [
-            { emailAddress: { address: userEmail } },
-          ],
+          toRecipients: [{ emailAddress: { address: userEmail } }],
           ccRecipients: ADMIN_EMAILS.map((email) => ({
             emailAddress: { address: email },
           })),
@@ -198,28 +228,53 @@ export class MicrosoftGraphService {
             contentType: 'html',
             content: htmlBody,
           },
+          internetMessageHeaders: [
+            { name: 'X-Analyzer-Sent', value: '1' },
+          ],
         },
       };
 
-      const replyResponse = await fetch(
-        `${GRAPH_BASE_URL}/me/messages/${messageId}/reply`,
+      const createResponse = await fetch(
+        `${GRAPH_BASE_URL}/me/messages/${messageId}/createReply`,
         {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(replyBody),
+          body: JSON.stringify(createReplyBody),
         },
       );
 
-      if (!replyResponse.ok) {
-        const errorText = await replyResponse.text();
-        this.logger.error(`Failed to send reply: ${replyResponse.status} - ${errorText}`);
+      if (!createResponse.ok) {
+        const errorText = await createResponse.text();
+        this.logger.error(
+          `Failed to create reply draft: ${createResponse.status} - ${errorText}`,
+        );
         return false;
       }
 
-      this.logger.log(`Reply-to-self sent via Graph for message ${messageId} (CC'd admins, threaded)`);
+      const draft = await createResponse.json();
+      const draftId = draft.id;
+
+      // Step 2: Send the draft
+      const sendResponse = await fetch(
+        `${GRAPH_BASE_URL}/me/messages/${draftId}/send`,
+        {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${accessToken}` },
+        },
+      );
+
+      if (!sendResponse.ok) {
+        const errorText = await sendResponse.text();
+        this.logger.error(`Failed to send reply: ${sendResponse.status} - ${errorText}`);
+        return false;
+      }
+
+      this.logger.log(
+        `Reply-to-self sent via Graph for message ${messageId} (CC'd admins, threaded)`,
+      );
       return true;
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
