@@ -1,6 +1,8 @@
 import {
   Controller,
   Get,
+  Patch,
+  Body,
   HttpException,
   HttpStatus,
   UseGuards,
@@ -39,5 +41,32 @@ export class ScreeningPreferencesController {
     }
 
     return prefs;
+  }
+
+  @Patch()
+  async patchScreeningPreferences(
+    @AuthUser('organizationId') organizationId: string | null,
+    @Body()
+    body: {
+      dealCriteria?: string;
+      alwaysSkip?: string;
+      passedFolderName?: string;
+      digestSchedule?: string;
+      digestTimeZone?: string;
+      companyName?: string;
+      brandColor?: string;
+    },
+  ) {
+    if (!organizationId) {
+      throw new HttpException(
+        'User not in organization',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    return this.screeningPreferencesService.updatePreferences(
+      organizationId,
+      body,
+    );
   }
 }

@@ -120,8 +120,8 @@ Fields:
 - `brandColor` - Hex color code for email branding
 - `passedFolderName` - Folder name for passed/rejected deals (default: "Passed Deals")
 - `dealCriteria` - Criteria for AI to evaluate deals against
-- `logoUrl` - Logo URL for email branding
-- `alwaysSkip` - Criteria for deals to always skip (checked via AI in deal detection)
+- `alwaysSkip` - Criteria for deals to always skip
+- Logo comes from Organization `imageUrl` (not stored on ScreeningPreferences) (checked via AI in deal detection)
 
 Preferences are automatically created when an Organization is created via Clerk webhooks. The `ScreeningPreferencesService` loads preferences by `organizationId`.
 
@@ -319,7 +319,12 @@ This allows the API to start successfully locally without configuring AWS.
 
 ### Preventing Infinite Loops
 - `MicrosoftWebhookService` checks if email sender = inbox owner
-- If so, skips processing (it's our own reply-to-self)
+- If so: fetch message, check `X-Analyzer-Sent` header (we add this to our analysis replies). If present → skip (our reply). If absent → user reply, enqueue to SQS as `user-reply-command` for the Email Command Agent pipeline (never the deal pipeline)
+
+### Unified Agent (Web + Email)
+- Same agent powers web chat and email replies. Extract from chat route into shared `AnalyzerAgentService`.
+- Write tools: update_always_skip, update_deal_criteria, update_buy_box. No forward_deal_to.
+- **Agent must understand:** alwaysSkip = skip entirely (not a deal, no analysis, no move); dealCriteria = yes/no evaluation (no = moved to Passed Deals).
 
 ### Deduplication
 - In-memory cache of processed message IDs
