@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { motion, useInView } from 'framer-motion';
 import { Building2, Workflow, Sparkles, Linkedin, Mail, TrendingUp, Clock, DollarSign, ArrowRight } from 'lucide-react';
 import { Button } from "../components/ui/button";
+import posthog from 'posthog-js';
 
 const FadeInSection = ({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) => {
   const ref = useRef(null);
@@ -42,17 +43,17 @@ export default function Home() {
             <span className="text-xl font-semibold tracking-tight">Levine & Weinstein</span>
           </div>
           <div className="hidden md:flex items-center gap-8 text-sm text-white/60">
-            <button onClick={() => document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-white transition-colors">Services</button>
-            <button onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-white transition-colors">How It Works</button>
-            <button onClick={() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-white transition-colors">About</button>
+            <button onClick={() => { posthog.capture('nav_section_clicked', { section: 'services' }); document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' }); }} className="hover:text-white transition-colors">Services</button>
+            <button onClick={() => { posthog.capture('nav_section_clicked', { section: 'how-it-works' }); document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' }); }} className="hover:text-white transition-colors">How It Works</button>
+            <button onClick={() => { posthog.capture('nav_section_clicked', { section: 'about' }); document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' }); }} className="hover:text-white transition-colors">About</button>
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/sign-in">
+            <Link href="/sign-in" onClick={() => posthog.capture('cta_clicked', { cta_type: 'sign_in', location: 'header' })}>
               <Button className="bg-zinc-800 hover:bg-zinc-700 text-white font-medium px-6">
                 Sign In
               </Button>
             </Link>
-            <Link href="/book">
+            <Link href="/book" onClick={() => posthog.capture('cta_clicked', { cta_type: 'lets_talk', location: 'header' })}>
               <Button className="bg-[#3ECFA0] hover:bg-[#35b88f] text-black font-medium px-6">
                  Let&apos;s Talk
               </Button>
@@ -96,8 +97,8 @@ export default function Home() {
             </p> */}
             
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/book">
-                <Button 
+              <Link href="/book" onClick={() => posthog.capture('cta_clicked', { cta_type: 'book_your_call', location: 'hero' })}>
+                <Button
                   size="lg"
                   className="bg-[#3ECFA0] hover:bg-[#35b88f] text-black font-semibold px-8 h-14 text-base"
                 >
@@ -345,10 +346,10 @@ export default function Home() {
                         />
                       </div>
                       <div className="flex gap-2">
-                        <a href={founder.linkedin} target="_blank" rel="noopener noreferrer" className="p-2 bg-white/5 rounded-lg hover:bg-white/10 transition-colors">
+                        <a href={founder.linkedin} target="_blank" rel="noopener noreferrer" onClick={() => posthog.capture('founder_linkedin_clicked', { founder_name: founder.name })} className="p-2 bg-white/5 rounded-lg hover:bg-white/10 transition-colors">
                           <Linkedin className="w-4 h-4 text-white/50" />
                         </a>
-                        <a href={`mailto:${founder.email}`} className="p-2 bg-white/5 rounded-lg hover:bg-white/10 transition-colors">
+                        <a href={`mailto:${founder.email}`} onClick={() => posthog.capture('founder_email_clicked', { founder_name: founder.name, email: founder.email })} className="p-2 bg-white/5 rounded-lg hover:bg-white/10 transition-colors">
                           <Mail className="w-4 h-4 text-white/50" />
                         </a>
                       </div>
@@ -400,7 +401,7 @@ export default function Home() {
                           <p className="text-[#3ECFA0] text-sm">{advisor.role}</p>
                         </div>
                       </div>
-                      <a href={advisor.linkedin} target="_blank" rel="noopener noreferrer" className="p-2 bg-white/5 rounded-lg hover:bg-white/10 transition-colors shrink-0">
+                      <a href={advisor.linkedin} target="_blank" rel="noopener noreferrer" onClick={() => posthog.capture('founder_linkedin_clicked', { founder_name: advisor.name, role: 'advisor' })} className="p-2 bg-white/5 rounded-lg hover:bg-white/10 transition-colors shrink-0">
                         <Linkedin className="w-4 h-4 text-white/50" />
                       </a>
                     </div>
@@ -450,8 +451,8 @@ export default function Home() {
                   <p className="text-white/70 text-lg mb-10">
                     30 minutes. No pitch deck. Just an honest conversation about whether AI can help your firm.
                   </p>
-                  <Link href="/book">
-                    <Button 
+                  <Link href="/book" onClick={() => posthog.capture('cta_clicked', { cta_type: 'book_your_call', location: 'final_cta' })}>
+                    <Button
                       size="lg"
                       className="bg-[#3ECFA0] hover:bg-[#35b88f] text-black font-semibold px-8 h-14 text-base"
                     >
