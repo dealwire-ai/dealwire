@@ -322,6 +322,9 @@ export class MicrosoftGraphService {
             contentType: 'html',
             content: htmlBody,
           },
+          internetMessageHeaders: [
+            { name: 'X-Analyzer-Sent', value: '1' },
+          ],
         }),
       });
 
