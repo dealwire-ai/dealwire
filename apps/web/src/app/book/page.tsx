@@ -1,10 +1,16 @@
 'use client';
 
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { Building2, ArrowLeft } from 'lucide-react';
 import { Button } from "../../components/ui/button";
+import posthog from 'posthog-js';
 
 export default function BookPage() {
+  useEffect(() => {
+    posthog.capture('booking_page_viewed');
+  }, []);
+
   return (
     <div className="min-h-screen bg-black text-white font-sans">
       {/* Ambient Background */}

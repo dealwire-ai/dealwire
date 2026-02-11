@@ -9,6 +9,7 @@ import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import posthog from 'posthog-js';
 
 export function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
@@ -16,11 +17,26 @@ export function Chatbot() {
     api: '/api/chat',
   });
 
+  const handleOpen = () => {
+    posthog.capture('chat_opened');
+    setIsOpen(true);
+  };
+
+  const handleClose = () => {
+    posthog.capture('chat_closed', { messages_count: messages.length });
+    setIsOpen(false);
+  };
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    posthog.capture('chat_message_sent', { message_length: input.length });
+    handleSubmit(e);
+  };
+
   return (
     <>
       {/* Floating button */}
       <button
-        onClick={() => setIsOpen(true)}
+        onClick={handleOpen}
         className={cn(
           'fixed bottom-6 right-6 z-50',
           'h-14 w-14 rounded-full',
@@ -41,7 +57,7 @@ export function Chatbot() {
           {/* Backdrop */}
           <div
             className="absolute inset-0 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200"
-            onClick={() => setIsOpen(false)}
+            onClick={handleClose}
           />
 
           {/* Chat window */}
@@ -58,7 +74,7 @@ export function Chatbot() {
                 </div>
               </div>
               <button
-                onClick={() => setIsOpen(false)}
+                onClick={handleClose}
                 className="p-1.5 rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors"
                 aria-label="Close chat"
               >
@@ -142,7 +158,7 @@ export function Chatbot() {
             </ScrollArea>
 
             {/* Input form */}
-            <form onSubmit={handleSubmit} className="p-4 border-t border-zinc-800">
+            <form onSubmit={handleFormSubmit} className="p-4 border-t border-zinc-800">
               <div className="flex gap-2">
                 <Input
                   value={input}
