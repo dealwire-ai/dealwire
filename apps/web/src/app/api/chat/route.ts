@@ -1,15 +1,27 @@
 import { auth } from '@clerk/nextjs/server';
+import { getPostHogClient } from '@/lib/posthog-server';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
 export async function POST(req: Request) {
   try {
     const { messages } = await req.json();
-    const { getToken } = await auth();
+    const { userId, getToken } = await auth();
     const token = await getToken();
-    if (!token) {
+    if (!userId || !token) {
       return new Response('Unauthorized', { status: 401 });
     }
+
+    const posthog = getPostHogClient();
+    const lastUserMessage = messages.filter((m: { role: string }) => m.role === 'user').pop();
+    posthog.capture({
+      distinctId: userId,
+      event: 'chat_api_called',
+      properties: {
+        messages_count: messages.length,
+        last_message_length: lastUserMessage?.content?.length || 0,
+      },
+    });
 
     const apiRes = await fetch(`${API_URL}/chat`, {
       method: 'POST',
