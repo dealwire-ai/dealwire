@@ -73,6 +73,7 @@ describe('SQS Integration Tests (LocalStack)', () => {
   });
 
   beforeEach(async () => {
+    if (!process.env.AWS_ENDPOINT_URL) return;
     // Purge queue before each test
     try {
       await sqsClient.send(

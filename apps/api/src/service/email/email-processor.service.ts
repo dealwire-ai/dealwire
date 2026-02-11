@@ -415,7 +415,7 @@ export class EmailProcessorService {
 
   private async saveDeal(
     ctx: ProcessDealContext,
-    detection: { isDeal: boolean; confidence: string; reason: string },
+    detection: DealDetection,
     accessToken?: string,
   ): Promise<string | undefined> {
     const { event, organizationId, receivedByUserId, dealId } = ctx;

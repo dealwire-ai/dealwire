@@ -86,6 +86,10 @@
       "**/*.spec.ts",
       "**/test/**/*.spec.ts"
     ],
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "sqs.integration.spec"
+    ],
     "transform": {
       "^.+\\.(t|j)s$": [
         "ts-jest",
