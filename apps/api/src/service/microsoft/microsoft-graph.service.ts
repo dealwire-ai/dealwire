@@ -51,27 +51,44 @@ export class MicrosoftGraphService {
     userId: string,
     logLevel: 'warn' | 'debug' = 'warn',
   ): Promise<string | null> {
-    try {
-      const tokens = await this.clerk.users.getUserOauthAccessToken(
-        userId,
-        'microsoft',
-      );
+    const maxRetries = 3;
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const tokens = await this.clerk.users.getUserOauthAccessToken(
+          userId,
+          'microsoft',
+        );
 
-      if (!tokens.data || tokens.data.length === 0) {
-        if (logLevel === 'debug') {
-          this.logger.debug(`No Microsoft OAuth token found for user ${userId}`);
-        } else {
-          this.logger.warn(`No Microsoft OAuth token found for user ${userId}`);
+        if (!tokens.data || tokens.data.length === 0) {
+          if (logLevel === 'debug') {
+            this.logger.debug(`No Microsoft OAuth token found for user ${userId}`);
+          } else {
+            this.logger.warn(`No Microsoft OAuth token found for user ${userId}`);
+          }
+          return null;
         }
-        return null;
-      }
 
-      return tokens.data[0].token;
-    } catch (error) {
-      const msg = error instanceof Error ? error.message : String(error);
-      this.logger.error(`Failed to get Microsoft token for ${userId}: ${msg}`);
-      return null;
+        return tokens.data[0].token;
+      } catch (error: any) {
+        const msg = error instanceof Error ? error.message : String(error);
+        const clerkErrors = error?.errors || error?.clerkError || error?.data;
+
+        if (attempt < maxRetries) {
+          const delayMs = 1000 * Math.pow(2, attempt - 1); // 1s, 2s
+          this.logger.warn(
+            `Failed to get Microsoft token for ${userId} (attempt ${attempt}/${maxRetries}): ${msg} — retrying in ${delayMs}ms`,
+          );
+          await new Promise((resolve) => setTimeout(resolve, delayMs));
+        } else {
+          this.logger.error(
+            `Failed to get Microsoft token for ${userId} after ${maxRetries} attempts: ${msg}`,
+            clerkErrors ? JSON.stringify(clerkErrors) : undefined,
+          );
+          return null;
+        }
+      }
     }
+    return null;
   }
 
   /**
