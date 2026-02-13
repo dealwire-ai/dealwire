@@ -9,6 +9,7 @@ import { MicrosoftGraphService } from '../microsoft/microsoft-graph.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { MetricsService } from '../metrics/metrics.service';
 import { AnalyzerAgentService } from '../agent/analyzer-agent.service';
+import { extractNewReplyContent } from '../../util/email-reply';
 
 interface QueuedEmailMessage {
   event: NormalizedEmailEvent;
@@ -141,11 +142,16 @@ export class NormalizedEmailListenerService {
       return;
     }
 
-    const userMessage =
+    const rawBody =
       event.bodyText ||
       (event.bodyHtml
-        ? event.bodyHtml.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
+        ? event.bodyHtml
+            .replace(/<\/p>|<\/div>|<br\s*\/?>/gi, '\n')
+            .replace(/<[^>]+>/g, '')
+            .replace(/\n\s*\n/g, '\n')
+            .trim()
         : '');
+    const userMessage = extractNewReplyContent(rawBody);
     if (!userMessage || userMessage.length < 2) {
       this.logger.warn('User reply has no content, skipping');
       return;
