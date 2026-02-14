@@ -1,13 +1,24 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { DealsTable } from "@/components/deals-table";
 import { ContactsTable } from "@/components/contacts-table";
 import { AssetsTable } from "@/components/assets-table";
+import { TableToolbar } from "@/components/table-toolbar";
+import { TablePagination } from "@/components/table-pagination";
+import { TableSkeleton } from "@/components/table-skeleton";
 import { useApi } from "@/hooks/use-api";
+import { useTableState } from "@/hooks/use-table-state";
 import { Chatbot } from "@/components/chat/chatbot";
 import posthog from "posthog-js";
 
@@ -88,6 +99,11 @@ export default function DashboardPage() {
     assets: null as string | null,
   });
 
+  // Table state per tab
+  const dealsTable = useTableState();
+  const contactsTable = useTableState();
+  const assetsTable = useTableState();
+
   // Tab and expansion state management
   const [activeTab, setActiveTab] = useState("deals");
   const [expandedDeals, setExpandedDeals] = useState<Set<string>>(new Set());
@@ -135,70 +151,98 @@ export default function DashboardPage() {
     }
   }, [isLoaded, user, userId]);
 
+  // Fetch deals when table state changes
+  const fetchDeals = useCallback(async () => {
+    if (!isLoaded || !userId) return;
+    try {
+      setLoading((prev) => ({ ...prev, deals: true }));
+      setErrors((prev) => ({ ...prev, deals: null }));
+      const response = await apiCall(`/deals?${dealsTable.queryString}`);
+      setDeals(response.data || []);
+      if (response.pagination) dealsTable.setMeta(response.pagination);
+    } catch (e) {
+      setErrors((prev) => ({
+        ...prev,
+        deals: e instanceof Error ? e.message : "Failed to load deals",
+      }));
+    } finally {
+      setLoading((prev) => ({ ...prev, deals: false }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoaded, userId, dealsTable.queryString]);
+
+  // Fetch contacts when table state changes
+  const fetchContacts = useCallback(async () => {
+    if (!isLoaded || !userId) return;
+    try {
+      setLoading((prev) => ({ ...prev, contacts: true }));
+      setErrors((prev) => ({ ...prev, contacts: null }));
+      const response = await apiCall(`/contacts?${contactsTable.queryString}`);
+      setContacts(response.data || []);
+      if (response.pagination) contactsTable.setMeta(response.pagination);
+    } catch (e) {
+      setErrors((prev) => ({
+        ...prev,
+        contacts: e instanceof Error ? e.message : "Failed to load contacts",
+      }));
+    } finally {
+      setLoading((prev) => ({ ...prev, contacts: false }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoaded, userId, contactsTable.queryString]);
+
+  // Fetch assets when table state changes
+  const fetchAssets = useCallback(async () => {
+    if (!isLoaded || !userId) return;
+    try {
+      setLoading((prev) => ({ ...prev, assets: true }));
+      setErrors((prev) => ({ ...prev, assets: null }));
+      const response = await apiCall(`/assets?${assetsTable.queryString}`);
+      setAssets(response.data || []);
+      if (response.pagination) assetsTable.setMeta(response.pagination);
+    } catch (e) {
+      setErrors((prev) => ({
+        ...prev,
+        assets: e instanceof Error ? e.message : "Failed to load properties",
+      }));
+    } finally {
+      setLoading((prev) => ({ ...prev, assets: false }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoaded, userId, assetsTable.queryString]);
+
+  // Redirect if not authenticated
   useEffect(() => {
     if (isLoaded && !userId) {
       router.push("/sign-in");
-      return;
     }
+  }, [isLoaded, userId, router]);
 
-    if (!isLoaded || !userId) {
-      return;
-    }
-
-    // Fetch all data on mount
-    const fetchDeals = async () => {
-      try {
-        setLoading((prev) => ({ ...prev, deals: true }));
-        setErrors((prev) => ({ ...prev, deals: null }));
-        const response = await apiCall("/deals?page=1&limit=100");
-        setDeals(response.data || []);
-      } catch (e) {
-        setErrors((prev) => ({
-          ...prev,
-          deals: e instanceof Error ? e.message : "Failed to load deals",
-        }));
-      } finally {
-        setLoading((prev) => ({ ...prev, deals: false }));
-      }
-    };
-
-    const fetchContacts = async () => {
-      try {
-        setLoading((prev) => ({ ...prev, contacts: true }));
-        setErrors((prev) => ({ ...prev, contacts: null }));
-        const response = await apiCall("/contacts?page=1&limit=100");
-        setContacts(response.data || []);
-      } catch (e) {
-        setErrors((prev) => ({
-          ...prev,
-          contacts: e instanceof Error ? e.message : "Failed to load contacts",
-        }));
-      } finally {
-        setLoading((prev) => ({ ...prev, contacts: false }));
-      }
-    };
-
-    const fetchAssets = async () => {
-      try {
-        setLoading((prev) => ({ ...prev, assets: true }));
-        setErrors((prev) => ({ ...prev, assets: null }));
-        const response = await apiCall("/assets?page=1&limit=100");
-        setAssets(response.data || []);
-      } catch (e) {
-        setErrors((prev) => ({
-          ...prev,
-          assets: e instanceof Error ? e.message : "Failed to load properties",
-        }));
-      } finally {
-        setLoading((prev) => ({ ...prev, assets: false }));
-      }
-    };
-
+  // Fetch data when query strings change
+  useEffect(() => {
     fetchDeals();
+  }, [fetchDeals]);
+
+  useEffect(() => {
     fetchContacts();
+  }, [fetchContacts]);
+
+  useEffect(() => {
     fetchAssets();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoaded, userId]);
+  }, [fetchAssets]);
+
+  // Clear expanded rows on page change
+  useEffect(() => {
+    setExpandedDeals(new Set());
+  }, [dealsTable.page]);
+
+  useEffect(() => {
+    setExpandedContacts(new Set());
+  }, [contactsTable.page]);
+
+  useEffect(() => {
+    setExpandedAssets(new Set());
+  }, [assetsTable.page]);
 
   if (!isLoaded) {
     return (
@@ -236,15 +280,38 @@ export default function DashboardPage() {
             </TabsList>
 
             <TabsContent value="deals" className="mt-6">
+              <TableToolbar
+                search={dealsTable.search}
+                onSearchChange={dealsTable.setSearch}
+                totalLabel="deals"
+                total={dealsTable.meta.total}
+                hasActiveFilters={dealsTable.hasActiveFilters}
+                onClearFilters={dealsTable.clearFilters}
+                filterSlot={
+                  <Select
+                    value={dealsTable.filters.decision || "all"}
+                    onValueChange={(value) =>
+                      dealsTable.setFilter("decision", value === "all" ? "" : value)
+                    }
+                  >
+                    <SelectTrigger className="w-[130px] bg-zinc-950 border-zinc-800 text-white">
+                      <SelectValue placeholder="Decision" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All</SelectItem>
+                      <SelectItem value="YES">Yes</SelectItem>
+                      <SelectItem value="NO">No</SelectItem>
+                    </SelectContent>
+                  </Select>
+                }
+              />
               {errors.deals && (
                 <div className="p-4 bg-red-900/20 border border-red-900/50 rounded-lg text-red-400 mb-4">
                   {errors.deals}
                 </div>
               )}
               {loading.deals ? (
-                <div className="text-center py-8 text-zinc-400">
-                  Loading deals...
-                </div>
+                <TableSkeleton columns={6} />
               ) : (
                 <DealsTable
                   deals={deals}
@@ -267,20 +334,35 @@ export default function DashboardPage() {
                   onNavigateToContact={(contactId) =>
                     navigateToTabAndExpand("contacts", contactId)
                   }
+                  hasActiveFilters={dealsTable.hasActiveFilters}
+                  onClearFilters={dealsTable.clearFilters}
                 />
               )}
+              <TablePagination
+                page={dealsTable.page}
+                totalPages={dealsTable.meta.totalPages}
+                total={dealsTable.meta.total}
+                limit={dealsTable.limit}
+                onPageChange={dealsTable.setPage}
+              />
             </TabsContent>
 
             <TabsContent value="contacts" className="mt-6">
+              <TableToolbar
+                search={contactsTable.search}
+                onSearchChange={contactsTable.setSearch}
+                totalLabel="contacts"
+                total={contactsTable.meta.total}
+                hasActiveFilters={contactsTable.hasActiveFilters}
+                onClearFilters={contactsTable.clearFilters}
+              />
               {errors.contacts && (
                 <div className="p-4 bg-red-900/20 border border-red-900/50 rounded-lg text-red-400 mb-4">
                   {errors.contacts}
                 </div>
               )}
               {loading.contacts ? (
-                <div className="text-center py-8 text-zinc-400">
-                  Loading contacts...
-                </div>
+                <TableSkeleton columns={5} />
               ) : (
                 <ContactsTable
                   contacts={contacts}
@@ -294,20 +376,35 @@ export default function DashboardPage() {
                     }
                     setExpandedContacts(newExpanded);
                   }}
+                  hasActiveFilters={contactsTable.hasActiveFilters}
+                  onClearFilters={contactsTable.clearFilters}
                 />
               )}
+              <TablePagination
+                page={contactsTable.page}
+                totalPages={contactsTable.meta.totalPages}
+                total={contactsTable.meta.total}
+                limit={contactsTable.limit}
+                onPageChange={contactsTable.setPage}
+              />
             </TabsContent>
 
             <TabsContent value="properties" className="mt-6">
+              <TableToolbar
+                search={assetsTable.search}
+                onSearchChange={assetsTable.setSearch}
+                totalLabel="properties"
+                total={assetsTable.meta.total}
+                hasActiveFilters={assetsTable.hasActiveFilters}
+                onClearFilters={assetsTable.clearFilters}
+              />
               {errors.assets && (
                 <div className="p-4 bg-red-900/20 border border-red-900/50 rounded-lg text-red-400 mb-4">
                   {errors.assets}
                 </div>
               )}
               {loading.assets ? (
-                <div className="text-center py-8 text-zinc-400">
-                  Loading properties...
-                </div>
+                <TableSkeleton columns={6} />
               ) : (
                 <AssetsTable
                   assets={assets}
@@ -321,8 +418,17 @@ export default function DashboardPage() {
                     }
                     setExpandedAssets(newExpanded);
                   }}
+                  hasActiveFilters={assetsTable.hasActiveFilters}
+                  onClearFilters={assetsTable.clearFilters}
                 />
               )}
+              <TablePagination
+                page={assetsTable.page}
+                totalPages={assetsTable.meta.totalPages}
+                total={assetsTable.meta.total}
+                limit={assetsTable.limit}
+                onPageChange={assetsTable.setPage}
+              />
             </TabsContent>
           </Tabs>
         </div>
