@@ -60,20 +60,25 @@ export class HistoricalIngestionService implements OnApplicationBootstrap {
    * Handles Railway container restarts during a running job.
    */
   async onApplicationBootstrap(): Promise<void> {
-    const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
-    const stale = await this.prisma.historicalIngestion.updateMany({
-      where: {
-        status: IngestionStatus.RUNNING,
-        startedAt: { lt: tenMinutesAgo },
-      },
-      data: {
-        status: IngestionStatus.PAUSED,
-        lastError: 'Paused: application restarted while job was running',
-      },
-    });
+    try {
+      const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
+      const stale = await this.prisma.historicalIngestion.updateMany({
+        where: {
+          status: IngestionStatus.RUNNING,
+          startedAt: { lt: tenMinutesAgo },
+        },
+        data: {
+          status: IngestionStatus.PAUSED,
+          lastError: 'Paused: application restarted while job was running',
+        },
+      });
 
-    if (stale.count > 0) {
-      this.logger.warn(`Marked ${stale.count} stale ingestion(s) as PAUSED on startup`);
+      if (stale.count > 0) {
+        this.logger.warn(`Marked ${stale.count} stale ingestion(s) as PAUSED on startup`);
+      }
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      this.logger.warn(`Startup stale ingestion check failed (table may not exist yet): ${msg}`);
     }
   }
 
