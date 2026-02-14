@@ -27,6 +27,7 @@ export interface ProcessDealContext {
   organizationId: string; // Required - deals must be associated with an organization
   dealId?: string; // Pre-generated dealId for S3 organization
   detection: DealDetection; // Deal detection result (done in webhook)
+  historical?: boolean; // When true, skip reply emails and folder moves (historical ingestion)
 }
 
 export interface ProcessDealResult {
@@ -128,6 +129,15 @@ export class EmailProcessorService {
 
       // Step 5: Handle "no" decisions - skip summary and reply, just move folder (Microsoft only)
       if (decision.decision === 'no') {
+        // Historical ingestion: skip folder moves
+        if (ctx.historical) {
+          const durationSeconds = (Date.now() - startTime) / 1000;
+          this.metricsService.recordDealProcessed('no', event.source, organizationId, inboxOwnerEmail);
+          this.metricsService.recordDealProcessingDuration(durationSeconds, 'no', event.source);
+          this.metricsService.recordEmailEvent(true, 'no', false);
+          this.logger.log(`Historical deal processed in ${durationSeconds.toFixed(2)}s: ${event.messageId} → no (skipped folder move)`);
+          return { processed: true, dealId, decision: 'no', reason: decision.reason };
+        }
         return this.handleDealDecisionNo(
           event,
           accessToken,
@@ -147,14 +157,17 @@ export class EmailProcessorService {
       );
 
       // Step 7: Send reply (must happen BEFORE moving message, as moving changes the message ID)
-      await this.sendDealAnalysisReply(
-        event,
-        accessToken,
-        inboxOwnerEmail,
-        summary,
-        decision,
-        prefs,
-      );
+      // Historical ingestion: skip reply emails
+      if (!ctx.historical) {
+        await this.sendDealAnalysisReply(
+          event,
+          accessToken,
+          inboxOwnerEmail,
+          summary,
+          decision,
+          prefs,
+        );
+      }
 
       const durationSeconds = (Date.now() - startTime) / 1000;
       this.metricsService.recordDealProcessed(
