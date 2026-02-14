@@ -35,7 +35,6 @@ RUN pnpm --filter @analyzer/api run build
 # Expose port
 EXPOSE 8080
 
-# Start the application (run migrations first)
+# Start the application
 CMD cd apps/api && \
-    pnpm exec prisma migrate deploy && \
     node dist/src/main.js
