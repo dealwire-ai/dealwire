@@ -18,8 +18,9 @@ model User {
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
-  microsoftSubscription MicrosoftSubscription?
-  receivedDeals         Deal[]                 @relation("ReceivedDeals")
+  microsoftSubscription  MicrosoftSubscription?
+  receivedDeals          Deal[]                 @relation("ReceivedDeals")
+  triggeredIngestions    HistoricalIngestion[]   @relation("TriggeredIngestions")
 }
 
 model Organization {
@@ -27,11 +28,12 @@ model Organization {
   name                String
   slug                String?                @unique
   imageUrl            String?
-  users               User[]
-  deals               Deal[]
-  screeningPreferences ScreeningPreferences?
-  createdAt           DateTime               @default(now())
-  updatedAt           DateTime               @updatedAt
+  users                 User[]
+  deals                 Deal[]
+  screeningPreferences  ScreeningPreferences?
+  historicalIngestions   HistoricalIngestion[]
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
 }
 
 model MicrosoftSubscription {
@@ -178,6 +180,51 @@ model Document {
 // ============================================
 // SCREENING PREFERENCES - Organization settings
 // ============================================
+// ============================================
+// HISTORICAL INGESTION - Batch inbox processing job
+// ============================================
+enum IngestionStatus {
+  PENDING
+  RUNNING
+  PAUSED
+  COMPLETED
+  FAILED
+}
+
+model HistoricalIngestion {
+  id                     String          @id @default(cuid())
+  organizationId         String
+  organization           Organization    @relation(fields: [organizationId], references: [id])
+  triggeredByUserId      String
+  triggeredByUser        User            @relation("TriggeredIngestions", fields: [triggeredByUserId], references: [id])
+
+  // Config
+  startDate              DateTime?
+  endDate                DateTime?
+  folderName             String          @default("Inbox")
+
+  // Progress
+  status                 IngestionStatus @default(PENDING)
+  totalMessages          Int?
+  scannedCount           Int             @default(0)
+  detectedCount          Int             @default(0)
+  processedCount         Int             @default(0)
+  skippedCount           Int             @default(0)
+  errorCount             Int             @default(0)
+
+  // Resumability
+  nextLink               String?         @db.Text
+  lastProcessedMessageId String?
+  lastError              String?         @db.Text
+
+  startedAt              DateTime?
+  completedAt            DateTime?
+  createdAt              DateTime        @default(now())
+  updatedAt              DateTime        @updatedAt
+
+  @@index([organizationId, status])
+}
+
 model ScreeningPreferences {
   id              String       @id @default(cuid())
   organizationId  String       @unique

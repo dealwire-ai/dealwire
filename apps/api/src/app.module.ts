@@ -15,11 +15,12 @@ import { EmailProcessorModule } from './module/email-processor.module';
 import { NotificationsModule } from './module/notifications.module';
 import { DealDigestModule } from './module/deal-digest.module';
 import { AgentModule } from './module/agent.module';
+import { IngestionModule } from './module/ingestion.module';
 import { ClerkAuthGuard } from './guard/clerk-auth.guard';
 import { ScreeningPreferencesService } from './service/preferences/screening-preferences.service';
 
 @Module({
-  imports: [PrismaModule, WebhookModule, MetricsModule, EmailProcessorModule, NotificationsModule, DealDigestModule, AgentModule],
+  imports: [PrismaModule, WebhookModule, MetricsModule, EmailProcessorModule, NotificationsModule, DealDigestModule, AgentModule, IngestionModule],
   controllers: [
     AppController,
     MetricsController,
