@@ -99,8 +99,8 @@ export class AnalyzerAgentService {
         execute: async () => {
           const [total, yesCount, noCount] = await Promise.all([
             this.prisma.deal.count({ where: orgWhere }),
-            this.prisma.deal.count({ where: { ...orgWhere, initialScreeningDecision: 'YES' } }),
-            this.prisma.deal.count({ where: { ...orgWhere, initialScreeningDecision: 'NO' } }),
+            this.prisma.deal.count({ where: { ...orgWhere, initialScreening: { decision: 'YES' } } }),
+            this.prisma.deal.count({ where: { ...orgWhere, initialScreening: { decision: 'NO' } } }),
           ]);
           return { total, decisions: { yes: yesCount, no: noCount } };
         },
@@ -222,7 +222,7 @@ export class AnalyzerAgentService {
         execute: async ({ search, decision, page = 1, limit = 20 }) => {
           const where: Record<string, unknown> = { ...orgWhere };
           if (decision) {
-            (where as any).initialScreeningDecision = decision;
+            (where as any).initialScreening = { decision };
           }
           if (search) {
             (where as any).OR = [
