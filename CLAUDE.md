@@ -1,7 +1,32 @@
 # Analyzer - AI-Powered Real Estate Deal Analysis Platform
 
 ## Overview
-Analyzer is a monorepo that provides automated real estate deal analysis. When users connect their Microsoft Outlook account, the system monitors their inbox for deal-related emails (teasers, offering memorandums, etc.), extracts and analyzes the content using AI, and replies with a structured summary and go/no-go decision based on client-specific criteria.
+
+Analyzer is an **agentic platform for private market asset analysis** — starting with commercial real estate but designed to extend to businesses, funds, and other private market assets.
+
+### What This Is
+
+This is NOT a traditional SaaS application. Analyzer is an **agentic layer** — software that works autonomously through integrations (email, APIs, data sources) rather than through a web dashboard. The frontend exists for configuration and visibility, but the core value is delivered through:
+
+- **Email integration**: Monitoring inboxes, analyzing incoming deals, replying with structured analysis
+- **Data enrichment**: Pulling property data from APIs, public records, government sites, and other sources to build deep asset intelligence
+- **Autonomous workflows**: Agents that understand context, make decisions, and take actions without requiring a user to click through a UI
+
+### Vision
+
+Build the ultimate private market analyst — an AI system with access to deep property/asset data that can autonomously process deal flow, enrich it with external data, and surface actionable intelligence through the channels people already use (email, messaging, etc.).
+
+### Guiding Principles
+
+1. **Agentic-first**: Every feature should work autonomously. If it requires a user to open a dashboard and click buttons, rethink the approach. The agent should do the work and communicate results through integrations.
+2. **Data depth over breadth**: Rich, accurate property/asset data is the moat. Invest in data quality — source from APIs, public records, and scraping where needed.
+3. **Integration-native**: Meet users where they are (Outlook, email, future channels). Don't force them into yet another app.
+4. **Not just real estate**: Architecture decisions should account for extending to other private market asset classes (businesses, funds, etc.) — avoid hard-coding real estate assumptions where possible.
+5. **Replace SaaS, don't rebuild it**: Don't replicate CRM/pipeline/dashboard patterns from legacy software. Build the intelligent layer that makes those tools unnecessary.
+
+### Current Capabilities
+
+When users connect their Microsoft Outlook account, the system monitors their inbox for deal-related emails (teasers, offering memorandums, etc.), extracts and analyzes the content using AI, and replies with a structured summary and go/no-go decision based on client-specific criteria.
 
 ## Architecture
 
