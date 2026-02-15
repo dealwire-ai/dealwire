@@ -8,11 +8,11 @@
   "scripts": {
     "dev": "nest start --watch",
     "build": "prisma generate && nest build",
-    "start": "prisma migrate deploy && node dist/src/main.js",
+    "start": "prisma migrate resolve --rolled-back 20260215000000_remove_deprecated_screening_fields 2>/dev/null; prisma migrate deploy && node dist/src/main.js",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:push": "prisma db push",
-    "db:migrate:prod": "prisma migrate deploy",
+    "db:migrate:prod": "sh -c 'read -sp \"Supabase password: \" PW && echo && PW_ENC=$(python3 -c \"import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1],safe=\\\"\\\")); \" \"$PW\") && DATABASE_URL=\"postgresql://postgres.icujkrafywivakbfrerg:${PW_ENC}@aws-1-us-east-1.pooler.supabase.com:5432/postgres\" DIRECT_URL=\"postgresql://postgres.icujkrafywivakbfrerg:${PW_ENC}@aws-1-us-east-1.pooler.supabase.com:5432/postgres\" prisma migrate deploy'",
     "db:studio": "prisma studio",
     "db:seed": "ts-node prisma/seed.ts",
     "test": "jest",
