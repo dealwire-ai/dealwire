@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { ScreeningBucket } from '@prisma/client';
 import { EmailProcessingService } from '../email/email-processing.service';
 import { EmailTemplateService } from '../email/email-template.service';
 import { EmailSenderService } from '../email/email-sender.service';
@@ -6,8 +7,8 @@ import { MicrosoftGraphService } from '../microsoft/microsoft-graph.service';
 import {
   ScreeningPreferencesService,
   ScreeningPreferences,
-  DEFAULT_PASSED_FOLDER,
 } from '../preferences/screening-preferences.service';
+import { ScreeningBucketService } from '../preferences/screening-bucket.service';
 import { DealSummaryService } from '../deal/deal-summary.service';
 import { InitialScreeningService } from '../deal/initial-screening.service';
 import { DataExtractionService } from '../deal/data-extraction.service';
@@ -37,6 +38,8 @@ export interface ProcessDealResult {
   decision?: 'yes' | 'no';
   reason?: string;
   skippedReason?: string;
+  bucketId?: string;
+  bucketName?: string;
 }
 
 @Injectable()
@@ -50,6 +53,7 @@ export class EmailProcessorService {
     private readonly emailSenderService: EmailSenderService,
     private readonly microsoftGraphService: MicrosoftGraphService,
     private readonly screeningPreferencesService: ScreeningPreferencesService,
+    private readonly screeningBucketService: ScreeningBucketService,
     private readonly dealSummaryService: DealSummaryService,
     private readonly initialScreeningService: InitialScreeningService,
     private readonly dataExtractionService: DataExtractionService,
@@ -91,13 +95,21 @@ export class EmailProcessorService {
 
       const combinedText = extractedTexts.join('\n\n');
 
-      // Step 2: Get client preferences
+      // Step 2: Get client preferences and screening buckets
       const prefs = await this.screeningPreferencesService.getPreferences(organizationId);
+      const buckets = await this.screeningBucketService.findAll(organizationId);
+
+      if (buckets.length === 0) {
+        // Safety net: ensure default buckets exist
+        await this.screeningBucketService.ensureDefaultBuckets(organizationId);
+        const defaultBuckets = await this.screeningBucketService.findAll(organizationId);
+        buckets.push(...defaultBuckets);
+      }
 
       // Step 3: Save deal to database first (without screening fields - screening service handles that)
       // Attachments already in S3 from webhook
       const dealId = await this.saveDeal(ctx, detection, accessToken);
-      
+
       if (!dealId) {
         throw new Error('Failed to save deal');
       }
@@ -106,7 +118,7 @@ export class EmailProcessorService {
       const decision = await this.initialScreeningService.screen(
         dealId,
         combinedText,
-        prefs.dealCriteria,
+        buckets,
         event.from,
         event.fromName,
       );
@@ -137,71 +149,56 @@ export class EmailProcessorService {
         this.logger.log(`Associated deal ${dealId} with contact ${decision.contactId}`);
       }
 
-      // Step 5: Handle "no" decisions - skip summary and reply, just move folder (Microsoft only)
-      if (decision.decision === 'no') {
-        // Historical ingestion: skip folder moves
-        if (ctx.historical) {
-          const durationSeconds = (Date.now() - startTime) / 1000;
-          this.metricsService.recordDealProcessed('no', event.source, organizationId, inboxOwnerEmail);
-          this.metricsService.recordDealProcessingDuration(durationSeconds, 'no', event.source);
-          this.metricsService.recordEmailEvent(true, 'no', false);
-          this.logger.log(`Historical deal processed in ${durationSeconds.toFixed(2)}s: ${event.messageId} → no (skipped folder move)`);
-          return { processed: true, dealId, decision: 'no', reason: decision.reason };
-        }
-        return this.handleDealDecisionNo(
-          event,
-          accessToken,
-          dealId,
-          prefs,
-          decision,
-          startTime,
-          organizationId,
-          inboxOwnerEmail,
-        );
+      // Step 5: Find the matched bucket and dispatch on its action
+      const matchedBucket = buckets.find((b) => b.id === decision.bucketId) || buckets[buckets.length - 1];
+
+      // Historical ingestion: skip email actions (folder moves, replies, drafts)
+      if (ctx.historical) {
+        const durationSeconds = (Date.now() - startTime) / 1000;
+        this.metricsService.recordDealProcessed(decision.decision, event.source, organizationId, inboxOwnerEmail);
+        this.metricsService.recordDealProcessingDuration(durationSeconds, decision.decision, event.source);
+        this.metricsService.recordEmailEvent(true, decision.decision, false);
+        this.logger.log(`Historical deal processed in ${durationSeconds.toFixed(2)}s: ${event.messageId} → ${decision.decision} bucket="${matchedBucket.name}" (skipped actions)`);
+        return { processed: true, dealId, decision: decision.decision, reason: decision.reason, bucketId: matchedBucket.id, bucketName: matchedBucket.name };
       }
 
-      // Step 6: For "yes" decisions, generate summary
-      const summary = await this.dealSummaryService.summarizeDeal(
+      // Dispatch on bucket action
+      await this.executeBucketAction(
+        matchedBucket,
+        event,
+        accessToken,
+        inboxOwnerEmail,
+        dealId,
         combinedText,
-        prefs.dealCriteria,
+        decision,
+        prefs,
       );
-
-      // Step 7: Send reply (must happen BEFORE moving message, as moving changes the message ID)
-      // Historical ingestion: skip reply emails
-      if (!ctx.historical) {
-        await this.sendDealAnalysisReply(
-          event,
-          accessToken,
-          inboxOwnerEmail,
-          summary,
-          decision,
-          prefs,
-        );
-      }
 
       const durationSeconds = (Date.now() - startTime) / 1000;
       this.metricsService.recordDealProcessed(
-        decision.decision as 'yes' | 'no',
+        decision.decision,
         event.source,
         organizationId,
         inboxOwnerEmail,
       );
       this.metricsService.recordDealProcessingDuration(
         durationSeconds,
-        decision.decision as 'yes' | 'no',
+        decision.decision,
         event.source,
       );
-      this.metricsService.recordEmailEvent(true, decision.decision as 'yes' | 'no', false);
+      this.metricsService.recordEmailEvent(true, decision.decision, false);
 
       this.logger.log(
-        `Deal processed in ${durationSeconds.toFixed(2)}s: ${event.messageId} → ${decision.decision}`,
+        `Deal processed in ${durationSeconds.toFixed(2)}s: ${event.messageId} → ${decision.decision} bucket="${matchedBucket.name}" action=${matchedBucket.action}`,
       );
 
       return {
         processed: true,
         dealId,
-        decision: decision.decision as 'yes' | 'no',
+        decision: decision.decision,
         reason: decision.reason,
+        bucketId: matchedBucket.id,
+        bucketName: matchedBucket.name,
       };
     } catch (error: unknown) {
       const errorType = error instanceof Error ? error.constructor.name : 'Unknown';
@@ -224,79 +221,118 @@ export class EmailProcessorService {
   }
 
   /**
-   * Handle "no" deal decision: move to passed folder (Microsoft only), record metrics, return early.
-   * No summary or reply is generated.
+   * Execute the action defined by the matched screening bucket.
    */
-  private async handleDealDecisionNo(
+  private async executeBucketAction(
+    bucket: ScreeningBucket,
     event: NormalizedEmailEvent,
     accessToken: string | undefined,
-    dealId: string,
-    prefs: ScreeningPreferences,
-    decision: InitialScreeningResult,
-    startTime: number,
-    organizationId: string,
     inboxOwnerEmail: string,
-  ): Promise<ProcessDealResult> {
-    if (event.source === 'microsoft' && accessToken && dealId) {
-      const folderName = prefs.passedFolderName || DEFAULT_PASSED_FOLDER;
-      const folderId = await this.microsoftGraphService.getOrCreateFolder(accessToken, folderName);
-
-      if (folderId) {
-        // Get conversation ID BEFORE moving (message ID changes after move)
-        const originalMessage = await this.microsoftGraphService.getMessage(accessToken, event.messageId);
-        const conversationId = originalMessage?.conversationId;
-
-        // Move original email immediately
-        await this.microsoftGraphService.moveMessage(accessToken, event.messageId, folderId);
-        this.logger.log(`Moved original email ${event.messageId} to ${folderName} (no summary/reply for "no" decision)`);
-
-        // Move entire conversation (wait for Graph API to index)
-        await new Promise((resolve) => setTimeout(resolve, 8000));
-
-        if (conversationId && folderId) {
-          await this.microsoftGraphService.moveConversation(accessToken, conversationId, folderId);
-        }
-
-        // Update Deal record with folder name
-        await this.prismaService.deal.update({
-          where: { id: dealId },
-          data: { folderMovedTo: folderName },
-        });
-
-        // Record metrics
-        this.metricsService.recordFolderMove(folderName);
-      }
+    dealId: string,
+    combinedText: string,
+    decision: InitialScreeningResult,
+    prefs: ScreeningPreferences,
+  ): Promise<void> {
+    // Generate summary if the bucket requires it
+    let summary: string | undefined;
+    if (bucket.generateSummary) {
+      summary = await this.dealSummaryService.summarizeDeal(
+        combinedText,
+        bucket.description,
+      );
     }
 
-    // Record metrics and return (no summary, no reply)
-    const durationSeconds = (Date.now() - startTime) / 1000;
-    this.metricsService.recordDealProcessed(
-      decision.decision as 'yes' | 'no',
-      event.source,
-      organizationId,
-      inboxOwnerEmail,
-    );
-    this.metricsService.recordDealProcessingDuration(
-      durationSeconds,
-      decision.decision as 'yes' | 'no',
-      event.source,
-    );
-    this.metricsService.recordEmailEvent(true, decision.decision as 'yes' | 'no', false);
+    switch (bucket.action) {
+      case 'REPLY_TO_SELF':
+        if (summary) {
+          await this.sendDealAnalysisReply(event, accessToken, inboxOwnerEmail, summary, decision, prefs);
+        }
+        break;
 
-    this.logger.log(
-      `Deal processed in ${durationSeconds.toFixed(2)}s: ${event.messageId} → ${decision.decision} (no summary/reply)`,
-    );
+      case 'DRAFT_REPLY_TO_BROKER':
+        if (summary && event.source === 'microsoft' && accessToken) {
+          await this.handleDraftReplyToBroker(accessToken, event.messageId, summary, decision, prefs);
+        }
+        break;
 
-    return {
-      processed: true,
-      dealId,
-      decision: decision.decision as 'yes' | 'no',
-      reason: decision.reason,
-    };
+      case 'MOVE_TO_FOLDER':
+        if (bucket.folderName) {
+          await this.handleMoveToFolder(event, accessToken, dealId, bucket.folderName);
+        }
+        break;
+
+      case 'NONE':
+        this.logger.log(`Bucket "${bucket.name}" action=NONE, no email action taken for deal ${dealId}`);
+        break;
+    }
   }
 
   /**
-   * Send deal analysis reply (for "yes" decisions).
+   * Move email to a specific folder (Microsoft only).
+   */
+  private async handleMoveToFolder(
+    event: NormalizedEmailEvent,
+    accessToken: string | undefined,
+    dealId: string,
+    folderName: string,
+  ): Promise<void> {
+    if (event.source !== 'microsoft' || !accessToken) return;
+
+    const folderId = await this.microsoftGraphService.getOrCreateFolder(accessToken, folderName);
+    if (!folderId) return;
+
+    // Get conversation ID BEFORE moving (message ID changes after move)
+    const originalMessage = await this.microsoftGraphService.getMessage(accessToken, event.messageId);
+    const conversationId = originalMessage?.conversationId;
+
+    // Move original email immediately
+    await this.microsoftGraphService.moveMessage(accessToken, event.messageId, folderId);
+    this.logger.log(`Moved original email ${event.messageId} to ${folderName}`);
+
+    // Move entire conversation (wait for Graph API to index)
+    await new Promise((resolve) => setTimeout(resolve, 8000));
+
+    if (conversationId && folderId) {
+      await this.microsoftGraphService.moveConversation(accessToken, conversationId, folderId);
+    }
+
+    // Update Deal record with folder name
+    await this.prismaService.deal.update({
+      where: { id: dealId },
+      data: { folderMovedTo: folderName },
+    });
+
+    this.metricsService.recordFolderMove(folderName);
+  }
+
+  /**
+   * Create a draft reply to the broker (original sender) with deal analysis.
+   * The draft is left unsent in the user's Drafts folder for review.
+   */
+  private async handleDraftReplyToBroker(
+    accessToken: string,
+    messageId: string,
+    summary: string,
+    decision: InitialScreeningResult,
+    prefs: ScreeningPreferences,
+  ): Promise<void> {
+    const htmlEmail = this.emailTemplateService.formatSummaryAsHtml(
+      summary,
+      decision,
+      prefs.organizationImageUrl,
+      prefs.companyName,
+      prefs.brandColor,
+    );
+
+    await this.microsoftGraphService.createDraftReplyToBroker(
+      accessToken,
+      messageId,
+      htmlEmail,
+    );
+  }
+
+  /**
+   * Send deal analysis reply to self (threaded).
    * Formats HTML email and sends via Microsoft Graph or Resend API.
    * Must be called BEFORE moving message, as moving changes the message ID.
    */
@@ -327,7 +363,6 @@ export class EmailProcessorService {
       );
 
       // Forward original email to admins (non-blocking)
-      // Admins are also CC'd on the reply, so they'll see both in the conversation thread
       try {
         await this.microsoftGraphService.forwardToAdmins(
           accessToken,
@@ -336,7 +371,6 @@ export class EmailProcessorService {
       } catch (error) {
         const msg = error instanceof Error ? error.message : String(error);
         this.logger.warn(`Failed to forward email to admins: ${msg}`);
-        // Don't fail the deal processing if forward fails
       }
     } else if (event.source === 'resend') {
       // Send reply via Resend API

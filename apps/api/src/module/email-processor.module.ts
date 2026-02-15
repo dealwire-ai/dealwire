@@ -2,6 +2,7 @@ import { Module, forwardRef } from '@nestjs/common';
 import { SqsModule, SqsService } from '@ssut/nestjs-sqs';
 import { EmailProcessorService } from '../service/email/email-processor.service';
 import { NormalizedEmailListenerService } from '../service/email/normalized-email-listener.service';
+import { ScreeningBucketService } from '../service/preferences/screening-bucket.service';
 import { SQSService } from '../service/sqs/sqs.service';
 import { AIModule } from './ai.module';
 import { AgentModule } from './agent.module';
@@ -50,6 +51,7 @@ const sqsImports = enableSqs
   providers: [
     EmailProcessorService,
     NormalizedEmailListenerService,
+    ScreeningBucketService,
     SQSService,
     ...(enableSqs ? [] : [{ provide: SqsService, useValue: null }]),
   ],

@@ -32,6 +32,7 @@ model Organization {
   users                 User[]
   deals                 Deal[]
   screeningPreferences  ScreeningPreferences?
+  screeningBuckets      ScreeningBucket[]
   historicalIngestions   HistoricalIngestion[]
   createdAt             DateTime               @default(now())
   updatedAt             DateTime               @updatedAt
@@ -95,6 +96,13 @@ enum Decision {
   NO
 }
 
+enum BucketAction {
+  REPLY_TO_SELF
+  DRAFT_REPLY_TO_BROKER
+  MOVE_TO_FOLDER
+  NONE
+}
+
 // ============================================
 // INITIAL SCREENING - Screening result for a deal
 // ============================================
@@ -106,8 +114,12 @@ model InitialScreening {
   deal   Deal   @relation(fields: [dealId], references: [id], onDelete: Cascade)
 
   // Screening result
-  decision Decision // YES or NO
+  decision Decision // YES or NO (derived from bucket.isPass)
   reason   String   @db.Text // One-sentence reason from screening
+
+  // Bucket classification
+  screeningBucketId String?
+  screeningBucket   ScreeningBucket? @relation(fields: [screeningBucketId], references: [id], onDelete: SetNull)
 
   // When screening was performed
   screenedAt DateTime @default(now())
@@ -121,6 +133,31 @@ model InitialScreening {
 
   @@index([dealId, digestSent, digestSentAt])
   @@index([dealId, digestSent, screenedAt])
+}
+
+// ============================================
+// SCREENING BUCKET - Customizable deal classification tier
+// ============================================
+model ScreeningBucket {
+  id              String       @id @default(cuid())
+  organizationId  String
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  name            String       // "Hot Deal", "Good Fit", "Pass"
+  description     String       @db.Text  // Criteria for AI classification
+  rank            Int          // 1 = highest priority
+  isPass          Boolean      // true = Decision.YES, false = Decision.NO
+  action          BucketAction @default(NONE)
+  folderName      String?      // For MOVE_TO_FOLDER action
+  generateSummary Boolean      @default(false)
+  color           String?      // Hex color for UI/email
+
+  initialScreenings InitialScreening[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([organizationId])
 }
 
 // ============================================

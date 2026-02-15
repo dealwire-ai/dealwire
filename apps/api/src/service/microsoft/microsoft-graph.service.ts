@@ -806,6 +806,58 @@ export class MicrosoftGraphService {
   }
 
   /**
+   * Create a draft reply to the original sender (broker) without sending it.
+   * The draft appears in the user's Drafts folder for review before sending.
+   * Does NOT add X-Analyzer-Sent header since it's not sent by us.
+   */
+  async createDraftReplyToBroker(
+    accessToken: string,
+    messageId: string,
+    htmlBody: string,
+  ): Promise<boolean> {
+    try {
+      // Create reply draft — toRecipients defaults to the original sender
+      const createReplyBody = {
+        message: {
+          body: {
+            contentType: 'html',
+            content: htmlBody,
+          },
+        },
+      };
+
+      const createResponse = await fetch(
+        `${GRAPH_BASE_URL}/me/messages/${messageId}/createReply`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(createReplyBody),
+        },
+      );
+
+      if (!createResponse.ok) {
+        const errorText = await createResponse.text();
+        this.logger.error(
+          `Failed to create draft reply to broker: ${createResponse.status} - ${errorText}`,
+        );
+        return false;
+      }
+
+      this.logger.log(
+        `Draft reply to broker created for message ${messageId}`,
+      );
+      return true;
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Error creating draft reply to broker for ${messageId}: ${msg}`);
+      return false;
+    }
+  }
+
+  /**
    * Convert a Microsoft Graph message to our NormalizedEmailEvent format
    */
   async toNormalizedEvent(

@@ -5,6 +5,7 @@ import { DealController } from './controller/deal.controller';
 import { ContactController } from './controller/contact.controller';
 import { AssetController } from './controller/asset.controller';
 import { ScreeningPreferencesController } from './controller/screening-preferences.controller';
+import { ScreeningBucketController } from './controller/screening-bucket.controller';
 import { EmailEventController } from './controller/email-event.controller';
 import { ChatController } from './controller/chat.controller';
 import { AppService } from './service/app.service';
@@ -18,6 +19,7 @@ import { AgentModule } from './module/agent.module';
 import { IngestionModule } from './module/ingestion.module';
 import { ClerkAuthGuard } from './guard/clerk-auth.guard';
 import { ScreeningPreferencesService } from './service/preferences/screening-preferences.service';
+import { ScreeningBucketService } from './service/preferences/screening-bucket.service';
 
 @Module({
   imports: [PrismaModule, WebhookModule, MetricsModule, EmailProcessorModule, NotificationsModule, DealDigestModule, AgentModule, IngestionModule],
@@ -28,9 +30,10 @@ import { ScreeningPreferencesService } from './service/preferences/screening-pre
     ContactController,
     AssetController,
     ScreeningPreferencesController,
+    ScreeningBucketController,
     EmailEventController,
     ChatController,
   ],
-  providers: [AppService, ClerkAuthGuard, ScreeningPreferencesService],
+  providers: [AppService, ClerkAuthGuard, ScreeningPreferencesService, ScreeningBucketService],
 })
 export class AppModule {}
