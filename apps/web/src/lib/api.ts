@@ -12,13 +12,8 @@ export async function apiClient(endpoint: string, options: RequestInit = {}) {
   // Get the token with no template - this returns the default Clerk session JWT
   const token = await getToken();
   
-  console.log('[apiClient] Calling:', endpoint);
-  console.log('[apiClient] Token obtained:', token ? 'YES' : 'NO');
-  if (token) {
-    console.log('[apiClient] Token preview:', token.substring(0, 50) + '...');
-    console.log('[apiClient] Token has dots:', (token.match(/\./g) || []).length);
-  }
-  
+  console.log(JSON.stringify({ context: 'apiClient', message: 'Calling endpoint', endpoint, hasToken: !!token }));
+
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
     ...(token && { Authorization: `Bearer ${token}` }),
