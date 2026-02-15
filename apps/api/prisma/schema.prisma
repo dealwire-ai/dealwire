@@ -74,6 +74,10 @@ model Deal {
   detectionReason     String? @db.Text // Why it was classified as a deal
   folderMovedTo       String? // Folder name if moved (e.g., "Passed Deals")
 
+  // Structured extracted data
+  dealType      String? // "real_estate", "debt", "business", "unknown"
+  extractedData Json? // Typed at app layer per dealType
+
   // Relationships
   asset             Asset?             @relation(fields: [assetId], references: [id])
   assetId           String?
