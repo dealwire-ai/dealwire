@@ -144,32 +144,43 @@ async function main() {
     const dayOffset = i;
     const receivedAt = new Date(2026, 0, 5 + dayOffset, 8 + (i % 12), (i * 17) % 60);
 
+    const dealId = `deal_seed_${i + 1}`;
     await prisma.deal.upsert({
-      where: { id: `deal_seed_${i + 1}` },
+      where: { id: dealId },
       update: {
         sourceSubject: t.subject,
-        initialScreeningDecision: t.decision,
-        initialScreeningSummary: t.summary,
         folderMovedTo: t.folder || null,
         assetId: assets[assetIdx].id,
         contactId: contacts[contactIdx].id,
         sourceReceivedAt: receivedAt,
       },
       create: {
-        id: `deal_seed_${i + 1}`,
+        id: dealId,
         organizationId: org.id,
         receivedByUserId: user.id,
         sourceMessageId: `msg_seed_${i + 1}`,
         sourceFrom: contactData[contactIdx].email,
         sourceSubject: t.subject,
         sourceReceivedAt: receivedAt,
-        initialScreeningDecision: t.decision,
-        initialScreeningSummary: t.summary,
         detectionConfidence: 'high',
         detectionReason: 'Email contains acquisition details and deal information',
         folderMovedTo: t.folder || null,
         assetId: assets[assetIdx].id,
         contactId: contacts[contactIdx].id,
+      },
+    });
+
+    // Create InitialScreening record (the proper relation)
+    await prisma.initialScreening.upsert({
+      where: { dealId },
+      update: {
+        decision: t.decision,
+        reason: t.summary,
+      },
+      create: {
+        dealId,
+        decision: t.decision,
+        reason: t.summary,
       },
     });
   }

@@ -41,7 +41,7 @@ export class DealController {
     const where: any = { organizationId };
 
     if (decision) {
-      where.initialScreeningDecision = decision;
+      where.initialScreening = { decision };
     }
     if (search) {
       where.OR = [
@@ -100,8 +100,8 @@ export class DealController {
 
     const [total, yesCount, noCount, byConfidence, byFolder] = await Promise.all([
       this.prismaService.deal.count({ where }),
-      this.prismaService.deal.count({ where: { ...where, initialScreeningDecision: 'YES' } }),
-      this.prismaService.deal.count({ where: { ...where, initialScreeningDecision: 'NO' } }),
+      this.prismaService.deal.count({ where: { ...where, initialScreening: { decision: 'YES' } } }),
+      this.prismaService.deal.count({ where: { ...where, initialScreening: { decision: 'NO' } } }),
       this.prismaService.deal.groupBy({
         by: ['detectionConfidence'],
         where,

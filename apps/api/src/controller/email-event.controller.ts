@@ -54,7 +54,7 @@ export class EmailEventController {
           sourceSubject: true,
           sourceFrom: true,
           sourceReceivedAt: true,
-          initialScreeningDecision: true,
+          initialScreening: { select: { decision: true, reason: true } },
           detectionConfidence: true,
           detectionReason: true,
           folderMovedTo: true,
@@ -97,8 +97,8 @@ export class EmailEventController {
 
     const [total, yesCount, noCount] = await Promise.all([
       this.prismaService.deal.count({ where }),
-      this.prismaService.deal.count({ where: { ...where, initialScreeningDecision: 'YES' } }),
-      this.prismaService.deal.count({ where: { ...where, initialScreeningDecision: 'NO' } }),
+      this.prismaService.deal.count({ where: { ...where, initialScreening: { decision: 'YES' } } }),
+      this.prismaService.deal.count({ where: { ...where, initialScreening: { decision: 'NO' } } }),
     ]);
 
     return {
