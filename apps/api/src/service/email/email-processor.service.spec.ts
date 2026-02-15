@@ -7,6 +7,7 @@ import { ScreeningPreferencesService } from '../preferences/screening-preference
 import { DealSummaryService } from '../deal/deal-summary.service';
 import { InitialScreeningService } from '../deal/initial-screening.service';
 import { DealDetectionService } from '../deal/deal-detection.service';
+import { DataExtractionService } from '../deal/data-extraction.service';
 import { MetricsService } from '../metrics/metrics.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { S3Service } from '../s3/s3.service';
@@ -84,6 +85,12 @@ describe('EmailProcessorService', () => {
               decision: 'yes',
               reason: 'Good deal',
             }),
+          },
+        },
+        {
+          provide: DataExtractionService,
+          useValue: {
+            extract: jest.fn().mockResolvedValue(undefined),
           },
         },
         {
