@@ -22,13 +22,13 @@ export async function extractPdfText(pdfBuffer: Buffer): Promise<string> {
       const text = await fs.readFile(tmpTxt, 'utf-8');
       return text;
     } catch (pdftotextError) {
-      console.error('pdftotext failed:', pdftotextError);
+      console.error(JSON.stringify({ level: 'error', context: 'PdfParser', message: 'pdftotext failed', error: String(pdftotextError) }));
       // Fallback: use strings command
       try {
         const { stdout } = await execAsync(`strings "${tmpPdf}"`);
         return stdout;
       } catch (stringsError) {
-        console.error('strings fallback also failed:', stringsError);
+        console.error(JSON.stringify({ level: 'error', context: 'PdfParser', message: 'strings fallback also failed', error: String(stringsError) }));
         throw stringsError;
       }
     }

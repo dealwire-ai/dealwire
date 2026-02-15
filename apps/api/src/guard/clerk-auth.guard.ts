@@ -2,6 +2,7 @@ import {
   CanActivate,
   ExecutionContext,
   Injectable,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { Request } from 'express';
@@ -24,6 +25,8 @@ declare global {
 
 @Injectable()
 export class ClerkAuthGuard implements CanActivate {
+  private readonly logger = new Logger(ClerkAuthGuard.name);
+
   constructor(private readonly prisma: PrismaService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -36,7 +39,7 @@ export class ClerkAuthGuard implements CanActivate {
     const token = bearer || undefined;
 
     if (!token) {
-      console.log('[ClerkAuthGuard] No token provided');
+      this.logger.log('No token provided');
       if (config.requireAuth) {
         throw new UnauthorizedException('Missing or invalid authorization');
       }
@@ -48,14 +51,14 @@ export class ClerkAuthGuard implements CanActivate {
         secretKey: config.clerkSecretKey,
       });
       
-      console.log('[ClerkAuthGuard] Token verification result:', JSON.stringify(result, null, 2));
-      
+      this.logger.debug(`Token verified, subject: ${result.sub}`);
+
       const clerkUserId = result.sub || (result.data as any)?.sub;
-      
-      console.log('[ClerkAuthGuard] Extracted user ID:', clerkUserId);
-      
+
+      this.logger.log(`Extracted user ID: ${clerkUserId}`);
+
       if (!clerkUserId) {
-        console.log('[ClerkAuthGuard] No user ID in token. Full result:', result);
+        this.logger.warn(`No user ID in token`);
         if (config.requireAuth) {
           throw new UnauthorizedException('Invalid token');
         }
@@ -67,17 +70,12 @@ export class ClerkAuthGuard implements CanActivate {
         select: { id: true, organizationId: true, email: true },
       });
 
-      console.log('[ClerkAuthGuard] User lookup result:', {
-        found: !!user,
-        userId: user?.id,
-        organizationId: user?.organizationId,
-        email: user?.email,
-      });
+      this.logger.log(`User lookup: found=${!!user}, userId=${user?.id}, organizationId=${user?.organizationId}`);
 
       if (!user) {
-        console.log('[ClerkAuthGuard] ⚠️ User not found in database. User needs to be synced via Clerk webhook.');
+        this.logger.warn(`User not found in database - needs sync via Clerk webhook`);
       } else if (!user.organizationId) {
-        console.log('[ClerkAuthGuard] ⚠️ User found but has no organizationId. User needs to be added to an organization in Clerk.');
+        this.logger.warn(`User found but has no organizationId - needs org assignment in Clerk`);
       }
 
       request.auth = {
@@ -86,7 +84,7 @@ export class ClerkAuthGuard implements CanActivate {
       };
       return true;
     } catch (error) {
-      console.log('[ClerkAuthGuard] Token verification failed:', error instanceof Error ? error.message : error);
+      this.logger.warn(`Token verification failed: ${error instanceof Error ? error.message : error}`);
       if (config.requireAuth) {
         throw new UnauthorizedException('Invalid or expired token');
       }
