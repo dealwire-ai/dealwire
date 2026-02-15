@@ -10,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { formatRelativeDate } from "@/lib/date-utils";
 
 interface Contact {
   id: string;
@@ -24,17 +25,29 @@ interface ContactsTableProps {
   contacts: Contact[];
   expandedRows: Set<string>;
   onToggleRow: (id: string) => void;
+  hasActiveFilters?: boolean;
+  onClearFilters?: () => void;
 }
 
 export function ContactsTable({
   contacts,
   expandedRows,
   onToggleRow,
+  hasActiveFilters,
+  onClearFilters,
 }: ContactsTableProps) {
   if (contacts.length === 0) {
     return (
-      <div className="text-center py-8 text-zinc-400">
-        No contacts found.
+      <div className="text-center py-12 text-zinc-400">
+        <p>{hasActiveFilters ? "No contacts match your search." : "No contacts found."}</p>
+        {hasActiveFilters && onClearFilters && (
+          <button
+            onClick={onClearFilters}
+            className="mt-2 text-sm text-[#3ECFA0] hover:underline"
+          >
+            Clear filters
+          </button>
+        )}
       </div>
     );
   }
@@ -47,7 +60,7 @@ export function ContactsTable({
           <TableHead>Email</TableHead>
           <TableHead>First Name</TableHead>
           <TableHead>Last Name</TableHead>
-          <TableHead>Created At</TableHead>
+          <TableHead>Created</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -70,60 +83,65 @@ export function ContactsTable({
                 <TableCell>{contact.firstName || "-"}</TableCell>
                 <TableCell>{contact.lastName || "-"}</TableCell>
                 <TableCell>
-                  {new Date(contact.createdAt).toLocaleDateString()}
+                  {formatRelativeDate(contact.createdAt)}
                 </TableCell>
               </TableRow>
               {isExpanded && (
                 <TableRow>
-                  <TableCell colSpan={5} className="bg-zinc-950/50 p-4 transition-all duration-200">
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <div className="text-zinc-400 mb-2 font-medium">
-                          Contact Information
-                        </div>
-                        <div className="space-y-2">
-                          <div>
-                            <span className="text-zinc-500">Email: </span>
-                            <span className="text-zinc-300">
-                              {contact.email}
-                            </span>
+                  <TableCell
+                    colSpan={5}
+                    className="bg-zinc-950/50 p-0 transition-all duration-200"
+                  >
+                    <div className="border-l-2 border-[#3ECFA0] pl-4 py-4 pr-4">
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <div className="text-zinc-400 mb-2 font-medium">
+                            Contact Information
                           </div>
-                          {contact.firstName && (
+                          <div className="space-y-2">
                             <div>
-                              <span className="text-zinc-500">
-                                First Name:{" "}
-                              </span>
+                              <span className="text-zinc-500">Email: </span>
                               <span className="text-zinc-300">
-                                {contact.firstName}
+                                {contact.email}
                               </span>
                             </div>
-                          )}
-                          {contact.lastName && (
+                            {contact.firstName && (
+                              <div>
+                                <span className="text-zinc-500">
+                                  First Name:{" "}
+                                </span>
+                                <span className="text-zinc-300">
+                                  {contact.firstName}
+                                </span>
+                              </div>
+                            )}
+                            {contact.lastName && (
+                              <div>
+                                <span className="text-zinc-500">Last Name: </span>
+                                <span className="text-zinc-300">
+                                  {contact.lastName}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        <div>
+                          <div className="text-zinc-400 mb-2 font-medium">
+                            Metadata
+                          </div>
+                          <div className="space-y-2">
                             <div>
-                              <span className="text-zinc-500">Last Name: </span>
+                              <span className="text-zinc-500">Created: </span>
                               <span className="text-zinc-300">
-                                {contact.lastName}
+                                {new Date(contact.createdAt).toLocaleString()}
                               </span>
                             </div>
-                          )}
-                        </div>
-                      </div>
-                      <div>
-                        <div className="text-zinc-400 mb-2 font-medium">
-                          Metadata
-                        </div>
-                        <div className="space-y-2">
-                          <div>
-                            <span className="text-zinc-500">Created: </span>
-                            <span className="text-zinc-300">
-                              {new Date(contact.createdAt).toLocaleString()}
-                            </span>
-                          </div>
-                          <div>
-                            <span className="text-zinc-500">Updated: </span>
-                            <span className="text-zinc-300">
-                              {new Date(contact.updatedAt).toLocaleString()}
-                            </span>
+                            <div>
+                              <span className="text-zinc-500">Updated: </span>
+                              <span className="text-zinc-300">
+                                {formatRelativeDate(contact.updatedAt)}
+                              </span>
+                            </div>
                           </div>
                         </div>
                       </div>
