@@ -18,7 +18,6 @@ interface Deal {
   sourceSubject: string | null;
   sourceFrom: string | null;
   sourceReceivedAt: string | null;
-  initialScreeningDecision: "YES" | "NO" | null;
   initialScreeningSummary: string | null;
   folderMovedTo: string | null;
   assetId?: string | null;
@@ -137,7 +136,7 @@ export function DealsTable({
           const isExpanded = expandedRows.has(deal.id);
           const asset = getAsset(deal.assetId);
           const contact = getContact(deal.contactId);
-          const decision = deal.initialScreening?.decision || deal.initialScreeningDecision;
+          const decision = deal.initialScreening?.decision;
 
           return (
             <Fragment key={deal.id}>

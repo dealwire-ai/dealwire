@@ -27,7 +27,6 @@ interface Deal {
   sourceSubject: string | null;
   sourceFrom: string | null;
   sourceReceivedAt: string | null;
-  initialScreeningDecision: "YES" | "NO" | null;
   initialScreeningSummary: string | null;
   detectionConfidence: string | null;
   detectionReason: string | null;
