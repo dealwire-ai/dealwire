@@ -45,7 +45,7 @@ export async function POST(req: Request) {
       headers: Object.fromEntries(apiRes.headers.entries()),
     });
   } catch (error) {
-    console.error('Chat API error:', error);
+    console.error(JSON.stringify({ context: 'ChatAPI', message: 'Chat API error', error: error instanceof Error ? error.message : String(error) }));
     return new Response(
       JSON.stringify({ error: 'Internal server error' }),
       { status: 500, headers: { 'Content-Type': 'application/json' } }

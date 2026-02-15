@@ -7,6 +7,7 @@ import {
   DefaultValuePipe,
   HttpException,
   HttpStatus,
+  Logger,
   UseGuards,
 } from '@nestjs/common';
 import { PrismaService } from '../service/prisma/prisma.service';
@@ -16,6 +17,8 @@ import { AuthUser } from '../decorator/auth-user.decorator';
 @Controller('deals')
 @UseGuards(ClerkAuthGuard)
 export class DealController {
+  private readonly logger = new Logger(DealController.name);
+
   constructor(private readonly prismaService: PrismaService) {}
 
   @Get()
@@ -27,10 +30,10 @@ export class DealController {
     @Query('decision') decision?: 'YES' | 'NO',
     @Query('search') search?: string,
   ) {
-    console.log('[DealController] GET /deals - userId:', userId, 'organizationId:', organizationId);
-    
+    this.logger.log(`GET /deals - userId=${userId}, organizationId=${organizationId}`);
+
     if (!organizationId) {
-      console.log('[DealController] ❌ Rejecting request - user not in organization');
+      this.logger.warn(`Rejecting request - user not in organization`);
       throw new HttpException(
         'User not in organization. Please ensure: 1) Your user exists in the database (synced via Clerk webhook), and 2) You are added to an organization in Clerk.',
         HttpStatus.FORBIDDEN,
