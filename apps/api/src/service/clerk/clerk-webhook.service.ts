@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { MicrosoftSubscriptionService } from '../microsoft/microsoft-subscription.service';
+import { ScreeningBucketService } from '../preferences/screening-bucket.service';
 
 @Injectable()
 export class ClerkWebhookService {
@@ -9,6 +10,7 @@ export class ClerkWebhookService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly microsoftSubscription: MicrosoftSubscriptionService,
+    private readonly screeningBucketService: ScreeningBucketService,
   ) {}
 
   async handleEvent(eventType: string, data: any): Promise<void> {
@@ -221,7 +223,8 @@ export class ClerkWebhookService {
         },
       },
     });
-    this.logger.log(`Organization created: ${data.id} with default screening preferences`);
+    await this.screeningBucketService.ensureDefaultBuckets(data.id);
+    this.logger.log(`Organization created: ${data.id} with default screening preferences and buckets`);
   }
 
   private async upsertOrganization(data: any): Promise<void> {
@@ -258,6 +261,8 @@ export class ClerkWebhookService {
       });
       this.logger.log(`Created default screening preferences for organization ${data.id}`);
     }
+
+    await this.screeningBucketService.ensureDefaultBuckets(data.id);
 
     this.logger.log(`Organization updated: ${data.id}`);
   }
@@ -314,6 +319,8 @@ export class ClerkWebhookService {
         });
         this.logger.log(`Created default screening preferences for organization ${organizationId}`);
       }
+
+      await this.screeningBucketService.ensureDefaultBuckets(organizationId);
     }
 
     // Ensure user exists before updating

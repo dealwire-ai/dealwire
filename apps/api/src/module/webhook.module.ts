@@ -10,11 +10,12 @@ import { MicrosoftModule } from './microsoft.module';
 import { SQSModule } from './sqs.module';
 import { S3Module } from './s3.module';
 import { ScreeningPreferencesService } from '../service/preferences/screening-preferences.service';
+import { ScreeningBucketService } from '../service/preferences/screening-bucket.service';
 
 @Module({
   imports: [EmailModule, AIModule, PrismaModule, MicrosoftModule, SQSModule, S3Module],
   controllers: [ClerkWebhookController, ResendWebhookController],
-  providers: [ClerkWebhookService, ResendWebhookService, ScreeningPreferencesService],
+  providers: [ClerkWebhookService, ResendWebhookService, ScreeningPreferencesService, ScreeningBucketService],
 })
 export class WebhookModule {}
 

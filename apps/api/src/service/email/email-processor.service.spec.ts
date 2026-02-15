@@ -4,6 +4,7 @@ import { EmailProcessingService } from '../email/email-processing.service';
 import { EmailTemplateService } from '../email/email-template.service';
 import { MicrosoftGraphService } from '../microsoft/microsoft-graph.service';
 import { ScreeningPreferencesService } from '../preferences/screening-preferences.service';
+import { ScreeningBucketService } from '../preferences/screening-bucket.service';
 import { DealSummaryService } from '../deal/deal-summary.service';
 import { InitialScreeningService } from '../deal/initial-screening.service';
 import { DealDetectionService } from '../deal/deal-detection.service';
@@ -14,6 +15,37 @@ import { S3Service } from '../s3/s3.service';
 import { NotificationService } from '../notifications/notification.service';
 import { EmailSenderService } from '../email/email-sender.service';
 import { NormalizedEmailEvent } from '../../dto/normalized-email-event.dto';
+
+const mockBuckets = [
+  {
+    id: 'bucket-yes',
+    organizationId: 'org123',
+    name: 'Yes',
+    description: 'Test criteria',
+    rank: 1,
+    isPass: true,
+    action: 'REPLY_TO_SELF' as const,
+    folderName: null,
+    generateSummary: true,
+    color: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+  {
+    id: 'bucket-no',
+    organizationId: 'org123',
+    name: 'No',
+    description: 'Does not meet criteria',
+    rank: 2,
+    isPass: false,
+    action: 'MOVE_TO_FOLDER' as const,
+    folderName: 'Passed Deals',
+    generateSummary: false,
+    color: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  },
+];
 
 // Mock marked module to avoid ES module issues
 jest.mock('marked', () => ({
@@ -73,6 +105,13 @@ describe('EmailProcessorService', () => {
           },
         },
         {
+          provide: ScreeningBucketService,
+          useValue: {
+            findAll: jest.fn().mockResolvedValue(mockBuckets),
+            ensureDefaultBuckets: jest.fn().mockResolvedValue(undefined),
+          },
+        },
+        {
           provide: DealSummaryService,
           useValue: {
             summarizeDeal: jest.fn().mockResolvedValue('AI-generated summary'),
@@ -84,6 +123,8 @@ describe('EmailProcessorService', () => {
             screen: jest.fn().mockResolvedValue({
               decision: 'yes',
               reason: 'Good deal',
+              bucketId: 'bucket-yes',
+              bucketName: 'Yes',
             }),
           },
         },
@@ -220,11 +261,11 @@ describe('EmailProcessorService', () => {
     expect(result.processed).toBe(true);
     expect(result.dealId).toBe('deal123');
 
-    // Verify InitialScreeningService.screen() was called with dealId, text, criteria, sender email, and sender name
+    // Verify InitialScreeningService.screen() was called with dealId, text, buckets, sender email, and sender name
     expect(initialScreeningService.screen).toHaveBeenCalledWith(
       'deal123',
       expect.stringContaining('extracted pdf text'),
-      'Test criteria',
+      mockBuckets,
       'broker@example.com',
       undefined, // event has no fromName in this test
     );
@@ -276,7 +317,7 @@ describe('EmailProcessorService', () => {
     expect(initialScreeningService.screen).toHaveBeenCalledWith(
       'deal123',
       expect.any(String),
-      'Test criteria',
+      mockBuckets,
       'broker@example.com',
       'John Smith',
     );

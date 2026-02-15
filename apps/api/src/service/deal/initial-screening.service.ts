@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { ScreeningBucket } from '@prisma/client';
 import OpenAI from 'openai';
 import { aiConfig } from '../../config/ai.config';
 import { InitialScreeningResult } from '../../model/initial-screening.model';
@@ -25,10 +26,11 @@ export class InitialScreeningService {
   }
 
   /**
-   * Screen a deal and persist the result to the database
+   * Screen a deal and persist the result to the database.
+   * Classifies the deal into one of the provided screening buckets.
    * @param dealId - The ID of the deal being screened
    * @param extractedText - Raw extracted text from email and attachments (may have formatting issues from OCR)
-   * @param dealCriteria - The client's screening criteria
+   * @param buckets - The org's screening buckets (ordered by rank)
    * @param senderEmail - Email address of the sender (for contact normalization)
    * @param senderName - Sender display name if available (for contact firstName/lastName)
    * @returns The screening result
@@ -36,60 +38,13 @@ export class InitialScreeningService {
   async screen(
     dealId: string,
     extractedText: string,
-    dealCriteria?: string,
+    buckets: ScreeningBucket[],
     senderEmail?: string,
     senderName?: string,
   ): Promise<InitialScreeningResult> {
     const start = Date.now();
     try {
-      // Build prompt based on whether criteria is provided
-      let systemPrompt: string;
-
-      if (dealCriteria) {
-        systemPrompt =
-          'You are a real estate deal screener. Your ONLY job is to check if deals meet the client\'s specific screening requirements.\n\n' +
-          '=== IMPORTANT: THIS IS SCREENING, NOT UNDERWRITING ===\n' +
-          '- Do NOT evaluate deal quality, financial viability, or investment metrics\n' +
-          '- Do NOT reject deals for missing financial metrics, incomplete information, or subjective quality concerns\n' +
-          '- ONLY check if the deal meets or violates the specific requirements listed below\n\n' +
-          '=== CLIENT SCREENING REQUIREMENTS ===\n' +
-          'These are the ONLY criteria you should evaluate. Check each requirement carefully:\n\n' +
-          `${dealCriteria}\n\n` +
-          '=== DECISION RULES ===\n' +
-          '1. Return "yes" ONLY if the deal meets ALL requirements listed above\n' +
-          '2. Return "no" if the deal clearly violates one or more requirements\n' +
-          '3. Be strict about geography and property requirements \n' +
-          '4. Missing Price Handling: If the purchase price is missing but you can infer deal size from units (e.g., 200-unit building), ' +
-          'use typical price-per-unit ranges to estimate. Only reject for missing price if you cannot reasonably infer the deal meets minimum size requirements\n\n' +
-          '=== INPUT FORMAT ===\n' +
-          'The text below is raw extracted text from emails and PDFs. It may have:\n' +
-          '- OCR formatting issues\n' +
-          '- Vertical stacking of text\n' +
-          '- Missing or unclear labels\n\n' +
-          'Use context clues and proximity to match labels with values. Look for information near related terms.\n\n' +
-          '=== OUTPUT FORMAT ===\n' +
-          'Respond with JSON in this exact format:\n' +
-          '{"decision": "yes" or "no", "reason": "your reason", "address": {"street": "123 Main St", "city": "New York", "state": "NY", "country": "USA"}}\n\n' +
-          'The reason should be:\n' +
-          '- One sentence\n' +
-          '- Written as if speaking directly to the client\n' +
-          '- Cite which specific requirement was not met (if "no")\n' +
-          '- Be clear and specific\n\n' +
-          'The address field should contain the property address if available. If no address is found or the deal is not about a specific property, set address to null. ' +
-          'Extract the street address, city, state (use 2-letter abbreviation if possible), and country (default to "USA" if not specified).';
-      } else {
-        systemPrompt =
-          'You are a real estate acquisitions analyst. Evaluate whether this is a ' +
-          'good deal opportunity and make a yes/no decision. ' +
-          "Return 'yes' if it's a good opportunity, 'no' otherwise. " +
-          '\n\nThe text below is raw extracted text from emails and PDFs (may have OCR formatting issues, vertical stacking, etc.). ' +
-          'Use context clues and proximity to match labels with values. ' +
-          'Provide a one-sentence reason for your decision. ' +
-          'Also extract the property address if available. ' +
-          'Respond with JSON in the format: {"decision": "yes" or "no", "reason": "your reason", "address": {"street": "123 Main St", "city": "New York", "state": "NY", "country": "USA"}}. ' +
-          'If no address is found or the deal is not about a specific property, set address to null. ' +
-          'Extract the street address, city, state (use 2-letter abbreviation if possible), and country (default to "USA" if not specified).';
-      }
+      const systemPrompt = this.buildPrompt(buckets);
 
       const response = await this.openai.chat.completions.create({
         model: this.aiConfig.openaiModel,
@@ -109,7 +64,10 @@ export class InitialScreeningService {
       }
 
       const parsedContent = JSON.parse(content);
-      
+
+      // Match AI's returned bucket name to a ScreeningBucket record
+      const matchedBucket = this.matchBucket(parsedContent.bucket, buckets);
+
       // Extract address components from AI response
       let assetId: string | null = null;
       if (parsedContent.address && typeof parsedContent.address === 'object') {
@@ -125,7 +83,6 @@ export class InitialScreeningService {
           this.logger.warn(
             `Failed to process address for deal ${dealId}: ${errorMessage}. Continuing without asset association.`,
           );
-          // Continue without asset - don't fail the screening
         }
       }
 
@@ -142,15 +99,19 @@ export class InitialScreeningService {
           this.logger.warn(
             `Failed to process contact for deal ${dealId}: ${errorMessage}. Continuing without contact association.`,
           );
-          // Continue without contact - don't fail the screening
         }
       }
 
+      // Derive decision from bucket's isPass flag
+      const decision: 'yes' | 'no' = matchedBucket.isPass ? 'yes' : 'no';
+
       const result: InitialScreeningResult = {
-        decision: parsedContent.decision as 'yes' | 'no',
+        decision,
         reason: parsedContent.reason,
         assetId,
         contactId,
+        bucketId: matchedBucket.id,
+        bucketName: matchedBucket.name,
       };
 
       // Persist the screening result to the database
@@ -158,13 +119,15 @@ export class InitialScreeningService {
         where: { dealId },
         create: {
           dealId,
-          decision: result.decision.toUpperCase() as 'YES' | 'NO',
+          decision: decision.toUpperCase() as 'YES' | 'NO',
           reason: result.reason,
+          screeningBucketId: matchedBucket.id,
           screenedAt: new Date(),
         },
         update: {
-          decision: result.decision.toUpperCase() as 'YES' | 'NO',
+          decision: decision.toUpperCase() as 'YES' | 'NO',
           reason: result.reason,
+          screeningBucketId: matchedBucket.id,
           screenedAt: new Date(),
           updatedAt: new Date(),
         },
@@ -174,7 +137,7 @@ export class InitialScreeningService {
       this.metricsService.recordAICall('initial-screening', this.aiConfig.openaiModel, duration, 'success');
 
       this.logger.log(
-        `Initial screening completed: ${result.decision} (model: ${this.aiConfig.openaiModel}) for deal ${dealId}${assetId ? ` with asset ${assetId}` : ' (no asset)'}${contactId ? ` with contact ${contactId}` : ' (no contact)'}`,
+        `Initial screening completed: ${decision} bucket="${matchedBucket.name}" (model: ${this.aiConfig.openaiModel}) for deal ${dealId}${assetId ? ` with asset ${assetId}` : ' (no asset)'}${contactId ? ` with contact ${contactId}` : ' (no contact)'}`,
       );
 
       return result;
@@ -188,5 +151,66 @@ export class InitialScreeningService {
       );
       throw new Error(`Failed to perform initial screening: ${errorMessage}`);
     }
+  }
+
+  private buildPrompt(buckets: ScreeningBucket[]): string {
+    const bucketDescriptions = buckets
+      .map(
+        (b, i) =>
+          `Bucket ${i + 1}: "${b.name}"\nCriteria: ${b.description}`,
+      )
+      .join('\n\n');
+
+    return (
+      'You are a real estate deal screener. Classify the deal into exactly one screening bucket.\n\n' +
+      '=== IMPORTANT: THIS IS SCREENING, NOT UNDERWRITING ===\n' +
+      '- Do NOT evaluate deal quality, financial viability, or investment metrics\n' +
+      '- Do NOT reject deals for missing financial metrics, incomplete information, or subjective quality concerns\n' +
+      '- ONLY check if the deal meets or violates the specific requirements listed in the buckets\n\n' +
+      '=== SCREENING BUCKETS (evaluate in order) ===\n' +
+      `${bucketDescriptions}\n\n` +
+      '=== RULES ===\n' +
+      '1. Evaluate buckets in rank order. Assign to the FIRST bucket whose criteria match.\n' +
+      '2. The last bucket is the catch-all if no earlier bucket matches.\n' +
+      '3. Be strict about geography and property requirements.\n' +
+      '4. Missing Price Handling: If the purchase price is missing but you can infer deal size from units (e.g., 200-unit building), ' +
+      'use typical price-per-unit ranges to estimate. Only reject for missing price if you cannot reasonably infer the deal meets minimum size requirements.\n\n' +
+      '=== INPUT FORMAT ===\n' +
+      'The text below is raw extracted text from emails and PDFs. It may have:\n' +
+      '- OCR formatting issues\n' +
+      '- Vertical stacking of text\n' +
+      '- Missing or unclear labels\n\n' +
+      'Use context clues and proximity to match labels with values. Look for information near related terms.\n\n' +
+      '=== OUTPUT FORMAT ===\n' +
+      'Respond with JSON in this exact format:\n' +
+      '{"bucket": "<bucket name>", "reason": "your reason", "address": {"street": "123 Main St", "city": "New York", "state": "NY", "country": "USA"}}\n\n' +
+      'The bucket field must be the exact name of one of the buckets above.\n\n' +
+      'The reason should be:\n' +
+      '- One sentence\n' +
+      '- Written as if speaking directly to the client\n' +
+      '- Cite which specific requirement was or was not met\n' +
+      '- Be clear and specific\n\n' +
+      'The address field should contain the property address if available. If no address is found or the deal is not about a specific property, set address to null. ' +
+      'Extract the street address, city, state (use 2-letter abbreviation if possible), and country (default to "USA" if not specified).'
+    );
+  }
+
+  /**
+   * Match AI's returned bucket name to a ScreeningBucket record.
+   * Case-insensitive match, falls back to last-ranked bucket if unrecognized.
+   */
+  private matchBucket(bucketName: string | undefined, buckets: ScreeningBucket[]): ScreeningBucket {
+    if (bucketName) {
+      const normalized = bucketName.toLowerCase().trim();
+      const match = buckets.find((b) => b.name.toLowerCase().trim() === normalized);
+      if (match) return match;
+
+      this.logger.warn(
+        `Unrecognized bucket name "${bucketName}" from AI, falling back to last-ranked bucket`,
+      );
+    }
+
+    // Fall back to last-ranked bucket (catch-all)
+    return buckets[buckets.length - 1];
   }
 }
