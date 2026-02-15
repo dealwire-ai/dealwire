@@ -10,6 +10,7 @@ import {
 } from '../preferences/screening-preferences.service';
 import { DealSummaryService } from '../deal/deal-summary.service';
 import { InitialScreeningService } from '../deal/initial-screening.service';
+import { DataExtractionService } from '../deal/data-extraction.service';
 import { DealDetection } from '../deal/deal-detection.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { S3Service } from '../s3/s3.service';
@@ -51,6 +52,7 @@ export class EmailProcessorService {
     private readonly screeningPreferencesService: ScreeningPreferencesService,
     private readonly dealSummaryService: DealSummaryService,
     private readonly initialScreeningService: InitialScreeningService,
+    private readonly dataExtractionService: DataExtractionService,
     private readonly prismaService: PrismaService,
     private readonly s3Service: S3Service,
     private readonly metricsService: MetricsService,
@@ -109,7 +111,15 @@ export class EmailProcessorService {
         event.fromName,
       );
 
-      // Step 4.5: Associate asset with deal if one was found/created
+      // Step 4.5: Extract structured deal data (non-fatal)
+      try {
+        await this.dataExtractionService.extract(dealId, combinedText);
+      } catch (error) {
+        const msg = error instanceof Error ? error.message : String(error);
+        this.logger.warn(`Data extraction failed for deal ${dealId}: ${msg}`);
+      }
+
+      // Step 4.6: Associate asset with deal if one was found/created
       if (decision.assetId) {
         await this.prismaService.deal.update({
           where: { id: dealId },
@@ -118,7 +128,7 @@ export class EmailProcessorService {
         this.logger.log(`Associated deal ${dealId} with asset ${decision.assetId}`);
       }
 
-      // Step 4.6: Associate contact with deal if one was found/created
+      // Step 4.7: Associate contact with deal if one was found/created
       if (decision.contactId) {
         await this.prismaService.deal.update({
           where: { id: dealId },
