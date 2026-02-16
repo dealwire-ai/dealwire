@@ -19,7 +19,8 @@
     "test:watch": "jest --watch",
     "test:integration": "jest --testPathPatterns=integration",
     "test:localstack:up": "docker compose -f docker-compose.test.yml up -d",
-    "test:localstack:down": "docker compose -f docker-compose.test.yml down"
+    "test:localstack:down": "docker compose -f docker-compose.test.yml down",
+    "send-test-email": "bash scripts/send-test-email.sh"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
