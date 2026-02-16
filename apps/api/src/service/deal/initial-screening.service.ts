@@ -22,6 +22,7 @@ export class InitialScreeningService {
   ) {
     this.openai = new OpenAI({
       apiKey: this.aiConfig.openaiApiKey,
+      maxRetries: 3,
     });
   }
 

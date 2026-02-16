@@ -25,6 +25,7 @@ export class DealDetectionService {
   ) {
     this.openai = new OpenAI({
       apiKey: this.aiConfig.openaiApiKey,
+      maxRetries: 3,
     });
   }
 
