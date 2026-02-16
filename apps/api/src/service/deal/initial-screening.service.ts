@@ -212,8 +212,18 @@ export class InitialScreeningService {
       '- Written as if speaking directly to the client\n' +
       '- Cite which specific requirement was or was not met\n' +
       '- Be clear and specific\n\n' +
-      'The address field should contain the property address if available. If no address is found or the deal is not about a specific property, set address to null. ' +
-      'Extract the street address, city, state (use 2-letter abbreviation if possible), and country (default to "USA" if not specified).'
+      '=== ADDRESS EXTRACTION ===\n' +
+      'Extract the PROPERTY address — the address of the asset being offered for sale or investment.\n\n' +
+      'CRITICAL: Do NOT extract addresses from:\n' +
+      '- Email signatures or sign-off blocks\n' +
+      '- Brokerage/company office addresses (often at the bottom of emails)\n' +
+      '- "Contact us" or sender contact information\n' +
+      '- Footer/disclaimer sections\n\n' +
+      'These are SENDER addresses, not property addresses. The property address is typically found in the deal description, subject line, or property highlights section.\n\n' +
+      'If the deal mentions a city/state or neighborhood but no specific street address (common for teasers), return the city and state with street set to null. ' +
+      'For example: {"street": null, "city": "Gretna", "state": "LA", "country": "USA"}\n\n' +
+      'If no property location can be determined at all, set address to null.\n' +
+      'Use 2-letter state abbreviations when possible. Default country to "USA" if not specified.'
     );
   }
 
