@@ -63,6 +63,7 @@ _The data Analyzer produces must be best-in-class. This is the foundation everyt
 ### Phase 2: Data Enrichment
 _Deep data is the moat. An analyst is only as good as their data access._
 
+- [ ] **Public data ingestion platform** — Adapter-based system for pulling tax liens, zoning, permits, assessments, and deed data from municipal/county sources. Starts with NYC (Socrata SODA API + ArcGIS), designed to expand city-by-city via configuration. See [`docs/PUBLIC_DATA_PLATFORM.md`](docs/PUBLIC_DATA_PLATFORM.md) for full architecture.
 - [ ] **Property data enrichment** — Pull from public records, assessor databases, census/demographic data to auto-fill details the email didn't include (year built, lot size, zoning, ownership history, tax assessments).
 - [ ] **Market context** — Auto-attach market comps, submarket stats, rent trends to deal summaries. "This is priced 15% above recent comps in the submarket."
 - [ ] **Deal scoring** — Quantitative scoring beyond yes/no. Rank deals by fit, upside potential, risk factors based on extracted + enriched data.
