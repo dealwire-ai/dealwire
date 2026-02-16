@@ -157,7 +157,7 @@ export class NormalizedEmailListenerService {
       return;
     }
 
-    this.logger.log(`Processing user-reply-command: ${event.messageId} - "${userMessage.slice(0, 50)}..."`);
+    this.logger.log(`Processing user-reply-command: ${event.messageId} - "${userMessage.slice(0, 500)}..."`);
 
     const responseText = await this.analyzerAgent.generate(
       { organizationId },
