@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { motion, useInView } from 'framer-motion';
 import { Building2, Workflow, Sparkles, Linkedin, Mail, TrendingUp, Clock, DollarSign, ArrowRight } from 'lucide-react';
 import { Button } from "../components/ui/button";
+import { useAuth, useClerk } from '@clerk/nextjs';
 import posthog from 'posthog-js';
 
 const FadeInSection = ({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) => {
@@ -25,6 +26,9 @@ const FadeInSection = ({ children, delay = 0 }: { children: React.ReactNode; del
 };
 
 export default function Home() {
+  const { isSignedIn } = useAuth();
+  const { signOut } = useClerk();
+
   return (
     <div className="min-h-screen bg-black text-white overflow-x-hidden font-sans">
       {/* Ambient Background */}
@@ -48,11 +52,24 @@ export default function Home() {
             <button onClick={() => { posthog.capture('nav_section_clicked', { section: 'about' }); document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' }); }} className="hover:text-white transition-colors">About</button>
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/sign-in" onClick={() => posthog.capture('cta_clicked', { cta_type: 'sign_in', location: 'header' })}>
-              <Button className="bg-zinc-800 hover:bg-zinc-700 text-white font-medium px-6">
-                Sign In
+            {isSignedIn ? (
+              <Button
+                className="bg-zinc-800 hover:bg-zinc-700 text-white font-medium px-6"
+                onClick={() => {
+                  posthog.capture('cta_clicked', { cta_type: 'sign_out', location: 'header' });
+                  posthog.reset();
+                  signOut();
+                }}
+              >
+                Sign Out
               </Button>
-            </Link>
+            ) : (
+              <Link href="/sign-in" onClick={() => posthog.capture('cta_clicked', { cta_type: 'sign_in', location: 'header' })}>
+                <Button className="bg-zinc-800 hover:bg-zinc-700 text-white font-medium px-6">
+                  Sign In
+                </Button>
+              </Link>
+            )}
             <Link href="/book" onClick={() => posthog.capture('cta_clicked', { cta_type: 'lets_talk', location: 'header' })}>
               <Button className="bg-[#3ECFA0] hover:bg-[#35b88f] text-black font-medium px-6">
                  Let&apos;s Talk
