@@ -28,6 +28,8 @@ Build the ultimate private market analyst — an AI system with access to deep p
 
 When users connect their Microsoft Outlook account, the system monitors their inbox for deal-related emails (teasers, offering memorandums, etc.), extracts and analyzes the content using AI, and replies with a structured summary and go/no-go decision based on client-specific criteria.
 
+See `ROADMAP.md` for current product priorities and feature roadmap. Check it before proposing new features to ensure alignment with the current phase.
+
 ## Architecture
 
 ### Monorepo Structure
