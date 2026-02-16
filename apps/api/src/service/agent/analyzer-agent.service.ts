@@ -83,6 +83,20 @@ export class AnalyzerAgentService {
       messages,
       tools,
       maxSteps: 5,
+      onStepFinish: ({ toolCalls, toolResults }) => {
+        if (toolCalls && toolCalls.length > 0) {
+          for (const call of toolCalls) {
+            this.logger.log(`Tool call: ${call.toolName}(${JSON.stringify(call.args)})`);
+          }
+        }
+        if (toolResults && toolResults.length > 0) {
+          for (const res of toolResults) {
+            const resultStr = JSON.stringify(res.result);
+            const truncated = resultStr.length > 500 ? resultStr.slice(0, 500) + '...' : resultStr;
+            this.logger.log(`Tool result [${res.toolName}]: ${truncated}`);
+          }
+        }
+      },
     });
 
     return result.text || '';
