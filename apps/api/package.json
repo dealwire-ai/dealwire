@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "nest start --watch",
     "build": "prisma generate && nest build",
-    "start": "prisma migrate resolve --rolled-back 20260215000000_remove_deprecated_screening_fields && prisma migrate deploy && node dist/src/main.js",
+    "start": "prisma migrate deploy && node dist/src/main.js",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:push": "prisma db push",
