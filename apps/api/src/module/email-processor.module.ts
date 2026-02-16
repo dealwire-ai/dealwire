@@ -55,6 +55,7 @@ const sqsImports = enableSqs
     SQSService,
     ...(enableSqs ? [] : [{ provide: SqsService, useValue: null }]),
   ],
+  // BrokerIntelligenceService is provided via AgentModule (imported above)
   exports: [EmailProcessorService, SQSService],
 })
 export class EmailProcessorModule {}

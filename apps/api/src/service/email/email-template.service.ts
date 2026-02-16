@@ -2,6 +2,21 @@ import { Injectable } from '@nestjs/common';
 import { marked } from 'marked';
 import { InitialScreeningResult, DealDecision } from '../../model/initial-screening.model';
 
+export interface ActionCardData {
+  originalEmailLink?: string;
+  attachments?: Array<{ filename: string; url: string; contentType: string; sizeBytes?: number }>;
+  brokerContext?: {
+    name: string;
+    email: string;
+    totalDeals: number;
+    passRate: number;
+    topCities: string[];
+    lastDealAt?: Date;
+  };
+  dealRoomLinks?: string[];
+  caLinks?: string[];
+}
+
 @Injectable()
 export class EmailTemplateService {
   formatSummaryAsHtml(
@@ -10,6 +25,8 @@ export class EmailTemplateService {
     logoUrl?: string,
     companyName?: string,
     brandColor?: string,
+    narrative?: string,
+    actionCard?: ActionCardData,
   ): string {
     const htmlSummary = marked.parse(summary) as string;
 
@@ -52,6 +69,22 @@ export class EmailTemplateService {
         </table>
       `;
     }
+
+    // Format narrative section if provided
+    let narrativeHtml = '';
+    if (narrative) {
+      narrativeHtml = `
+        <div style="background-color: #f8fafc; border-left: 4px solid ${color}; padding: 16px 20px; margin: 0 0 24px 0; border-radius: 4px; font-style: italic;">
+          <p style="margin: 0 0 4px 0; font-size: 11px; font-weight: 600; color: ${color}; text-transform: uppercase; letter-spacing: 0.5px;">The Story</p>
+          <p style="margin: 0; font-size: 14px; color: #475569; line-height: 1.6;">
+            ${narrative}
+          </p>
+        </div>
+      `;
+    }
+
+    // Format action card section if provided
+    const actionCardHtml = this.renderActionCard(actionCard, color);
 
     const headerContent = logo
       ? `<img src="${logo}" alt="${company}" style="max-width: 160px; height: auto; display: block; margin: 0 auto;" />`
@@ -163,6 +196,8 @@ export class EmailTemplateService {
                     <tr>
                         <td style="background-color: #ffffff; padding: 36px 36px 24px 36px;">
                             ${decisionHtml}
+                            ${actionCardHtml}
+                            ${narrativeHtml}
                             <div class="markdown-body">
                                 ${htmlSummary}
                             </div>
@@ -179,6 +214,96 @@ export class EmailTemplateService {
     </table>
 </body>
 </html>`;
+  }
+
+  /**
+   * Render the action card section (quick actions + broker intel).
+   */
+  private renderActionCard(actionCard?: ActionCardData, color?: string): string {
+    if (!actionCard) return '';
+    const brandColor = color || '#2A4A7C';
+
+    const hasQuickActions =
+      actionCard.originalEmailLink ||
+      (actionCard.attachments && actionCard.attachments.length > 0) ||
+      (actionCard.dealRoomLinks && actionCard.dealRoomLinks.length > 0) ||
+      (actionCard.caLinks && actionCard.caLinks.length > 0);
+
+    let quickActionsHtml = '';
+    if (hasQuickActions) {
+      let linksHtml = '';
+
+      if (actionCard.originalEmailLink) {
+        linksHtml += `<p style="margin: 0 0 8px 0;"><a href="${actionCard.originalEmailLink}" style="color: ${brandColor}; text-decoration: none; font-size: 14px;">&rarr; View Original Email</a></p>`;
+      }
+
+      if (actionCard.attachments) {
+        for (const att of actionCard.attachments) {
+          const size = att.sizeBytes ? ` (${this.formatFileSize(att.sizeBytes)})` : '';
+          linksHtml += `<p style="margin: 0 0 8px 0;"><a href="${att.url}" style="color: ${brandColor}; text-decoration: none; font-size: 14px;">&bull; ${att.filename}</a><span style="color: #94a3b8; font-size: 12px;">${size}</span></p>`;
+        }
+      }
+
+      if (actionCard.dealRoomLinks) {
+        for (const link of actionCard.dealRoomLinks) {
+          linksHtml += `<p style="margin: 0 0 8px 0;"><a href="${link}" style="color: ${brandColor}; text-decoration: none; font-size: 14px;">&rarr; Deal Room</a></p>`;
+        }
+      }
+
+      if (actionCard.caLinks) {
+        for (const link of actionCard.caLinks) {
+          linksHtml += `<p style="margin: 0 0 8px 0;"><a href="${link}" style="color: ${brandColor}; text-decoration: none; font-size: 14px;">&rarr; Sign CA/NDA</a></p>`;
+        }
+      }
+
+      quickActionsHtml = `
+        <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px 20px; margin: 0 0 24px 0;">
+          <p style="margin: 0 0 12px 0; font-size: 11px; font-weight: 600; color: ${brandColor}; text-transform: uppercase; letter-spacing: 0.5px;">Quick Actions</p>
+          ${linksHtml}
+        </div>
+      `;
+    }
+
+    let brokerHtml = '';
+    if (actionCard.brokerContext) {
+      const bc = actionCard.brokerContext;
+      const citiesStr = bc.topCities.length > 0 ? `, focuses on ${bc.topCities.join(', ')}` : '';
+      let lastDealStr = '';
+      if (bc.lastDealAt) {
+        lastDealStr = ` &middot; Last deal: ${this.timeAgo(bc.lastDealAt)}`;
+      }
+      brokerHtml = `
+        <div style="background-color: #fefce8; border: 1px solid #fde68a; border-radius: 8px; padding: 12px 16px; margin: 0 0 24px 0; font-size: 13px; color: #713f12;">
+          <strong>${bc.name}</strong> &mdash; ${bc.totalDeals} deals sent, ${bc.passRate}% pass rate${citiesStr}${lastDealStr}
+        </div>
+      `;
+    }
+
+    return quickActionsHtml + brokerHtml;
+  }
+
+  /**
+   * Format file size in human-readable form.
+   */
+  private formatFileSize(bytes: number): string {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  }
+
+  /**
+   * Format a date as a relative time string (e.g., "3 days ago").
+   */
+  private timeAgo(date: Date): string {
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    if (diffDays === 0) return 'today';
+    if (diffDays === 1) return 'yesterday';
+    if (diffDays < 30) return `${diffDays} days ago`;
+    const diffMonths = Math.floor(diffDays / 30);
+    if (diffMonths === 1) return '1 month ago';
+    return `${diffMonths} months ago`;
   }
 }
 

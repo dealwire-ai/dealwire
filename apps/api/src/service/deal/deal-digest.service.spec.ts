@@ -5,6 +5,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { EmailSenderService } from '../email/email-sender.service';
 import { ScreeningPreferencesService } from '../preferences/screening-preferences.service';
 import { MicrosoftGraphService } from '../microsoft/microsoft-graph.service';
+import { S3Service } from '../s3/s3.service';
 import { ADMIN_EMAILS } from '../../config/email.config';
 
 describe('DealDigestService', () => {
@@ -49,6 +50,12 @@ describe('DealDigestService', () => {
           useValue: {
             getMicrosoftOAuthTokenFromClerk: jest.fn().mockResolvedValue(null),
             sendMail: jest.fn().mockResolvedValue(false),
+          },
+        },
+        {
+          provide: S3Service,
+          useValue: {
+            getPresignedUrl: jest.fn().mockResolvedValue('https://s3.example.com/presigned'),
           },
         },
         {

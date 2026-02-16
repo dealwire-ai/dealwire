@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { s3Config } from '../../config/s3.config';
 import { MetricsService } from '../metrics/metrics.service';
 
@@ -104,6 +105,33 @@ export class S3Service {
       const msg = error instanceof Error ? error.message : String(error);
       this.logger.error(`Failed to download ${s3Key} from S3: ${msg}`);
       throw new Error(`S3 download failed: ${msg}`);
+    }
+  }
+
+  /**
+   * Generate a pre-signed URL for downloading a file from S3
+   * @param s3Key S3 key (path) of the file
+   * @param expiresInSeconds URL expiry time in seconds (default: 7 days)
+   * @returns Pre-signed URL for downloading the file
+   */
+  async getPresignedUrl(s3Key: string, expiresInSeconds: number = 604800): Promise<string> {
+    if (!this.config.dealAttachmentsBucket) {
+      throw new Error('AWS_DEAL_ATTACHMENTS_S3_BUCKET_NAME not configured');
+    }
+
+    try {
+      const command = new GetObjectCommand({
+        Bucket: this.config.dealAttachmentsBucket,
+        Key: s3Key,
+      });
+
+      const url = await getSignedUrl(this.s3Client, command, { expiresIn: expiresInSeconds });
+      this.logger.debug(`Generated pre-signed URL for ${s3Key} (expires in ${expiresInSeconds}s)`);
+      return url;
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Failed to generate pre-signed URL for ${s3Key}: ${msg}`);
+      throw new Error(`S3 pre-signed URL generation failed: ${msg}`);
     }
   }
 
