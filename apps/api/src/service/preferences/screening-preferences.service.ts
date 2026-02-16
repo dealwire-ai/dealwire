@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { CronExpressionParser } from 'cron-parser';
 import { PrismaService } from '../prisma/prisma.service';
 
 export interface ScreeningPreferences {
@@ -100,8 +101,16 @@ export class ScreeningPreferencesService {
     if (partial.alwaysSkip !== undefined) data.alwaysSkip = partial.alwaysSkip;
     if (partial.passedFolderName !== undefined)
       data.passedFolderName = partial.passedFolderName;
-    if (partial.digestSchedule !== undefined)
+    if (partial.digestSchedule !== undefined) {
+      if (partial.digestSchedule) {
+        try {
+          CronExpressionParser.parse(partial.digestSchedule);
+        } catch {
+          throw new Error(`Invalid CRON expression: "${partial.digestSchedule}"`);
+        }
+      }
       data.digestSchedule = partial.digestSchedule;
+    }
     if (partial.digestTimeZone !== undefined)
       data.digestTimeZone = partial.digestTimeZone;
     if (partial.companyName !== undefined) data.companyName = partial.companyName;
