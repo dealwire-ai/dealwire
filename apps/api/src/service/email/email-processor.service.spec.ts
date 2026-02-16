@@ -13,6 +13,7 @@ import { MetricsService } from '../metrics/metrics.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { S3Service } from '../s3/s3.service';
 import { NotificationService } from '../notifications/notification.service';
+import { ImageProcessorService } from '../email/image-processor.service';
 import { EmailSenderService } from '../email/email-sender.service';
 import { NormalizedEmailEvent } from '../../dto/normalized-email-event.dto';
 
@@ -131,7 +132,17 @@ describe('EmailProcessorService', () => {
         {
           provide: DataExtractionService,
           useValue: {
-            extract: jest.fn().mockResolvedValue(undefined),
+            extract: jest.fn().mockResolvedValue({
+              dealType: 'real_estate',
+              extractedData: { askingPrice: 5000000, propertyType: 'multifamily', units: 50 },
+            }),
+          },
+        },
+        {
+          provide: ImageProcessorService,
+          useValue: {
+            extractTextFromImage: jest.fn().mockResolvedValue(''),
+            extractTextFromMultipleImages: jest.fn().mockResolvedValue(''),
           },
         },
         {
@@ -261,13 +272,14 @@ describe('EmailProcessorService', () => {
     expect(result.processed).toBe(true);
     expect(result.dealId).toBe('deal123');
 
-    // Verify InitialScreeningService.screen() was called with dealId, text, buckets, sender email, and sender name
+    // Verify InitialScreeningService.screen() was called with dealId, text, buckets, sender email, sender name, and structured data
     expect(initialScreeningService.screen).toHaveBeenCalledWith(
       'deal123',
       expect.stringContaining('extracted pdf text'),
       mockBuckets,
       'broker@example.com',
       undefined, // event has no fromName in this test
+      { askingPrice: 5000000, propertyType: 'multifamily', units: 50 },
     );
 
     // Verify Document was created with S3 key (attachments already in S3 from webhook)
@@ -320,6 +332,7 @@ describe('EmailProcessorService', () => {
       mockBuckets,
       'broker@example.com',
       'John Smith',
+      { askingPrice: 5000000, propertyType: 'multifamily', units: 50 },
     );
   });
 
@@ -423,5 +436,193 @@ describe('EmailProcessorService', () => {
     expect(prismaService.document.create).not.toHaveBeenCalled();
     expect(dealSummaryService.summarizeDeal).not.toHaveBeenCalled();
       expect(initialScreeningService.screen).not.toHaveBeenCalled();
+  });
+
+  describe('extractTextAndImagesFromHtml', () => {
+    it('should extract text and filter out tracking pixels by dimension', async () => {
+      // Arrange
+      const html = `
+        <html>
+          <body>
+            <p>Deal overview for 123 Main St</p>
+            <img src="https://cdn.example.com/property.jpg" width="600" height="400" />
+            <img src="https://track.mailchimp.com/open.gif" width="1" height="1" />
+          </body>
+        </html>
+      `;
+
+      // Mock fetch for external image download
+      const originalFetch = global.fetch;
+      const largePngBuffer = Buffer.alloc(10000, 0x89);
+      global.fetch = jest.fn().mockImplementation((url: string) => {
+        if (url.includes('cdn.example.com')) {
+          return Promise.resolve({
+            ok: true,
+            headers: new Map([['content-type', 'image/jpeg']]) as any,
+            arrayBuffer: () => Promise.resolve(largePngBuffer.buffer.slice(largePngBuffer.byteOffset, largePngBuffer.byteOffset + largePngBuffer.byteLength)),
+          });
+        }
+        return Promise.resolve({ ok: false });
+      }) as jest.Mock;
+
+      // Act
+      const result = await (service as any).extractTextAndImagesFromHtml(html);
+
+      // Assert
+      expect(result.text).toContain('Deal overview for 123 Main St');
+      // Should have 1 image (property.jpg), tracking pixel filtered by 1x1 dimension
+      expect(result.imageDataUrls).toHaveLength(1);
+      expect(result.imageDataUrls[0]).toMatch(/^data:image\/jpeg;base64,/);
+
+      global.fetch = originalFetch;
+    });
+
+    it('should filter out known tracking domains', async () => {
+      // Arrange
+      const html = `
+        <html><body>
+          <img src="https://open.trackingservice.com/pixel.png" width="100" height="100" />
+          <img src="https://click.mailchimp.com/track/abc" width="100" height="100" />
+        </body></html>
+      `;
+
+      // Act
+      const result = await (service as any).extractTextAndImagesFromHtml(html);
+
+      // Assert
+      expect(result.imageDataUrls).toHaveLength(0);
+    });
+
+    it('should include base64 embedded images directly', async () => {
+      // Arrange
+      const base64Data = 'data:image/png;base64,iVBORw0KGgoAAAANS';
+      const html = `<html><body><img src="${base64Data}" /></body></html>`;
+
+      // Act
+      const result = await (service as any).extractTextAndImagesFromHtml(html);
+
+      // Assert
+      expect(result.imageDataUrls).toHaveLength(1);
+      expect(result.imageDataUrls[0]).toBe(base64Data);
+    });
+
+    it('should return plain text fallback when html is empty', async () => {
+      // Act
+      const result = await (service as any).extractTextAndImagesFromHtml('', 'Plain text body');
+
+      // Assert
+      expect(result.text).toBe('Plain text body');
+      expect(result.imageDataUrls).toHaveLength(0);
+    });
+
+    it('should skip images smaller than 5KB', async () => {
+      // Arrange
+      const html = `<html><body><img src="https://cdn.example.com/tiny.png" /></body></html>`;
+
+      const tinyBuffer = Buffer.alloc(1000); // 1KB — too small
+      const originalFetch = global.fetch;
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        headers: new Map([['content-type', 'image/png']]) as any,
+        arrayBuffer: () => Promise.resolve(tinyBuffer.buffer.slice(tinyBuffer.byteOffset, tinyBuffer.byteOffset + tinyBuffer.byteLength)),
+      }) as jest.Mock;
+
+      // Act
+      const result = await (service as any).extractTextAndImagesFromHtml(html);
+
+      // Assert
+      expect(result.imageDataUrls).toHaveLength(0);
+
+      global.fetch = originalFetch;
+    });
+  });
+
+  it('should pass structured data to screening when extraction succeeds', async () => {
+    // Arrange
+    const emailEvent: NormalizedEmailEvent = {
+      source: 'microsoft',
+      messageId: 'msg123',
+      userId: 'user123',
+      from: 'broker@example.com',
+      to: ['user@example.com'],
+      subject: 'Deal Opportunity',
+      bodyText: 'Deal text',
+      attachments: [],
+      receivedAt: new Date(),
+    };
+    const ctx = {
+      event: emailEvent,
+      accessToken: 'token123',
+      inboxOwnerEmail: 'user@example.com',
+      receivedByUserId: 'user123',
+      organizationId: 'org123',
+      detection: { isDeal: true, confidence: 'high' as const, reason: 'Deal' },
+    };
+    (prismaService.deal.create as jest.Mock).mockResolvedValue({ id: 'deal123' });
+
+    // Act
+    await service.process(ctx);
+
+    // Assert — screening receives the structured data from extraction
+    expect(initialScreeningService.screen).toHaveBeenCalledWith(
+      'deal123',
+      expect.any(String),
+      mockBuckets,
+      'broker@example.com',
+      undefined,
+      { askingPrice: 5000000, propertyType: 'multifamily', units: 50 },
+    );
+  });
+
+  it('should still screen when data extraction fails', async () => {
+    // Arrange
+    const dataExtractionService = { extract: jest.fn().mockRejectedValue(new Error('extraction failed')) } as any;
+    // Rebuild with failing data extraction
+    const module2 = await Test.createTestingModule({
+      providers: [
+        EmailProcessorService,
+        { provide: EmailProcessingService, useValue: { processPdfBuffer: jest.fn().mockResolvedValue('text') } },
+        { provide: EmailTemplateService, useValue: { formatSummaryAsHtml: jest.fn().mockReturnValue('<html></html>') } },
+        { provide: EmailSenderService, useValue: { sendEmail: jest.fn() } },
+        { provide: MicrosoftGraphService, useValue: { replyInThreadToSelf: jest.fn(), getOrCreateFolder: jest.fn(), getMessage: jest.fn(), moveMessage: jest.fn(), moveConversation: jest.fn(), forwardToAdmins: jest.fn(), getAttachmentContent: jest.fn() } },
+        { provide: ScreeningPreferencesService, useValue: { getPreferences: jest.fn().mockResolvedValue({}) } },
+        { provide: ScreeningBucketService, useValue: { findAll: jest.fn().mockResolvedValue(mockBuckets), ensureDefaultBuckets: jest.fn() } },
+        { provide: DealSummaryService, useValue: { summarizeDeal: jest.fn().mockResolvedValue('summary') } },
+        { provide: InitialScreeningService, useValue: { screen: jest.fn().mockResolvedValue({ decision: 'yes', reason: 'ok', bucketId: 'bucket-yes', bucketName: 'Yes' }) } },
+        { provide: DataExtractionService, useValue: dataExtractionService },
+        { provide: ImageProcessorService, useValue: { extractTextFromMultipleImages: jest.fn().mockResolvedValue('') } },
+        { provide: DealDetectionService, useValue: {} },
+        { provide: PrismaService, useValue: { deal: { create: jest.fn().mockResolvedValue({ id: 'd1' }), update: jest.fn() }, document: { create: jest.fn() } } },
+        { provide: S3Service, useValue: { downloadDealAttachment: jest.fn() } },
+        { provide: MetricsService, useValue: { recordAICall: jest.fn(), recordDealSkipped: jest.fn(), recordDealProcessed: jest.fn(), recordProcessingError: jest.fn(), recordEmailEvent: jest.fn(), recordDealProcessingDuration: jest.fn(), recordFolderMove: jest.fn() } },
+        { provide: NotificationService, useValue: { notifyDealProcessed: jest.fn(), notifyError: jest.fn() } },
+      ],
+    }).compile();
+
+    const svc2 = module2.get<EmailProcessorService>(EmailProcessorService);
+    const screening2 = module2.get(InitialScreeningService) as jest.Mocked<InitialScreeningService>;
+
+    const ctx = {
+      event: { source: 'microsoft' as const, messageId: 'm1', userId: 'u1', from: 'b@x.com', to: ['u@x.com'], subject: 'Deal', bodyText: 'text', attachments: [], receivedAt: new Date() },
+      accessToken: 'tok',
+      inboxOwnerEmail: 'u@x.com',
+      receivedByUserId: 'u1',
+      organizationId: 'org1',
+      detection: { isDeal: true, confidence: 'high' as const, reason: 'deal' },
+    };
+
+    // Act
+    const result = await svc2.process(ctx);
+
+    // Assert — screening still runs, with undefined structured data
+    expect(result.processed).toBe(true);
+    expect(screening2.screen).toHaveBeenCalledWith(
+      'd1',
+      expect.any(String),
+      mockBuckets,
+      'b@x.com',
+      undefined,
+      undefined,
+    );
   });
 });

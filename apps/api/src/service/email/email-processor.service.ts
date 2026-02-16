@@ -17,6 +17,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { S3Service } from '../s3/s3.service';
 import { MetricsService } from '../metrics/metrics.service';
 import { NotificationService } from '../notifications/notification.service';
+import { ImageProcessorService } from '../email/image-processor.service';
 import { aiConfig } from '../../config/ai.config';
 import { NormalizedEmailEvent } from '../../dto/normalized-email-event.dto';
 import { InitialScreeningResult } from '../../model/initial-screening.model';
@@ -61,6 +62,7 @@ export class EmailProcessorService {
     private readonly s3Service: S3Service,
     private readonly metricsService: MetricsService,
     private readonly notificationService: NotificationService,
+    private readonly imageProcessorService: ImageProcessorService,
   ) {}
 
   /**
@@ -114,22 +116,25 @@ export class EmailProcessorService {
         throw new Error('Failed to save deal');
       }
 
-      // Step 4: Perform initial screening (service handles AI call AND persistence)
+      // Step 4: Extract structured deal data FIRST (feeds into screening)
+      let structuredData: Record<string, unknown> | undefined;
+      try {
+        const extraction = await this.dataExtractionService.extract(dealId, combinedText);
+        structuredData = extraction.extractedData as Record<string, unknown>;
+      } catch (error) {
+        const msg = error instanceof Error ? error.message : String(error);
+        this.logger.warn(`Data extraction failed for deal ${dealId}: ${msg}`);
+      }
+
+      // Step 5: Perform initial screening with structured data context
       const decision = await this.initialScreeningService.screen(
         dealId,
         combinedText,
         buckets,
         event.from,
         event.fromName,
+        structuredData,
       );
-
-      // Step 4.5: Extract structured deal data (non-fatal)
-      try {
-        await this.dataExtractionService.extract(dealId, combinedText);
-      } catch (error) {
-        const msg = error instanceof Error ? error.message : String(error);
-        this.logger.warn(`Data extraction failed for deal ${dealId}: ${msg}`);
-      }
 
       // Step 4.6: Associate asset with deal if one was found/created
       if (decision.assetId) {
@@ -394,10 +399,26 @@ export class EmailProcessorService {
   ): Promise<string[]> {
     const texts: string[] = [];
 
-    // Email body
-    const bodyText = event.bodyText || this.htmlToText(event.bodyHtml || '');
+    // Email body — extract text AND images from HTML
+    const { text: bodyText, imageDataUrls } = await this.extractTextAndImagesFromHtml(
+      event.bodyHtml || '',
+      event.bodyText,
+    );
     if (bodyText) {
       texts.push(`--- Email Body ---\n${bodyText}`);
+    }
+
+    // Process extracted images from HTML via Vision API
+    if (imageDataUrls.length > 0) {
+      this.logger.log(`Found ${imageDataUrls.length} content images in email HTML`);
+      const images = imageDataUrls.map((dataUrl, i) => ({
+        data: dataUrl,
+        label: `embedded-image-${i + 1}`,
+      }));
+      const imageText = await this.imageProcessorService.extractTextFromMultipleImages(images);
+      if (imageText) {
+        texts.push(`--- Embedded Image Content ---\n${imageText}`);
+      }
     }
 
     // Process attachments (prefer S3, fallback to Microsoft Graph)
@@ -540,13 +561,108 @@ export class EmailProcessorService {
     }
   }
 
-  private htmlToText(html: string): string {
-    return html
-      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-      .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
-      .replace(/<[^>]+>/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim();
+  /**
+   * Known tracking/pixel domains to exclude from image OCR
+   */
+  private static readonly TRACKING_DOMAINS = [
+    'open.', 'track.', 'click.', 'pixel.', 'beacon.',
+    'mailchimp.com/track', 'list-manage.com/track',
+    'sendgrid.net/wf/', 'mandrillapp.com/track',
+    'google-analytics.com', 'doubleclick.net',
+    'facebook.com/tr', 'bat.bing.com',
+  ];
+
+  /**
+   * Extract text and content images from HTML email.
+   * Filters out tracking pixels and non-content images.
+   * Downloads external images and converts them to data URLs for Vision API.
+   */
+  async extractTextAndImagesFromHtml(
+    html: string,
+    plainText?: string,
+  ): Promise<{ text: string; imageDataUrls: string[] }> {
+    if (!html) {
+      return { text: plainText || '', imageDataUrls: [] };
+    }
+
+    try {
+      const { load } = await import('cheerio');
+      const $ = load(html);
+
+      // Remove script and style tags
+      $('script, style').remove();
+
+      // Extract text content
+      const text = $.text().replace(/\s+/g, ' ').trim();
+
+      // Collect image URLs (external and base64)
+      const imageDataUrls: string[] = [];
+      const imgElements = $('img').toArray();
+
+      for (const el of imgElements) {
+        const src = $(el).attr('src');
+        if (!src) continue;
+
+        const width = parseInt($(el).attr('width') || '0', 10);
+        const height = parseInt($(el).attr('height') || '0', 10);
+
+        // Filter out tracking pixels by dimension
+        if ((width > 0 && width <= 3) || (height > 0 && height <= 3)) {
+          continue;
+        }
+
+        // Base64 embedded images — include directly
+        if (src.startsWith('data:image/')) {
+          imageDataUrls.push(src);
+          continue;
+        }
+
+        // External image URLs
+        if (src.startsWith('http://') || src.startsWith('https://')) {
+          // Filter out known tracking domains
+          if (EmailProcessorService.TRACKING_DOMAINS.some((d) => src.includes(d))) {
+            continue;
+          }
+
+          // Download and convert to data URL
+          try {
+            const response = await fetch(src, {
+              signal: AbortSignal.timeout(10000),
+              headers: { 'User-Agent': 'Mozilla/5.0' },
+            });
+            if (!response.ok) continue;
+
+            const contentType = response.headers.get('content-type') || '';
+            if (!contentType.startsWith('image/')) continue;
+
+            const arrayBuffer = await response.arrayBuffer();
+            const buffer = Buffer.from(arrayBuffer);
+
+            // Skip tiny images (likely tracking pixels or spacers)
+            if (buffer.length < 5000) continue;
+
+            const base64 = buffer.toString('base64');
+            const mimeType = contentType.split(';')[0];
+            imageDataUrls.push(`data:${mimeType};base64,${base64}`);
+          } catch {
+            // Skip images that fail to download
+          }
+        }
+      }
+
+      return { text: text || plainText || '', imageDataUrls };
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      this.logger.warn(`HTML parsing failed, falling back to regex strip: ${msg}`);
+      // Fallback to basic regex strip
+      const fallbackText = html
+        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+        .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
+        .replace(/<[^>]+>/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      return { text: fallbackText || plainText || '', imageDataUrls: [] };
+    }
   }
 
   /**
