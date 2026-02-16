@@ -379,7 +379,11 @@ This allows the API to start successfully locally without configuring AWS.
 
 ## Development Tips
 
-1. **Testing email flow**: Send email to user's Outlook, watch Railway logs
+1. **Testing email flow (E2E)**: Send a test deal email to a monitored Outlook inbox to trigger the full pipeline:
+   ```bash
+   cd apps/api && pnpm send-test-email imlevine@outlook.com
+   ```
+   This sends a realistic deal email via Resend → arrives in Outlook → Graph webhook fires → deal detection → screening → reply. Watch Railway logs or local server output. The verified Resend sending domain is `mail.deals.frontstep.ai`.
 2. **Preferences not loading?**: Check snake_case vs camelCase mapping
 3. **Subscription not working?**: Verify `API_BASE_URL` is HTTPS
 4. **Replies not threaded?**: Must use Graph API's `createReply` endpoint
@@ -438,3 +442,9 @@ Unit tests should be **simple, readable, and focused on core functionality**. Mo
 - Implementation details that don't affect behavior
 
 After adding tests you must always verify that they are passing.
+
+---
+
+## Git & PRs
+
+When creating a PR, break changes into separate, logical commits — each group of related changes should be its own commit rather than one big commit for the whole PR.
