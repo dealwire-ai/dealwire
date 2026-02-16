@@ -13,6 +13,7 @@ import { DealSummaryService } from '../deal/deal-summary.service';
 import { InitialScreeningService } from '../deal/initial-screening.service';
 import { DataExtractionService } from '../deal/data-extraction.service';
 import { DealDetection } from '../deal/deal-detection.service';
+import { BrokerIntelligenceService } from '../deal/broker-intelligence.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { S3Service } from '../s3/s3.service';
 import { MetricsService } from '../metrics/metrics.service';
@@ -63,6 +64,7 @@ export class EmailProcessorService {
     private readonly metricsService: MetricsService,
     private readonly notificationService: NotificationService,
     private readonly imageProcessorService: ImageProcessorService,
+    private readonly brokerIntelligenceService: BrokerIntelligenceService,
   ) {}
 
   /**
@@ -177,6 +179,7 @@ export class EmailProcessorService {
         combinedText,
         decision,
         prefs,
+        organizationId,
       );
 
       const durationSeconds = (Date.now() - startTime) / 1000;
@@ -237,26 +240,34 @@ export class EmailProcessorService {
     combinedText: string,
     decision: InitialScreeningResult,
     prefs: ScreeningPreferences,
+    organizationId: string,
   ): Promise<void> {
-    // Generate summary if the bucket requires it
+    // Generate summary and narrative if the bucket requires it
     let summary: string | undefined;
+    let narrative: string | undefined;
     if (bucket.generateSummary) {
-      summary = await this.dealSummaryService.summarizeDeal(
-        combinedText,
-        bucket.description,
-      );
+      // Run summary and narrative in parallel
+      const [summaryResult, narrativeResult] = await Promise.all([
+        this.dealSummaryService.summarizeDeal(combinedText, bucket.description),
+        this.dealSummaryService.generateDealNarrative(combinedText).catch((err) => {
+          this.logger.warn(`Deal narrative generation failed: ${err.message}`);
+          return undefined;
+        }),
+      ]);
+      summary = summaryResult;
+      narrative = narrativeResult;
     }
 
     switch (bucket.action) {
       case 'REPLY_TO_SELF':
         if (summary) {
-          await this.sendDealAnalysisReply(event, accessToken, inboxOwnerEmail, summary, decision, prefs);
+          await this.sendDealAnalysisReply(event, accessToken, inboxOwnerEmail, summary, decision, prefs, narrative, dealId, organizationId);
         }
         break;
 
       case 'DRAFT_REPLY_TO_BROKER':
         if (event.source === 'microsoft' && accessToken) {
-          await this.handleDraftReplyToBroker(accessToken, event.messageId, combinedText, decision, prefs);
+          await this.handleDraftReplyToBroker(accessToken, event.messageId, combinedText, decision, prefs, dealId);
         }
         break;
 
@@ -313,6 +324,7 @@ export class EmailProcessorService {
   /**
    * Create a draft reply to the broker (original sender) with a conversational response.
    * Uses AI to generate a natural-sounding reply (not the internal analysis).
+   * Enriched with broker relationship context and smart follow-up questions.
    * The draft is left unsent in the user's Drafts folder for review before sending.
    */
   private async handleDraftReplyToBroker(
@@ -321,11 +333,70 @@ export class EmailProcessorService {
     combinedText: string,
     decision: InitialScreeningResult,
     prefs: ScreeningPreferences,
+    dealId: string,
   ): Promise<void> {
+    // Fetch broker context and deal data in parallel for enriched draft
+    let brokerContext: Parameters<DealSummaryService['generateBrokerReplyDraft']>[3];
+    let extractedData: Record<string, unknown> | undefined;
+
+    try {
+      const deal = await this.prismaService.deal.findUnique({
+        where: { id: dealId },
+        select: {
+          contactId: true,
+          organizationId: true,
+          extractedData: true,
+          contact: { select: { notes: true } },
+        },
+      });
+
+      if (deal?.extractedData && typeof deal.extractedData === 'object') {
+        extractedData = deal.extractedData as Record<string, unknown>;
+      }
+
+      if (deal?.contactId && deal.organizationId) {
+        const stats = await this.brokerIntelligenceService.getBrokerStats(
+          deal.contactId,
+          deal.organizationId,
+        );
+
+        if (stats && stats.totalDeals > 1) {
+          // Get recent passing deal subjects for relationship context
+          const recentPassingDeals = await this.prismaService.deal.findMany({
+            where: {
+              organizationId: deal.organizationId,
+              contactId: deal.contactId,
+              initialScreening: { decision: 'YES' },
+              id: { not: dealId },
+            },
+            select: { sourceSubject: true },
+            orderBy: { createdAt: 'desc' },
+            take: 3,
+          });
+
+          brokerContext = {
+            name: [stats.firstName, stats.lastName].filter(Boolean).join(' ') || stats.email,
+            totalDeals: stats.totalDeals,
+            passRate: stats.passRate,
+            topCities: stats.topCities,
+            recentPassingDeals: recentPassingDeals
+              .map((d) => d.sourceSubject)
+              .filter(Boolean) as string[],
+            notes: deal.contact?.notes || undefined,
+          };
+        }
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      this.logger.warn(`Failed to fetch broker context for draft: ${msg}`);
+    }
+
     const brokerReply = await this.dealSummaryService.generateBrokerReplyDraft(
       combinedText,
       decision.decision,
       prefs.companyName,
+      brokerContext,
+      extractedData,
     );
 
     // Format as simple HTML (no branded template — this goes to the broker)
@@ -350,7 +421,13 @@ export class EmailProcessorService {
     summary: string,
     decision: InitialScreeningResult,
     prefs: ScreeningPreferences,
+    narrative?: string,
+    dealId?: string,
+    organizationId?: string,
   ): Promise<void> {
+    // Build action card data (best-effort, non-blocking)
+    const actionCard = await this.buildActionCard(event, accessToken, dealId, organizationId, decision);
+
     // Format HTML email
     const htmlEmail = this.emailTemplateService.formatSummaryAsHtml(
       summary,
@@ -358,6 +435,8 @@ export class EmailProcessorService {
       prefs.organizationImageUrl,
       prefs.companyName,
       prefs.brandColor,
+      narrative,
+      actionCard,
     );
 
     if (event.source === 'microsoft' && accessToken) {
@@ -390,6 +469,126 @@ export class EmailProcessorService {
         replyToMessageId: event.messageId,
       });
       this.logger.log(`Reply sent via Resend for ${event.messageId} to ${inboxOwnerEmail}`);
+    }
+  }
+
+  /**
+   * Build action card data for the deal analysis email.
+   * Gathers webLink, attachment pre-signed URLs, broker context, and extracted links.
+   * All lookups are best-effort — failures result in a partial or empty action card.
+   */
+  private async buildActionCard(
+    event: NormalizedEmailEvent,
+    accessToken: string | undefined,
+    dealId?: string,
+    organizationId?: string,
+    decision?: InitialScreeningResult,
+  ): Promise<import('../email/email-template.service').ActionCardData | undefined> {
+    try {
+      const actionCard: import('../email/email-template.service').ActionCardData = {};
+
+      // 1. Get webLink from Graph API (original email link in Outlook Web)
+      if (event.source === 'microsoft' && accessToken) {
+        try {
+          const message = await this.microsoftGraphService.getMessage(accessToken, event.messageId);
+          if (message?.webLink) {
+            actionCard.originalEmailLink = message.webLink;
+            // Persist webLink on the deal for digest use
+            if (dealId) {
+              this.prismaService.deal.update({
+                where: { id: dealId },
+                data: { sourceWebLink: message.webLink },
+              }).catch(() => {}); // fire-and-forget
+            }
+          }
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : String(err);
+          this.logger.debug(`Failed to get webLink for action card: ${msg}`);
+        }
+      }
+
+      // 2. Get pre-signed URLs for deal documents from S3
+      if (dealId) {
+        try {
+          const documents = await this.prismaService.document.findMany({
+            where: { dealId },
+            select: { filename: true, s3Key: true, contentType: true, sizeBytes: true },
+          });
+
+          const attachmentLinks: Array<{ filename: string; url: string; contentType: string; sizeBytes?: number }> = [];
+          for (const doc of documents) {
+            if (doc.s3Key) {
+              try {
+                const url = await this.s3Service.getPresignedUrl(doc.s3Key);
+                attachmentLinks.push({
+                  filename: doc.filename,
+                  url,
+                  contentType: doc.contentType,
+                  sizeBytes: doc.sizeBytes || undefined,
+                });
+              } catch {
+                // Skip documents that fail to generate pre-signed URLs
+              }
+            }
+          }
+
+          if (attachmentLinks.length > 0) {
+            actionCard.attachments = attachmentLinks;
+          }
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : String(err);
+          this.logger.debug(`Failed to get document links for action card: ${msg}`);
+        }
+      }
+
+      // 3. Look up broker stats
+      if (decision?.contactId && organizationId) {
+        try {
+          const stats = await this.brokerIntelligenceService.getBrokerStats(
+            decision.contactId,
+            organizationId,
+          );
+
+          if (stats && stats.totalDeals > 1) {
+            actionCard.brokerContext = {
+              name: [stats.firstName, stats.lastName].filter(Boolean).join(' ') || stats.email,
+              email: stats.email,
+              totalDeals: stats.totalDeals,
+              passRate: stats.passRate,
+              topCities: stats.topCities.map((c) => c.city),
+              lastDealAt: stats.lastDealAt || undefined,
+            };
+          }
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : String(err);
+          this.logger.debug(`Failed to get broker stats for action card: ${msg}`);
+        }
+      }
+
+      // 4. Extract links from email HTML
+      if (event.bodyHtml) {
+        const links = this.extractLinksFromHtml(event.bodyHtml);
+        if (links.dealRoomLinks.length > 0) {
+          actionCard.dealRoomLinks = links.dealRoomLinks;
+        }
+        if (links.caLinks.length > 0) {
+          actionCard.caLinks = links.caLinks;
+        }
+      }
+
+      // Only return action card if it has any content
+      const hasContent =
+        actionCard.originalEmailLink ||
+        (actionCard.attachments && actionCard.attachments.length > 0) ||
+        actionCard.brokerContext ||
+        (actionCard.dealRoomLinks && actionCard.dealRoomLinks.length > 0) ||
+        (actionCard.caLinks && actionCard.caLinks.length > 0);
+
+      return hasContent ? actionCard : undefined;
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      this.logger.warn(`Failed to build action card: ${msg}`);
+      return undefined;
     }
   }
 
@@ -503,6 +702,11 @@ export class EmailProcessorService {
     try {
       // Create deal (use pre-generated dealId if provided, otherwise Prisma generates one)
       // Note: Screening fields are no longer saved here - InitialScreeningService handles that
+      // Extract links from email HTML for action cards and digest
+      const extractedLinks = event.bodyHtml
+        ? this.extractLinksFromHtml(event.bodyHtml)
+        : undefined;
+
       const savedDeal = await this.prismaService.deal.create({
         data: {
           id: dealId, // Use pre-generated dealId from webhook (for S3 organization)
@@ -514,6 +718,7 @@ export class EmailProcessorService {
           sourceReceivedAt: event.receivedAt,
           detectionConfidence: detection.confidence,
           detectionReason: detection.reason,
+          extractedLinks: extractedLinks ? JSON.parse(JSON.stringify(extractedLinks)) : undefined,
         },
         select: { id: true },
       });
@@ -662,6 +867,83 @@ export class EmailProcessorService {
         .replace(/\s+/g, ' ')
         .trim();
       return { text: fallbackText || plainText || '', imageDataUrls: [] };
+    }
+  }
+
+  /**
+   * Extract and classify URLs from email HTML.
+   * Finds deal room links, CA/NDA links, and listing links.
+   */
+  private extractLinksFromHtml(html: string): {
+    dealRoomLinks: string[];
+    caLinks: string[];
+    listingLinks: string[];
+  } {
+    const result = { dealRoomLinks: [] as string[], caLinks: [] as string[], listingLinks: [] as string[] };
+    if (!html) return result;
+
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { load } = require('cheerio');
+      const $ = load(html);
+
+      // Domains to skip entirely
+      const skipPatterns = [
+        'unsubscribe', 'mailto:', 'tel:',
+        'facebook.com', 'twitter.com', 'linkedin.com', 'instagram.com',
+        'youtube.com', 'tiktok.com',
+        'open.', 'track.', 'click.', 'pixel.', 'beacon.',
+        'google-analytics.com', 'doubleclick.net',
+      ];
+
+      const dealRoomDomains = [
+        'junipersquare.com', 'dropbox.com', 'box.com', 'sharefile.com',
+        'onedrive.com', 'drive.google.com', 'ipreo.com', 'dealpath.com',
+      ];
+
+      const caDomains = [
+        'docusign.com', 'docusign.net', 'hellosign.com',
+        'adobesign.com', 'pandadoc.com',
+      ];
+      const caTextPatterns = ['confidential', 'nda', 'ca agreement'];
+
+      const listingDomains = [
+        'crexi.com', 'loopnet.com', 'costar.com', 'cbre.com',
+        'jll.com', 'cushwake.com', 'nmrk.com', 'colliers.com',
+      ];
+
+      const seen = new Set<string>();
+
+      $('a[href]').each((_: number, el: unknown) => {
+        const href = ($(el).attr('href') as string | undefined)?.trim();
+        if (!href || !href.startsWith('http')) return;
+
+        const lowerHref = href.toLowerCase();
+        const linkText = ($(el).text() as string).toLowerCase().trim();
+
+        // Skip tracking/social/utility links
+        if (skipPatterns.some((p) => lowerHref.includes(p))) return;
+
+        // Deduplicate
+        if (seen.has(href)) return;
+        seen.add(href);
+
+        // Classify
+        if (dealRoomDomains.some((d) => lowerHref.includes(d))) {
+          result.dealRoomLinks.push(href);
+        } else if (
+          caDomains.some((d) => lowerHref.includes(d)) ||
+          caTextPatterns.some((p) => linkText.includes(p))
+        ) {
+          result.caLinks.push(href);
+        } else if (listingDomains.some((d) => lowerHref.includes(d))) {
+          result.listingLinks.push(href);
+        }
+      });
+
+      return result;
+    } catch {
+      return result;
     }
   }
 

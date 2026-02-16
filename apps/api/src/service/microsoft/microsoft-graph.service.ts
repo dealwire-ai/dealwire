@@ -25,6 +25,7 @@ interface GraphMessage {
   conversationId?: string;
   internetMessageId?: string;
   internetMessageHeaders?: InternetMessageHeader[];
+  webLink?: string;
 }
 
 interface GraphAttachment {
@@ -121,6 +122,7 @@ export class MicrosoftGraphService {
         'hasAttachments',
         'conversationId',
         'internetMessageId',
+        'webLink',
       ];
       if (includeHeaders) {
         selectFields.push('internetMessageHeaders');

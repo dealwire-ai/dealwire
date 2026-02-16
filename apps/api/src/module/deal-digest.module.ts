@@ -5,9 +5,10 @@ import { BrokerIntelligenceService } from '../service/deal/broker-intelligence.s
 import { PrismaModule } from './prisma.module';
 import { EmailModule } from './email.module';
 import { MicrosoftModule } from './microsoft.module';
+import { S3Module } from './s3.module';
 
 @Module({
-  imports: [PrismaModule, EmailModule, MicrosoftModule, ScheduleModule.forRoot()],
+  imports: [PrismaModule, EmailModule, MicrosoftModule, S3Module, ScheduleModule.forRoot()],
   providers: [DealDigestService, BrokerIntelligenceService],
   exports: [DealDigestService],
 })

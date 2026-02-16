@@ -79,6 +79,10 @@ model Deal {
   dealType      String? // "real_estate", "debt", "business", "unknown"
   extractedData Json? // Typed at app layer per dealType
 
+  // Action card data (captured at processing time for digest)
+  sourceWebLink  String? // Outlook Web link to original email
+  extractedLinks Json?   // { dealRoomLinks: string[], caLinks: string[], listingLinks: string[] }
+
   // Relationships
   asset             Asset?             @relation(fields: [assetId], references: [id])
   assetId           String?
@@ -189,6 +193,8 @@ model Contact {
   email String @unique // Normalized email (lowercase, trimmed) - used as unique key
   firstName String?
   lastName  String?
+  notes     String?  @db.Text // Freeform broker notes (e.g., "just had a baby, likes the Knicks")
+  tags      String[] @default([]) // Tags like "top broker", "responsive", etc.
 
   deals     Deal[]
   createdAt DateTime @default(now())

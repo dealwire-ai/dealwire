@@ -9,6 +9,7 @@ import { DealSummaryService } from '../deal/deal-summary.service';
 import { InitialScreeningService } from '../deal/initial-screening.service';
 import { DealDetectionService } from '../deal/deal-detection.service';
 import { DataExtractionService } from '../deal/data-extraction.service';
+import { BrokerIntelligenceService } from '../deal/broker-intelligence.service';
 import { MetricsService } from '../metrics/metrics.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { S3Service } from '../s3/s3.service';
@@ -116,6 +117,7 @@ describe('EmailProcessorService', () => {
           provide: DealSummaryService,
           useValue: {
             summarizeDeal: jest.fn().mockResolvedValue('AI-generated summary'),
+            generateDealNarrative: jest.fn().mockResolvedValue('Deal narrative text'),
           },
         },
         {
@@ -195,6 +197,12 @@ describe('EmailProcessorService', () => {
           useValue: {
             notifyDealProcessed: jest.fn().mockResolvedValue(undefined),
             notifyError: jest.fn().mockResolvedValue(undefined),
+          },
+        },
+        {
+          provide: BrokerIntelligenceService,
+          useValue: {
+            getBrokerStats: jest.fn().mockResolvedValue(null),
           },
         },
       ],
@@ -587,7 +595,7 @@ describe('EmailProcessorService', () => {
         { provide: MicrosoftGraphService, useValue: { replyInThreadToSelf: jest.fn(), getOrCreateFolder: jest.fn(), getMessage: jest.fn(), moveMessage: jest.fn(), moveConversation: jest.fn(), forwardToAdmins: jest.fn(), getAttachmentContent: jest.fn() } },
         { provide: ScreeningPreferencesService, useValue: { getPreferences: jest.fn().mockResolvedValue({}) } },
         { provide: ScreeningBucketService, useValue: { findAll: jest.fn().mockResolvedValue(mockBuckets), ensureDefaultBuckets: jest.fn() } },
-        { provide: DealSummaryService, useValue: { summarizeDeal: jest.fn().mockResolvedValue('summary') } },
+        { provide: DealSummaryService, useValue: { summarizeDeal: jest.fn().mockResolvedValue('summary'), generateDealNarrative: jest.fn().mockResolvedValue('narrative') } },
         { provide: InitialScreeningService, useValue: { screen: jest.fn().mockResolvedValue({ decision: 'yes', reason: 'ok', bucketId: 'bucket-yes', bucketName: 'Yes' }) } },
         { provide: DataExtractionService, useValue: dataExtractionService },
         { provide: ImageProcessorService, useValue: { extractTextFromMultipleImages: jest.fn().mockResolvedValue('') } },
@@ -596,6 +604,7 @@ describe('EmailProcessorService', () => {
         { provide: S3Service, useValue: { downloadDealAttachment: jest.fn() } },
         { provide: MetricsService, useValue: { recordAICall: jest.fn(), recordDealSkipped: jest.fn(), recordDealProcessed: jest.fn(), recordProcessingError: jest.fn(), recordEmailEvent: jest.fn(), recordDealProcessingDuration: jest.fn(), recordFolderMove: jest.fn() } },
         { provide: NotificationService, useValue: { notifyDealProcessed: jest.fn(), notifyError: jest.fn() } },
+        { provide: BrokerIntelligenceService, useValue: { getBrokerStats: jest.fn().mockResolvedValue(null) } },
       ],
     }).compile();
 
