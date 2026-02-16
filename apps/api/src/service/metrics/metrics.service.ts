@@ -217,7 +217,7 @@ export class MetricsService implements OnModuleInit {
   }
 
   recordAICall(
-    service: 'detection' | 'summary' | 'initial-screening' | 'image-ocr' | 'data-extraction' | 'broker-reply-draft',
+    service: 'detection' | 'summary' | 'initial-screening' | 'image-ocr' | 'image-ocr-multi' | 'data-extraction' | 'broker-reply-draft',
     model: string,
     durationSeconds: number,
     status: 'success' | 'error',

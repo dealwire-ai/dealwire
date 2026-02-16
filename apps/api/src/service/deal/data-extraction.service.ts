@@ -3,8 +3,13 @@ import OpenAI from 'openai';
 import { aiConfig } from '../../config/ai.config';
 import { MetricsService } from '../metrics/metrics.service';
 import { PrismaService } from '../prisma/prisma.service';
-import { DealType } from '../../model/extracted-data.model';
+import { DealType, ExtractedData } from '../../model/extracted-data.model';
 import { Prisma } from '@prisma/client';
+
+export interface DataExtractionResult {
+  dealType: DealType;
+  extractedData: ExtractedData;
+}
 
 @Injectable()
 export class DataExtractionService {
@@ -25,8 +30,9 @@ export class DataExtractionService {
    * Extract structured data from deal text and persist to the database.
    * @param dealId - The deal to update
    * @param extractedText - Combined text from email body and attachments
+   * @returns The extracted deal type and structured data
    */
-  async extract(dealId: string, extractedText: string): Promise<void> {
+  async extract(dealId: string, extractedText: string): Promise<DataExtractionResult> {
     const start = Date.now();
 
     try {
@@ -89,6 +95,8 @@ export class DataExtractionService {
       this.logger.log(
         `Data extraction completed for deal ${dealId}: type=${dealType} (${duration.toFixed(2)}s)`,
       );
+
+      return { dealType, extractedData: (parsed.extractedData || {}) as ExtractedData };
     } catch (error) {
       const duration = (Date.now() - start) / 1000;
       this.metricsService.recordAICall('data-extraction', this.aiConfig.openaiModel, duration, 'error');
