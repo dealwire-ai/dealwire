@@ -43,9 +43,13 @@ The deal screener is the wedge. The endgame is an autonomous acquisitions analys
 ### Phase 1: Data Quality & Fidelity
 _The data Analyzer produces must be best-in-class. This is the foundation everything else depends on._
 
-- [ ] **Attachment intelligence** — Better PDF/document parsing. Handle image-heavy OMs, rent rolls, financial statements. Extract tables, charts, and structured financial data — not just text.
+- [x] **HTML image extraction** — Parse HTML emails with cheerio, extract embedded/external images, filter tracking pixels, OCR content images via Vision API. Most deal flow arrives as image-heavy HTML (Mailchimp-style broker blasts) that was previously invisible to the system.
+- [x] **Scanned PDF OCR** — Fallback to pdftoppm + Vision API when pdftotext returns empty (image-only PDFs). Handles scanned OMs that previously produced zero text.
+- [x] **Screening model upgrade** — Screening uses gpt-4o (via `OPENAI_SCREENING_MODEL` env var) while cheaper tasks stay on gpt-4o-mini. The most important decision in the product now uses a more capable model.
+- [x] **Two-stage screening** — Data extraction runs before screening. Structured fields (price, cap rate, units, location, property type) are passed into the screening prompt so the model evaluates clean data against buy box criteria, not garbled OCR text.
+- [ ] **Attachment intelligence** — Handle rent rolls, financial statements, and multi-page OMs. Extract tables, charts, and structured financial data — not just text blobs.
 - [ ] **Data extraction accuracy** — Validate and cross-reference extracted fields. Flag low-confidence extractions. Structured output for every deal metric (price, NOI, cap rate, occupancy, units, sqft, year built, tenant mix, etc.).
-- [ ] **Screening accuracy** — Fine-tune prompts, add user feedback loops (user corrects wrong decisions → system learns). Track accuracy over time.
+- [ ] **Screening feedback loop** — User corrects wrong decisions → system learns. Track accuracy over time. Confidence-based routing for borderline deals.
 - [ ] **Deal deduplication** — Detect when multiple brokers send the same deal (same property, different packaging). Merge data from multiple sources into one canonical deal record.
 - [ ] **Richer deal detail view** — Full deal page showing all extracted data, source documents, screening rationale, and confidence levels for each field.
 
