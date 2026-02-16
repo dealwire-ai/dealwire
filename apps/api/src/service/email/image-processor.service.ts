@@ -106,10 +106,23 @@ export class ImageProcessorService {
    * Extract text from multiple images in a single Vision API call.
    * Provides cross-image context so the model can correlate info across pages/sections.
    */
+  /**
+   * Max images to process in a single multi-image call.
+   * Each high-detail image can use 3000+ tokens — capping at 6 keeps token usage reasonable.
+   */
+  private static readonly MAX_MULTI_IMAGES = 6;
+
   async extractTextFromMultipleImages(
     images: Array<{ data: string; label: string }>,
   ): Promise<string> {
     if (images.length === 0) return '';
+    // Cap images to limit token usage
+    if (images.length > ImageProcessorService.MAX_MULTI_IMAGES) {
+      this.logger.log(
+        `Capping image OCR from ${images.length} to ${ImageProcessorService.MAX_MULTI_IMAGES} images to limit token usage`,
+      );
+      images = images.slice(0, ImageProcessorService.MAX_MULTI_IMAGES);
+    }
     if (images.length === 1) {
       // For a single image, fall back to the standard method with a buffer
       const match = images[0].data.match(/^data:image\/\w+;base64,(.+)$/);
@@ -135,7 +148,7 @@ export class ImageProcessorService {
       for (const img of images) {
         content.push({
           type: 'image_url',
-          image_url: { url: img.data, detail: 'high' },
+          image_url: { url: img.data, detail: 'low' },
         });
       }
 

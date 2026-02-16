@@ -114,19 +114,23 @@ export class EmailProcessorService {
       // Attachments already in S3 from webhook
       const dealId = await this.saveDeal(ctx, detection, accessToken);
 
+      // Truncate text for all AI calls to stay within TPM limits.
+      // Data extraction gets a larger budget; downstream calls get less since they also receive structuredData.
+      const MAX_EXTRACTION_CHARS = 50_000;
+      const MAX_DOWNSTREAM_CHARS = 30_000;
+      const extractionText = combinedText.length > MAX_EXTRACTION_CHARS
+        ? combinedText.slice(0, MAX_EXTRACTION_CHARS) + '\n\n[...text truncated for token efficiency]'
+        : combinedText;
+
       // Step 4: Extract structured deal data FIRST (feeds into screening)
       let structuredData: Record<string, unknown> | undefined;
       try {
-        const extraction = await this.dataExtractionService.extract(dealId, combinedText);
+        const extraction = await this.dataExtractionService.extract(dealId, extractionText);
         structuredData = extraction.extractedData as Record<string, unknown>;
       } catch (error) {
         const msg = error instanceof Error ? error.message : String(error);
         this.logger.warn(`Data extraction failed for deal ${dealId}: ${msg}`);
       }
-
-      // Truncate text for downstream calls (screening, summary+narrative).
-      // Data extraction (above) gets the full text — it's the only call that truly needs it.
-      const MAX_DOWNSTREAM_CHARS = 30_000;
       const downstreamText = combinedText.length > MAX_DOWNSTREAM_CHARS
         ? combinedText.slice(0, MAX_DOWNSTREAM_CHARS) + '\n\n[...text truncated for token efficiency]'
         : combinedText;
