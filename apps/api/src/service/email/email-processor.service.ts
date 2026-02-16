@@ -242,16 +242,13 @@ export class EmailProcessorService {
     let summary: string | undefined;
     let narrative: string | undefined;
     if (bucket.generateSummary) {
-      // Run summary and narrative in parallel
-      const [summaryResult, narrativeResult] = await Promise.all([
-        this.dealSummaryService.summarizeDeal(combinedText, bucket.description),
-        this.dealSummaryService.generateDealNarrative(combinedText).catch((err) => {
-          this.logger.warn(`Deal narrative generation failed: ${err.message}`);
-          return undefined;
-        }),
-      ]);
-      summary = summaryResult;
-      narrative = narrativeResult;
+      // Run summary first, then narrative (serialized to avoid OpenAI TPM rate limits)
+      summary = await this.dealSummaryService.summarizeDeal(combinedText, bucket.description);
+      try {
+        narrative = await this.dealSummaryService.generateDealNarrative(combinedText);
+      } catch (err) {
+        this.logger.warn(`Deal narrative generation failed: ${err instanceof Error ? err.message : err}`);
+      }
     }
 
     switch (bucket.action) {

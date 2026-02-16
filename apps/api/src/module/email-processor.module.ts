@@ -24,7 +24,7 @@ const sqsImports = enableSqs
           queueUrl: sqsConfig().normalizedEmailQueueUrl,
           region: sqsConfig().region,
           waitTimeSeconds: 20, // Long polling
-          visibilityTimeout: 60, // 60 seconds to process
+          visibilityTimeout: 300, // 5 minutes to process (AI calls are serialized)
         },
       ],
       producers: [
