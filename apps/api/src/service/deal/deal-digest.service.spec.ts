@@ -357,36 +357,5 @@ describe('DealDigestService', () => {
     });
   });
 
-  describe('escapeHtml()', () => {
-    it('should escape HTML special characters', () => {
-      // Arrange
-      const testCases = [
-        { input: 'Test & Company', expected: 'Test &amp; Company' },
-        { input: 'Price < 100', expected: 'Price &lt; 100' },
-        { input: 'Price > 50', expected: 'Price &gt; 50' },
-        { input: 'Say "hello"', expected: 'Say &quot;hello&quot;' },
-        { input: "It's a deal", expected: 'It&#039;s a deal' },
-        { input: 'All: <>&"\'', expected: 'All: &lt;&gt;&amp;&quot;&#039;' },
-      ];
-
-      testCases.forEach(({ input, expected }) => {
-        // Act
-        const result = (service as any).escapeHtml(input);
-
-        // Assert
-        expect(result).toBe(expected);
-      });
-    });
-
-    it('should not escape safe characters', () => {
-      // Arrange
-      const input = 'Regular text 123 ABC';
-
-      // Act
-      const result = (service as any).escapeHtml(input);
-
-      // Assert
-      expect(result).toBe(input);
-    });
-  });
+  // escapeHtml tests moved to util/format.spec.ts (shared utility)
 });

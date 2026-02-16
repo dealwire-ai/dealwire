@@ -8,6 +8,8 @@ import { S3Service } from '../s3/s3.service';
 import { BrokerIntelligenceService, DigestBrokerContext } from './broker-intelligence.service';
 import { ADMIN_EMAILS } from '../../config/email.config';
 import CronExpressionParser from 'cron-parser';
+import { formatFileSize, escapeHtml, getErrorMessage } from '../../util/format';
+import { EMAIL_DEFAULTS, DECISION_COLORS } from '../../util/email-branding';
 
 interface DigestActionLinks {
   webLink?: string;
@@ -82,9 +84,8 @@ export class DealDigestService {
         await this.sendDigestForOrganization(org.id);
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
       const errorStack = error instanceof Error ? error.stack : undefined;
-      this.logger.error(`Failed to check and send digests: ${errorMessage}`, errorStack);
+      this.logger.error(`Failed to check and send digests: ${getErrorMessage(error)}`, errorStack);
     }
   }
 
@@ -343,10 +344,9 @@ export class DealDigestService {
         },
       });
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
       const errorStack = error instanceof Error ? error.stack : undefined;
       this.logger.error(
-        `Failed to send digest for organization ${organizationId}: ${errorMessage}`,
+        `Failed to send digest for organization ${organizationId}: ${getErrorMessage(error)}`,
         errorStack,
       );
     }
@@ -480,8 +480,8 @@ export class DealDigestService {
     },
     actionLinksMap?: Map<string, DigestActionLinks>,
   ): string {
-    const companyName = preferences?.companyName || 'Deal Analyzer';
-    const brandColor = preferences?.brandColor || '#2A4A7C';
+    const companyName = preferences?.companyName || EMAIL_DEFAULTS.companyName;
+    const brandColor = preferences?.brandColor || EMAIL_DEFAULTS.brandColor;
     const organizationImageUrl = preferences?.organizationImageUrl;
 
     // Separate YES and NO deals
@@ -506,10 +506,11 @@ export class DealDigestService {
         minute: '2-digit',
       });
 
-      const accentColor = isYes ? '#16a34a' : '#dc2626';
-      const pillBg = isYes ? '#dcfce7' : '#fee2e2';
-      const pillText = isYes ? '#166534' : '#991b1b';
-      const reasonColor = isYes ? '#15803d' : '#b91c1c';
+      const colors = isYes ? DECISION_COLORS.yes : DECISION_COLORS.no;
+      const accentColor = colors.accent;
+      const pillBg = colors.pillBg;
+      const pillText = colors.pillText;
+      const reasonColor = colors.reason;
       const decisionText = isYes ? 'YES' : 'NO';
 
       // Broker context line
@@ -527,7 +528,7 @@ export class DealDigestService {
         brokerLine = `
                     <tr>
                       <td style="padding: 2px 0; font-size: 13px; color: #9ca3af;">Broker</td>
-                      <td style="padding: 2px 0 2px 12px; font-size: 13px; color: #374151;">${this.escapeHtml(brokerName)} <span style="color: #9ca3af; font-size: 12px;">(${parts.join(' &middot; ')})</span></td>
+                      <td style="padding: 2px 0 2px 12px; font-size: 13px; color: #374151;">${escapeHtml(brokerName)} <span style="color: #9ca3af; font-size: 12px;">(${parts.join(' &middot; ')})</span></td>
                     </tr>`;
       }
 
@@ -539,7 +540,7 @@ export class DealDigestService {
               <table role="presentation" cellpadding="0" cellspacing="0" style="width: 100%;">
                 <tr>
                   <td style="font-size: 16px; font-weight: 600; color: #111827; padding-bottom: 12px;">
-                    ${this.escapeHtml(subject)}
+                    ${escapeHtml(subject)}
                   </td>
                   <td style="text-align: right; vertical-align: top; padding-bottom: 12px;">
                     <span style="background-color: ${pillBg}; color: ${pillText}; padding: 4px 14px; border-radius: 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px;">
@@ -551,11 +552,11 @@ export class DealDigestService {
               <table role="presentation" cellpadding="0" cellspacing="0" style="width: 100%; margin-bottom: 14px;">
                 <tr>
                   <td style="padding: 2px 0; font-size: 13px; color: #9ca3af; width: 70px;">From</td>
-                  <td style="padding: 2px 0 2px 12px; font-size: 13px; color: #374151;">${this.escapeHtml(from)}</td>
+                  <td style="padding: 2px 0 2px 12px; font-size: 13px; color: #374151;">${escapeHtml(from)}</td>
                 </tr>${brokerLine}
                 <tr>
                   <td style="padding: 2px 0; font-size: 13px; color: #9ca3af;">Location</td>
-                  <td style="padding: 2px 0 2px 12px; font-size: 13px; color: #374151;">${this.escapeHtml(location)}</td>
+                  <td style="padding: 2px 0 2px 12px; font-size: 13px; color: #374151;">${escapeHtml(location)}</td>
                 </tr>
                 <tr>
                   <td style="padding: 2px 0; font-size: 13px; color: #9ca3af;">Screened</td>
@@ -564,7 +565,7 @@ export class DealDigestService {
               </table>
               <div style="border-top: 1px solid #f3f4f6; padding-top: 14px;">
                 <p style="margin: 0; font-size: 14px; color: ${reasonColor}; line-height: 1.5;">
-                  ${this.escapeHtml(reason)}
+                  ${escapeHtml(reason)}
                 </p>
               </div>
               ${this.renderDealActionLinks(screening.deal.id, actionLinksMap)}
@@ -617,7 +618,7 @@ export class DealDigestService {
         ${orgSummary.topMarkets.length > 0 ? `
         <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #e5e7eb;">
           <span style="font-size: 12px; color: #9ca3af;">Top markets:</span>
-          ${orgSummary.topMarkets.map((m) => `<span style="font-size: 12px; color: #374151; margin-left: 6px;">${this.escapeHtml(m.location)} <span style="color: #9ca3af;">(${m.count})</span></span>`).join(' &middot;')}
+          ${orgSummary.topMarkets.map((m) => `<span style="font-size: 12px; color: #374151; margin-left: 6px;">${escapeHtml(m.location)} <span style="color: #9ca3af;">(${m.count})</span></span>`).join(' &middot;')}
         </div>` : ''}
       </div>`
       : '';
@@ -642,7 +643,7 @@ export class DealDigestService {
             const borderBottom = i < leaderboard.brokers.length - 1 ? 'border-bottom: 1px solid #f3f4f6;' : '';
             return `
           <tr>
-            <td style="padding: 10px 16px; color: #111827; font-weight: 500; background-color: ${rowBg}; ${borderBottom}">${this.escapeHtml(name)}</td>
+            <td style="padding: 10px 16px; color: #111827; font-weight: 500; background-color: ${rowBg}; ${borderBottom}">${escapeHtml(name)}</td>
             <td style="padding: 10px 16px; color: #374151; text-align: center; background-color: ${rowBg}; ${borderBottom}">${b.totalDeals}</td>
             <td style="padding: 10px 16px; color: #16a34a; font-weight: 600; text-align: center; background-color: ${rowBg}; ${borderBottom}">${b.yesCount}</td>
             <td style="padding: 10px 16px; color: #374151; text-align: center; background-color: ${rowBg}; ${borderBottom}">${b.passRate}%</td>
@@ -673,7 +674,7 @@ export class DealDigestService {
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width: 800px; margin: 0 auto;">
                     <tr>
                         <td style="padding: 28px 32px; text-align: center; background-color: ${brandColor}; border-radius: 0 0 0 0;">
-                            ${organizationImageUrl ? `<img src="${organizationImageUrl}" alt="${companyName}" style="max-width: 160px; height: auto; display: block; margin: 0 auto;" />` : `<span style="font-size: 20px; font-weight: 700; color: #ffffff; letter-spacing: -0.3px;">${this.escapeHtml(companyName)}</span>`}
+                            ${organizationImageUrl ? `<img src="${organizationImageUrl}" alt="${companyName}" style="max-width: 160px; height: auto; display: block; margin: 0 auto;" />` : `<span style="font-size: 20px; font-weight: 700; color: #ffffff; letter-spacing: -0.3px;">${escapeHtml(companyName)}</span>`}
                         </td>
                     </tr>
                     <tr>
@@ -692,7 +693,7 @@ export class DealDigestService {
                     </tr>
                     <tr>
                         <td style="padding: 24px 36px; background-color: #f9fafb; border-top: 1px solid #e5e7eb; text-align: center;">
-                            <p style="margin: 0; font-size: 12px; color: #9ca3af;">${this.escapeHtml(companyName)}</p>
+                            <p style="margin: 0; font-size: 12px; color: #9ca3af;">${escapeHtml(companyName)}</p>
                         </td>
                     </tr>
                 </table>
@@ -725,8 +726,8 @@ export class DealDigestService {
 
     if (links.documentLinks && links.documentLinks.length > 0) {
       for (const doc of links.documentLinks) {
-        const size = doc.sizeBytes ? ` (${this.formatFileSize(doc.sizeBytes)})` : '';
-        items.push(`<a href="${doc.url}" style="${linkStyle}" target="_blank">${this.escapeHtml(doc.filename)}${size}</a>`);
+        const size = doc.sizeBytes ? ` (${formatFileSize(doc.sizeBytes)})` : '';
+        items.push(`<a href="${doc.url}" style="${linkStyle}" target="_blank">${escapeHtml(doc.filename)}${size}</a>`);
       }
     }
 
@@ -747,20 +748,4 @@ export class DealDigestService {
               </div>`;
   }
 
-  private formatFileSize(bytes: number): string {
-    if (bytes < 1024) return `${bytes}B`;
-    if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)}KB`;
-    return `${(bytes / (1024 * 1024)).toFixed(1)}MB`;
-  }
-
-  private escapeHtml(text: string): string {
-    const map: Record<string, string> = {
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#039;',
-    };
-    return text.replace(/[&<>"']/g, (m) => map[m]);
-  }
 }
