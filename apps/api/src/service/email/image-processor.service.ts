@@ -102,6 +102,75 @@ export class ImageProcessorService {
   }
 
   /**
+   * Extract text from multiple images in a single Vision API call.
+   * Provides cross-image context so the model can correlate info across pages/sections.
+   */
+  async extractTextFromMultipleImages(
+    images: Array<{ data: string; label: string }>,
+  ): Promise<string> {
+    if (images.length === 0) return '';
+    if (images.length === 1) {
+      // For a single image, fall back to the standard method with a buffer
+      const match = images[0].data.match(/^data:image\/\w+;base64,(.+)$/);
+      if (match) {
+        return this.extractTextFromImage(Buffer.from(match[1], 'base64'), images[0].label);
+      }
+    }
+
+    const start = Date.now();
+    try {
+      const content: OpenAI.Chat.Completions.ChatCompletionContentPart[] = [
+        {
+          type: 'text',
+          text:
+            `You are viewing ${images.length} images from a real estate deal email or teaser. ` +
+            'Extract ALL text from every image. These images likely form a single deal presentation — ' +
+            'correlate information across images (e.g., property name from one image with financials from another). ' +
+            'Preserve relationships between labels and values. Include all financial metrics, property details, ' +
+            'addresses, and contact information. Format as structured text.',
+        },
+      ];
+
+      for (const img of images) {
+        content.push({
+          type: 'image_url',
+          image_url: { url: img.data, detail: 'high' },
+        });
+      }
+
+      const response = await this.openai.chat.completions.create({
+        model: this.aiConfig.openaiModel,
+        temperature: this.aiConfig.openaiTemperature,
+        messages: [{ role: 'user', content }],
+        max_tokens: 4096,
+        user: 'image-ocr-multi',
+      });
+
+      const extractedText = response.choices[0]?.message?.content || '';
+      const duration = (Date.now() - start) / 1000;
+
+      this.metricsService.recordAICall(
+        'image-ocr-multi',
+        this.aiConfig.openaiModel,
+        duration,
+        extractedText ? 'success' : 'error',
+      );
+
+      this.logger.log(
+        `Extracted ${extractedText.length} chars from ${images.length} images (${duration.toFixed(2)}s)`,
+      );
+
+      return extractedText;
+    } catch (error) {
+      const duration = (Date.now() - start) / 1000;
+      this.metricsService.recordAICall('image-ocr-multi', this.aiConfig.openaiModel, duration, 'error');
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Multi-image processing failed: ${errorMessage}`);
+      return '';
+    }
+  }
+
+  /**
    * Detect image type from filename extension
    */
   private detectImageType(filename: string): string | null {

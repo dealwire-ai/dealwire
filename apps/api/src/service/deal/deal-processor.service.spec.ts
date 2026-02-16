@@ -13,6 +13,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { S3Service } from '../s3/s3.service';
 import { MetricsService } from '../metrics/metrics.service';
 import { NotificationService } from '../notifications/notification.service';
+import { ImageProcessorService } from '../email/image-processor.service';
 import { EmailSenderService } from '../email/email-sender.service';
 import { NormalizedEmailEvent } from '../../dto/normalized-email-event.dto';
 
@@ -131,7 +132,17 @@ describe('EmailProcessorService', () => {
         {
           provide: DataExtractionService,
           useValue: {
-            extract: jest.fn().mockResolvedValue(undefined),
+            extract: jest.fn().mockResolvedValue({
+              dealType: 'real_estate',
+              extractedData: { askingPrice: 5000000 },
+            }),
+          },
+        },
+        {
+          provide: ImageProcessorService,
+          useValue: {
+            extractTextFromImage: jest.fn().mockResolvedValue(''),
+            extractTextFromMultipleImages: jest.fn().mockResolvedValue(''),
           },
         },
         {

@@ -33,6 +33,7 @@ export class InitialScreeningService {
    * @param buckets - The org's screening buckets (ordered by rank)
    * @param senderEmail - Email address of the sender (for contact normalization)
    * @param senderName - Sender display name if available (for contact firstName/lastName)
+   * @param structuredData - Pre-extracted structured data from DataExtractionService (price, cap rate, etc.)
    * @returns The screening result
    */
   async screen(
@@ -41,17 +42,31 @@ export class InitialScreeningService {
     buckets: ScreeningBucket[],
     senderEmail?: string,
     senderName?: string,
+    structuredData?: Record<string, unknown>,
   ): Promise<InitialScreeningResult> {
     const start = Date.now();
     try {
-      const systemPrompt = this.buildPrompt(buckets);
+      const systemPrompt = this.buildPrompt(buckets, !!structuredData);
+
+      // Build user message with structured data section if available
+      let userContent = '';
+      if (structuredData && Object.keys(structuredData).length > 0) {
+        const dataLines = Object.entries(structuredData)
+          .filter(([, v]) => v != null)
+          .map(([k, v]) => `  ${k}: ${v}`)
+          .join('\n');
+        if (dataLines) {
+          userContent += `=== PRE-EXTRACTED STRUCTURED DATA ===\n${dataLines}\n\n`;
+        }
+      }
+      userContent += `Raw Extracted Text:\n\n${extractedText}`;
 
       const response = await this.openai.chat.completions.create({
-        model: this.aiConfig.openaiModel,
+        model: this.aiConfig.openaiScreeningModel,
         temperature: this.aiConfig.openaiTemperature,
         messages: [
           { role: 'system', content: systemPrompt },
-          { role: 'user', content: `Raw Extracted Text:\n\n${extractedText}` },
+          { role: 'user', content: userContent },
         ],
         response_format: { type: 'json_object' },
         user: 'initial-screening',
@@ -134,16 +149,16 @@ export class InitialScreeningService {
       });
 
       const duration = (Date.now() - start) / 1000;
-      this.metricsService.recordAICall('initial-screening', this.aiConfig.openaiModel, duration, 'success');
+      this.metricsService.recordAICall('initial-screening', this.aiConfig.openaiScreeningModel, duration, 'success');
 
       this.logger.log(
-        `Initial screening completed: ${decision} bucket="${matchedBucket.name}" (model: ${this.aiConfig.openaiModel}) for deal ${dealId}${assetId ? ` with asset ${assetId}` : ' (no asset)'}${contactId ? ` with contact ${contactId}` : ' (no contact)'}`,
+        `Initial screening completed: ${decision} bucket="${matchedBucket.name}" (model: ${this.aiConfig.openaiScreeningModel}) for deal ${dealId}${assetId ? ` with asset ${assetId}` : ' (no asset)'}${contactId ? ` with contact ${contactId}` : ' (no contact)'}`,
       );
 
       return result;
     } catch (error) {
       const duration = (Date.now() - start) / 1000;
-      this.metricsService.recordAICall('initial-screening', this.aiConfig.openaiModel, duration, 'error');
+      this.metricsService.recordAICall('initial-screening', this.aiConfig.openaiScreeningModel, duration, 'error');
       const errorMessage = error instanceof Error ? error.message : String(error);
       const errorType = error instanceof Error ? error.constructor.name : 'Unknown';
       this.logger.error(
@@ -153,7 +168,7 @@ export class InitialScreeningService {
     }
   }
 
-  private buildPrompt(buckets: ScreeningBucket[]): string {
+  private buildPrompt(buckets: ScreeningBucket[], hasStructuredData: boolean = false): string {
     const bucketDescriptions = buckets
       .map(
         (b, i) =>
@@ -176,11 +191,17 @@ export class InitialScreeningService {
       '4. Missing Price Handling: If the purchase price is missing but you can infer deal size from units (e.g., 200-unit building), ' +
       'use typical price-per-unit ranges to estimate. Only reject for missing price if you cannot reasonably infer the deal meets minimum size requirements.\n\n' +
       '=== INPUT FORMAT ===\n' +
-      'The text below is raw extracted text from emails and PDFs. It may have:\n' +
-      '- OCR formatting issues\n' +
-      '- Vertical stacking of text\n' +
-      '- Missing or unclear labels\n\n' +
-      'Use context clues and proximity to match labels with values. Look for information near related terms.\n\n' +
+      (hasStructuredData
+        ? 'You will receive TWO sections:\n' +
+          '1. PRE-EXTRACTED STRUCTURED DATA — verified fields (price, cap rate, units, etc.) extracted by a prior step. ' +
+          'Use these values as the PRIMARY source for factual fields like price, location, property type, and unit count.\n' +
+          '2. Raw Extracted Text — the original text for additional context and details not captured in structured data.\n\n' +
+          'If structured data and raw text conflict on a factual field, prefer the structured data.\n\n'
+        : 'The text below is raw extracted text from emails and PDFs. It may have:\n' +
+          '- OCR formatting issues\n' +
+          '- Vertical stacking of text\n' +
+          '- Missing or unclear labels\n\n' +
+          'Use context clues and proximity to match labels with values. Look for information near related terms.\n\n') +
       '=== OUTPUT FORMAT ===\n' +
       'Respond with JSON in this exact format:\n' +
       '{"bucket": "<bucket name>", "reason": "your reason", "address": {"street": "123 Main St", "city": "New York", "state": "NY", "country": "USA"}}\n\n' +
