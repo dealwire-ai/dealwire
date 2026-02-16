@@ -4,27 +4,38 @@ import { openai } from '@ai-sdk/openai';
 import { z } from 'zod';
 import { PrismaService } from '../prisma/prisma.service';
 import { ScreeningPreferencesService } from '../preferences/screening-preferences.service';
+import { BrokerIntelligenceService } from '../deal/broker-intelligence.service';
 import { aiConfig } from '../../config/ai.config';
 
-const SYSTEM_PROMPT = `You are a helpful assistant for a real estate investment platform. You help users query their deals, contacts (brokers), and properties/assets. You can also update their screening preferences.
+const SYSTEM_PROMPT = `You are an AI acquisitions analyst for a real estate investment firm. You monitor their deal flow, track broker relationships, and help refine screening criteria. You communicate via email replies and web chat.
 
-IMPORTANT - Screening preferences (understand the difference):
-1. **alwaysSkip**: Criteria for emails to NEVER process as deals. If an email matches alwaysSkip, we don't analyze it at all—no summary, no reply, no folder move. It stays in the inbox. Use for: "skip all emails from X", "ignore retail deals".
-2. **dealCriteria**: Hard requirements for deal evaluation. Each deal is evaluated against these. If it fails → moved to "Passed Deals" folder. If it passes → stays in inbox with our analysis reply. Use for: "New York only", "minimum 5% cap rate", "no office".
-3. **buyBox**: (Phase 2) Positive criteria for deals they want.
+CORE CAPABILITIES:
+1. Query deals, brokers, and properties
+2. Provide broker intelligence (who sends what, pass rates, geographic focus)
+3. Update screening preferences based on user feedback
 
-When updating preferences:
-- update_always_skip: Sets what to skip entirely (not a deal).
-- update_deal_criteria: Sets the evaluation criteria (YES/NO decision).
-- update_passed_folder: Sets folder name for passed/rejected deals (default "Passed Deals").
-- update_digest_schedule: Sets when digest emails are sent (cron + timezone).
+SCREENING PREFERENCES (understand the difference):
+- **alwaysSkip**: Criteria for emails to NEVER process. No analysis, no reply, no folder move. Use for: "skip all emails from X", "ignore retail deals", "don't process newsletters".
+- **dealCriteria**: Hard requirements for YES/NO evaluation. Fails → moved to "Passed Deals" folder. Passes → stays in inbox with analysis. Use for: "New York only", "min 5% cap rate", "no office".
+- **screening buckets**: Fine-grained classification tiers (Hot Deal, Good Fit, Pass, etc.) with customizable actions per bucket.
 
-Use the most specific tool for each question:
-- For "who sent the most deals?" or ranking → get_top_contacts_by_deal_count
-- For overall statistics → get_deal_stats
-- For deals from a specific contact → get_deals_by_contact
-- For deals in a location → get_deals_by_location
-- Only use get_deals/get_contacts/get_assets for specific searches
+INTERPRETING USER FEEDBACK AS CRITERIA UPDATES:
+When a user gives feedback about deals, interpret it as a criteria change:
+- "Too big for us" or "we don't do deals this large" → update dealCriteria to add a size cap
+- "Not interested in warehouse" or "skip warehouse deals" → update dealCriteria or alwaysSkip depending on severity
+- "Actually this looks interesting" or "we'd consider this type" → suggest expanding criteria
+- "Stop sending me deals like this" → update alwaysSkip
+- "I don't care about ones from [broker]" → update alwaysSkip with sender filter
+
+After any criteria update, ALWAYS confirm back what you changed and ask if the user wants to adjust further. Be specific about what changed.
+
+TOOL SELECTION:
+- Broker ranking/leaderboard → get_broker_leaderboard
+- Detailed broker stats → get_broker_stats
+- Deals from a specific broker → get_deals_by_contact
+- Overall deal statistics → get_deal_stats
+- Deals in a location → get_deals_by_location
+- Generic deal/contact/asset search → get_deals/get_contacts/get_assets
 
 Never fetch all data by paginating through everything. Use targeted queries.
 Respond briefly and directly. No markdown formatting, plain text.`;
@@ -41,6 +52,7 @@ export class AnalyzerAgentService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly screeningPreferences: ScreeningPreferencesService,
+    private readonly brokerIntelligence: BrokerIntelligenceService,
   ) {}
 
   /**
@@ -52,11 +64,22 @@ export class AnalyzerAgentService {
   ): Promise<string> {
     const config = aiConfig();
     const tools = this.createTools(context);
+
+    // Load current preferences for context
+    const prefs = await this.screeningPreferences.getPreferences(context.organizationId);
+    const prefsContext = [
+      prefs.dealCriteria ? `Current deal criteria: ${prefs.dealCriteria}` : null,
+      prefs.alwaysSkip ? `Current always-skip rules: ${prefs.alwaysSkip}` : null,
+    ].filter(Boolean).join('\n');
+    const systemWithContext = prefsContext
+      ? `${SYSTEM_PROMPT}\n\nCURRENT PREFERENCES:\n${prefsContext}`
+      : SYSTEM_PROMPT;
+
     const messages: CoreMessage[] = [{ role: 'user', content: userMessage }];
 
     const result = await generateText({
       model: openai(config.openaiModel),
-      system: SYSTEM_PROMPT,
+      system: systemWithContext,
       messages,
       tools,
       maxSteps: 5,
@@ -106,36 +129,80 @@ export class AnalyzerAgentService {
         },
       }),
 
-      get_top_contacts_by_deal_count: tool({
-        description: 'Get contacts ranked by number of deals they sent. Use for "who sent the most deals?".',
+      get_broker_leaderboard: tool({
+        description: 'Get brokers ranked by deal count with pass rates, geographic focus, and activity. Use for "who sent the most deals?", "top brokers", "broker leaderboard".',
         parameters: z.object({
-          limit: z.number().optional().default(10).describe('Number of top contacts'),
+          limit: z.number().optional().default(10).describe('Number of top brokers'),
+          sortBy: z.enum(['dealCount', 'passRate']).optional().default('dealCount'),
+          sinceDays: z.number().optional().describe('Only include deals from last N days'),
         }),
-        execute: async ({ limit = 10 }) => {
-          const deals = await this.prisma.deal.findMany({
-            where: orgWhere,
-            select: { contactId: true },
+        execute: async ({ limit = 10, sortBy = 'dealCount', sinceDays }) => {
+          const since = sinceDays ? new Date(Date.now() - sinceDays * 24 * 60 * 60 * 1000) : undefined;
+          const leaderboard = await this.brokerIntelligence.getLeaderboard(organizationId, {
+            limit,
+            since,
+            sortBy,
           });
-          const counts: Record<string, number> = {};
-          for (const d of deals) {
-            if (d.contactId) {
-              counts[d.contactId] = (counts[d.contactId] || 0) + 1;
-            }
-          }
-          const sorted = Object.entries(counts)
-            .sort(([, a], [, b]) => b - a)
-            .slice(0, limit);
-          const contactIds = sorted.map(([id]) => id);
-          const contacts = await this.prisma.contact.findMany({
-            where: { id: { in: contactIds } },
-          });
-          const contactMap = new Map(contacts.map((c) => [c.id, c]));
           return {
-            topContacts: sorted.map(([id, count]) => ({
-              contact: contactMap.get(id) || { id, email: 'Unknown' },
-              dealCount: count,
+            brokers: leaderboard.brokers.map((b) => ({
+              name: [b.firstName, b.lastName].filter(Boolean).join(' ') || b.email,
+              email: b.email,
+              totalDeals: b.totalDeals,
+              passRate: `${b.passRate}%`,
+              yesCount: b.yesCount,
+              noCount: b.noCount,
+              topCities: b.topCities,
+              lastDealAt: b.lastDealAt,
+              avgDaysBetweenDeals: b.avgDaysBetweenDeals,
             })),
-            totalAnalyzed: deals.length,
+            totalBrokers: leaderboard.totalBrokers,
+            totalDeals: leaderboard.totalDeals,
+          };
+        },
+      }),
+
+      get_broker_stats: tool({
+        description: 'Get detailed stats for a specific broker. Use for "tell me about broker X", "what does [name] send?".',
+        parameters: z.object({
+          contactEmail: z.string().optional(),
+          contactSearch: z.string().optional(),
+        }),
+        execute: async ({ contactEmail, contactSearch }) => {
+          // Find contact
+          let contact;
+          if (contactEmail) {
+            contact = await this.prisma.contact.findFirst({
+              where: { email: { equals: contactEmail, mode: 'insensitive' }, deals: { some: orgWhere } },
+            });
+          } else if (contactSearch) {
+            contact = await this.prisma.contact.findFirst({
+              where: {
+                OR: [
+                  { email: { contains: contactSearch, mode: 'insensitive' } },
+                  { firstName: { contains: contactSearch, mode: 'insensitive' } },
+                  { lastName: { contains: contactSearch, mode: 'insensitive' } },
+                ],
+                deals: { some: orgWhere },
+              },
+            });
+          }
+          if (!contact) return { error: 'Broker not found' };
+
+          const stats = await this.brokerIntelligence.getBrokerStats(contact.id, organizationId);
+          if (!stats) return { error: 'No deals found for this broker' };
+
+          return {
+            name: [stats.firstName, stats.lastName].filter(Boolean).join(' ') || stats.email,
+            email: stats.email,
+            totalDeals: stats.totalDeals,
+            passRate: `${stats.passRate}%`,
+            yesCount: stats.yesCount,
+            noCount: stats.noCount,
+            topCities: stats.topCities,
+            topStates: stats.topStates,
+            firstDealAt: stats.firstDealAt,
+            lastDealAt: stats.lastDealAt,
+            avgDaysBetweenDeals: stats.avgDaysBetweenDeals,
           };
         },
       }),
@@ -359,6 +426,61 @@ export class AnalyzerAgentService {
             digestTimeZone: timeZone,
           });
           return { success: true, digestSchedule: updated.digestSchedule, digestTimeZone: updated.digestTimeZone };
+        },
+      }),
+
+      update_screening_bucket: tool({
+        description: 'Update criteria for a specific screening bucket (e.g. "Hot Deal", "Good Fit", "Pass"). Use when user wants to refine what goes into a specific classification tier.',
+        parameters: z.object({
+          bucketName: z.string().describe('Name of the bucket to update (case-insensitive match)'),
+          newDescription: z.string().describe('Updated criteria description for the bucket'),
+        }),
+        execute: async ({ bucketName, newDescription }) => {
+          const bucket = await this.prisma.screeningBucket.findFirst({
+            where: {
+              organizationId,
+              name: { equals: bucketName, mode: 'insensitive' },
+            },
+          });
+          if (!bucket) {
+            const allBuckets = await this.prisma.screeningBucket.findMany({
+              where: { organizationId },
+              select: { name: true },
+              orderBy: { rank: 'asc' },
+            });
+            return {
+              error: `Bucket "${bucketName}" not found. Available buckets: ${allBuckets.map((b) => b.name).join(', ')}`,
+            };
+          }
+          const updated = await this.prisma.screeningBucket.update({
+            where: { id: bucket.id },
+            data: { description: newDescription },
+          });
+          return { success: true, bucket: updated.name, description: updated.description };
+        },
+      }),
+
+      get_current_preferences: tool({
+        description: 'Get the current screening preferences and bucket configuration. Use when user asks "what are my current criteria?" or before suggesting changes.',
+        parameters: z.object({}),
+        execute: async () => {
+          const prefs = await this.screeningPreferences.getPreferences(organizationId);
+          const buckets = await this.prisma.screeningBucket.findMany({
+            where: { organizationId },
+            orderBy: { rank: 'asc' },
+            select: { name: true, description: true, rank: true, isPass: true, action: true },
+          });
+          return {
+            dealCriteria: prefs.dealCriteria || 'Not set',
+            alwaysSkip: prefs.alwaysSkip || 'Not set',
+            passedFolderName: prefs.passedFolderName || 'Passed Deals',
+            buckets: buckets.map((b) => ({
+              name: b.name,
+              criteria: b.description,
+              decision: b.isPass ? 'YES' : 'NO',
+              action: b.action,
+            })),
+          };
         },
       }),
     };

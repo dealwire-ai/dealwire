@@ -250,8 +250,8 @@ export class EmailProcessorService {
         break;
 
       case 'DRAFT_REPLY_TO_BROKER':
-        if (summary && event.source === 'microsoft' && accessToken) {
-          await this.handleDraftReplyToBroker(accessToken, event.messageId, summary, decision, prefs);
+        if (event.source === 'microsoft' && accessToken) {
+          await this.handleDraftReplyToBroker(accessToken, event.messageId, combinedText, decision, prefs);
         }
         break;
 
@@ -306,28 +306,30 @@ export class EmailProcessorService {
   }
 
   /**
-   * Create a draft reply to the broker (original sender) with deal analysis.
-   * The draft is left unsent in the user's Drafts folder for review.
+   * Create a draft reply to the broker (original sender) with a conversational response.
+   * Uses AI to generate a natural-sounding reply (not the internal analysis).
+   * The draft is left unsent in the user's Drafts folder for review before sending.
    */
   private async handleDraftReplyToBroker(
     accessToken: string,
     messageId: string,
-    summary: string,
+    combinedText: string,
     decision: InitialScreeningResult,
     prefs: ScreeningPreferences,
   ): Promise<void> {
-    const htmlEmail = this.emailTemplateService.formatSummaryAsHtml(
-      summary,
-      decision,
-      prefs.organizationImageUrl,
+    const brokerReply = await this.dealSummaryService.generateBrokerReplyDraft(
+      combinedText,
+      decision.decision,
       prefs.companyName,
-      prefs.brandColor,
     );
+
+    // Format as simple HTML (no branded template — this goes to the broker)
+    const htmlBody = `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 14px; color: #333; line-height: 1.6;">${brokerReply.replace(/\n/g, '<br>')}</div>`;
 
     await this.microsoftGraphService.createDraftReplyToBroker(
       accessToken,
       messageId,
-      htmlEmail,
+      htmlBody,
     );
   }
 
