@@ -23,6 +23,7 @@ export class DataExtractionService {
   ) {
     this.openai = new OpenAI({
       apiKey: this.aiConfig.openaiApiKey,
+      maxRetries: 3,
     });
   }
 

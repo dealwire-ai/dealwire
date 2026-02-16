@@ -13,6 +13,7 @@ export class DealDecisionService {
   constructor(private readonly metricsService: MetricsService) {
     this.openai = new OpenAI({
       apiKey: this.aiConfig.openaiApiKey,
+      maxRetries: 3,
     });
   }
 
