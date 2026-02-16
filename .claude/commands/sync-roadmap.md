@@ -5,14 +5,14 @@ description: Update ROADMAP.md after merging a PR to keep sessions aware of curr
 
 ## Context
 
-- Current ROADMAP.md: !`cat ROADMAP.md 2>/dev/null || echo "(no ROADMAP.md found)"`
+- Current ROADMAP.md: !`cat docs/ROADMAP.md 2>/dev/null || echo "(no ROADMAP.md found)"`
 - Recent merged PRs (last 10): !`gh pr list --state merged --limit 10 --json number,title,mergedAt,body --jq '.[] | "PR #\(.number): \(.title) (merged \(.mergedAt))\n\(.body)\n---"' 2>/dev/null || echo "(could not fetch PRs)"`
 - Recent commits on main (last 20): !`git log --oneline -20 2>/dev/null || echo "(no git log)"`
 - What's currently built: !`cat CLAUDE.md 2>/dev/null | head -100 || echo "(no CLAUDE.md)"`
 
 ## Your task
 
-Review the recently merged PRs and commits, then update `ROADMAP.md` to accurately reflect the current state of the project. This keeps all future Claude Code sessions aware of what's done, what's in progress, and what's next.
+Review the recently merged PRs and commits, then update `docs/ROADMAP.md` to accurately reflect the current state of the project. This keeps all future Claude Code sessions aware of what's done, what's in progress, and what's next.
 
 ### Steps:
 
