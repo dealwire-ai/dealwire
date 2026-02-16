@@ -365,6 +365,27 @@ describe('InitialScreeningService', () => {
     expect(contactNormalizationService.findOrCreateContact).not.toHaveBeenCalled();
   });
 
+  it('should include address disambiguation instructions to reject brokerage/signature addresses', async () => {
+    // Arrange
+    mockOpenAIResponse({
+      bucket: 'Interested',
+      reason: 'Good deal',
+      address: null,
+    });
+
+    // Act
+    await service.screen('deal-addr', 'some text', buckets);
+
+    // Assert - verify the prompt contains critical address disambiguation guidance
+    const callArgs = mockCreate.mock.calls[0][0];
+    const systemPrompt: string = callArgs.messages[0].content;
+    expect(systemPrompt).toContain('Do NOT extract addresses from');
+    expect(systemPrompt).toContain('Email signatures');
+    expect(systemPrompt).toContain('Brokerage/company office addresses');
+    expect(systemPrompt).toContain('SENDER addresses, not property addresses');
+    expect(systemPrompt).toContain('"street": null');
+  });
+
   it('should not call address normalization when AI returns null address', async () => {
     // Arrange
     mockOpenAIResponse({
