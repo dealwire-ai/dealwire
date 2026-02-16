@@ -28,13 +28,27 @@ Build the ultimate private market analyst — an AI system with access to deep p
 
 When users connect their Microsoft Outlook account, the system monitors their inbox for deal-related emails (teasers, offering memorandums, etc.), extracts and analyzes the content using AI, and replies with a structured summary, deal narrative, action card (links to documents, deal rooms, broker intel), and go/no-go decision based on client-specific criteria. For promising deals, it also drafts relationship-aware broker reply emails. A scheduled digest surfaces all screened deals with inline action links.
 
-See `ROADMAP.md` for current product priorities and feature roadmap. Check it before proposing new features to ensure alignment with the current phase.
+See `docs/ROADMAP.md` for current product priorities and feature roadmap. Check it before proposing new features to ensure alignment with the current phase.
 
 ## Architecture
 
 ### Monorepo Structure
 - `apps/web` - Next.js 16 frontend (React 19, Tailwind 4)
 - `apps/api` - NestJS 11 backend
+
+### Documentation Map
+
+All project instructions live in `CLAUDE.md` (this file). `.cursorrules` points here — do not duplicate rules there.
+
+| Document | Location | Purpose |
+|----------|----------|---------|
+| **CLAUDE.md** | `/CLAUDE.md` | Single source of truth for project rules, architecture, patterns |
+| **ROADMAP.md** | `/docs/ROADMAP.md` | Current product priorities and feature roadmap |
+| **Public Data Platform** | `/docs/PUBLIC_DATA_PLATFORM.md` | Architecture for public property data ingestion |
+| **Clerk Auth Setup** | `/docs/CLERK_AUTH_SETUP.md` | Clerk authentication implementation details |
+| **Grafana Setup** | `/docs/GRAFANA_SETUP.md` | Monitoring/observability setup guide |
+| **Prisma Schema** | `/apps/api/prisma/schema.prisma` | Database schema (source of truth for data model) |
+| **API .env.example** | `/apps/api/.env.example` | Required environment variables for backend |
 
 ### Commands (from root)
 - `pnpm dev` - Run both frontend and backend
