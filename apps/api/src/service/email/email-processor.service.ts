@@ -124,10 +124,17 @@ export class EmailProcessorService {
         this.logger.warn(`Data extraction failed for deal ${dealId}: ${msg}`);
       }
 
+      // Truncate text for downstream calls (screening, summary+narrative).
+      // Data extraction (above) gets the full text — it's the only call that truly needs it.
+      const MAX_DOWNSTREAM_CHARS = 30_000;
+      const downstreamText = combinedText.length > MAX_DOWNSTREAM_CHARS
+        ? combinedText.slice(0, MAX_DOWNSTREAM_CHARS) + '\n\n[...text truncated for token efficiency]'
+        : combinedText;
+
       // Step 5: Perform initial screening with structured data context
       const decision = await this.initialScreeningService.screen(
         dealId,
-        combinedText,
+        downstreamText,
         buckets,
         event.from,
         event.fromName,
@@ -172,10 +179,11 @@ export class EmailProcessorService {
         accessToken,
         inboxOwnerEmail,
         dealId,
-        combinedText,
+        downstreamText,
         decision,
         prefs,
         organizationId,
+        structuredData,
       );
 
       const durationSeconds = (Date.now() - startTime) / 1000;
@@ -237,18 +245,19 @@ export class EmailProcessorService {
     decision: InitialScreeningResult,
     prefs: ScreeningPreferences,
     organizationId: string,
+    structuredData?: Record<string, unknown>,
   ): Promise<void> {
-    // Generate summary and narrative if the bucket requires it
+    // Generate summary and narrative in a single OpenAI call if the bucket requires it
     let summary: string | undefined;
     let narrative: string | undefined;
     if (bucket.generateSummary) {
-      // Run summary first, then narrative (serialized to avoid OpenAI TPM rate limits)
-      summary = await this.dealSummaryService.summarizeDeal(combinedText, bucket.description);
-      try {
-        narrative = await this.dealSummaryService.generateDealNarrative(combinedText);
-      } catch (err) {
-        this.logger.warn(`Deal narrative generation failed: ${err instanceof Error ? err.message : err}`);
-      }
+      const result = await this.dealSummaryService.summarizeDealWithNarrative(
+        combinedText,
+        bucket.description,
+        structuredData,
+      );
+      summary = result.summary;
+      narrative = result.narrative || undefined;
     }
 
     switch (bucket.action) {

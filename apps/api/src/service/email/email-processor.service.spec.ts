@@ -118,6 +118,7 @@ describe('EmailProcessorService', () => {
           useValue: {
             summarizeDeal: jest.fn().mockResolvedValue('AI-generated summary'),
             generateDealNarrative: jest.fn().mockResolvedValue('Deal narrative text'),
+            summarizeDealWithNarrative: jest.fn().mockResolvedValue({ summary: 'AI-generated summary', narrative: 'Deal narrative text' }),
           },
         },
         {
@@ -596,7 +597,7 @@ describe('EmailProcessorService', () => {
         { provide: MicrosoftGraphService, useValue: { replyInThreadToSelf: jest.fn(), getOrCreateFolder: jest.fn(), getMessage: jest.fn(), moveMessage: jest.fn(), moveConversation: jest.fn(), forwardToAdmins: jest.fn(), getAttachmentContent: jest.fn() } },
         { provide: ScreeningPreferencesService, useValue: { getPreferences: jest.fn().mockResolvedValue({}) } },
         { provide: ScreeningBucketService, useValue: { findAll: jest.fn().mockResolvedValue(mockBuckets), ensureDefaultBuckets: jest.fn() } },
-        { provide: DealSummaryService, useValue: { summarizeDeal: jest.fn().mockResolvedValue('summary'), generateDealNarrative: jest.fn().mockResolvedValue('narrative') } },
+        { provide: DealSummaryService, useValue: { summarizeDeal: jest.fn().mockResolvedValue('summary'), generateDealNarrative: jest.fn().mockResolvedValue('narrative'), summarizeDealWithNarrative: jest.fn().mockResolvedValue({ summary: 'summary', narrative: 'narrative' }) } },
         { provide: InitialScreeningService, useValue: { screen: jest.fn().mockResolvedValue({ decision: 'yes', reason: 'ok', bucketId: 'bucket-yes', bucketName: 'Yes' }) } },
         { provide: DataExtractionService, useValue: dataExtractionService },
         { provide: ImageProcessorService, useValue: { extractTextFromMultipleImages: jest.fn().mockResolvedValue('') } },

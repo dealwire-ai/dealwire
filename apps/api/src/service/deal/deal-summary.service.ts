@@ -20,6 +20,7 @@ export class DealSummaryService {
     );
   }
 
+  // Deprecated: Use summarizeDealWithNarrative() instead to save an OpenAI call
   async summarizeDeal(
     extractedText: string,
     dealCriteria?: string,
@@ -213,6 +214,100 @@ Keep it concise — 2-3 sentences max.`;
   }
 
   /**
+   * Generate both a structured summary and a conversational narrative in a single OpenAI call.
+   * Saves ~50% of tokens vs calling summarizeDeal + generateDealNarrative separately.
+   */
+  async summarizeDealWithNarrative(
+    extractedText: string,
+    dealCriteria?: string,
+    structuredData?: Record<string, unknown>,
+  ): Promise<{ summary: string; narrative: string }> {
+    const start = Date.now();
+    try {
+      let systemPrompt =
+        'You are a real estate acquisitions analyst. ' +
+        'You are analyzing OCR-extracted text from deal memos and images. The text may have formatting ' +
+        'issues where labels and values are not on the same line, especially when extracted from images ' +
+        'where labels and values may be vertically stacked. You must use context clues, proximity, and ' +
+        'spatial relationships to match labels with their corresponding values. ' +
+        '\n\n' +
+        'You will produce TWO outputs in a single JSON response:\n\n' +
+        '1. **summary**: A markdown-formatted deal summary with clear sections. Focus on: Property Address, ' +
+        'Purchase Price/Asking Price, NOI (T-12 and pro forma if available), Cap Rate (going-in and exit if available), ' +
+        'Property Type/Class, Location/Market, Occupancy, Lease Terms, Key Value Drivers, and any red flags or concerns. ' +
+        'Be brief and to the point - this is for initial deal screening. Use terms like NOI, cap rate, ' +
+        'cash-on-cash, LTV, DSCR, stabilized NOI, rent roll, etc. Format with markdown headers (##) and bullet points (-).\n\n' +
+        '2. **narrative**: A 3-5 sentence conversational narrative that tells the story of this deal. Cover why it is being sold ' +
+        '(if apparent), what the property is, the investment angle/thesis, and any noteworthy details. ' +
+        'Write it like what you would say out loud on a broker call — NOT bullet points, NOT a list. ' +
+        'Plain text, no markdown. If something is not in the text, do not speculate.\n\n' +
+        'IMPORTANT - Vertical Stacking: When text comes from images, labels and values are often ' +
+        'vertically stacked (e.g., "Purchase Price" appears above "$3,500,000"). Look for patterns where ' +
+        'a label appears directly above or below its value within 2-3 lines.\n\n' +
+        'Return ONLY valid JSON with exactly two keys: "summary" and "narrative". No markdown code fences.';
+
+      if (dealCriteria) {
+        systemPrompt +=
+          '\n\nCLIENT-SPECIFIC CRITERIA: The client has the following deal preferences. ' +
+          "In the summary, add a section called '## Fit Assessment' that evaluates " +
+          `how well this deal matches their criteria:\n${dealCriteria}`;
+      }
+
+      let userPrompt =
+        'Analyze this deal and produce both a structured summary and conversational narrative.\n\n';
+
+      if (structuredData) {
+        userPrompt += `Structured data already extracted from the deal (use as primary source for numbers):\n${JSON.stringify(structuredData, null, 2)}\n\n`;
+      }
+
+      userPrompt += `Extracted text:\n\n${extractedText}`;
+
+      const response = await this.openai.chat.completions.create({
+        model: this.aiConfig.openaiModel,
+        temperature: this.aiConfig.openaiTemperature,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
+        response_format: { type: 'json_object' },
+        user: 'summary-and-narrative',
+      });
+
+      const content = response.choices[0]?.message?.content || '';
+      if (!content) {
+        throw new Error('Empty response from OpenAI');
+      }
+
+      const parsed = JSON.parse(content) as { summary?: string; narrative?: string };
+      const summary = parsed.summary || '';
+      const narrative = parsed.narrative || '';
+
+      if (!summary) {
+        throw new Error('Missing summary in OpenAI response');
+      }
+
+      const duration = (Date.now() - start) / 1000;
+      this.metricsService.recordAICall('summary-and-narrative', this.aiConfig.openaiModel, duration, 'success');
+
+      this.logger.log(
+        `Deal summary+narrative generated (summary: ${summary.length}, narrative: ${narrative.length}, model: ${this.aiConfig.openaiModel})`,
+      );
+
+      return { summary, narrative };
+    } catch (error) {
+      const duration = (Date.now() - start) / 1000;
+      this.metricsService.recordAICall('summary-and-narrative', this.aiConfig.openaiModel, duration, 'error');
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorType = error instanceof Error ? error.constructor.name : 'Unknown';
+      this.logger.error(
+        `Deal summary+narrative failed: ${errorMessage} (type: ${errorType})`,
+      );
+      throw new Error(`Failed to generate deal summary+narrative: ${errorMessage}`);
+    }
+  }
+
+  /**
+   * Deprecated: Use summarizeDealWithNarrative() instead to save an OpenAI call.
    * Generate a 3-5 sentence narrative that tells "the story" of a deal.
    * Unlike the structured summary (numbers/metrics), this reads like what
    * an analyst would say in a quick verbal summary on a broker call.
