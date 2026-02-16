@@ -110,5 +110,63 @@ export class DealSummaryService {
       throw new Error(`Failed to summarize deal: ${errorMessage}`);
     }
   }
+
+  /**
+   * Generate a short, conversational reply draft to send to the broker.
+   * This is NOT the internal analysis — it's what the user would send to the broker
+   * to express interest and move the conversation forward.
+   */
+  async generateBrokerReplyDraft(
+    extractedText: string,
+    decision: 'yes' | 'no',
+    companyName?: string,
+  ): Promise<string> {
+    const start = Date.now();
+    try {
+      const systemPrompt = decision === 'yes'
+        ? `You are drafting a brief, professional email reply from a real estate acquisitions team to a broker who sent a deal.
+The team is interested in this deal. Write a short reply (2-4 sentences) that:
+- Thanks them for sending the deal
+- References the specific property or deal (use details from the text - address, property type, unit count, etc.)
+- Expresses interest and suggests a next step (quick call, more info, OM request, etc.)
+- Sounds natural and human — not overly formal or templated
+${companyName ? `- The user works at ${companyName}` : ''}
+
+Do NOT include a subject line. Do NOT include a greeting or sign-off (the email system handles threading). Just the body text.
+Keep it concise — 2-4 sentences max.`
+        : `You are drafting a brief, professional email reply from a real estate acquisitions team to a broker who sent a deal.
+The team is NOT interested in this deal but wants to maintain the broker relationship. Write a short reply (2-3 sentences) that:
+- Thanks them for thinking of the team
+- Briefly explains it's not a fit right now (without being too specific about why)
+- Encourages them to keep sending deals
+${companyName ? `- The user works at ${companyName}` : ''}
+
+Do NOT include a subject line. Do NOT include a greeting or sign-off. Just the body text.
+Keep it concise — 2-3 sentences max.`;
+
+      const response = await this.openai.chat.completions.create({
+        model: this.aiConfig.openaiModel,
+        temperature: 0.7, // Slightly more creative for natural-sounding replies
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: `Deal text:\n\n${extractedText.slice(0, 3000)}` },
+        ],
+        user: 'broker-reply-draft',
+      });
+
+      const draft = response.choices[0]?.message?.content || '';
+      const duration = (Date.now() - start) / 1000;
+      this.metricsService.recordAICall('broker-reply-draft', this.aiConfig.openaiModel, duration, 'success');
+
+      this.logger.log(`Broker reply draft generated (decision: ${decision}, length: ${draft.length})`);
+      return draft;
+    } catch (error) {
+      const duration = (Date.now() - start) / 1000;
+      this.metricsService.recordAICall('broker-reply-draft', this.aiConfig.openaiModel, duration, 'error');
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Broker reply draft generation failed: ${errorMessage}`);
+      throw new Error(`Failed to generate broker reply draft: ${errorMessage}`);
+    }
+  }
 }
 

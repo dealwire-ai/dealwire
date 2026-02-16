@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { DealDigestService } from './deal-digest.service';
+import { BrokerIntelligenceService } from './broker-intelligence.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { EmailSenderService } from '../email/email-sender.service';
 import { ScreeningPreferencesService } from '../preferences/screening-preferences.service';
@@ -48,6 +49,21 @@ describe('DealDigestService', () => {
           useValue: {
             getMicrosoftOAuthTokenFromClerk: jest.fn().mockResolvedValue(null),
             sendMail: jest.fn().mockResolvedValue(false),
+          },
+        },
+        {
+          provide: BrokerIntelligenceService,
+          useValue: {
+            getBrokerContextForDigest: jest.fn().mockResolvedValue(new Map()),
+            getOrgDealSummary: jest.fn().mockResolvedValue({
+              totalScreened: 10,
+              yesCount: 3,
+              noCount: 7,
+              passRate: 30,
+              uniqueBrokers: 5,
+              topMarkets: [],
+            }),
+            getLeaderboard: jest.fn().mockResolvedValue({ brokers: [] }),
           },
         },
       ],
