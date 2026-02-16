@@ -700,9 +700,11 @@ export class EmailProcessorService {
       ? this.extractLinksFromHtml(event.bodyHtml)
       : undefined;
 
-    const savedDeal = await this.prismaService.deal.create({
-      data: {
-        id: dealId, // Use pre-generated dealId from webhook (for S3 organization)
+    // Use upsert so SQS retries don't fail on unique constraint if deal was already created
+    const savedDeal = await this.prismaService.deal.upsert({
+      where: { id: dealId },
+      create: {
+        id: dealId,
         organizationId,
         receivedByUserId,
         sourceMessageId: event.messageId,
@@ -713,6 +715,7 @@ export class EmailProcessorService {
         detectionReason: detection.reason,
         extractedLinks: extractedLinks ? JSON.parse(JSON.stringify(extractedLinks)) : undefined,
       },
+      update: {},
       select: { id: true },
     });
     this.logger.log(`Deal saved: ${savedDeal.id}`);
