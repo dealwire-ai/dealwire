@@ -1,8 +1,15 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+import * as fs from 'fs/promises';
+import * as path from 'path';
+import * as os from 'os';
 import { load } from 'cheerio';
 import { EmailSenderService } from './email-sender.service';
 import { extractPdfText } from '../../util/pdf-parser';
 import { ImageProcessorService } from './image-processor.service';
+
+const execAsync = promisify(exec);
 
 interface AttachmentMetadata {
   filename: string;
@@ -155,27 +162,100 @@ export class EmailProcessingService {
   }
 
   /**
-   * Process a PDF buffer and extract text
-   * Exposed for use by Microsoft webhook service
+   * Process a PDF buffer and extract text.
+   * Falls back to Vision API OCR for scanned/image-only PDFs.
    */
   async processPdfBuffer(buffer: Buffer, filename?: string): Promise<string> {
     const name = filename || 'attachment.pdf';
     try {
       const trimmedText = await extractPdfText(buffer);
 
-      if (trimmedText) {
+      if (trimmedText && trimmedText.trim().length >= 50) {
         this.logger.log(
           `Extracted ${trimmedText.length} characters from PDF: ${name}`,
         );
         return trimmedText;
-      } else {
-        this.logger.warn(`No text extracted from PDF: ${name}`);
-        return '';
       }
+
+      // Text extraction returned empty/minimal — likely a scanned PDF
+      this.logger.log(`PDF text extraction returned <50 chars for ${name}, falling back to Vision OCR`);
+      const ocrText = await this.ocrPdfViaVision(buffer, name);
+      if (ocrText) {
+        return ocrText;
+      }
+
+      // Return whatever pdftotext gave us (even if minimal)
+      return trimmedText || '';
     } catch (pdfError) {
       const errorMessage = pdfError instanceof Error ? pdfError.message : String(pdfError);
       this.logger.error(`PDF parsing failed for ${name}: ${errorMessage}`);
+
+      // Try Vision OCR as last resort
+      try {
+        const ocrText = await this.ocrPdfViaVision(buffer, name);
+        if (ocrText) return ocrText;
+      } catch {
+        // Already logged in ocrPdfViaVision
+      }
       return '';
+    }
+  }
+
+  /**
+   * Convert PDF pages to PNG images using pdftoppm and OCR each page via Vision API.
+   * Caps at first 10 pages to control costs.
+   */
+  private async ocrPdfViaVision(buffer: Buffer, filename: string): Promise<string> {
+    const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'pdf-ocr-'));
+    const tmpPdf = path.join(tmpDir, 'input.pdf');
+
+    try {
+      await fs.writeFile(tmpPdf, buffer);
+
+      // Convert PDF pages to PNG (first 10 pages, 200 DPI for good OCR quality)
+      const outputPrefix = path.join(tmpDir, 'page');
+      await execAsync(
+        `pdftoppm -png -r 200 -l 10 "${tmpPdf}" "${outputPrefix}"`,
+        { timeout: 30000 },
+      );
+
+      // Find generated page images
+      const files = await fs.readdir(tmpDir);
+      const pageFiles = files
+        .filter((f) => f.startsWith('page-') && f.endsWith('.png'))
+        .sort();
+
+      if (pageFiles.length === 0) {
+        this.logger.warn(`pdftoppm produced no images for ${filename}`);
+        return '';
+      }
+
+      this.logger.log(`Converting ${pageFiles.length} pages of ${filename} via Vision OCR`);
+
+      // Process each page through Vision API
+      const pageTexts: string[] = [];
+      for (const pageFile of pageFiles) {
+        const pagePath = path.join(tmpDir, pageFile);
+        const pageBuffer = await fs.readFile(pagePath);
+        const pageText = await this.imageProcessorService.extractTextFromImage(
+          pageBuffer,
+          `${filename}-${pageFile}`,
+        );
+        if (pageText) {
+          pageTexts.push(pageText);
+        }
+      }
+
+      const result = pageTexts.join('\n\n--- Page Break ---\n\n');
+      this.logger.log(`Vision OCR extracted ${result.length} chars from ${pageFiles.length} pages of ${filename}`);
+      return result;
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Vision OCR fallback failed for ${filename}: ${msg}`);
+      return '';
+    } finally {
+      // Cleanup temp directory
+      await fs.rm(tmpDir, { recursive: true, force: true }).catch(() => {});
     }
   }
 
