@@ -461,4 +461,18 @@ After adding tests you must always verify that they are passing.
 
 ## Git & PRs
 
-When creating a PR, break changes into separate, logical commits — each group of related changes should be its own commit rather than one big commit for the whole PR.
+### Commit Messages
+
+Use **Conventional Commits** format: `type: short description`
+
+- **Types:** `feat`, `fix`, `refactor`, `docs`, `test`, `chore`, `perf`, `ci`
+- Imperative mood ("add" not "added"), lowercase, no period, under 72 chars
+- Body (optional): blank line after subject, explain **why** not what
+
+### PR Titles
+
+Same `type: description` format as commits. Keep under 70 chars — use the description body for details.
+
+### PR Structure
+
+Break changes into separate, logical commits — each group of related changes should be its own commit rather than one big commit for the whole PR.
