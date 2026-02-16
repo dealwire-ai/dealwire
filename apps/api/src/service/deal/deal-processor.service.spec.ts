@@ -118,6 +118,7 @@ describe('EmailProcessorService', () => {
           useValue: {
             summarizeDeal: jest.fn().mockResolvedValue('AI-generated summary'),
             generateDealNarrative: jest.fn().mockResolvedValue('Deal narrative text'),
+            summarizeDealWithNarrative: jest.fn().mockResolvedValue({ summary: 'AI-generated summary', narrative: 'Deal narrative text' }),
           },
         },
         {
