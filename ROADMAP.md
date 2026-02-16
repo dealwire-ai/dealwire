@@ -20,6 +20,13 @@ The deal screener is the wedge. The endgame is an autonomous acquisitions analys
 - Draft reply to broker for out-of-buy-box deals
 - Historical inbox backfill (batch process past emails)
 
+### Post-Screening Workflow
+- Deal Action Card — screening emails include actionable links (Open in Outlook, S3 document downloads, deal room links, CA/NDA signing links, broker intel)
+- Deal Narrative — 3-5 sentence conversational "story" of each deal in screening emails
+- Broker Outreach Draft — relationship-aware reply drafts with broker history, contact notes, and smart follow-up questions about missing data
+- Broker Notes — persistent notes and tags on contacts, accessible via agent tools (email + web chat)
+- Smart Digest — daily digest with per-deal inline action links (Outlook, documents, deal room, CA signing)
+
 ### Intelligence
 - Broker stats: deal volume, pass rate, top markets, frequency
 - Broker leaderboard
@@ -27,15 +34,15 @@ The deal screener is the wedge. The endgame is an autonomous acquisitions analys
 
 ### Agent
 - Unified AI agent (web chat + email reply)
-- Query tools: deals, brokers, assets, stats, leaderboard
-- Write tools: update criteria, always-skip, buy box, digest schedule, screening buckets
+- Query tools: deals, brokers, assets, stats, leaderboard, contact notes
+- Write tools: update criteria, always-skip, buy box, digest schedule, screening buckets, contact notes/tags
 - Preference updates via email (e.g., email the system to adjust buy box)
 
 ### Platform
 - Multi-tenant with Clerk orgs
 - Scheduled deal digest emails with per-org timezone support
 - Dashboard: deals, contacts, assets with search/filter/pagination
-- S3 document storage for attachments
+- S3 document storage for attachments with pre-signed URL downloads
 - SQS async processing pipeline
 
 ## Roadmap

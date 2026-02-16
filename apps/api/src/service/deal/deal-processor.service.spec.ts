@@ -12,6 +12,7 @@ import { DataExtractionService } from '../deal/data-extraction.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { S3Service } from '../s3/s3.service';
 import { MetricsService } from '../metrics/metrics.service';
+import { BrokerIntelligenceService } from '../deal/broker-intelligence.service';
 import { NotificationService } from '../notifications/notification.service';
 import { ImageProcessorService } from '../email/image-processor.service';
 import { EmailSenderService } from '../email/email-sender.service';
@@ -116,6 +117,7 @@ describe('EmailProcessorService', () => {
           provide: DealSummaryService,
           useValue: {
             summarizeDeal: jest.fn().mockResolvedValue('AI-generated summary'),
+            generateDealNarrative: jest.fn().mockResolvedValue('Deal narrative text'),
           },
         },
         {
@@ -195,6 +197,12 @@ describe('EmailProcessorService', () => {
           useValue: {
             notifyDealProcessed: jest.fn().mockResolvedValue(undefined),
             notifyError: jest.fn().mockResolvedValue(undefined),
+          },
+        },
+        {
+          provide: BrokerIntelligenceService,
+          useValue: {
+            getBrokerStats: jest.fn().mockResolvedValue(null),
           },
         },
       ],

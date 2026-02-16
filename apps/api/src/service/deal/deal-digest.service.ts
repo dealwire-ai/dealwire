@@ -4,9 +4,17 @@ import { PrismaService } from '../prisma/prisma.service';
 import { EmailSenderService } from '../email/email-sender.service';
 import { ScreeningPreferencesService } from '../preferences/screening-preferences.service';
 import { MicrosoftGraphService } from '../microsoft/microsoft-graph.service';
+import { S3Service } from '../s3/s3.service';
 import { BrokerIntelligenceService, DigestBrokerContext } from './broker-intelligence.service';
 import { ADMIN_EMAILS } from '../../config/email.config';
 import CronExpressionParser from 'cron-parser';
+
+interface DigestActionLinks {
+  webLink?: string;
+  documentLinks?: Array<{ filename: string; url: string; sizeBytes?: number }>;
+  dealRoomLinks?: string[];
+  caLinks?: string[];
+}
 
 @Injectable()
 export class DealDigestService {
@@ -17,6 +25,7 @@ export class DealDigestService {
     private readonly emailSenderService: EmailSenderService,
     private readonly screeningPreferencesService: ScreeningPreferencesService,
     private readonly microsoftGraphService: MicrosoftGraphService,
+    private readonly s3Service: S3Service,
     private readonly brokerIntelligence: BrokerIntelligenceService,
   ) {}
 
@@ -207,6 +216,14 @@ export class DealDigestService {
                   lastName: true,
                 },
               },
+              documents: {
+                select: {
+                  filename: true,
+                  s3Key: true,
+                  contentType: true,
+                  sizeBytes: true,
+                },
+              },
             },
           },
         },
@@ -233,11 +250,14 @@ export class DealDigestService {
         since: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
       });
 
+      // Build action links for each deal (pre-signed S3 URLs, extracted links, webLinks)
+      const actionLinksMap = await this.buildActionLinksForDigest(screenings);
+
       // Get organization preferences for email branding
       const preferences = await this.screeningPreferencesService.getPreferences(organizationId);
 
       // Format email with enhanced data
-      const emailHtml = this.formatDigestEmail(screenings, preferences, brokerContext, orgSummary, leaderboard);
+      const emailHtml = this.formatDigestEmail(screenings, preferences, brokerContext, orgSummary, leaderboard, actionLinksMap);
 
       // Get user emails
       const userEmails = org.users
@@ -332,6 +352,79 @@ export class DealDigestService {
     }
   }
 
+  /**
+   * Build action links for all deals in a digest batch.
+   * Generates pre-signed S3 URLs for documents and extracts stored links.
+   */
+  private async buildActionLinksForDigest(
+    screenings: Array<{
+      deal: {
+        id?: string;
+        sourceWebLink?: string | null;
+        extractedLinks?: unknown;
+        documents?: Array<{
+          filename: string;
+          s3Key: string | null;
+          sizeBytes: number | null;
+        }>;
+      };
+    }>,
+  ): Promise<Map<string, DigestActionLinks>> {
+    const map = new Map<string, DigestActionLinks>();
+
+    for (const screening of screenings) {
+      const deal = screening.deal as { id: string; sourceWebLink?: string | null; extractedLinks?: unknown; documents?: Array<{ filename: string; s3Key: string | null; sizeBytes: number | null }> };
+      if (!deal.id) continue;
+
+      const links: DigestActionLinks = {};
+
+      // Web link to original email in Outlook
+      if (deal.sourceWebLink) {
+        links.webLink = deal.sourceWebLink;
+      }
+
+      // Pre-signed S3 URLs for documents
+      if (deal.documents && deal.documents.length > 0) {
+        const docLinks: Array<{ filename: string; url: string; sizeBytes?: number }> = [];
+        for (const doc of deal.documents) {
+          if (doc.s3Key) {
+            try {
+              const url = await this.s3Service.getPresignedUrl(doc.s3Key);
+              docLinks.push({
+                filename: doc.filename,
+                url,
+                sizeBytes: doc.sizeBytes || undefined,
+              });
+            } catch {
+              // Skip docs that fail
+            }
+          }
+        }
+        if (docLinks.length > 0) {
+          links.documentLinks = docLinks;
+        }
+      }
+
+      // Extracted links from email HTML (stored at processing time)
+      if (deal.extractedLinks && typeof deal.extractedLinks === 'object') {
+        const extracted = deal.extractedLinks as { dealRoomLinks?: string[]; caLinks?: string[] };
+        if (extracted.dealRoomLinks?.length) {
+          links.dealRoomLinks = extracted.dealRoomLinks;
+        }
+        if (extracted.caLinks?.length) {
+          links.caLinks = extracted.caLinks;
+        }
+      }
+
+      // Only store if there's something
+      if (links.webLink || links.documentLinks || links.dealRoomLinks || links.caLinks) {
+        map.set(deal.id, links);
+      }
+    }
+
+    return map;
+  }
+
   private formatDigestEmail(
     screenings: Array<{
       id: string;
@@ -339,6 +432,7 @@ export class DealDigestService {
       reason: string;
       screenedAt: Date;
       deal: {
+        id: string;
         sourceSubject: string | null;
         sourceFrom: string | null;
         contactId?: string | null;
@@ -384,6 +478,7 @@ export class DealDigestService {
         yesCount: number;
       }>;
     },
+    actionLinksMap?: Map<string, DigestActionLinks>,
   ): string {
     const companyName = preferences?.companyName || 'Deal Analyzer';
     const brandColor = preferences?.brandColor || '#2A4A7C';
@@ -472,6 +567,7 @@ export class DealDigestService {
                   ${this.escapeHtml(reason)}
                 </p>
               </div>
+              ${this.renderDealActionLinks(screening.deal.id, actionLinksMap)}
             </td>
           </tr>
         </table>
@@ -605,6 +701,56 @@ export class DealDigestService {
     </table>
 </body>
 </html>`;
+  }
+
+  /**
+   * Render inline action links for a deal card in the digest.
+   * Shows: Open in Outlook, Download docs, Deal room, Sign CA — as compact link row.
+   */
+  private renderDealActionLinks(
+    dealId: string,
+    actionLinksMap?: Map<string, DigestActionLinks>,
+  ): string {
+    if (!actionLinksMap) return '';
+    const links = actionLinksMap.get(dealId);
+    if (!links) return '';
+
+    const linkStyle = 'color: #2563eb; text-decoration: none; font-size: 12px; font-weight: 500;';
+    const separatorStyle = 'color: #d1d5db; margin: 0 6px; font-size: 12px;';
+    const items: string[] = [];
+
+    if (links.webLink) {
+      items.push(`<a href="${links.webLink}" style="${linkStyle}" target="_blank">Open in Outlook</a>`);
+    }
+
+    if (links.documentLinks && links.documentLinks.length > 0) {
+      for (const doc of links.documentLinks) {
+        const size = doc.sizeBytes ? ` (${this.formatFileSize(doc.sizeBytes)})` : '';
+        items.push(`<a href="${doc.url}" style="${linkStyle}" target="_blank">${this.escapeHtml(doc.filename)}${size}</a>`);
+      }
+    }
+
+    if (links.dealRoomLinks && links.dealRoomLinks.length > 0) {
+      items.push(`<a href="${links.dealRoomLinks[0]}" style="${linkStyle}" target="_blank">Deal Room</a>`);
+    }
+
+    if (links.caLinks && links.caLinks.length > 0) {
+      items.push(`<a href="${links.caLinks[0]}" style="${linkStyle}" target="_blank">Sign CA</a>`);
+    }
+
+    if (items.length === 0) return '';
+
+    const separator = `<span style="${separatorStyle}">|</span>`;
+    return `
+              <div style="border-top: 1px solid #f3f4f6; padding-top: 10px; margin-top: 10px;">
+                ${items.join(separator)}
+              </div>`;
+  }
+
+  private formatFileSize(bytes: number): string {
+    if (bytes < 1024) return `${bytes}B`;
+    if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)}KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)}MB`;
   }
 
   private escapeHtml(text: string): string {
