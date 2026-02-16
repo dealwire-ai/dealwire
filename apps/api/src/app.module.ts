@@ -20,6 +20,7 @@ import { IngestionModule } from './module/ingestion.module';
 import { ClerkAuthGuard } from './guard/clerk-auth.guard';
 import { ScreeningPreferencesService } from './service/preferences/screening-preferences.service';
 import { ScreeningBucketService } from './service/preferences/screening-bucket.service';
+import { BrokerIntelligenceService } from './service/deal/broker-intelligence.service';
 
 @Module({
   imports: [PrismaModule, WebhookModule, MetricsModule, EmailProcessorModule, NotificationsModule, DealDigestModule, AgentModule, IngestionModule],
@@ -34,6 +35,6 @@ import { ScreeningBucketService } from './service/preferences/screening-bucket.s
     EmailEventController,
     ChatController,
   ],
-  providers: [AppService, ClerkAuthGuard, ScreeningPreferencesService, ScreeningBucketService],
+  providers: [AppService, ClerkAuthGuard, ScreeningPreferencesService, ScreeningBucketService, BrokerIntelligenceService],
 })
 export class AppModule {}

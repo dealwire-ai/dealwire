@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { HttpStatus } from '@nestjs/common';
 import { ContactController } from './contact.controller';
 import { PrismaService } from '../service/prisma/prisma.service';
+import { BrokerIntelligenceService } from '../service/deal/broker-intelligence.service';
 import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
 
 describe('ContactController', () => {
@@ -19,6 +20,13 @@ describe('ContactController', () => {
         {
           provide: PrismaService,
           useValue: { contact: prisma },
+        },
+        {
+          provide: BrokerIntelligenceService,
+          useValue: {
+            getBrokerStats: jest.fn(),
+            getLeaderboard: jest.fn(),
+          },
         },
       ],
     })
