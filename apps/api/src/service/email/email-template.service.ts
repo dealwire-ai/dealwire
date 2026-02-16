@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { marked } from 'marked';
 import { InitialScreeningResult, DealDecision } from '../../model/initial-screening.model';
+import { formatFileSize, timeAgo, escapeHtml } from '../../util/format';
+import { EMAIL_DEFAULTS, DECISION_COLORS } from '../../util/email-branding';
 
 export interface ActionCardData {
   originalEmailLink?: string;
@@ -32,17 +34,18 @@ export class EmailTemplateService {
 
     // Use provided values or fall back to defaults
     const logo = logoUrl;
-    const company = companyName || 'Deal Analyzer';
-    const color = brandColor || '#2A4A7C';
+    const company = companyName || EMAIL_DEFAULTS.companyName;
+    const color = brandColor || EMAIL_DEFAULTS.brandColor;
 
     // Format decision section if provided
     let decisionHtml = '';
     if (decision) {
       const isYes = decision.decision === 'yes';
       const decisionText = isYes ? 'Yes' : 'No';
-      const accentColor = isYes ? '#16a34a' : '#dc2626';
-      const pillBg = isYes ? '#dcfce7' : '#fee2e2';
-      const pillText = isYes ? '#166534' : '#991b1b';
+      const colors = isYes ? DECISION_COLORS.yes : DECISION_COLORS.no;
+      const accentColor = colors.accent;
+      const pillBg = colors.pillBg;
+      const pillText = colors.pillText;
 
       decisionHtml = `
         <table role="presentation" cellpadding="0" cellspacing="0" style="width: 100%; margin: 0 0 28px 0; border-collapse: collapse;">
@@ -62,7 +65,7 @@ export class EmailTemplateService {
                 </tr>
               </table>
               <p style="margin: 10px 0 0 0; font-size: 14px; color: #374151; line-height: 1.6;">
-                ${decision.reason}
+                ${escapeHtml(decision.reason)}
               </p>
             </td>
           </tr>
@@ -77,7 +80,7 @@ export class EmailTemplateService {
         <div style="background-color: #f8fafc; border-left: 4px solid ${color}; padding: 16px 20px; margin: 0 0 24px 0; border-radius: 4px; font-style: italic;">
           <p style="margin: 0 0 4px 0; font-size: 11px; font-weight: 600; color: ${color}; text-transform: uppercase; letter-spacing: 0.5px;">The Story</p>
           <p style="margin: 0; font-size: 14px; color: #475569; line-height: 1.6;">
-            ${narrative}
+            ${escapeHtml(narrative)}
           </p>
         </div>
       `;
@@ -239,7 +242,7 @@ export class EmailTemplateService {
 
       if (actionCard.attachments) {
         for (const att of actionCard.attachments) {
-          const size = att.sizeBytes ? ` (${this.formatFileSize(att.sizeBytes)})` : '';
+          const size = att.sizeBytes ? ` (${formatFileSize(att.sizeBytes)})` : '';
           linksHtml += `<p style="margin: 0 0 8px 0;"><a href="${att.url}" style="color: ${brandColor}; text-decoration: none; font-size: 14px;">&bull; ${att.filename}</a><span style="color: #94a3b8; font-size: 12px;">${size}</span></p>`;
         }
       }
@@ -270,7 +273,7 @@ export class EmailTemplateService {
       const citiesStr = bc.topCities.length > 0 ? `, focuses on ${bc.topCities.join(', ')}` : '';
       let lastDealStr = '';
       if (bc.lastDealAt) {
-        lastDealStr = ` &middot; Last deal: ${this.timeAgo(bc.lastDealAt)}`;
+        lastDealStr = ` &middot; Last deal: ${timeAgo(bc.lastDealAt)}`;
       }
       brokerHtml = `
         <div style="background-color: #fefce8; border: 1px solid #fde68a; border-radius: 8px; padding: 12px 16px; margin: 0 0 24px 0; font-size: 13px; color: #713f12;">
@@ -282,28 +285,5 @@ export class EmailTemplateService {
     return quickActionsHtml + brokerHtml;
   }
 
-  /**
-   * Format file size in human-readable form.
-   */
-  private formatFileSize(bytes: number): string {
-    if (bytes < 1024) return `${bytes} B`;
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
-    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-  }
-
-  /**
-   * Format a date as a relative time string (e.g., "3 days ago").
-   */
-  private timeAgo(date: Date): string {
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    if (diffDays === 0) return 'today';
-    if (diffDays === 1) return 'yesterday';
-    if (diffDays < 30) return `${diffDays} days ago`;
-    const diffMonths = Math.floor(diffDays / 30);
-    if (diffMonths === 1) return '1 month ago';
-    return `${diffMonths} months ago`;
-  }
 }
 
