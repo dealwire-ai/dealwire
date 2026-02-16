@@ -114,10 +114,6 @@ export class EmailProcessorService {
       // Attachments already in S3 from webhook
       const dealId = await this.saveDeal(ctx, detection, accessToken);
 
-      if (!dealId) {
-        throw new Error('Failed to save deal');
-      }
-
       // Step 4: Extract structured deal data FIRST (feeds into screening)
       let structuredData: Record<string, unknown> | undefined;
       try {
@@ -696,45 +692,37 @@ export class EmailProcessorService {
     ctx: ProcessDealContext,
     detection: DealDetection,
     accessToken?: string,
-  ): Promise<string | undefined> {
+  ): Promise<string> {
     const { event, organizationId, receivedByUserId, dealId } = ctx;
 
-    try {
-      // Create deal (use pre-generated dealId if provided, otherwise Prisma generates one)
-      // Note: Screening fields are no longer saved here - InitialScreeningService handles that
-      // Extract links from email HTML for action cards and digest
-      const extractedLinks = event.bodyHtml
-        ? this.extractLinksFromHtml(event.bodyHtml)
-        : undefined;
+    // Extract links from email HTML for action cards and digest
+    const extractedLinks = event.bodyHtml
+      ? this.extractLinksFromHtml(event.bodyHtml)
+      : undefined;
 
-      const savedDeal = await this.prismaService.deal.create({
-        data: {
-          id: dealId, // Use pre-generated dealId from webhook (for S3 organization)
-          organizationId,
-          receivedByUserId,
-          sourceMessageId: event.messageId,
-          sourceFrom: event.from,
-          sourceSubject: event.subject,
-          sourceReceivedAt: event.receivedAt,
-          detectionConfidence: detection.confidence,
-          detectionReason: detection.reason,
-          extractedLinks: extractedLinks ? JSON.parse(JSON.stringify(extractedLinks)) : undefined,
-        },
-        select: { id: true },
-      });
-      this.logger.log(`Deal saved: ${savedDeal.id}`);
+    const savedDeal = await this.prismaService.deal.create({
+      data: {
+        id: dealId, // Use pre-generated dealId from webhook (for S3 organization)
+        organizationId,
+        receivedByUserId,
+        sourceMessageId: event.messageId,
+        sourceFrom: event.from,
+        sourceSubject: event.subject,
+        sourceReceivedAt: event.receivedAt,
+        detectionConfidence: detection.confidence,
+        detectionReason: detection.reason,
+        extractedLinks: extractedLinks ? JSON.parse(JSON.stringify(extractedLinks)) : undefined,
+      },
+      select: { id: true },
+    });
+    this.logger.log(`Deal saved: ${savedDeal.id}`);
 
-      // Create Document records (attachments already in S3 from webhook)
-      if (event.attachments.length > 0) {
-        await this.createDocumentRecords(savedDeal.id, event);
-      }
-
-      return savedDeal.id;
-    } catch (error) {
-      const msg = error instanceof Error ? error.message : String(error);
-      this.logger.error(`Failed to save deal: ${msg}`);
-      return undefined;
+    // Create Document records (attachments already in S3 from webhook)
+    if (event.attachments.length > 0) {
+      await this.createDocumentRecords(savedDeal.id, event);
     }
+
+    return savedDeal.id;
   }
 
   /**
