@@ -162,6 +162,7 @@ describe('EmailProcessorService', () => {
           useValue: {
             deal: {
               create: jest.fn(),
+              upsert: jest.fn(),
               update: jest.fn(),
             },
             document: {
@@ -261,7 +262,7 @@ describe('EmailProcessorService', () => {
     };
 
     // Mock Prisma deal creation
-    (prismaService.deal.create as jest.Mock).mockResolvedValue({
+    (prismaService.deal.upsert as jest.Mock).mockResolvedValue({
       id: 'deal123',
     });
 
@@ -328,7 +329,7 @@ describe('EmailProcessorService', () => {
         reason: 'Deal',
       },
     };
-    (prismaService.deal.create as jest.Mock).mockResolvedValue({ id: 'deal123' });
+    (prismaService.deal.upsert as jest.Mock).mockResolvedValue({ id: 'deal123' });
 
     // Act
     await service.process(ctx);
@@ -378,7 +379,7 @@ describe('EmailProcessorService', () => {
       },
     };
 
-    (prismaService.deal.create as jest.Mock).mockResolvedValue({ id: 'deal123' });
+    (prismaService.deal.upsert as jest.Mock).mockResolvedValue({ id: 'deal123' });
     (microsoftGraphService.getAttachmentContent as jest.Mock).mockResolvedValue(
       Buffer.from('content'),
     );
@@ -440,7 +441,7 @@ describe('EmailProcessorService', () => {
     // Assert
     expect(result.processed).toBe(false);
     expect(result.skippedReason).toBe('Not a deal email');
-    expect(prismaService.deal.create).not.toHaveBeenCalled();
+    expect(prismaService.deal.upsert).not.toHaveBeenCalled();
     expect(prismaService.document.create).not.toHaveBeenCalled();
     expect(dealSummaryService.summarizeDeal).not.toHaveBeenCalled();
       expect(initialScreeningService.screen).not.toHaveBeenCalled();
@@ -566,7 +567,7 @@ describe('EmailProcessorService', () => {
       organizationId: 'org123',
       detection: { isDeal: true, confidence: 'high' as const, reason: 'Deal' },
     };
-    (prismaService.deal.create as jest.Mock).mockResolvedValue({ id: 'deal123' });
+    (prismaService.deal.upsert as jest.Mock).mockResolvedValue({ id: 'deal123' });
 
     // Act
     await service.process(ctx);
@@ -600,7 +601,7 @@ describe('EmailProcessorService', () => {
         { provide: DataExtractionService, useValue: dataExtractionService },
         { provide: ImageProcessorService, useValue: { extractTextFromMultipleImages: jest.fn().mockResolvedValue('') } },
         { provide: DealDetectionService, useValue: {} },
-        { provide: PrismaService, useValue: { deal: { create: jest.fn().mockResolvedValue({ id: 'd1' }), update: jest.fn() }, document: { create: jest.fn() } } },
+        { provide: PrismaService, useValue: { deal: { create: jest.fn(), upsert: jest.fn().mockResolvedValue({ id: 'd1' }), update: jest.fn() }, document: { create: jest.fn() } } },
         { provide: S3Service, useValue: { downloadDealAttachment: jest.fn() } },
         { provide: MetricsService, useValue: { recordAICall: jest.fn(), recordDealSkipped: jest.fn(), recordDealProcessed: jest.fn(), recordProcessingError: jest.fn(), recordEmailEvent: jest.fn(), recordDealProcessingDuration: jest.fn(), recordFolderMove: jest.fn() } },
         { provide: NotificationService, useValue: { notifyDealProcessed: jest.fn(), notifyError: jest.fn() } },

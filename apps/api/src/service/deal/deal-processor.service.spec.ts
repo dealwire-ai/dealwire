@@ -162,6 +162,7 @@ describe('EmailProcessorService', () => {
           useValue: {
             deal: {
               create: jest.fn(),
+              upsert: jest.fn(),
               update: jest.fn(),
             },
             document: {
@@ -261,7 +262,7 @@ describe('EmailProcessorService', () => {
     };
 
     // Mock Prisma deal creation
-    (prismaService.deal.create as jest.Mock).mockResolvedValue({
+    (prismaService.deal.upsert as jest.Mock).mockResolvedValue({
       id: 'deal123',
     });
 
@@ -328,7 +329,7 @@ describe('EmailProcessorService', () => {
       },
     };
 
-    (prismaService.deal.create as jest.Mock).mockResolvedValue({ id: 'deal123' });
+    (prismaService.deal.upsert as jest.Mock).mockResolvedValue({ id: 'deal123' });
     // Mock fallback to Microsoft Graph if S3 not available
     (microsoftGraphService.getAttachmentContent as jest.Mock).mockResolvedValue(
       Buffer.from('content'),
