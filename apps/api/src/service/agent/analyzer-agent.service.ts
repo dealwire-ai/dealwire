@@ -29,12 +29,18 @@ When a user gives feedback about deals, interpret it as a criteria change:
 
 After any criteria update, ALWAYS confirm back what you changed and ask if the user wants to adjust further. Be specific about what changed.
 
+BROKER NOTES:
+- Users can save personal notes about brokers ("just had a baby", "likes the Knicks", "always responsive")
+- Use update_contact_notes to save notes, get_contact_notes to retrieve them
+- Use update_contact_tags to categorize brokers ("top broker", "responsive", "multifamily specialist")
+
 TOOL SELECTION:
 - Broker ranking/leaderboard → get_broker_leaderboard
 - Detailed broker stats → get_broker_stats
 - Deals from a specific broker → get_deals_by_contact
 - Overall deal statistics → get_deal_stats
 - Deals in a location → get_deals_by_location
+- Broker notes/tags → update_contact_notes/get_contact_notes/update_contact_tags
 - Generic deal/contact/asset search → get_deals/get_contacts/get_assets
 
 Never fetch all data by paginating through everything. Use targeted queries.
@@ -471,6 +477,110 @@ export class AnalyzerAgentService {
             data: { description: newDescription },
           });
           return { success: true, bucket: updated.name, description: updated.description };
+        },
+      }),
+
+      update_contact_notes: tool({
+        description: 'Add or update notes on a broker/contact. Use when user says "note: John Smith just had a baby" or "remember that broker X likes the Knicks". Appends to existing notes.',
+        parameters: z.object({
+          contactSearch: z.string().describe('Name or email of the contact to update'),
+          notes: z.string().describe('Notes to add about this contact'),
+        }),
+        execute: async ({ contactSearch, notes }) => {
+          const contact = await this.prisma.contact.findFirst({
+            where: {
+              OR: [
+                { email: { contains: contactSearch, mode: 'insensitive' } },
+                { firstName: { contains: contactSearch, mode: 'insensitive' } },
+                { lastName: { contains: contactSearch, mode: 'insensitive' } },
+              ],
+              deals: { some: orgWhere },
+            },
+          });
+          if (!contact) return { error: `Contact "${contactSearch}" not found` };
+
+          const existingNotes = contact.notes || '';
+          const updatedNotes = existingNotes
+            ? `${existingNotes}\n${notes}`
+            : notes;
+
+          const updated = await this.prisma.contact.update({
+            where: { id: contact.id },
+            data: { notes: updatedNotes },
+          });
+          return {
+            success: true,
+            contact: [updated.firstName, updated.lastName].filter(Boolean).join(' ') || updated.email,
+            notes: updated.notes,
+          };
+        },
+      }),
+
+      update_contact_tags: tool({
+        description: 'Add or remove tags on a broker/contact. Use for categorizing brokers (e.g., "top broker", "responsive", "multifamily specialist").',
+        parameters: z.object({
+          contactSearch: z.string().describe('Name or email of the contact'),
+          addTags: z.array(z.string()).optional().describe('Tags to add'),
+          removeTags: z.array(z.string()).optional().describe('Tags to remove'),
+        }),
+        execute: async ({ contactSearch, addTags, removeTags }) => {
+          const contact = await this.prisma.contact.findFirst({
+            where: {
+              OR: [
+                { email: { contains: contactSearch, mode: 'insensitive' } },
+                { firstName: { contains: contactSearch, mode: 'insensitive' } },
+                { lastName: { contains: contactSearch, mode: 'insensitive' } },
+              ],
+              deals: { some: orgWhere },
+            },
+          });
+          if (!contact) return { error: `Contact "${contactSearch}" not found` };
+
+          let tags = [...contact.tags];
+          if (addTags) {
+            for (const tag of addTags) {
+              if (!tags.includes(tag)) tags.push(tag);
+            }
+          }
+          if (removeTags) {
+            tags = tags.filter((t) => !removeTags.includes(t));
+          }
+
+          const updated = await this.prisma.contact.update({
+            where: { id: contact.id },
+            data: { tags },
+          });
+          return {
+            success: true,
+            contact: [updated.firstName, updated.lastName].filter(Boolean).join(' ') || updated.email,
+            tags: updated.tags,
+          };
+        },
+      }),
+
+      get_contact_notes: tool({
+        description: 'Get notes and tags for a specific broker/contact.',
+        parameters: z.object({
+          contactSearch: z.string().describe('Name or email of the contact'),
+        }),
+        execute: async ({ contactSearch }) => {
+          const contact = await this.prisma.contact.findFirst({
+            where: {
+              OR: [
+                { email: { contains: contactSearch, mode: 'insensitive' } },
+                { firstName: { contains: contactSearch, mode: 'insensitive' } },
+                { lastName: { contains: contactSearch, mode: 'insensitive' } },
+              ],
+              deals: { some: orgWhere },
+            },
+          });
+          if (!contact) return { error: `Contact "${contactSearch}" not found` };
+          return {
+            name: [contact.firstName, contact.lastName].filter(Boolean).join(' ') || contact.email,
+            email: contact.email,
+            notes: contact.notes || 'No notes',
+            tags: contact.tags,
+          };
         },
       }),
 

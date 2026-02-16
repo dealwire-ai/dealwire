@@ -115,22 +115,63 @@ export class DealSummaryService {
    * Generate a short, conversational reply draft to send to the broker.
    * This is NOT the internal analysis — it's what the user would send to the broker
    * to express interest and move the conversation forward.
+   *
+   * When broker context is provided, the draft references past relationship history.
+   * When extracted data is provided, the draft asks smart follow-up questions about missing info.
    */
   async generateBrokerReplyDraft(
     extractedText: string,
     decision: 'yes' | 'no',
     companyName?: string,
+    brokerContext?: {
+      name: string;
+      totalDeals: number;
+      passRate: number;
+      topCities: Array<{ city: string; count: number }>;
+      recentPassingDeals?: string[];
+      notes?: string;
+    },
+    extractedData?: Record<string, unknown>,
   ): Promise<string> {
     const start = Date.now();
     try {
+      // Build relationship context for the prompt
+      let relationshipContext = '';
+      if (brokerContext && brokerContext.totalDeals > 1) {
+        relationshipContext = `\n\nBROKER RELATIONSHIP CONTEXT (use subtly — don't list stats, just sound like you know them):
+- This broker has sent ${brokerContext.totalDeals} deals previously`;
+        if (brokerContext.recentPassingDeals && brokerContext.recentPassingDeals.length > 0) {
+          relationshipContext += `\n- Recent deals from them you liked: ${brokerContext.recentPassingDeals.slice(0, 3).join(', ')}`;
+        }
+        if (brokerContext.notes) {
+          relationshipContext += `\n- Personal notes: ${brokerContext.notes}`;
+        }
+      }
+
+      // Detect missing info to ask smart follow-up questions
+      let missingDataContext = '';
+      if (decision === 'yes' && extractedData) {
+        const missing: string[] = [];
+        if (!extractedData.noi) missing.push('T-12 or current NOI');
+        if (!extractedData.occupancy) missing.push('current occupancy');
+        if (!extractedData.askingPrice) missing.push('asking price or guidance');
+        if (!extractedData.units && !extractedData.squareFeet) missing.push('unit count or square footage');
+        if (missing.length > 0) {
+          missingDataContext = `\n\nMISSING INFORMATION (naturally ask about 1-2 of these — don't list them all):
+${missing.join(', ')}`;
+        }
+      }
+
       const systemPrompt = decision === 'yes'
         ? `You are drafting a brief, professional email reply from a real estate acquisitions team to a broker who sent a deal.
 The team is interested in this deal. Write a short reply (2-4 sentences) that:
 - Thanks them for sending the deal
 - References the specific property or deal (use details from the text - address, property type, unit count, etc.)
 - Expresses interest and suggests a next step (quick call, more info, OM request, etc.)
+- If there's missing information, naturally ask about 1-2 key items
 - Sounds natural and human — not overly formal or templated
-${companyName ? `- The user works at ${companyName}` : ''}
+- If you have relationship context, reference it naturally (e.g., "appreciate you continuing to think of us" or mention a past deal)
+${companyName ? `- The user works at ${companyName}` : ''}${relationshipContext}${missingDataContext}
 
 Do NOT include a subject line. Do NOT include a greeting or sign-off (the email system handles threading). Just the body text.
 Keep it concise — 2-4 sentences max.`
@@ -139,14 +180,15 @@ The team is NOT interested in this deal but wants to maintain the broker relatio
 - Thanks them for thinking of the team
 - Briefly explains it's not a fit right now (without being too specific about why)
 - Encourages them to keep sending deals
-${companyName ? `- The user works at ${companyName}` : ''}
+- If you have relationship context, be warm and reference the ongoing relationship
+${companyName ? `- The user works at ${companyName}` : ''}${relationshipContext}
 
 Do NOT include a subject line. Do NOT include a greeting or sign-off. Just the body text.
 Keep it concise — 2-3 sentences max.`;
 
       const response = await this.openai.chat.completions.create({
         model: this.aiConfig.openaiModel,
-        temperature: 0.7, // Slightly more creative for natural-sounding replies
+        temperature: 0.7,
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: `Deal text:\n\n${extractedText.slice(0, 3000)}` },
@@ -158,7 +200,7 @@ Keep it concise — 2-3 sentences max.`;
       const duration = (Date.now() - start) / 1000;
       this.metricsService.recordAICall('broker-reply-draft', this.aiConfig.openaiModel, duration, 'success');
 
-      this.logger.log(`Broker reply draft generated (decision: ${decision}, length: ${draft.length})`);
+      this.logger.log(`Broker reply draft generated (decision: ${decision}, length: ${draft.length}, hasContext: ${!!brokerContext})`);
       return draft;
     } catch (error) {
       const duration = (Date.now() - start) / 1000;
@@ -166,6 +208,70 @@ Keep it concise — 2-3 sentences max.`;
       const errorMessage = error instanceof Error ? error.message : String(error);
       this.logger.error(`Broker reply draft generation failed: ${errorMessage}`);
       throw new Error(`Failed to generate broker reply draft: ${errorMessage}`);
+    }
+  }
+
+  /**
+   * Generate a 3-5 sentence narrative that tells "the story" of a deal.
+   * Unlike the structured summary (numbers/metrics), this reads like what
+   * an analyst would say in a quick verbal summary on a broker call.
+   */
+  async generateDealNarrative(
+    extractedText: string,
+    extractedData?: Record<string, unknown>,
+  ): Promise<string> {
+    const start = Date.now();
+    try {
+      const systemPrompt =
+        'You are a senior real estate acquisitions analyst giving a quick verbal summary of a deal to an investor or on a broker call. ' +
+        'Write a 3-5 sentence narrative that tells the story of this deal. Cover:\n' +
+        '- Why is this deal being sold? (seller motivation if apparent from the text)\n' +
+        '- What is this property? (type, size, location — in plain, conversational language)\n' +
+        '- What is the investment angle or thesis? (value-add, stabilized cash flow, development, repositioning, etc.)\n' +
+        '- Any noteworthy details (off-market, multiple offers, unique tenant mix, below-market rents, etc.)\n\n' +
+        'The narrative should be conversational and fluid — NOT bullet points, NOT a list. ' +
+        'It should read like what you would actually say out loud. Be concise and grounded in the facts from the text. ' +
+        'If something is not mentioned in the text, do not speculate — just skip it. ' +
+        'Do not use markdown formatting. Just plain text.';
+
+      let userPrompt = `Here is the extracted text from the deal:\n\n${extractedText}`;
+      if (extractedData) {
+        userPrompt += `\n\nStructured data extracted from the deal:\n${JSON.stringify(extractedData, null, 2)}`;
+      }
+
+      const response = await this.openai.chat.completions.create({
+        model: this.aiConfig.openaiModel,
+        temperature: 0.3,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
+        user: 'deal-narrative',
+      });
+
+      const narrative = response.choices[0]?.message?.content || '';
+
+      if (!narrative) {
+        throw new Error('Empty response from OpenAI');
+      }
+
+      const duration = (Date.now() - start) / 1000;
+      this.metricsService.recordAICall('deal-narrative', this.aiConfig.openaiModel, duration, 'success');
+
+      this.logger.log(
+        `Deal narrative generated (length: ${narrative.length}, model: ${this.aiConfig.openaiModel})`,
+      );
+
+      return narrative;
+    } catch (error) {
+      const duration = (Date.now() - start) / 1000;
+      this.metricsService.recordAICall('deal-narrative', this.aiConfig.openaiModel, duration, 'error');
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorType = error instanceof Error ? error.constructor.name : 'Unknown';
+      this.logger.error(
+        `Deal narrative generation failed: ${errorMessage} (type: ${errorType})`,
+      );
+      throw new Error(`Failed to generate deal narrative: ${errorMessage}`);
     }
   }
 }
