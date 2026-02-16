@@ -78,6 +78,15 @@ export class MicrosoftWebhookService {
     );
 
     try {
+      // Find which user this subscription belongs to BEFORE dedup check
+      // so that unknown/orphaned subscriptions don't poison the dedup cache
+      const userId =
+        await this.subscriptionService.getUserBySubscriptionId(subscriptionId);
+      if (!userId) {
+        this.logger.warn(`Unknown subscription ${subscriptionId} - no user found`);
+        return;
+      }
+
       // Dedup check - skip if we've already processed this message recently
       const now = Date.now();
       if (this.processedMessages.has(messageId)) {
@@ -87,14 +96,6 @@ export class MicrosoftWebhookService {
       // Mark as processed and clean up old entries
       this.processedMessages.set(messageId, now);
       this.cleanupProcessedMessages();
-
-      // Find which user this subscription belongs to
-      const userId =
-        await this.subscriptionService.getUserBySubscriptionId(subscriptionId);
-      if (!userId) {
-        this.logger.warn(`Unknown subscription ${subscriptionId} - no user found`);
-        return;
-      }
 
       this.logger.log(`Found user ${userId} for subscription ${subscriptionId}`);
 
