@@ -4,6 +4,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { EmailSenderService } from '../email/email-sender.service';
 import { ScreeningPreferencesService } from '../preferences/screening-preferences.service';
 import { MicrosoftGraphService } from '../microsoft/microsoft-graph.service';
+import { BrokerIntelligenceService, DigestBrokerContext } from './broker-intelligence.service';
 import { ADMIN_EMAILS } from '../../config/email.config';
 import CronExpressionParser from 'cron-parser';
 
@@ -16,6 +17,7 @@ export class DealDigestService {
     private readonly emailSenderService: EmailSenderService,
     private readonly screeningPreferencesService: ScreeningPreferencesService,
     private readonly microsoftGraphService: MicrosoftGraphService,
+    private readonly brokerIntelligence: BrokerIntelligenceService,
   ) {}
 
   /**
@@ -190,6 +192,14 @@ export class DealDigestService {
                   state: true,
                 },
               },
+              contact: {
+                select: {
+                  id: true,
+                  email: true,
+                  firstName: true,
+                  lastName: true,
+                },
+              },
               receivedByUser: {
                 select: {
                   email: true,
@@ -205,11 +215,29 @@ export class DealDigestService {
         },
       });
 
+      // Get broker context for all contacts in this digest
+      const contactIds = screenings
+        .map((s) => s.deal.contact?.id)
+        .filter((id): id is string => !!id);
+      const brokerContext = await this.brokerIntelligence.getBrokerContextForDigest(
+        contactIds,
+        organizationId,
+      );
+
+      // Get org-level summary stats
+      const orgSummary = await this.brokerIntelligence.getOrgDealSummary(organizationId);
+
+      // Get top brokers for leaderboard section
+      const leaderboard = await this.brokerIntelligence.getLeaderboard(organizationId, {
+        limit: 5,
+        since: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+      });
+
       // Get organization preferences for email branding
       const preferences = await this.screeningPreferencesService.getPreferences(organizationId);
 
-      // Format email (use organization imageUrl from preferences, which comes from the organization record)
-      const emailHtml = this.formatDigestEmail(screenings, preferences);
+      // Format email with enhanced data
+      const emailHtml = this.formatDigestEmail(screenings, preferences, brokerContext, orgSummary, leaderboard);
 
       // Get user emails
       const userEmails = org.users
@@ -313,6 +341,13 @@ export class DealDigestService {
       deal: {
         sourceSubject: string | null;
         sourceFrom: string | null;
+        contactId?: string | null;
+        contact?: {
+          id: string;
+          email: string;
+          firstName: string | null;
+          lastName: string | null;
+        } | null;
         asset: {
           address: string | null;
           city: string | null;
@@ -330,6 +365,25 @@ export class DealDigestService {
       brandColor?: string | null;
       organizationImageUrl?: string | null;
     } | null,
+    brokerContext?: Map<string, DigestBrokerContext>,
+    orgSummary?: {
+      totalScreened: number;
+      yesCount: number;
+      noCount: number;
+      passRate: number;
+      uniqueBrokers: number;
+      topMarkets: Array<{ location: string; count: number }>;
+    },
+    leaderboard?: {
+      brokers: Array<{
+        email: string;
+        firstName: string | null;
+        lastName: string | null;
+        totalDeals: number;
+        passRate: number;
+        yesCount: number;
+      }>;
+    },
   ): string {
     const companyName = preferences?.companyName || 'Deal Analyzer';
     const brandColor = preferences?.brandColor || '#2A4A7C';
@@ -364,8 +418,22 @@ export class DealDigestService {
       const bgColor = isYes ? '#f0fdf4' : '#fef2f2';
       const borderColor = isYes ? '#22c55e' : '#dc2626';
       const textColor = isYes ? '#166534' : '#991b1b';
-      const labelColor = isYes ? '#15803d' : '#991b1b';
       const decisionText = isYes ? 'YES' : 'NO';
+
+      // Broker context line
+      let brokerLine = '';
+      const contactId = screening.deal.contact?.id;
+      if (contactId && brokerContext?.has(contactId)) {
+        const ctx = brokerContext.get(contactId)!;
+        const brokerName = ctx.name || ctx.email;
+        const parts: string[] = [];
+        parts.push(`${ctx.totalDeals} deal${ctx.totalDeals !== 1 ? 's' : ''} total`);
+        parts.push(`${ctx.passRate}% pass rate`);
+        if (ctx.recentDeals > 1) {
+          parts.push(`${ctx.recentDeals} in last 30 days`);
+        }
+        brokerLine = `<strong>Broker:</strong> ${this.escapeHtml(brokerName)} (${parts.join(' · ')})<br>`;
+      }
 
       return `
         <div style="background-color: ${bgColor}; border-left: 4px solid ${borderColor}; padding: 16px 20px; margin: 0 0 20px 0; border-radius: 4px;">
@@ -379,6 +447,7 @@ export class DealDigestService {
           </div>
           <p style="margin: 0 0 8px 0; font-size: 13px; color: #6b7280;">
             <strong>From:</strong> ${this.escapeHtml(from)}<br>
+            ${brokerLine}
             <strong>Location:</strong> ${this.escapeHtml(location)}<br>
             <strong>Screened:</strong> ${date}
           </p>
@@ -410,6 +479,62 @@ export class DealDigestService {
       ${noDeals.map((s) => formatDeal(s, false)).join('')}
     `
         : '';
+
+    // Summary stats section
+    const summaryHtml = orgSummary
+      ? `
+      <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin: 0 0 24px 0;">
+        <h2 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600; color: ${brandColor};">
+          Pipeline Overview
+        </h2>
+        <table role="presentation" cellpadding="0" cellspacing="0" style="width: 100%;">
+          <tr>
+            <td style="padding: 4px 16px 4px 0; font-size: 13px; color: #6b7280;">All-time deals screened</td>
+            <td style="padding: 4px 0; font-size: 13px; font-weight: 600; color: #1f2937;">${orgSummary.totalScreened}</td>
+            <td style="padding: 4px 16px 4px 24px; font-size: 13px; color: #6b7280;">Pass rate</td>
+            <td style="padding: 4px 0; font-size: 13px; font-weight: 600; color: #1f2937;">${orgSummary.passRate}%</td>
+          </tr>
+          <tr>
+            <td style="padding: 4px 16px 4px 0; font-size: 13px; color: #6b7280;">Approved / Passed</td>
+            <td style="padding: 4px 0; font-size: 13px; font-weight: 600; color: #1f2937;">${orgSummary.yesCount} / ${orgSummary.noCount}</td>
+            <td style="padding: 4px 16px 4px 24px; font-size: 13px; color: #6b7280;">Unique brokers</td>
+            <td style="padding: 4px 0; font-size: 13px; font-weight: 600; color: #1f2937;">${orgSummary.uniqueBrokers}</td>
+          </tr>
+        </table>
+        ${orgSummary.topMarkets.length > 0 ? `
+        <p style="margin: 12px 0 0 0; font-size: 13px; color: #6b7280;">
+          <strong>Top markets:</strong> ${orgSummary.topMarkets.map((m) => `${this.escapeHtml(m.location)} (${m.count})`).join(' · ')}
+        </p>` : ''}
+      </div>`
+      : '';
+
+    // Top brokers section (last 30 days)
+    const brokersHtml = leaderboard && leaderboard.brokers.length > 0
+      ? `
+      <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin: 0 0 24px 0;">
+        <h2 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600; color: ${brandColor};">
+          Top Brokers (Last 30 Days)
+        </h2>
+        <table role="presentation" cellpadding="0" cellspacing="0" style="width: 100%; font-size: 13px;">
+          <tr style="border-bottom: 1px solid #e2e8f0;">
+            <td style="padding: 6px 8px 6px 0; font-weight: 600; color: #6b7280;">Broker</td>
+            <td style="padding: 6px 8px; font-weight: 600; color: #6b7280; text-align: center;">Deals</td>
+            <td style="padding: 6px 8px; font-weight: 600; color: #6b7280; text-align: center;">Approved</td>
+            <td style="padding: 6px 0 6px 8px; font-weight: 600; color: #6b7280; text-align: center;">Pass Rate</td>
+          </tr>
+          ${leaderboard.brokers.map((b) => {
+            const name = [b.firstName, b.lastName].filter(Boolean).join(' ') || b.email;
+            return `
+          <tr>
+            <td style="padding: 6px 8px 6px 0; color: #1f2937;">${this.escapeHtml(name)}</td>
+            <td style="padding: 6px 8px; color: #1f2937; text-align: center;">${b.totalDeals}</td>
+            <td style="padding: 6px 8px; color: #166534; text-align: center;">${b.yesCount}</td>
+            <td style="padding: 6px 0 6px 8px; color: #1f2937; text-align: center;">${b.passRate}%</td>
+          </tr>`;
+          }).join('')}
+        </table>
+      </div>`
+      : '';
 
     return `<!DOCTYPE html>
 <html>
@@ -443,8 +568,10 @@ export class DealDigestService {
                             <p style="margin: 0 0 24px 0; font-size: 14px; color: #666666; line-height: 1.6;">
                                 The following ${screenings.length} deal${screenings.length > 1 ? 's were' : ' was'} screened since the last digest:
                             </p>
+                            ${summaryHtml}
                             ${yesDealsHtml}
                             ${noDealsHtml}
+                            ${brokersHtml}
                         </td>
                     </tr>
                     <tr>

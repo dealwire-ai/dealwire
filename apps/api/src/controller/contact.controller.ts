@@ -10,13 +10,17 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { PrismaService } from '../service/prisma/prisma.service';
+import { BrokerIntelligenceService } from '../service/deal/broker-intelligence.service';
 import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
 import { AuthUser } from '../decorator/auth-user.decorator';
 
 @Controller('contacts')
 @UseGuards(ClerkAuthGuard)
 export class ContactController {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly brokerIntelligence: BrokerIntelligenceService,
+  ) {}
 
   @Get()
   async getContacts(
@@ -66,6 +70,29 @@ export class ContactController {
     };
   }
 
+  // Static routes MUST come before parameterized routes
+  @Get('stats/leaderboard')
+  async getBrokerLeaderboard(
+    @AuthUser('organizationId') organizationId: string | null,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+    @Query('sinceDays') sinceDays?: string,
+    @Query('sortBy') sortBy?: string,
+  ) {
+    if (!organizationId) {
+      throw new HttpException('User not in organization', HttpStatus.FORBIDDEN);
+    }
+
+    const since = sinceDays
+      ? new Date(Date.now() - parseInt(sinceDays, 10) * 24 * 60 * 60 * 1000)
+      : undefined;
+
+    return this.brokerIntelligence.getLeaderboard(organizationId, {
+      limit,
+      since,
+      sortBy: sortBy === 'passRate' ? 'passRate' : 'dealCount',
+    });
+  }
+
   @Get(':contactId')
   async getContact(
     @AuthUser('organizationId') organizationId: string | null,
@@ -101,5 +128,22 @@ export class ContactController {
     const { deals, ...contactData } = contact;
 
     return contactData;
+  }
+
+  @Get(':contactId/stats')
+  async getBrokerStats(
+    @AuthUser('organizationId') organizationId: string | null,
+    @Param('contactId') contactId: string,
+  ) {
+    if (!organizationId) {
+      throw new HttpException('User not in organization', HttpStatus.FORBIDDEN);
+    }
+
+    const stats = await this.brokerIntelligence.getBrokerStats(contactId, organizationId);
+    if (!stats) {
+      throw new HttpException('Contact not found or has no deals', HttpStatus.NOT_FOUND);
+    }
+
+    return stats;
   }
 }
