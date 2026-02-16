@@ -389,10 +389,6 @@ export class DealDigestService {
     const brandColor = preferences?.brandColor || '#2A4A7C';
     const organizationImageUrl = preferences?.organizationImageUrl;
 
-    const logoImgTag = organizationImageUrl
-      ? `<img src="${organizationImageUrl}" alt="${companyName}" style="max-width: 180px; height: auto; display: block; margin: 0 auto;" />`
-      : '';
-
     // Separate YES and NO deals
     type ScreeningType = typeof screenings[0];
     const yesDeals = screenings.filter((s: ScreeningType) => s.decision === 'YES');
@@ -415,9 +411,10 @@ export class DealDigestService {
         minute: '2-digit',
       });
 
-      const bgColor = isYes ? '#f0fdf4' : '#fef2f2';
-      const borderColor = isYes ? '#22c55e' : '#dc2626';
-      const textColor = isYes ? '#166534' : '#991b1b';
+      const accentColor = isYes ? '#16a34a' : '#dc2626';
+      const pillBg = isYes ? '#dcfce7' : '#fee2e2';
+      const pillText = isYes ? '#166534' : '#991b1b';
+      const reasonColor = isYes ? '#15803d' : '#b91c1c';
       const decisionText = isYes ? 'YES' : 'NO';
 
       // Broker context line
@@ -432,39 +429,60 @@ export class DealDigestService {
         if (ctx.recentDeals > 1) {
           parts.push(`${ctx.recentDeals} in last 30 days`);
         }
-        brokerLine = `<strong>Broker:</strong> ${this.escapeHtml(brokerName)} (${parts.join(' · ')})<br>`;
+        brokerLine = `
+                    <tr>
+                      <td style="padding: 2px 0; font-size: 13px; color: #9ca3af;">Broker</td>
+                      <td style="padding: 2px 0 2px 12px; font-size: 13px; color: #374151;">${this.escapeHtml(brokerName)} <span style="color: #9ca3af; font-size: 12px;">(${parts.join(' &middot; ')})</span></td>
+                    </tr>`;
       }
 
       return `
-        <div style="background-color: ${bgColor}; border-left: 4px solid ${borderColor}; padding: 16px 20px; margin: 0 0 20px 0; border-radius: 4px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <h3 style="margin: 0; font-size: 16px; font-weight: 600; color: #1f2937;">
-              ${this.escapeHtml(subject)}
-            </h3>
-            <span style="background-color: ${borderColor}; color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">
-              ${decisionText}
-            </span>
-          </div>
-          <p style="margin: 0 0 8px 0; font-size: 13px; color: #6b7280;">
-            <strong>From:</strong> ${this.escapeHtml(from)}<br>
-            ${brokerLine}
-            <strong>Location:</strong> ${this.escapeHtml(location)}<br>
-            <strong>Screened:</strong> ${date}
-          </p>
-          <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid ${borderColor}40;">
-            <p style="margin: 0; font-size: 14px; color: ${textColor}; font-style: italic;">
-              <strong>Reason:</strong> ${this.escapeHtml(reason)}
-            </p>
-          </div>
-        </div>
+        <table role="presentation" cellpadding="0" cellspacing="0" style="width: 100%; margin: 0 0 16px 0; border-collapse: collapse;">
+          <tr>
+            <td style="width: 4px; background-color: ${accentColor}; border-radius: 8px 0 0 8px;"></td>
+            <td style="background-color: #ffffff; border: 1px solid #e5e7eb; border-left: none; border-radius: 0 8px 8px 0; padding: 20px 24px;">
+              <table role="presentation" cellpadding="0" cellspacing="0" style="width: 100%;">
+                <tr>
+                  <td style="font-size: 16px; font-weight: 600; color: #111827; padding-bottom: 12px;">
+                    ${this.escapeHtml(subject)}
+                  </td>
+                  <td style="text-align: right; vertical-align: top; padding-bottom: 12px;">
+                    <span style="background-color: ${pillBg}; color: ${pillText}; padding: 4px 14px; border-radius: 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px;">
+                      ${decisionText}
+                    </span>
+                  </td>
+                </tr>
+              </table>
+              <table role="presentation" cellpadding="0" cellspacing="0" style="width: 100%; margin-bottom: 14px;">
+                <tr>
+                  <td style="padding: 2px 0; font-size: 13px; color: #9ca3af; width: 70px;">From</td>
+                  <td style="padding: 2px 0 2px 12px; font-size: 13px; color: #374151;">${this.escapeHtml(from)}</td>
+                </tr>${brokerLine}
+                <tr>
+                  <td style="padding: 2px 0; font-size: 13px; color: #9ca3af;">Location</td>
+                  <td style="padding: 2px 0 2px 12px; font-size: 13px; color: #374151;">${this.escapeHtml(location)}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 2px 0; font-size: 13px; color: #9ca3af;">Screened</td>
+                  <td style="padding: 2px 0 2px 12px; font-size: 13px; color: #374151;">${date}</td>
+                </tr>
+              </table>
+              <div style="border-top: 1px solid #f3f4f6; padding-top: 14px;">
+                <p style="margin: 0; font-size: 14px; color: ${reasonColor}; line-height: 1.5;">
+                  ${this.escapeHtml(reason)}
+                </p>
+              </div>
+            </td>
+          </tr>
+        </table>
       `;
     };
 
     const yesDealsHtml =
       yesDeals.length > 0
         ? `
-      <h2 style="margin: 24px 0 16px 0; font-size: 18px; font-weight: 600; color: ${brandColor};">
-        Approved Deals (${yesDeals.length})
+      <h2 style="margin: 32px 0 20px 0; font-size: 20px; font-weight: 700; color: #111827; letter-spacing: -0.3px;">
+        Approved Deals <span style="color: #9ca3af; font-weight: 500; font-size: 16px;">(${yesDeals.length})</span>
       </h2>
       ${yesDeals.map((s: ScreeningType) => formatDeal(s, true)).join('')}
     `
@@ -473,63 +491,65 @@ export class DealDigestService {
     const noDealsHtml =
       noDeals.length > 0
         ? `
-      <h2 style="margin: 24px 0 16px 0; font-size: 18px; font-weight: 600; color: ${brandColor};">
-        Passed Deals (${noDeals.length})
+      <h2 style="margin: 32px 0 20px 0; font-size: 20px; font-weight: 700; color: #111827; letter-spacing: -0.3px;">
+        Passed Deals <span style="color: #9ca3af; font-weight: 500; font-size: 16px;">(${noDeals.length})</span>
       </h2>
       ${noDeals.map((s) => formatDeal(s, false)).join('')}
     `
         : '';
 
-    // Summary stats section
+    // Summary stats section — compact inline bar
     const summaryHtml = orgSummary
       ? `
-      <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin: 0 0 24px 0;">
-        <h2 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600; color: ${brandColor};">
-          Pipeline Overview
-        </h2>
+      <div style="background-color: #f8fafc; border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px 20px; margin: 0 0 28px 0;">
         <table role="presentation" cellpadding="0" cellspacing="0" style="width: 100%;">
           <tr>
-            <td style="padding: 4px 16px 4px 0; font-size: 13px; color: #6b7280;">All-time deals screened</td>
-            <td style="padding: 4px 0; font-size: 13px; font-weight: 600; color: #1f2937;">${orgSummary.totalScreened}</td>
-            <td style="padding: 4px 16px 4px 24px; font-size: 13px; color: #6b7280;">Pass rate</td>
-            <td style="padding: 4px 0; font-size: 13px; font-weight: 600; color: #1f2937;">${orgSummary.passRate}%</td>
-          </tr>
-          <tr>
-            <td style="padding: 4px 16px 4px 0; font-size: 13px; color: #6b7280;">Approved / Passed</td>
-            <td style="padding: 4px 0; font-size: 13px; font-weight: 600; color: #1f2937;">${orgSummary.yesCount} / ${orgSummary.noCount}</td>
-            <td style="padding: 4px 16px 4px 24px; font-size: 13px; color: #6b7280;">Unique brokers</td>
-            <td style="padding: 4px 0; font-size: 13px; font-weight: 600; color: #1f2937;">${orgSummary.uniqueBrokers}</td>
+            <td style="font-size: 13px; color: #6b7280; padding-right: 20px;">
+              <span style="font-weight: 700; color: #111827;">${orgSummary.totalScreened}</span> screened
+            </td>
+            <td style="font-size: 13px; color: #6b7280; padding-right: 20px;">
+              <span style="font-weight: 700; color: #16a34a;">${orgSummary.yesCount}</span> approved
+            </td>
+            <td style="font-size: 13px; color: #6b7280; padding-right: 20px;">
+              <span style="font-weight: 700; color: #111827;">${orgSummary.passRate}%</span> pass rate
+            </td>
+            <td style="font-size: 13px; color: #6b7280;">
+              <span style="font-weight: 700; color: #111827;">${orgSummary.uniqueBrokers}</span> brokers
+            </td>
           </tr>
         </table>
         ${orgSummary.topMarkets.length > 0 ? `
-        <p style="margin: 12px 0 0 0; font-size: 13px; color: #6b7280;">
-          <strong>Top markets:</strong> ${orgSummary.topMarkets.map((m) => `${this.escapeHtml(m.location)} (${m.count})`).join(' · ')}
-        </p>` : ''}
+        <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #e5e7eb;">
+          <span style="font-size: 12px; color: #9ca3af;">Top markets:</span>
+          ${orgSummary.topMarkets.map((m) => `<span style="font-size: 12px; color: #374151; margin-left: 6px;">${this.escapeHtml(m.location)} <span style="color: #9ca3af;">(${m.count})</span></span>`).join(' &middot;')}
+        </div>` : ''}
       </div>`
       : '';
 
     // Top brokers section (last 30 days)
     const brokersHtml = leaderboard && leaderboard.brokers.length > 0
       ? `
-      <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin: 0 0 24px 0;">
-        <h2 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600; color: ${brandColor};">
-          Top Brokers (Last 30 Days)
+      <div style="margin: 0 0 32px 0;">
+        <h2 style="margin: 0 0 16px 0; font-size: 20px; font-weight: 700; color: #111827; letter-spacing: -0.3px;">
+          Top Brokers <span style="color: #9ca3af; font-weight: 500; font-size: 16px;">Last 30 Days</span>
         </h2>
-        <table role="presentation" cellpadding="0" cellspacing="0" style="width: 100%; font-size: 13px;">
-          <tr style="border-bottom: 1px solid #e2e8f0;">
-            <td style="padding: 6px 8px 6px 0; font-weight: 600; color: #6b7280;">Broker</td>
-            <td style="padding: 6px 8px; font-weight: 600; color: #6b7280; text-align: center;">Deals</td>
-            <td style="padding: 6px 8px; font-weight: 600; color: #6b7280; text-align: center;">Approved</td>
-            <td style="padding: 6px 0 6px 8px; font-weight: 600; color: #6b7280; text-align: center;">Pass Rate</td>
+        <table role="presentation" cellpadding="0" cellspacing="0" style="width: 100%; font-size: 13px; border: 1px solid #e5e7eb; border-radius: 8px; border-collapse: separate; overflow: hidden;">
+          <tr>
+            <td style="padding: 10px 16px; font-weight: 600; color: #9ca3af; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #f9fafb; border-bottom: 1px solid #e5e7eb;">Broker</td>
+            <td style="padding: 10px 16px; font-weight: 600; color: #9ca3af; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; background-color: #f9fafb; border-bottom: 1px solid #e5e7eb;">Deals</td>
+            <td style="padding: 10px 16px; font-weight: 600; color: #9ca3af; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; background-color: #f9fafb; border-bottom: 1px solid #e5e7eb;">Approved</td>
+            <td style="padding: 10px 16px; font-weight: 600; color: #9ca3af; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; background-color: #f9fafb; border-bottom: 1px solid #e5e7eb;">Pass Rate</td>
           </tr>
-          ${leaderboard.brokers.map((b) => {
+          ${leaderboard.brokers.map((b, i) => {
             const name = [b.firstName, b.lastName].filter(Boolean).join(' ') || b.email;
+            const rowBg = i % 2 === 0 ? '#ffffff' : '#f9fafb';
+            const borderBottom = i < leaderboard.brokers.length - 1 ? 'border-bottom: 1px solid #f3f4f6;' : '';
             return `
           <tr>
-            <td style="padding: 6px 8px 6px 0; color: #1f2937;">${this.escapeHtml(name)}</td>
-            <td style="padding: 6px 8px; color: #1f2937; text-align: center;">${b.totalDeals}</td>
-            <td style="padding: 6px 8px; color: #166534; text-align: center;">${b.yesCount}</td>
-            <td style="padding: 6px 0 6px 8px; color: #1f2937; text-align: center;">${b.passRate}%</td>
+            <td style="padding: 10px 16px; color: #111827; font-weight: 500; background-color: ${rowBg}; ${borderBottom}">${this.escapeHtml(name)}</td>
+            <td style="padding: 10px 16px; color: #374151; text-align: center; background-color: ${rowBg}; ${borderBottom}">${b.totalDeals}</td>
+            <td style="padding: 10px 16px; color: #16a34a; font-weight: 600; text-align: center; background-color: ${rowBg}; ${borderBottom}">${b.yesCount}</td>
+            <td style="padding: 10px 16px; color: #374151; text-align: center; background-color: ${rowBg}; ${borderBottom}">${b.passRate}%</td>
           </tr>`;
           }).join('')}
         </table>
@@ -546,27 +566,27 @@ export class DealDigestService {
             margin: 0;
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background-color: #f5f5f5;
+            background-color: #f1f5f9;
         }
     </style>
 </head>
 <body>
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f1f5f9;">
         <tr>
             <td>
-                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border: 1px solid #e0e0e0; max-width: 800px; margin: 20px auto;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width: 800px; margin: 0 auto;">
                     <tr>
-                        <td style="padding: 25px 30px; text-align: center; background-color: #ffffff; border-bottom: 2px solid ${brandColor};">
-                            ${logoImgTag}
+                        <td style="padding: 28px 32px; text-align: center; background-color: ${brandColor}; border-radius: 0 0 0 0;">
+                            ${organizationImageUrl ? `<img src="${organizationImageUrl}" alt="${companyName}" style="max-width: 160px; height: auto; display: block; margin: 0 auto;" />` : `<span style="font-size: 20px; font-weight: 700; color: #ffffff; letter-spacing: -0.3px;">${this.escapeHtml(companyName)}</span>`}
                         </td>
                     </tr>
                     <tr>
-                        <td style="padding: 30px;">
-                            <h1 style="margin: 0 0 20px 0; font-size: 24px; font-weight: 600; color: ${brandColor};">
+                        <td style="background-color: #ffffff; padding: 36px 36px 24px 36px;">
+                            <h1 style="margin: 0 0 8px 0; font-size: 28px; font-weight: 700; color: #111827; letter-spacing: -0.5px;">
                                 Deal Digest
                             </h1>
-                            <p style="margin: 0 0 24px 0; font-size: 14px; color: #666666; line-height: 1.6;">
-                                The following ${screenings.length} deal${screenings.length > 1 ? 's were' : ' was'} screened since the last digest:
+                            <p style="margin: 0 0 32px 0; font-size: 15px; color: #6b7280; line-height: 1.6;">
+                                ${screenings.length} deal${screenings.length > 1 ? 's' : ''} screened since the last digest
                             </p>
                             ${summaryHtml}
                             ${yesDealsHtml}
@@ -575,8 +595,8 @@ export class DealDigestService {
                         </td>
                     </tr>
                     <tr>
-                        <td style="padding: 20px 30px; background-color: #fafafa; border-top: 1px solid #e0e0e0; text-align: center; font-size: 11px; color: #999999;">
-                            <p style="margin: 0;">${companyName}</p>
+                        <td style="padding: 24px 36px; background-color: #f9fafb; border-top: 1px solid #e5e7eb; text-align: center;">
+                            <p style="margin: 0; font-size: 12px; color: #9ca3af;">${this.escapeHtml(companyName)}</p>
                         </td>
                     </tr>
                 </table>
