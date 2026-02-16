@@ -444,7 +444,7 @@ describe('EmailProcessorService', () => {
     expect(result.skippedReason).toBe('Not a deal email');
     expect(prismaService.deal.upsert).not.toHaveBeenCalled();
     expect(prismaService.document.create).not.toHaveBeenCalled();
-    expect(dealSummaryService.summarizeDeal).not.toHaveBeenCalled();
+    expect(dealSummaryService.summarizeDealWithNarrative).not.toHaveBeenCalled();
       expect(initialScreeningService.screen).not.toHaveBeenCalled();
   });
 
