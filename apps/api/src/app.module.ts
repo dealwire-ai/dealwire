@@ -6,7 +6,6 @@ import { ContactController } from './controller/contact.controller';
 import { AssetController } from './controller/asset.controller';
 import { ScreeningPreferencesController } from './controller/screening-preferences.controller';
 import { ScreeningBucketController } from './controller/screening-bucket.controller';
-import { EmailEventController } from './controller/email-event.controller';
 import { ChatController } from './controller/chat.controller';
 import { AppService } from './service/app.service';
 import { PrismaModule } from './module/prisma.module';
@@ -32,7 +31,6 @@ import { BrokerIntelligenceService } from './service/deal/broker-intelligence.se
     AssetController,
     ScreeningPreferencesController,
     ScreeningBucketController,
-    EmailEventController,
     ChatController,
   ],
   providers: [AppService, ClerkAuthGuard, ScreeningPreferencesService, ScreeningBucketService, BrokerIntelligenceService],
