@@ -118,13 +118,59 @@ export class AnalyzerAgentService {
     const config = aiConfig();
     const tools = this.createTools(context);
 
+    // Load current preferences for context (same as generate)
+    const prefs = await this.screeningPreferences.getPreferences(context.organizationId);
+    const prefsContext = [
+      prefs.dealCriteria ? `Current deal criteria: ${prefs.dealCriteria}` : null,
+      prefs.alwaysSkip ? `Current always-skip rules: ${prefs.alwaysSkip}` : null,
+    ].filter(Boolean).join('\n');
+    const systemWithContext = prefsContext
+      ? `${SYSTEM_PROMPT}\n\nCURRENT PREFERENCES:\n${prefsContext}`
+      : SYSTEM_PROMPT;
+
     return streamText({
       model: openai(config.openaiModel),
-      system: SYSTEM_PROMPT,
+      system: systemWithContext,
       messages,
       tools,
       maxSteps: 5,
     });
+  }
+
+  /**
+   * Wrap a tool execute function with error handling.
+   * Returns { error: '...' } on failure instead of throwing.
+   */
+  private safeTool<T>(toolName: string, fn: () => Promise<T>): Promise<T | { error: string }> {
+    return fn().catch((error) => {
+      const msg = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Tool ${toolName} failed: ${msg}`);
+      return { error: `Failed to execute ${toolName}. Please try again.` };
+    });
+  }
+
+  /**
+   * Find a contact by email or name search within the organization's deals.
+   */
+  private findContact(search: { contactEmail?: string; contactSearch?: string }, orgWhere: { organizationId: string }) {
+    if (search.contactEmail) {
+      return this.prisma.contact.findFirst({
+        where: { email: { equals: search.contactEmail, mode: 'insensitive' }, deals: { some: orgWhere } },
+      });
+    }
+    if (search.contactSearch) {
+      return this.prisma.contact.findFirst({
+        where: {
+          OR: [
+            { email: { contains: search.contactSearch, mode: 'insensitive' } },
+            { firstName: { contains: search.contactSearch, mode: 'insensitive' } },
+            { lastName: { contains: search.contactSearch, mode: 'insensitive' } },
+          ],
+          deals: { some: orgWhere },
+        },
+      });
+    }
+    return Promise.resolve(null);
   }
 
   private createTools(context: AgentContext) {
@@ -139,14 +185,14 @@ export class AnalyzerAgentService {
       get_deal_stats: tool({
         description: 'Get aggregated statistics about deals (total count, yes/no decisions, etc.).',
         parameters: z.object({}),
-        execute: async () => {
+        execute: async () => this.safeTool('get_deal_stats', async () => {
           const [total, yesCount, noCount] = await Promise.all([
             this.prisma.deal.count({ where: orgWhere }),
             this.prisma.deal.count({ where: { ...orgWhere, initialScreening: { decision: 'YES' } } }),
             this.prisma.deal.count({ where: { ...orgWhere, initialScreening: { decision: 'NO' } } }),
           ]);
           return { total, decisions: { yes: yesCount, no: noCount } };
-        },
+        }),
       }),
 
       get_broker_leaderboard: tool({
@@ -156,7 +202,7 @@ export class AnalyzerAgentService {
           sortBy: z.enum(['dealCount', 'passRate']).optional().default('dealCount'),
           sinceDays: z.number().optional().describe('Only include deals from last N days'),
         }),
-        execute: async ({ limit = 10, sortBy = 'dealCount', sinceDays }) => {
+        execute: async ({ limit = 10, sortBy = 'dealCount', sinceDays }) => this.safeTool('get_broker_leaderboard', async () => {
           const since = sinceDays ? new Date(Date.now() - sinceDays * 24 * 60 * 60 * 1000) : undefined;
           const leaderboard = await this.brokerIntelligence.getLeaderboard(organizationId, {
             limit,
@@ -178,7 +224,7 @@ export class AnalyzerAgentService {
             totalBrokers: leaderboard.totalBrokers,
             totalDeals: leaderboard.totalDeals,
           };
-        },
+        }),
       }),
 
       get_broker_stats: tool({
@@ -187,25 +233,8 @@ export class AnalyzerAgentService {
           contactEmail: z.string().optional(),
           contactSearch: z.string().optional(),
         }),
-        execute: async ({ contactEmail, contactSearch }) => {
-          // Find contact
-          let contact;
-          if (contactEmail) {
-            contact = await this.prisma.contact.findFirst({
-              where: { email: { equals: contactEmail, mode: 'insensitive' }, deals: { some: orgWhere } },
-            });
-          } else if (contactSearch) {
-            contact = await this.prisma.contact.findFirst({
-              where: {
-                OR: [
-                  { email: { contains: contactSearch, mode: 'insensitive' } },
-                  { firstName: { contains: contactSearch, mode: 'insensitive' } },
-                  { lastName: { contains: contactSearch, mode: 'insensitive' } },
-                ],
-                deals: { some: orgWhere },
-              },
-            });
-          }
+        execute: async ({ contactEmail, contactSearch }) => this.safeTool('get_broker_stats', async () => {
+          const contact = await this.findContact({ contactEmail, contactSearch }, orgWhere);
           if (!contact) return { error: 'Broker not found' };
 
           const stats = await this.brokerIntelligence.getBrokerStats(contact.id, organizationId);
@@ -224,7 +253,7 @@ export class AnalyzerAgentService {
             lastDealAt: stats.lastDealAt,
             avgDaysBetweenDeals: stats.avgDaysBetweenDeals,
           };
-        },
+        }),
       }),
 
       get_deals_by_contact: tool({
@@ -234,38 +263,17 @@ export class AnalyzerAgentService {
           contactSearch: z.string().optional(),
           limit: z.number().optional().default(50),
         }),
-        execute: async ({ contactEmail, contactSearch, limit = 50 }) => {
-          let contactId: string | null = null;
-          if (contactEmail) {
-            const c = await this.prisma.contact.findFirst({
-              where: {
-                email: { equals: contactEmail, mode: 'insensitive' },
-                deals: { some: orgWhere },
-              },
-            });
-            contactId = c?.id ?? null;
-          } else if (contactSearch) {
-            const c = await this.prisma.contact.findFirst({
-              where: {
-                OR: [
-                  { email: { contains: contactSearch, mode: 'insensitive' } },
-                  { firstName: { contains: contactSearch, mode: 'insensitive' } },
-                  { lastName: { contains: contactSearch, mode: 'insensitive' } },
-                ],
-                deals: { some: orgWhere },
-              },
-            });
-            contactId = c?.id ?? null;
-          }
-          if (!contactId) return { error: 'Contact not found', deals: [] };
+        execute: async ({ contactEmail, contactSearch, limit = 50 }) => this.safeTool('get_deals_by_contact', async () => {
+          const contact = await this.findContact({ contactEmail, contactSearch }, orgWhere);
+          if (!contact) return { error: 'Contact not found', deals: [] };
           const deals = await this.prisma.deal.findMany({
-            where: { ...orgWhere, contactId },
+            where: { ...orgWhere, contactId: contact.id },
             take: limit,
             orderBy: { createdAt: 'desc' },
             include: { contact: true, initialScreening: true },
           });
-          return { deals, contactId };
-        },
+          return { deals, contactId: contact.id };
+        }),
       }),
 
       get_deals_by_location: tool({
@@ -274,7 +282,7 @@ export class AnalyzerAgentService {
           locationSearch: z.string(),
           limit: z.number().optional().default(50),
         }),
-        execute: async ({ locationSearch, limit = 50 }) => {
+        execute: async ({ locationSearch, limit = 50 }) => this.safeTool('get_deals_by_location', async () => {
           const assets = await this.prisma.asset.findMany({
             where: {
               OR: [
@@ -295,7 +303,7 @@ export class AnalyzerAgentService {
             include: { asset: true, initialScreening: true },
           });
           return { deals, matchingAssets: assets.length };
-        },
+        }),
       }),
 
       get_deals: tool({
@@ -306,7 +314,7 @@ export class AnalyzerAgentService {
           page: z.number().optional().default(1),
           limit: z.number().optional().default(20),
         }),
-        execute: async ({ search, decision, page = 1, limit = 20 }) => {
+        execute: async ({ search, decision, page = 1, limit = 20 }) => this.safeTool('get_deals', async () => {
           const where: Record<string, unknown> = { ...orgWhere };
           if (decision) {
             (where as any).initialScreening = { decision };
@@ -332,7 +340,7 @@ export class AnalyzerAgentService {
             deals,
             pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
           };
-        },
+        }),
       }),
 
       get_contacts: tool({
@@ -342,7 +350,7 @@ export class AnalyzerAgentService {
           page: z.number().optional().default(1),
           limit: z.number().optional().default(20),
         }),
-        execute: async ({ search, page = 1, limit = 20 }) => {
+        execute: async ({ search, page = 1, limit = 20 }) => this.safeTool('get_contacts', async () => {
           const where: Record<string, unknown> = { deals: { some: orgWhere } };
           if (search) {
             (where as any).OR = [
@@ -356,8 +364,8 @@ export class AnalyzerAgentService {
             this.prisma.contact.findMany({ where: where as any, skip, take: limit, orderBy: { createdAt: 'desc' } }),
             this.prisma.contact.count({ where: where as any }),
           ]);
-          return { contacts: contacts, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
-        },
+          return { contacts, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
+        }),
       }),
 
       get_assets: tool({
@@ -367,7 +375,7 @@ export class AnalyzerAgentService {
           page: z.number().optional().default(1),
           limit: z.number().optional().default(20),
         }),
-        execute: async ({ search, page = 1, limit = 20 }) => {
+        execute: async ({ search, page = 1, limit = 20 }) => this.safeTool('get_assets', async () => {
           const where: Record<string, unknown> = { deals: { some: orgWhere } };
           if (search) {
             (where as any).OR = [
@@ -383,20 +391,20 @@ export class AnalyzerAgentService {
             this.prisma.asset.count({ where: where as any }),
           ]);
           return { assets, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
-        },
+        }),
       }),
 
       get_deal_details: tool({
         description: 'Get details for a specific deal by ID.',
         parameters: z.object({ dealId: z.string() }),
-        execute: async ({ dealId }) => {
+        execute: async ({ dealId }) => this.safeTool('get_deal_details', async () => {
           const deal = await this.prisma.deal.findFirst({
             where: { id: dealId, ...orgWhere },
             include: { contact: true, asset: true, initialScreening: true, documents: true },
           });
           if (!deal) return { error: 'Deal not found' };
           return deal;
-        },
+        }),
       }),
 
       update_always_skip: tool({
@@ -404,10 +412,10 @@ export class AnalyzerAgentService {
         parameters: z.object({
           criteria: z.string().describe('The criteria to always skip (e.g. "retail deals", "emails from @broker.com")'),
         }),
-        execute: async ({ criteria }) => {
+        execute: async ({ criteria }) => this.safeTool('update_always_skip', async () => {
           const updated = await this.screeningPreferences.updatePreferences(organizationId, { alwaysSkip: criteria });
           return { success: true, alwaysSkip: updated.alwaysSkip };
-        },
+        }),
       }),
 
       update_deal_criteria: tool({
@@ -415,10 +423,10 @@ export class AnalyzerAgentService {
         parameters: z.object({
           criteria: z.string().describe('The deal criteria for evaluation'),
         }),
-        execute: async ({ criteria }) => {
+        execute: async ({ criteria }) => this.safeTool('update_deal_criteria', async () => {
           const updated = await this.screeningPreferences.updatePreferences(organizationId, { dealCriteria: criteria });
           return { success: true, dealCriteria: updated.dealCriteria };
-        },
+        }),
       }),
 
       update_passed_folder: tool({
@@ -426,12 +434,12 @@ export class AnalyzerAgentService {
         parameters: z.object({
           folderName: z.string().describe('Folder name for passed deals'),
         }),
-        execute: async ({ folderName }) => {
+        execute: async ({ folderName }) => this.safeTool('update_passed_folder', async () => {
           const updated = await this.screeningPreferences.updatePreferences(organizationId, {
             passedFolderName: folderName,
           });
           return { success: true, passedFolderName: updated.passedFolderName };
-        },
+        }),
       }),
 
       update_digest_schedule: tool({
@@ -440,13 +448,13 @@ export class AnalyzerAgentService {
           schedule: z.string().describe('CRON expression, e.g. "0 12 * * *" for daily noon'),
           timeZone: z.string().optional().default('America/New_York').describe('Timezone for the schedule'),
         }),
-        execute: async ({ schedule, timeZone }) => {
+        execute: async ({ schedule, timeZone }) => this.safeTool('update_digest_schedule', async () => {
           const updated = await this.screeningPreferences.updatePreferences(organizationId, {
             digestSchedule: schedule,
             digestTimeZone: timeZone,
           });
           return { success: true, digestSchedule: updated.digestSchedule, digestTimeZone: updated.digestTimeZone };
-        },
+        }),
       }),
 
       update_screening_bucket: tool({
@@ -455,7 +463,7 @@ export class AnalyzerAgentService {
           bucketName: z.string().describe('Name of the bucket to update (case-insensitive match)'),
           newDescription: z.string().describe('Updated criteria description for the bucket'),
         }),
-        execute: async ({ bucketName, newDescription }) => {
+        execute: async ({ bucketName, newDescription }) => this.safeTool('update_screening_bucket', async () => {
           const bucket = await this.prisma.screeningBucket.findFirst({
             where: {
               organizationId,
@@ -477,7 +485,7 @@ export class AnalyzerAgentService {
             data: { description: newDescription },
           });
           return { success: true, bucket: updated.name, description: updated.description };
-        },
+        }),
       }),
 
       update_contact_notes: tool({
@@ -486,17 +494,8 @@ export class AnalyzerAgentService {
           contactSearch: z.string().describe('Name or email of the contact to update'),
           notes: z.string().describe('Notes to add about this contact'),
         }),
-        execute: async ({ contactSearch, notes }) => {
-          const contact = await this.prisma.contact.findFirst({
-            where: {
-              OR: [
-                { email: { contains: contactSearch, mode: 'insensitive' } },
-                { firstName: { contains: contactSearch, mode: 'insensitive' } },
-                { lastName: { contains: contactSearch, mode: 'insensitive' } },
-              ],
-              deals: { some: orgWhere },
-            },
-          });
+        execute: async ({ contactSearch, notes }) => this.safeTool('update_contact_notes', async () => {
+          const contact = await this.findContact({ contactSearch }, orgWhere);
           if (!contact) return { error: `Contact "${contactSearch}" not found` };
 
           const existingNotes = contact.notes || '';
@@ -513,7 +512,7 @@ export class AnalyzerAgentService {
             contact: [updated.firstName, updated.lastName].filter(Boolean).join(' ') || updated.email,
             notes: updated.notes,
           };
-        },
+        }),
       }),
 
       update_contact_tags: tool({
@@ -523,17 +522,8 @@ export class AnalyzerAgentService {
           addTags: z.array(z.string()).optional().describe('Tags to add'),
           removeTags: z.array(z.string()).optional().describe('Tags to remove'),
         }),
-        execute: async ({ contactSearch, addTags, removeTags }) => {
-          const contact = await this.prisma.contact.findFirst({
-            where: {
-              OR: [
-                { email: { contains: contactSearch, mode: 'insensitive' } },
-                { firstName: { contains: contactSearch, mode: 'insensitive' } },
-                { lastName: { contains: contactSearch, mode: 'insensitive' } },
-              ],
-              deals: { some: orgWhere },
-            },
-          });
+        execute: async ({ contactSearch, addTags, removeTags }) => this.safeTool('update_contact_tags', async () => {
+          const contact = await this.findContact({ contactSearch }, orgWhere);
           if (!contact) return { error: `Contact "${contactSearch}" not found` };
 
           let tags = [...contact.tags];
@@ -555,7 +545,7 @@ export class AnalyzerAgentService {
             contact: [updated.firstName, updated.lastName].filter(Boolean).join(' ') || updated.email,
             tags: updated.tags,
           };
-        },
+        }),
       }),
 
       get_contact_notes: tool({
@@ -563,17 +553,8 @@ export class AnalyzerAgentService {
         parameters: z.object({
           contactSearch: z.string().describe('Name or email of the contact'),
         }),
-        execute: async ({ contactSearch }) => {
-          const contact = await this.prisma.contact.findFirst({
-            where: {
-              OR: [
-                { email: { contains: contactSearch, mode: 'insensitive' } },
-                { firstName: { contains: contactSearch, mode: 'insensitive' } },
-                { lastName: { contains: contactSearch, mode: 'insensitive' } },
-              ],
-              deals: { some: orgWhere },
-            },
-          });
+        execute: async ({ contactSearch }) => this.safeTool('get_contact_notes', async () => {
+          const contact = await this.findContact({ contactSearch }, orgWhere);
           if (!contact) return { error: `Contact "${contactSearch}" not found` };
           return {
             name: [contact.firstName, contact.lastName].filter(Boolean).join(' ') || contact.email,
@@ -581,13 +562,13 @@ export class AnalyzerAgentService {
             notes: contact.notes || 'No notes',
             tags: contact.tags,
           };
-        },
+        }),
       }),
 
       get_current_preferences: tool({
         description: 'Get the current screening preferences and bucket configuration. Use when user asks "what are my current criteria?" or before suggesting changes.',
         parameters: z.object({}),
-        execute: async () => {
+        execute: async () => this.safeTool('get_current_preferences', async () => {
           const prefs = await this.screeningPreferences.getPreferences(organizationId);
           const buckets = await this.prisma.screeningBucket.findMany({
             where: { organizationId },
@@ -605,7 +586,7 @@ export class AnalyzerAgentService {
               action: b.action,
             })),
           };
-        },
+        }),
       }),
     };
   }
