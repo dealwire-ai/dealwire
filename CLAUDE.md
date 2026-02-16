@@ -26,7 +26,7 @@ Build the ultimate private market analyst — an AI system with access to deep p
 
 ### Current Capabilities
 
-When users connect their Microsoft Outlook account, the system monitors their inbox for deal-related emails (teasers, offering memorandums, etc.), extracts and analyzes the content using AI, and replies with a structured summary and go/no-go decision based on client-specific criteria.
+When users connect their Microsoft Outlook account, the system monitors their inbox for deal-related emails (teasers, offering memorandums, etc.), extracts and analyzes the content using AI, and replies with a structured summary, deal narrative, action card (links to documents, deal rooms, broker intel), and go/no-go decision based on client-specific criteria. For promising deals, it also drafts relationship-aware broker reply emails. A scheduled digest surfaces all screened deals with inline action links.
 
 See `ROADMAP.md` for current product priorities and feature roadmap. Check it before proposing new features to ensure alignment with the current phase.
 
@@ -72,22 +72,30 @@ See `ROADMAP.md` for current product priorities and feature roadmap. Check it be
    - Downloads and OCRs PDF attachments using `pdf-parse`
    - Combines all text for analysis
 
-4. **Deal Summary** (`DealSummaryService`)
+4. **Deal Summary + Narrative** (`DealSummaryService`)
    - Uses AI to generate structured summary of the deal
    - Extracts key metrics: price, cap rate, NOI, location, property type, etc.
    - Applies client-specific criteria for emphasis
+   - Generates 3-5 sentence "Deal Narrative" (conversational story) in parallel with summary
 
 5. **Deal Decision** (`DealDecisionService`)
    - AI evaluates deal against client's HARD REQUIREMENTS
    - Returns yes/no decision with reasoning
    - Criteria are non-negotiable (e.g., "New York only" means NJ = automatic no)
 
-6. **Reply via Graph** (`MicrosoftGraphService.replyInThreadToSelf`)
-   - Creates reply draft, sets recipient to user's own email
-   - Sends reply in same conversation thread
+6. **Action Card + Reply** (`EmailProcessorService` → `EmailTemplateService`)
+   - Builds action card with: Outlook webLink, pre-signed S3 doc URLs, deal room links, CA links, broker stats
+   - Formats HTML email with decision, narrative ("The Story"), action card, and summary
+   - Sends reply in same conversation thread via Graph API
    - Prevents infinite loops by skipping self-sent emails
 
-7. **Folder Organization**
+7. **Broker Reply Draft** (`DealSummaryService.generateBrokerReplyDraft`)
+   - Generates relationship-aware draft reply to broker (not the internal analysis)
+   - Enriched with broker history (deal count, pass rate, recent deals, notes)
+   - Detects missing data fields and asks smart follow-up questions
+   - Created as unsent draft in user's Outlook Drafts folder
+
+8. **Folder Organization**
    - "No" decisions: email is moved to configurable folder (default: "Passed Deals")
    - "Yes" decisions: email stays in inbox with analysis reply
 
@@ -109,7 +117,7 @@ See `ROADMAP.md` for current product priorities and feature roadmap. Check it be
 | Service | Purpose |
 |---------|---------|
 | `DealDetectionService` | Quick deal vs. non-deal classification |
-| `DealSummaryService` | Generate structured deal summary |
+| `DealSummaryService` | Generate structured deal summary, deal narrative, and broker reply drafts |
 | `DealDecisionService` | Yes/no decision based on client criteria |
 
 ### Email Module (`src/module/email.module.ts`)
@@ -134,6 +142,8 @@ See `ROADMAP.md` for current product priorities and feature roadmap. Check it be
 |---------|---------|
 | `ClerkWebhookService` | User creation → create Graph subscription; User deletion → cleanup |
 | `ScreeningPreferencesService` | Load screening preferences from database (ScreeningPreferences table) |
+| `BrokerIntelligenceService` | Broker stats (deal count, pass rate, top cities), leaderboard, digest context |
+| `DealDigestService` | Scheduled digest emails with action links, broker context, org stats, leaderboard |
 | `PrismaService` | Database access (PostgreSQL via Supabase) |
 
 ---
