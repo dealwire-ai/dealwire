@@ -20,5 +20,5 @@ import { MetricsModule } from './metrics.module';
     ImageProcessorService,
   ],
 })
-export class EmailModule {}
+export class EmailServicesModule {}
 
