@@ -6,18 +6,19 @@ import { MicrosoftWebhookService } from '../service/microsoft/microsoft-webhook.
 import { MicrosoftRenewalSchedulerService } from '../service/microsoft/microsoft-renewal-scheduler.service';
 import { MicrosoftWebhookController } from '../controller/webhook/microsoft-webhook.controller';
 import { PrismaModule } from './prisma.module';
-import { EmailProcessorModule } from './email-processor.module';
+import { SQSModule } from './sqs.module';
 import { S3Module } from './s3.module';
-import { AIModule } from './ai.module';
-import { ScreeningPreferencesService } from '../service/preferences/screening-preferences.service';
+import { DealAnalysisModule } from './ai.module';
+import { PreferencesModule } from './preferences.module';
 
 @Module({
   imports: [
     PrismaModule,
-    ScheduleModule.forRoot(),
-    EmailProcessorModule, // For SQSService
-    S3Module, // For S3Service
-    AIModule, // For DealDetectionService
+    ScheduleModule,
+    SQSModule, // For SQSService (was EmailProcessorModule — broke circular dep)
+    S3Module,
+    DealAnalysisModule, // For DealDetectionService
+    PreferencesModule, // For ScreeningPreferencesService
   ],
   controllers: [MicrosoftWebhookController],
   providers: [
@@ -25,9 +26,7 @@ import { ScreeningPreferencesService } from '../service/preferences/screening-pr
     MicrosoftSubscriptionService,
     MicrosoftWebhookService,
     MicrosoftRenewalSchedulerService,
-    ScreeningPreferencesService,
   ],
-  exports: [MicrosoftGraphService, MicrosoftSubscriptionService, ScreeningPreferencesService],
+  exports: [MicrosoftGraphService, MicrosoftSubscriptionService],
 })
 export class MicrosoftModule {}
-

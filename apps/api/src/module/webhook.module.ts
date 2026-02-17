@@ -3,19 +3,17 @@ import { ClerkWebhookController } from '../controller/webhook/clerk-webhook.cont
 import { ResendWebhookController } from '../controller/webhook/resend-webhook.controller';
 import { ClerkWebhookService } from '../service/clerk/clerk-webhook.service';
 import { ResendWebhookService } from '../service/resend/resend-webhook.service';
-import { EmailModule } from './email.module';
-import { AIModule } from './ai.module';
+import { EmailServicesModule } from './email.module';
+import { DealAnalysisModule } from './ai.module';
 import { PrismaModule } from './prisma.module';
 import { MicrosoftModule } from './microsoft.module';
 import { SQSModule } from './sqs.module';
 import { S3Module } from './s3.module';
-import { ScreeningPreferencesService } from '../service/preferences/screening-preferences.service';
-import { ScreeningBucketService } from '../service/preferences/screening-bucket.service';
+import { PreferencesModule } from './preferences.module';
 
 @Module({
-  imports: [EmailModule, AIModule, PrismaModule, MicrosoftModule, SQSModule, S3Module],
+  imports: [EmailServicesModule, DealAnalysisModule, PrismaModule, MicrosoftModule, SQSModule, S3Module, PreferencesModule],
   controllers: [ClerkWebhookController, ResendWebhookController],
-  providers: [ClerkWebhookService, ResendWebhookService, ScreeningPreferencesService, ScreeningBucketService],
+  providers: [ClerkWebhookService, ResendWebhookService],
 })
 export class WebhookModule {}
-

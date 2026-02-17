@@ -26,5 +26,4 @@ import { PrismaModule } from './prisma.module';
     ContactNormalizationService,
   ],
 })
-export class AIModule {}
-
+export class DealAnalysisModule {}

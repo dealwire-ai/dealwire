@@ -4,7 +4,7 @@ import { HistoricalIngestionService } from '../service/ingestion/historical-inge
 import { MicrosoftGraphListService } from '../service/microsoft/microsoft-graph-list.service';
 import { PrismaModule } from './prisma.module';
 import { MicrosoftModule } from './microsoft.module';
-import { AIModule } from './ai.module';
+import { DealAnalysisModule } from './ai.module';
 import { EmailProcessorModule } from './email-processor.module';
 import { S3Module } from './s3.module';
 import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
@@ -13,7 +13,7 @@ import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
   imports: [
     PrismaModule,
     MicrosoftModule,
-    AIModule,
+    DealAnalysisModule,
     EmailProcessorModule,
     S3Module,
   ],
