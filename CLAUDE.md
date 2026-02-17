@@ -30,6 +30,8 @@ When users connect their Microsoft Outlook account, the system monitors their in
 
 See `docs/ROADMAP.md` for current product priorities and feature roadmap. Check it before proposing new features to ensure alignment with the current phase.
 
+See `docs/PUBLIC_DATA_PLATFORM.md` for the public data ingestion architecture. Read it before working on data sources, adapters, property data, ingestion pipelines, or anything in the data enrichment layer.
+
 ## Architecture
 
 ### Monorepo Structure
