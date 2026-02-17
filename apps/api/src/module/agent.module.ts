@@ -1,12 +1,14 @@
 import { Module } from '@nestjs/common';
 import { AnalyzerAgentService } from '../service/agent/analyzer-agent.service';
+import { ChatController } from '../controller/chat.controller';
 import { PrismaModule } from './prisma.module';
-import { ScreeningPreferencesService } from '../service/preferences/screening-preferences.service';
-import { BrokerIntelligenceService } from '../service/deal/broker-intelligence.service';
+import { PreferencesModule } from './preferences.module';
+import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
 
 @Module({
-  imports: [PrismaModule],
-  providers: [AnalyzerAgentService, ScreeningPreferencesService, BrokerIntelligenceService],
-  exports: [AnalyzerAgentService, BrokerIntelligenceService],
+  imports: [PrismaModule, PreferencesModule],
+  controllers: [ChatController],
+  providers: [AnalyzerAgentService, ClerkAuthGuard],
+  exports: [AnalyzerAgentService],
 })
 export class AgentModule {}

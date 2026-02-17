@@ -1,16 +1,16 @@
-import { Module, forwardRef } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { SqsModule, SqsService } from '@ssut/nestjs-sqs';
 import { EmailProcessorService } from '../service/email/email-processor.service';
 import { NormalizedEmailListenerService } from '../service/email/normalized-email-listener.service';
-import { ScreeningBucketService } from '../service/preferences/screening-bucket.service';
 import { SQSService } from '../service/sqs/sqs.service';
-import { AIModule } from './ai.module';
+import { DealAnalysisModule } from './ai.module';
 import { AgentModule } from './agent.module';
-import { EmailModule as EmailServicesModule } from './email.module'; // Email services (EmailProcessingService, etc.)
+import { EmailServicesModule } from './email.module';
 import { PrismaModule } from './prisma.module';
 import { MicrosoftModule } from './microsoft.module';
 import { S3Module } from './s3.module';
 import { NotificationsModule } from './notifications.module';
+import { PreferencesModule } from './preferences.module';
 import { sqsConfig } from '../config/sqs.config';
 
 // Only enable SQS in production or when explicitly configured
@@ -39,23 +39,22 @@ const sqsImports = enableSqs
 
 @Module({
   imports: [
-    AIModule,
+    DealAnalysisModule,
     AgentModule,
     EmailServicesModule,
     PrismaModule,
     S3Module,
     NotificationsModule,
+    PreferencesModule,
     ...sqsImports,
-    forwardRef(() => MicrosoftModule), // For MicrosoftGraphService
+    MicrosoftModule, // No longer needs forwardRef — circular dep broken
   ],
   providers: [
     EmailProcessorService,
     NormalizedEmailListenerService,
-    ScreeningBucketService,
     SQSService,
     ...(enableSqs ? [] : [{ provide: SqsService, useValue: null }]),
   ],
-  // BrokerIntelligenceService is provided via AgentModule (imported above)
   exports: [EmailProcessorService, SQSService],
 })
 export class EmailProcessorModule {}
