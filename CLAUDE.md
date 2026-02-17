@@ -126,7 +126,7 @@ All project instructions live in `CLAUDE.md` (this file). `.cursorrules` points 
 | `MicrosoftWebhookService` | Handle incoming Graph notifications, orchestrate processing pipeline |
 | `MicrosoftRenewalSchedulerService` | Cron job (every 12 hours) to renew expiring subscriptions |
 
-### AI Module (`src/module/ai.module.ts`)
+### Deal Analysis Module (`src/module/ai.module.ts` — `DealAnalysisModule`)
 
 | Service | Purpose |
 |---------|---------|
@@ -134,13 +134,21 @@ All project instructions live in `CLAUDE.md` (this file). `.cursorrules` points 
 | `DealSummaryService` | Generate structured deal summary, deal narrative, and broker reply drafts |
 | `DealDecisionService` | Yes/no decision based on client criteria |
 
-### Email Module (`src/module/email.module.ts`)
+### Email Services Module (`src/module/email.module.ts` — `EmailServicesModule`)
 
 | Service | Purpose |
 |---------|---------|
 | `EmailProcessingService` | Extract text from emails and PDFs |
 | `EmailSenderService` | Send emails via Resend (fallback, not primary) |
 | `EmailTemplateService` | Format HTML email with branding |
+
+### Preferences Module (`src/module/preferences.module.ts`)
+
+| Service | Purpose |
+|---------|---------|
+| `ScreeningPreferencesService` | Load screening preferences from database |
+| `ScreeningBucketService` | CRUD for screening buckets |
+| `BrokerIntelligenceService` | Broker stats (deal count, pass rate, top cities), leaderboard, digest context |
 
 ### Webhook Module (`src/module/webhook.module.ts`)
 
@@ -155,8 +163,6 @@ All project instructions live in `CLAUDE.md` (this file). `.cursorrules` points 
 | Service | Purpose |
 |---------|---------|
 | `ClerkWebhookService` | User creation → create Graph subscription; User deletion → cleanup |
-| `ScreeningPreferencesService` | Load screening preferences from database (ScreeningPreferences table) |
-| `BrokerIntelligenceService` | Broker stats (deal count, pass rate, top cities), leaderboard, digest context |
 | `DealDigestService` | Scheduled digest emails with action links, broker context, org stats, leaderboard |
 | `PrismaService` | Database access (PostgreSQL via Supabase) |
 
@@ -367,6 +373,13 @@ This allows the API to start successfully locally without configuring AWS.
 ---
 
 ## Important Patterns
+
+### NestJS Module Hygiene
+
+- **Never duplicate providers**: Each service should be provided in exactly one module and imported via that module everywhere else. If you need `ScreeningPreferencesService`, import `PreferencesModule` — don't add it to `providers` directly.
+- **Controllers belong in feature modules**: New controllers go in their respective module (e.g., `DealModule`, `ContactModule`), not in `AppModule`. Each feature module provides its own `ClerkAuthGuard`.
+- **`ScheduleModule.forRoot()` is called once** in `AppModule`. Child modules that use `@Cron()` just import `ScheduleModule` (without `.forRoot()`).
+- **No circular dependencies**: If module A needs a service from module B and vice versa, extract the shared service into its own module. Never use `forwardRef`.
 
 ### Preventing Infinite Loops
 - `MicrosoftWebhookService` checks if email sender = inbox owner
