@@ -7,6 +7,7 @@ import { MicrosoftModule } from './microsoft.module';
 import { DealAnalysisModule } from './ai.module';
 import { EmailProcessorModule } from './email-processor.module';
 import { S3Module } from './s3.module';
+import { PreferencesModule } from './preferences.module';
 import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
 
 @Module({
@@ -16,6 +17,7 @@ import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
     DealAnalysisModule,
     EmailProcessorModule,
     S3Module,
+    PreferencesModule,
   ],
   controllers: [HistoricalIngestionController],
   providers: [
