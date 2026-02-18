@@ -1,5 +1,8 @@
 # TODO
 
+## General Ops
+    - Finish Vision 2048 form (10 min)
+    
 ## Deal Screener
     - Demo for Marc Zegen 
     - Demo for Jared Epstein (granular folder sorting)
