@@ -12,7 +12,7 @@
 
 ## Frontstep Acquisition
     - set plan for media outreach
-    - [?] test property for Tyler
+    - (Isaac) test property for Tyler
 
 ## Survey Platform
     - finish M2 development
