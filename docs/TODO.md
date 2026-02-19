@@ -1,7 +1,6 @@
 # TODO
 
 ## General Ops
-    - Finish Vision 2048 form (10 min)
     
 ## Deal Screener
     - Demo for Marc Zegen 
@@ -11,7 +10,7 @@
     - get proposal signed
 
 ## Frontstep Acquisition
-    - set plan for media outreach
+    - execute + track media outreach
     - (Isaac) test property for Tyler
 
 ## Survey Platform
