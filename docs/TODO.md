@@ -5,6 +5,7 @@
 ## Deal Screener
     - Record demo for Marc Zegen 
     - Record demo for Jared Epstein (granular folder sorting)
+    - Record demo for Quinn Breslin
     - Build demo for the boutique hotel chain guy 
 
 ## Tax Lien Analyzer
