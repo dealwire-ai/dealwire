@@ -493,17 +493,21 @@ export class EmailProcessorService {
     try {
       const actionCard: import('../email/email-template.service').ActionCardData = {};
 
-      // 1. Get webLink from Graph API (original email link in Outlook Web)
+      // 1. Get webLink and entry ID from Graph API (original email link in Outlook Web + desktop deep link)
       if (event.source === 'microsoft' && accessToken) {
         try {
-          const message = await this.microsoftGraphService.getMessage(accessToken, event.messageId);
+          const message = await this.microsoftGraphService.getMessage(accessToken, event.messageId, false, true);
           if (message?.webLink) {
             actionCard.originalEmailLink = message.webLink;
-            // Persist webLink on the deal for digest use
+            // Persist webLink and entry ID on the deal for digest use
             if (dealId) {
+              const entryId = this.microsoftGraphService.extractEntryId(message);
               this.prismaService.deal.update({
                 where: { id: dealId },
-                data: { sourceWebLink: message.webLink },
+                data: {
+                  sourceWebLink: message.webLink,
+                  ...(entryId && { sourceEntryId: entryId }),
+                },
               }).catch(() => {}); // fire-and-forget
             }
           }
