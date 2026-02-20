@@ -14,5 +14,4 @@
     - (Isaac) test property for Tyler
 
 ## Survey Platform
-    - finish M2 development
     - report M2 progress
