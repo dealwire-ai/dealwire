@@ -15,4 +15,4 @@
     - (Isaac) test property for Tyler
 
 ## Survey Platform
-    - report M2 progress
+    - get revised M3 scope from Milo/Josh
