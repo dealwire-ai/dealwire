@@ -180,27 +180,51 @@ This is analogous to the web's evolution: HTTP and web browsers commoditized, bu
 
 ## The Competitive Landscape and Gaps
 
-### What Exists Today
+### Data & Listing Incumbents
 
 | Company | What They Do | Weakness |
 |---------|-------------|----------|
 | **CoStar/LoopNet** | Property listings, comps | Dashboard-based. No agency. Data is broad but shallow on individual deals. Expensive. |
 | **Reonomy** | Property intelligence | Good data but no workflow integration. You have to go to their dashboard. |
-| **Cherre** | Property data platform | Infrastructure play, not agent. Serves as data source, not decision-maker. |
+| **Cherre** | Property data platform + Agent.STUDIO | Universal Data Model standardizing 3.3B+ addresses. Building AI analytics. Infrastructure play — serves as data source, not deal flow agent. |
 | **PitchBook/Preqin** | PE/VC deal data | Great for public fundraising data. Zero visibility into actual deal flow and screening. |
 | **Juniper Square** | Fund management | System of record for investor relations. No deal sourcing or screening. |
 | **Crexi** | CRE marketplace | Listing platform. No agent intelligence. |
-| **EliseAI** | Residential leasing automation | $250M Series E. But focused on property management, not acquisitions. |
+
+### CRE AI Startups (Emerging)
+
+| Company | What They Do | Weakness |
+|---------|-------------|----------|
+| **Cactus AI** | CRE underwriting in minutes (claims 92% time savings) | Dashboard-based. Underwriting focus, not deal flow screening. |
+| **Blooma** | AI-automated underwriting for CRE lenders/investors | Focused on lending side, not acquisitions. Dashboard. |
+| **IntellCRE** | Deal underwriting, valuation, marketing material generation | Tooling, not agentic. |
+| **Clik.ai** | Underwriting, deal analysis, loan origination, document processing | Document processing focus, not workflow integration. |
+| **HouseCanary (CanaryAI)** | GenAI assistant for RE valuation/forecasting, <3% error rates | Valuation tool, not deal flow agent. |
+| **Enodo** | Predictive analytics for multifamily due diligence | Analytics dashboard, not agentic layer. |
+| **EliseAI** | Residential leasing lifecycle automation ($250M Series E, a16z) | Property management, not acquisitions. |
+
+### Private Markets AI Startups
+
+| Company | What They Do |
+|---------|-------------|
+| **Affinity** | Relationship intelligence for PE/VC deal sourcing via email/calendar analysis |
+| **Grata** | ML-powered private company discovery, 1.2B+ page dataset |
+| **Trove** (Menlo Ventures) | AI agents for PE workflows — research aggregation, memo drafting |
+| **ChatFin** | Real-time portfolio monitoring, consolidated reporting, predictive analytics |
+| **Denki** (YC) | Automated internal auditing for SOX/SEC compliance |
 
 ### The Gap
 
 Nobody is building the **autonomous acquisitions analyst** that:
-1. Lives in your email
-2. Screens every deal against your specific criteria
+1. Lives in your email (not a dashboard you have to open)
+2. Screens every deal against your specific criteria with judgment
 3. Enriches deals with deep property data from public sources
-4. Manages broker relationships with context
+4. Manages broker relationships with full history and context
 5. Learns your preferences and improves over time
 6. Accumulates proprietary deal intelligence across the market
+7. Eventually matches deals between firms
+
+CRE-specific AI tools exist but they are all **dashboard-based underwriting tools** — you upload documents and get analysis. None are agentic. None live in email. None monitor deal flow autonomously. None build a proprietary data asset across clients.
 
 This is exactly what Analyzer is building. The question is how to make it a much larger business.
 
@@ -341,3 +365,92 @@ The Bloomberg Terminal of private markets — but instead of a human sitting at 
 ---
 
 *This is what you're building. The screener is the wedge. The data is the moat. The network is the endgame.*
+
+---
+
+## Appendix: Key Data Points
+
+### Market Sizing
+- AI agent market: $7.84B (2025) → $52.62B (2030), 46.3% CAGR
+- AI agents in financial services specifically: $691M (2025) → $6.7B (2033), 31.5% CAGR
+- Financial services AI spending overall: $35B+ in 2026
+- Venture funding for agentic AI: $2.8B in H1 2025 alone
+- Alpaca VC estimates $11B+ total economic impact opportunity from CRE inefficiency alone
+
+### Adoption Velocity
+- 82% of PE/VC firms actively using AI by Q4 2024, up from 47% the prior year
+- Gartner: 40% of enterprise apps will embed AI agents by end of 2026 (up from <5% in 2025)
+- Gartner: 1,445% surge in multi-agent system inquiries from Q1 2024 to Q2 2025
+- Firms using AI-driven sourcing report reviewing 3-5x more qualified opportunities
+- One PE fund reduced initial screening time from 45 minutes to 8 minutes per company
+
+### Protocol Standardization
+- Anthropic's MCP server downloads grew from ~100K (Nov 2024) to 8M+ (Apr 2025)
+- MCP donated to Linux Foundation's Agentic AI Foundation (Anthropic, Block, OpenAI, Google, Microsoft, AWS, Bloomberg)
+- Google's Agent-to-Agent Protocol (A2A) establishing inter-agent communication standards
+
+### Valuation Signals
+- Sierra AI: $10B valuation on ~$100M ARR (reached in 21 months) — ~100x revenue multiple
+- Brad Gerstner (All-In Podcast, Feb 2026): Combined software market cap could be "4 to 10x higher five years from now"
+- Agent startups with workflow-native positioning: 10x+ revenue multiples "not unheard of"
+- Traditional SaaS median EV/Revenue: 5.1x (down from 18-19x pandemic peak)
+
+### The "SaaSpocalypse"
+- Feb 3, 2026: ~$285B wiped from global SaaS/IT services in a single day
+- Nearly $1T total SaaS market cap erosion in first six weeks of 2026
+- Driven by "seat compression" — AI agents replacing the need for software licenses
+- Publicis Sapient cutting SaaS licenses by ~50%, substituting with AI agents
+
+### Key Quotes
+- **Bret Taylor** (Sierra AI, OpenAI Board Chair): "Every company's main digital interface will be an AI agent" within five years. "Closing a technology gap is hard but not impossible. Changing your business model is really hard." Points to "graveyard of CEOs" fired for failing to make pricing model transitions.
+- **IBM's Kate Blair**: "If 2025 was the year of the agent, 2026 should be the year where all multi-agent systems move into production."
+- **Andrej Karpathy**: Highlighted "how thick this new app layer is" — LLM apps that "bundle and orchestrate LLM calls for specific verticals" revealed a genuinely new software layer.
+- **Foundation Capital's Ashu Garg**: The real bottleneck is that "AI can't see the way work actually happens inside companies, scattered across disconnected tools, gated by permissions, shaped by undocumented exceptions."
+
+### Bret Taylor's Three-Layer Framework
+1. **Foundation Models** — Capital-intensive, low-margin, will consolidate to a handful of players
+2. **Tools / "Pickaxes"** — Infrastructure for AI development, face threats from model companies expanding
+3. **Applied AI / Agents** — Domain-specific applications solving real business problems. Taylor is most bullish on this layer as "the way software should be consumed."
+
+---
+
+## Sources
+
+### Platform Shift / Agentic Web
+- [AI agents, tech circularity: What's ahead for platforms in 2026 | MIT Sloan](https://mitsloan.mit.edu/ideas-made-to-matter/ai-agents-tech-circularity-whats-ahead-platforms-2026)
+- [The Agentic AI Shift: Why 2026 is the Year AI Starts Doing](https://www.nowthenext.com/artificial-intelligence/agentic-ai-trends-2026/)
+- [The trends that will shape AI and tech in 2026 | IBM](https://www.ibm.com/think/news/ai-tech-trends-predictions-2026)
+- [Where AI is headed in 2026 | Foundation Capital](https://foundationcapital.com/where-ai-is-headed-in-2026/)
+- [How AI is Reinventing Software Business Models ft. Bret Taylor | Sequoia](https://sequoiacap.com/podcast/training-data-bret-taylor/)
+- [Donating MCP and establishing the Agentic AI Foundation | Anthropic](https://www.anthropic.com/news/donating-the-model-context-protocol-and-establishing-of-the-agentic-ai-foundation)
+
+### Defensibility & Moats
+- [Building a moat in the age of AI | Insight Partners](https://www.insightpartners.com/ideas/building-a-moat-in-the-age-of-ai/)
+- [Forget the data moat: The workflow is your fortress | Vendep Capital](https://www.vendep.com/post/forget-the-data-moat-the-workflow-is-your-fortress-in-vertical-saas)
+- [Will Agentic AI Disrupt SaaS? | Bain & Company](https://www.bain.com/insights/will-agentic-ai-disrupt-saas-technology-report-2025/)
+- [In the Age of AI, Moats Matter More Than Ever | Insignia](https://review.insignia.vc/2025/04/15/moats-ai/)
+
+### Financial Services AI
+- [AI transformation in financial services | Microsoft](https://www.microsoft.com/en-us/industry/blog/financial-services/2025/12/18/ai-transformation-in-financial-services-5-predictors-for-success-in-2026/)
+- [AI in Real Estate Underwriting and Acquisitions | Alpaca VC](https://alpaca.vc/2025/07/ai-in-real-estate-underwriting-and-acquisitions/)
+- [The AI-Powered Deal Team | Medium / Bonsai Labs](https://medium.com/the-bonsai-labs-dispatch/the-ai-powered-deal-team-how-private-equity-firms-are-transforming-sourcing-diligence-and-value-f84f39682a52)
+- [AI in Due Diligence | RTS Labs](https://rtslabs.com/ai-due-diligence/)
+- [FINRA 2026 Oversight Report | ACA Group](https://www.acaglobal.com/industry-insights/finra-releases-2026-oversight-report-highlighting-ai-cybersecurity-and-compliance-risks/)
+
+### Pricing & Business Models
+- [The AI pricing and monetization playbook | Bessemer Venture Partners](https://www.bvp.com/atlas/the-ai-pricing-and-monetization-playbook)
+- [Selling Intelligence: The 2026 Playbook For Pricing AI Agents | Chargebee](https://www.chargebee.com/blog/pricing-ai-agents-playbook/)
+- [Sierra hits $100M ARR | Sierra](https://sierra.ai/blog/100m-arr)
+- [AI monetization in 2025 | Orb](https://www.withorb.com/blog/ai-monetization)
+
+### SaaS Disruption
+- [The Death of the 'Seat': The 2026 SaaSpocalypse | FinancialContent](https://markets.financialcontent.com/stocks/article/marketminute-2026-2-18-the-death-of-the-seat-how-ai-agents-triggered-the-2026-saaspocalypse-for-salesforce-and-adobe)
+- [SaaS meets AI agents | Deloitte](https://www.deloitte.com/us/en/insights/industry/technology/technology-media-and-telecom-predictions/2026/saas-ai-agents.html)
+- [Why SaaS Stocks Have Dropped | Bain & Company](https://www.bain.com/insights/why-saas-stocks-have-dropped-and-what-it-signals-for-softwares-next-chapter/)
+- [SaaS Isn't Dead (Yet) and AI Could Make it Bigger | Meritech Capital](https://www.meritechcapital.com/blog/saas-isnt-dead-yet-and-ai-could-make-it-bigger)
+
+### Startups & Funding
+- [10 US startups building the $7.8B category | TechFundingNews](https://techfundingnews.com/top-10-us-ai-agents-2026-fastest-scaling-category-52b-by-2030/)
+- [Real Estate Tech Funding Sees Slight Rebound | Crunchbase](https://news.crunchbase.com/real-estate-property-tech/rebound-ai-fintech-data-eoy-2025/)
+- [AI Agents Valuation Multiples: 2025 Insights | Finro](https://www.finrofca.com/news/ai-agents-valuation-2025)
+- [Bret Taylor's Sierra reaches $100M ARR | TechCrunch](https://techcrunch.com/2025/11/21/bret-taylors-sierra-reaches-100m-arr-in-under-two-years/)
