@@ -3,8 +3,9 @@
 ## General Ops
     
 ## Deal Screener
-    - Demo for Marc Zegen 
-    - Demo for Jared Epstein (granular folder sorting)
+    - Record demo for Marc Zegen 
+    - Record demo for Jared Epstein (granular folder sorting)
+    - Build demo for the boutique hotel chain guy 
 
 ## Tax Lien Analyzer
     - get proposal signed
