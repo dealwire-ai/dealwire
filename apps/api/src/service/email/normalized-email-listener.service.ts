@@ -157,12 +157,19 @@ export class NormalizedEmailListenerService {
       return;
     }
 
-    this.logger.log(`Processing user-reply-command: ${event.messageId} - "${userMessage.slice(0, 500)}..."`);
+    this.logger.log(`Processing user-reply-command: ${event.messageId}`);
 
     const responseText = await this.analyzerAgent.generate(
       { organizationId },
       userMessage,
     );
+
+    this.logger.log(
+      `[CommandAgent] messageId=${event.messageId}\n` +
+      `  QUERY: ${userMessage.slice(0, 1000)}\n` +
+      `  RESPONSE: ${responseText.slice(0, 2000)}`,
+    );
+
     const htmlBody = `<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">${(marked.parse(responseText) as string)}</div>`;
 
     const ok = await this.microsoftGraphService.replyInThreadToSelf(
