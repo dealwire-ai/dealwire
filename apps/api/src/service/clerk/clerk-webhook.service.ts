@@ -112,9 +112,17 @@ export class ClerkWebhookService {
       },
     });
 
-    // Create Microsoft Graph subscription for email notifications
-    // This runs async - don't block the webhook response
-    this.createMicrosoftSubscription(data.id);
+    // Only attempt Microsoft Graph subscription if user signed up with Microsoft
+    const hasMicrosoft = data.external_accounts?.some(
+      (acc: any) => acc.provider === 'microsoft',
+    );
+    if (hasMicrosoft) {
+      this.createMicrosoftSubscription(data.id);
+    } else {
+      this.logger.debug(
+        `User ${data.id} has no Microsoft account — skipping subscription creation`,
+      );
+    }
   }
 
   private async createMicrosoftSubscription(userId: string): Promise<void> {
@@ -123,9 +131,9 @@ export class ClerkWebhookService {
       if (success) {
         this.logger.log(`Microsoft subscription created for user ${userId}`);
       } else {
-        this.logger.warn(
+        this.logger.debug(
           `Failed to create Microsoft subscription for user ${userId} - ` +
-          `user may not have connected Microsoft account`,
+          `token may not be available yet`,
         );
       }
     } catch (error) {
