@@ -284,6 +284,90 @@ Focus on getting as many firms as possible onto the platform (even at low/free p
 
 ---
 
+## The TAM: Harder Numbers
+
+### Direct Labor Replacement
+
+The work that agents replace has a quantifiable cost:
+
+| Role | Fully Loaded Cost | % Automatable | Replaceable Value |
+|------|-------------------|---------------|-------------------|
+| CRE Analyst | $150-250K/yr | 50-80% | $75-200K/yr |
+| PE Analyst/Associate | $150-450K/yr | 50-60% | $75-270K/yr |
+| IB Analyst | $250-350K/yr | 40-60% | $100-210K/yr |
+| Insurance Underwriter | $80-150K/yr | 70-90% | $56-135K/yr |
+| Compliance/KYC Analyst | $80-120K/yr | 50-70% | $40-84K/yr |
+
+There are roughly 87,000 investment professionals in US PE/HF/investment vehicles alone. If 30-40% are in analyst/associate roles doing heavily automatable work, that's ~26,000-35,000 people at $150-300K fully loaded = **$3.9B-$10.5B in annual automatable labor cost** in PE alone.
+
+Add CRE, insurance, lending, M&A advisory, and compliance — the labor TAM is easily **$20-50B+**.
+
+### What Specifically Gets Automated
+
+| Task | % of Analyst Time | Automation Feasibility |
+|------|-------------------|----------------------|
+| Data entry, CRM updates | 15-20% | 95%+ automatable |
+| Email/document screening | 15-20% | 90%+ automatable |
+| CIM/OM processing & extraction | 10-15% | 93% time reduction proven |
+| Financial modeling (basic) | 10-15% | 80-90% automatable |
+| Comp analysis & market research | 10-15% | 70-85% automatable |
+| Report/memo drafting | 10% | 60-80% automatable |
+| Relationship management | 5-10% | 30-50% (augmented) |
+| Complex judgment & negotiation | 10-15% | 10-20% (human required) |
+
+One PE fund reduced initial screening time from **45 minutes to 8 minutes per company**, evaluating 200+ additional companies monthly. Another reported an AI system identifying **195 relevant targets in the time it takes a human to find one.**
+
+Firms report that AI lets them operate with **2 analysts instead of 3 analysts + 1 associate + 1 VP** — roughly 50-60% headcount reduction for routine deal processing.
+
+### The Software Market (Broader)
+
+- CRE software market: $26.36B (2024) → $49.94B by 2032
+- Global real estate software: $12.8B (2025) → $28.2B by 2033
+- M&A deal value: $4.9T in 2025, up 26% YoY
+- Private credit AUM: ~$2.28T (2025), expected to reach $4.5T by 2030
+
+---
+
+## Regulatory Catalysts: Compliance as a Wedge
+
+### FinCEN Residential Real Estate Rule (Effective March 1, 2026)
+
+This is a near-term catalyst that deserves special attention. FinCEN's new rule requires reporting on all non-financed (all-cash) transfers of residential real estate to entities or trusts. The report contains **111 data fields** requiring information from transferees, transferors, and financial institutions. Noncompliance carries significant civil and criminal penalties.
+
+This rule is **brand new**. Most firms have no systems in place. Title companies, closing agents, and settlement attorneys are the primary reporting entities. This creates immediate, urgent demand for automation.
+
+### Other Compliance Pain Points
+
+| Regulation | Pain Point | Agent Solution |
+|-----------|-----------|---------------|
+| BSA/AML | 90-95% false positive rate in transaction monitoring | Context-aware screening reduces false positives by 70% |
+| KYC/CDD | Weeks-long manual onboarding | Perpetual KYC with continuous automated monitoring |
+| Environmental (Phase I) | Hundreds of pages of reports per property | Automated extraction and risk scoring |
+| CFIUS | Complex national security review for foreign investors | Automated risk flagging and document preparation |
+| Fair lending | Manual review for disparate impact | Automated bias detection in underwriting |
+
+Banks assign **10-15% of FTEs to KYC/AML**, increasing spending 10% annually, yet detect only ~2% of global financial crime flows. By 2026, projected 70% of new account onboarding will be fully automated.
+
+**The compliance angle matters because:** it's a natural expansion path from deal screening. The same agent that screens deals can also flag compliance issues, check zoning, verify ownership structures, and prepare regulatory filings. And compliance work is the most painful, repetitive, and penalty-laden of all — firms will pay premium prices for automation that reduces regulatory risk.
+
+---
+
+## The "Intelligence Capital" Concept
+
+One of the most compelling frameworks from the research: **Intelligence Capital** (David Shrier, 2025).
+
+An AI system that processes deals generates institutional knowledge that "compounds with every decision, persists independently of any individual, and cannot be replicated by purchasing the same technology later."
+
+This is the deepest version of the moat argument:
+
+- **Human analysts leave.** When they do, they take their knowledge, relationships, and pattern recognition with them. The firm starts over.
+- **An agent's intelligence capital persists.** Every deal it screens, every broker it interacts with, every decision outcome it records — this institutional memory never leaves. It compounds.
+- **First-mover advantage is structural.** Organizations that begin earlier accumulate advantages that late-movers cannot close because they lack the compounding history. You can buy the same technology, but you can't buy the same history.
+
+This reframes the entire competitive dynamic. The question isn't "who has the best model?" — that commoditizes. The question is **"who has been processing deals the longest?"** — because that advantage compounds and is non-replicable.
+
+---
+
 ## The Honest Assessment
 
 ### What's Actually New Here
@@ -454,3 +538,30 @@ The Bloomberg Terminal of private markets — but instead of a human sitting at 
 - [Real Estate Tech Funding Sees Slight Rebound | Crunchbase](https://news.crunchbase.com/real-estate-property-tech/rebound-ai-fintech-data-eoy-2025/)
 - [AI Agents Valuation Multiples: 2025 Insights | Finro](https://www.finrofca.com/news/ai-agents-valuation-2025)
 - [Bret Taylor's Sierra reaches $100M ARR | TechCrunch](https://techcrunch.com/2025/11/21/bret-taylors-sierra-reaches-100m-arr-in-under-two-years/)
+
+### Analyst Replacement & Private Markets
+- [AI in Real Estate Underwriting and Acquisitions | Alpaca VC](https://alpaca.vc/2025/07/ai-in-real-estate-underwriting-and-acquisitions/)
+- [PwC: How Private Equity Survives AI](https://www.pwc.com/us/en/industries/financial-services/library/private-equity-ai-transformation.html)
+- [EQT: How Close Are We to AI-Native PE?](https://eqtgroup.com/thinq/technology/first-ai-native-private-equity-firm)
+- [CFA Institute: Outperformed by AI](https://blogs.cfainstitute.org/investor/2025/06/23/outperformed-by-ai-time-to-replace-your-analyst/)
+- [BCG: How Agents Are Accelerating AI Value Creation](https://www.bcg.com/publications/2025/agents-accelerate-next-wave-of-ai-value-creation)
+- [Cyndx: 2026 Will Be The Year of AI In Dealmaking](https://cyndx.com/blog/2026-will-be-the-year-of-ai-in-dealmaking)
+
+### Intelligence Capital & Data Moats
+- [AI-Risk: Intelligence Capital — The AI Your Competitors Can't Buy](https://www.ai-risk.co/our-insights-agentic-enterprise/the-ai-your-competitors-cant-buy)
+- [Bessemer Venture Partners: State of AI 2025](https://www.bvp.com/atlas/the-state-of-ai-2025)
+- [Insignia VC: Is Proprietary Data Still a Moat?](https://review.insignia.vc/2025/03/10/ai-moat/)
+
+### Competitive Landscape
+- [CoStar's Core Network at 47% Margins | Motley Fool](https://www.fool.com/investing/2026/02/19/costars-core-network-runs-at-47-margins-is-homesco/)
+- [PitchBook Navigator AI Launch](https://pitchbook.com/news/articles/pitchbook-navigator-openai-generative-ai-due-diligence)
+- [CompStak: CoStar Alternatives](https://guides.compstak.com/costar-alternatives-for-cre-appraisers/)
+- [CRE Daily: Reonomy 2026 Review](https://www.credaily.com/reviews/reonomy-review/)
+- [CRE Daily: Crexi 2026 Review](https://www.credaily.com/reviews/crexi-review/)
+
+### Regulatory & Compliance
+- [FinCEN: Residential Real Estate Rule](https://www.fincen.gov/rre)
+- [Phelps: FinCEN Real Estate Reporting Rule 2026](https://www.phelps.com/insights/fincens-real-estate-reporting-rule-prepare-for-compliance-changes-in-2026.html)
+- [Is 2026 the Year of Regulatory Automation in Real Estate | Ascent](https://www.ascentbusiness.com/blog/is-2026-the-year-of-regulatory-automation-in-real-estate/)
+- [AI to Transform AML/KYC in 2026 | RegTech Analyst](https://regtechanalyst.com/ai-set-to-transform-aml-and-kyc-in-2026/)
+- [Agentic AI for KYC and Compliance | AppsTek](https://appstekcorp.com/blog/agentic-ai-for-kyc-and-compliance/)
