@@ -81,6 +81,7 @@ model Deal {
 
   // Action card data (captured at processing time for digest)
   sourceWebLink  String? // Outlook Web link to original email
+  sourceEntryId  String? // MAPI entry ID (hex) for outlook: protocol deep link
   extractedLinks Json?   // { dealRoomLinks: string[], caLinks: string[], listingLinks: string[] }
 
   // Relationships

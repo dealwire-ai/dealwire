@@ -13,6 +13,7 @@ import { EMAIL_DEFAULTS, DECISION_COLORS } from '../../util/email-branding';
 
 interface DigestActionLinks {
   webLink?: string;
+  desktopLink?: string; // outlook:<entryId> protocol link for classic Win32 Outlook
   documentLinks?: Array<{ filename: string; url: string; sizeBytes?: number }>;
   dealRoomLinks?: string[];
   caLinks?: string[];
@@ -361,6 +362,7 @@ export class DealDigestService {
       deal: {
         id?: string;
         sourceWebLink?: string | null;
+        sourceEntryId?: string | null;
         extractedLinks?: unknown;
         documents?: Array<{
           filename: string;
@@ -373,7 +375,7 @@ export class DealDigestService {
     const map = new Map<string, DigestActionLinks>();
 
     for (const screening of screenings) {
-      const deal = screening.deal as { id: string; sourceWebLink?: string | null; extractedLinks?: unknown; documents?: Array<{ filename: string; s3Key: string | null; sizeBytes: number | null }> };
+      const deal = screening.deal as { id: string; sourceWebLink?: string | null; sourceEntryId?: string | null; extractedLinks?: unknown; documents?: Array<{ filename: string; s3Key: string | null; sizeBytes: number | null }> };
       if (!deal.id) continue;
 
       const links: DigestActionLinks = {};
@@ -381,6 +383,11 @@ export class DealDigestService {
       // Web link to original email in Outlook
       if (deal.sourceWebLink) {
         links.webLink = deal.sourceWebLink;
+      }
+
+      // Desktop deep link for classic Win32 Outlook
+      if (deal.sourceEntryId) {
+        links.desktopLink = `outlook:${deal.sourceEntryId}`;
       }
 
       // Pre-signed S3 URLs for documents
@@ -417,7 +424,7 @@ export class DealDigestService {
       }
 
       // Only store if there's something
-      if (links.webLink || links.documentLinks || links.dealRoomLinks || links.caLinks) {
+      if (links.webLink || links.desktopLink || links.documentLinks || links.dealRoomLinks || links.caLinks) {
         map.set(deal.id, links);
       }
     }
@@ -722,6 +729,10 @@ export class DealDigestService {
 
     if (links.webLink) {
       items.push(`<a href="${links.webLink}" style="${linkStyle}" target="_blank">View Email</a>`);
+    }
+
+    if (links.desktopLink) {
+      items.push(`<a href="${links.desktopLink}" style="${linkStyle}" target="_blank">Open in Desktop</a>`);
     }
 
     if (links.documentLinks && links.documentLinks.length > 0) {

@@ -26,6 +26,7 @@ interface GraphMessage {
   internetMessageId?: string;
   internetMessageHeaders?: InternetMessageHeader[];
   webLink?: string;
+  singleValueExtendedProperties?: Array<{ id: string; value: string }>;
 }
 
 interface GraphAttachment {
@@ -103,13 +104,27 @@ export class MicrosoftGraphService {
   }
 
   /**
+   * Extract MAPI entry ID from a Graph message's extended properties.
+   * Returns the entry ID as an uppercase hex string, or null if not present.
+   */
+  extractEntryId(message: GraphMessage): string | null {
+    const prop = message.singleValueExtendedProperties?.find(
+      (p) => p.id === 'Binary 0x0FFF',
+    );
+    if (!prop?.value) return null;
+    return Buffer.from(prop.value, 'base64').toString('hex').toUpperCase();
+  }
+
+  /**
    * Fetch a specific email message from Microsoft Graph
    * @param includeHeaders - When true, includes internetMessageHeaders in the response
+   * @param includeEntryId - When true, expands singleValueExtendedProperties to fetch MAPI PR_ENTRYID
    */
   async getMessage(
     accessToken: string,
     messageId: string,
     includeHeaders = false,
+    includeEntryId = false,
   ): Promise<GraphMessage | null> {
     try {
       const selectFields = [
@@ -127,8 +142,12 @@ export class MicrosoftGraphService {
       if (includeHeaders) {
         selectFields.push('internetMessageHeaders');
       }
+      let url = `${GRAPH_BASE_URL}/me/messages/${messageId}?$select=${selectFields.join(',')}`;
+      if (includeEntryId) {
+        url += `&$expand=singleValueExtendedProperties($filter=id eq 'Binary 0x0FFF')`;
+      }
       const response = await fetch(
-        `${GRAPH_BASE_URL}/me/messages/${messageId}?$select=${selectFields.join(',')}`,
+        url,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,

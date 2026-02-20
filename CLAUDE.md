@@ -47,6 +47,7 @@ All project instructions live in `CLAUDE.md` (this file). `.cursorrules` points 
 | **CLAUDE.md** | `/CLAUDE.md` | Single source of truth for project rules, architecture, patterns |
 | **ROADMAP.md** | `/docs/ROADMAP.md` | Current product priorities and feature roadmap |
 | **Public Data Platform** | `/docs/PUBLIC_DATA_PLATFORM.md` | Architecture for public property data ingestion |
+| **Desktop Deep Link** | `/docs/DESKTOP_DEEP_LINK.md` | MAPI entry ID fetch + `outlook:` protocol for desktop Outlook deep links in digest |
 | **Clerk Auth Setup** | `/docs/CLERK_AUTH_SETUP.md` | Clerk authentication implementation details |
 | **Grafana Setup** | `/docs/GRAFANA_SETUP.md` | Monitoring/observability setup guide |
 | **Prisma Schema** | `/apps/api/prisma/schema.prisma` | Database schema (source of truth for data model) |
