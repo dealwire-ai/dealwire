@@ -9,7 +9,8 @@
     - Build demo for the boutique hotel chain guy 
 
 ## Tax Lien Analyzer
-    - get proposal signed
+    - get proposal signed, verbally signed
+    - Isaac/Noah make plan of attack
 
 ## Frontstep Acquisition
     - execute + track media outreach
