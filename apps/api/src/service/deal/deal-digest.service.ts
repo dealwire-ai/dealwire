@@ -527,8 +527,8 @@ export class DealDigestService {
         }
         brokerLine = `
                     <tr>
-                      <td style="padding: 2px 0; font-size: 13px; color: #9ca3af;">Broker</td>
-                      <td style="padding: 2px 0 2px 12px; font-size: 13px; color: #374151;">${escapeHtml(brokerName)} <span style="color: #9ca3af; font-size: 12px;">(${parts.join(' &middot; ')})</span></td>
+                      <td style="padding: 2px 0; font-size: 14px; font-weight: 500; color: #6b7280;">Broker</td>
+                      <td style="padding: 2px 0 2px 12px; font-size: 14px; font-weight: 500; color: #1f2937;">${escapeHtml(brokerName)} <span style="color: #6b7280; font-size: 13px;">(${parts.join(' &middot; ')})</span></td>
                     </tr>`;
       }
 
@@ -539,11 +539,11 @@ export class DealDigestService {
             <td style="background-color: #ffffff; border: 1px solid #e5e7eb; border-left: none; border-radius: 0 8px 8px 0; padding: 20px 24px;">
               <table role="presentation" cellpadding="0" cellspacing="0" style="width: 100%;">
                 <tr>
-                  <td style="font-size: 16px; font-weight: 600; color: #111827; padding-bottom: 12px;">
+                  <td style="font-size: 17px; font-weight: 700; color: #111827; padding-bottom: 12px;">
                     ${escapeHtml(subject)}
                   </td>
                   <td style="text-align: right; vertical-align: top; padding-bottom: 12px;">
-                    <span style="background-color: ${pillBg}; color: ${pillText}; padding: 4px 14px; border-radius: 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px;">
+                    <span style="background-color: ${pillBg}; color: ${pillText}; padding: 4px 14px; border-radius: 12px; font-size: 12px; font-weight: 700; letter-spacing: 0.5px;">
                       ${decisionText}
                     </span>
                   </td>
@@ -551,20 +551,20 @@ export class DealDigestService {
               </table>
               <table role="presentation" cellpadding="0" cellspacing="0" style="width: 100%; margin-bottom: 14px;">
                 <tr>
-                  <td style="padding: 2px 0; font-size: 13px; color: #9ca3af; width: 70px;">From</td>
-                  <td style="padding: 2px 0 2px 12px; font-size: 13px; color: #374151;">${escapeHtml(from)}</td>
+                  <td style="padding: 2px 0; font-size: 14px; font-weight: 500; color: #6b7280; width: 70px;">From</td>
+                  <td style="padding: 2px 0 2px 12px; font-size: 14px; font-weight: 500; color: #1f2937;">${escapeHtml(from)}</td>
                 </tr>${brokerLine}
                 <tr>
-                  <td style="padding: 2px 0; font-size: 13px; color: #9ca3af;">Location</td>
-                  <td style="padding: 2px 0 2px 12px; font-size: 13px; color: #374151;">${escapeHtml(location)}</td>
+                  <td style="padding: 2px 0; font-size: 14px; font-weight: 500; color: #6b7280;">Location</td>
+                  <td style="padding: 2px 0 2px 12px; font-size: 14px; font-weight: 500; color: #1f2937;">${escapeHtml(location)}</td>
                 </tr>
                 <tr>
-                  <td style="padding: 2px 0; font-size: 13px; color: #9ca3af;">Screened</td>
-                  <td style="padding: 2px 0 2px 12px; font-size: 13px; color: #374151;">${date}</td>
+                  <td style="padding: 2px 0; font-size: 14px; font-weight: 500; color: #6b7280;">Screened</td>
+                  <td style="padding: 2px 0 2px 12px; font-size: 14px; font-weight: 500; color: #1f2937;">${date}</td>
                 </tr>
               </table>
               <div style="border-top: 1px solid #f3f4f6; padding-top: 14px;">
-                <p style="margin: 0; font-size: 14px; color: ${reasonColor}; line-height: 1.5;">
+                <p style="margin: 0; font-size: 15px; font-weight: 500; color: ${reasonColor}; line-height: 1.5;">
                   ${escapeHtml(reason)}
                 </p>
               </div>
@@ -579,7 +579,7 @@ export class DealDigestService {
       yesDeals.length > 0
         ? `
       <h2 style="margin: 32px 0 20px 0; font-size: 20px; font-weight: 700; color: #111827; letter-spacing: -0.3px;">
-        Approved Deals <span style="color: #9ca3af; font-weight: 500; font-size: 16px;">(${yesDeals.length})</span>
+        Approved Deals <span style="color: #6b7280; font-weight: 500; font-size: 16px;">(${yesDeals.length})</span>
       </h2>
       ${yesDeals.map((s: ScreeningType) => formatDeal(s, true)).join('')}
     `
@@ -589,7 +589,7 @@ export class DealDigestService {
       noDeals.length > 0
         ? `
       <h2 style="margin: 32px 0 20px 0; font-size: 20px; font-weight: 700; color: #111827; letter-spacing: -0.3px;">
-        Passed Deals <span style="color: #9ca3af; font-weight: 500; font-size: 16px;">(${noDeals.length})</span>
+        Passed Deals <span style="color: #6b7280; font-weight: 500; font-size: 16px;">(${noDeals.length})</span>
       </h2>
       ${noDeals.map((s) => formatDeal(s, false)).join('')}
     `
@@ -601,24 +601,24 @@ export class DealDigestService {
       <div style="background-color: #f8fafc; border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px 20px; margin: 0 0 28px 0;">
         <table role="presentation" cellpadding="0" cellspacing="0" style="width: 100%;">
           <tr>
-            <td style="font-size: 13px; color: #6b7280; padding-right: 20px;">
+            <td style="font-size: 14px; font-weight: 500; color: #4b5563; padding-right: 20px;">
               <span style="font-weight: 700; color: #111827;">${orgSummary.totalScreened}</span> screened
             </td>
-            <td style="font-size: 13px; color: #6b7280; padding-right: 20px;">
+            <td style="font-size: 14px; font-weight: 500; color: #4b5563; padding-right: 20px;">
               <span style="font-weight: 700; color: #16a34a;">${orgSummary.yesCount}</span> approved
             </td>
-            <td style="font-size: 13px; color: #6b7280; padding-right: 20px;">
+            <td style="font-size: 14px; font-weight: 500; color: #4b5563; padding-right: 20px;">
               <span style="font-weight: 700; color: #111827;">${orgSummary.passRate}%</span> pass rate
             </td>
-            <td style="font-size: 13px; color: #6b7280;">
+            <td style="font-size: 14px; font-weight: 500; color: #4b5563;">
               <span style="font-weight: 700; color: #111827;">${orgSummary.uniqueBrokers}</span> brokers
             </td>
           </tr>
         </table>
         ${orgSummary.topMarkets.length > 0 ? `
         <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #e5e7eb;">
-          <span style="font-size: 12px; color: #9ca3af;">Top markets:</span>
-          ${orgSummary.topMarkets.map((m) => `<span style="font-size: 12px; color: #374151; margin-left: 6px;">${escapeHtml(m.location)} <span style="color: #9ca3af;">(${m.count})</span></span>`).join(' &middot;')}
+          <span style="font-size: 13px; color: #6b7280;">Top markets:</span>
+          ${orgSummary.topMarkets.map((m) => `<span style="font-size: 13px; color: #1f2937; margin-left: 6px;">${escapeHtml(m.location)} <span style="color: #6b7280;">(${m.count})</span></span>`).join(' &middot;')}
         </div>` : ''}
       </div>`
       : '';
@@ -628,14 +628,14 @@ export class DealDigestService {
       ? `
       <div style="margin: 0 0 32px 0;">
         <h2 style="margin: 0 0 16px 0; font-size: 20px; font-weight: 700; color: #111827; letter-spacing: -0.3px;">
-          Top Brokers <span style="color: #9ca3af; font-weight: 500; font-size: 16px;">Last 30 Days</span>
+          Top Brokers <span style="color: #6b7280; font-weight: 500; font-size: 16px;">Last 30 Days</span>
         </h2>
-        <table role="presentation" cellpadding="0" cellspacing="0" style="width: 100%; font-size: 13px; border: 1px solid #e5e7eb; border-radius: 8px; border-collapse: separate; overflow: hidden;">
+        <table role="presentation" cellpadding="0" cellspacing="0" style="width: 100%; font-size: 14px; border: 1px solid #e5e7eb; border-radius: 8px; border-collapse: separate; overflow: hidden;">
           <tr>
-            <td style="padding: 10px 16px; font-weight: 600; color: #9ca3af; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #f9fafb; border-bottom: 1px solid #e5e7eb;">Broker</td>
-            <td style="padding: 10px 16px; font-weight: 600; color: #9ca3af; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; background-color: #f9fafb; border-bottom: 1px solid #e5e7eb;">Deals</td>
-            <td style="padding: 10px 16px; font-weight: 600; color: #9ca3af; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; background-color: #f9fafb; border-bottom: 1px solid #e5e7eb;">Approved</td>
-            <td style="padding: 10px 16px; font-weight: 600; color: #9ca3af; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; background-color: #f9fafb; border-bottom: 1px solid #e5e7eb;">Pass Rate</td>
+            <td style="padding: 10px 16px; font-weight: 700; color: #6b7280; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #f9fafb; border-bottom: 1px solid #e5e7eb;">Broker</td>
+            <td style="padding: 10px 16px; font-weight: 700; color: #6b7280; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; background-color: #f9fafb; border-bottom: 1px solid #e5e7eb;">Deals</td>
+            <td style="padding: 10px 16px; font-weight: 700; color: #6b7280; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; background-color: #f9fafb; border-bottom: 1px solid #e5e7eb;">Approved</td>
+            <td style="padding: 10px 16px; font-weight: 700; color: #6b7280; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; background-color: #f9fafb; border-bottom: 1px solid #e5e7eb;">Pass Rate</td>
           </tr>
           ${leaderboard.brokers.map((b, i) => {
             const name = [b.firstName, b.lastName].filter(Boolean).join(' ') || b.email;
@@ -643,10 +643,10 @@ export class DealDigestService {
             const borderBottom = i < leaderboard.brokers.length - 1 ? 'border-bottom: 1px solid #f3f4f6;' : '';
             return `
           <tr>
-            <td style="padding: 10px 16px; color: #111827; font-weight: 500; background-color: ${rowBg}; ${borderBottom}">${escapeHtml(name)}</td>
-            <td style="padding: 10px 16px; color: #374151; text-align: center; background-color: ${rowBg}; ${borderBottom}">${b.totalDeals}</td>
+            <td style="padding: 10px 16px; color: #111827; font-weight: 600; background-color: ${rowBg}; ${borderBottom}">${escapeHtml(name)}</td>
+            <td style="padding: 10px 16px; color: #1f2937; font-weight: 500; text-align: center; background-color: ${rowBg}; ${borderBottom}">${b.totalDeals}</td>
             <td style="padding: 10px 16px; color: #16a34a; font-weight: 600; text-align: center; background-color: ${rowBg}; ${borderBottom}">${b.yesCount}</td>
-            <td style="padding: 10px 16px; color: #374151; text-align: center; background-color: ${rowBg}; ${borderBottom}">${b.passRate}%</td>
+            <td style="padding: 10px 16px; color: #1f2937; font-weight: 500; text-align: center; background-color: ${rowBg}; ${borderBottom}">${b.passRate}%</td>
           </tr>`;
           }).join('')}
         </table>
@@ -682,7 +682,7 @@ export class DealDigestService {
                             <h1 style="margin: 0 0 8px 0; font-size: 28px; font-weight: 700; color: #111827; letter-spacing: -0.5px;">
                                 Deal Digest
                             </h1>
-                            <p style="margin: 0 0 32px 0; font-size: 15px; color: #6b7280; line-height: 1.6;">
+                            <p style="margin: 0 0 32px 0; font-size: 16px; color: #4b5563; line-height: 1.6;">
                                 ${screenings.length} deal${screenings.length > 1 ? 's' : ''} screened since the last digest
                             </p>
                             ${summaryHtml}
@@ -693,7 +693,7 @@ export class DealDigestService {
                     </tr>
                     <tr>
                         <td style="padding: 24px 36px; background-color: #f9fafb; border-top: 1px solid #e5e7eb; text-align: center;">
-                            <p style="margin: 0; font-size: 12px; color: #9ca3af;">${escapeHtml(companyName)}</p>
+                            <p style="margin: 0; font-size: 13px; color: #6b7280;">${escapeHtml(companyName)}</p>
                         </td>
                     </tr>
                 </table>
@@ -706,7 +706,7 @@ export class DealDigestService {
 
   /**
    * Render inline action links for a deal card in the digest.
-   * Shows: Open in Outlook, Download docs, Deal room, Sign CA — as compact link row.
+   * Shows: View Email, Download docs, Deal room, Sign CA — as compact link row.
    */
   private renderDealActionLinks(
     dealId: string,
@@ -716,12 +716,12 @@ export class DealDigestService {
     const links = actionLinksMap.get(dealId);
     if (!links) return '';
 
-    const linkStyle = 'color: #2563eb; text-decoration: none; font-size: 12px; font-weight: 500;';
-    const separatorStyle = 'color: #d1d5db; margin: 0 6px; font-size: 12px;';
+    const linkStyle = 'color: #2563eb; text-decoration: none; font-size: 13px; font-weight: 600;';
+    const separatorStyle = 'color: #d1d5db; margin: 0 6px; font-size: 13px;';
     const items: string[] = [];
 
     if (links.webLink) {
-      items.push(`<a href="${links.webLink}" style="${linkStyle}" target="_blank">Open in Outlook</a>`);
+      items.push(`<a href="${links.webLink}" style="${linkStyle}" target="_blank">View Email</a>`);
     }
 
     if (links.documentLinks && links.documentLinks.length > 0) {
