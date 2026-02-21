@@ -273,24 +273,43 @@ Per-source tracking:
 
 ### Phase 1: NYC Deep (prove the adapter model)
 
-**Goal**: Build the adapter framework, ingest NYC data, validate the canonical schema.
+**Goal**: Build the adapter framework, ingest NYC data, validate with a real user.
 
-- [ ] Define Prisma schema for `DataSource`, `RawIngestion`, `Property`, `PropertyTaxLien`, `PropertyAssessment`
-- [ ] Build `SodaAdapter` (generic, handles any Socrata dataset)
-- [ ] Build `ArcGisAdapter` (generic, handles any ArcGIS FeatureServer)
-- [ ] Create source configs for:
-  - NYC Tax Lien Sale Lists (`9rz4-mjek`)
-  - NYC Property Charges Balance (`scjx-j6np`)
-  - PLUTO via Socrata (`64uk-42ks`) or ArcGIS endpoint
-- [ ] Build normalization pipeline (field mapping, basic address parsing)
-- [ ] API endpoint to trigger ingestion manually (`POST /data-sources/:id/ingest`)
-- [ ] API endpoint to query ingested property data (`GET /properties?fips=...&parcelId=...`)
-- [ ] Raw storage with dedup (record hashing)
+**Status: COMPLETE** — Shipped Feb 2026. Simplified approach vs original plan (see notes below).
+
+- [x] Build `SodaAdapter` (generic Socrata client with pagination, app token support)
+- [x] Create NYC source configs for 3 datasets:
+  - Tax Lien Sale Lists (`9rz4-mjek`)
+  - PLUTO via Socrata (`64uk-42ks`)
+  - HPD Violations (`wvxf-dwi5`)
+- [x] `Parcel` Prisma model — denormalized single table per BBL with PLUTO fields, lien status, violation aggregates, and distress score
+- [x] Lien-first ingestion: start from lien list (~3K BBLs for BK+QN), enrich only those with PLUTO + HPD
+- [x] Distress scoring engine (0-100, weighted: active lien +30, violations/unit up to +40, class C up to +20, class B up to +10)
+- [x] API: `POST /public-data/ingest` (async, fire-and-forget), `GET /public-data/parcels` (filtered/paginated), `GET /public-data/parcels/export` (CSV), `GET /public-data/stats`, `GET /public-data/parcels/:bbl`
+- [x] Frontend: filterable parcel table at `/public-data/parcels` with score badges, expandable rows, CSV export
+- [x] Agent tools: `query_parcels`, `get_parcel_stats`
+- [x] Feature flag: `parcels` (org-level, off by default)
+
+**What was deferred to Phase 2:**
+- `DataSource` / `RawIngestion` DB models (source registry) — used hardcoded TS constants instead
+- `ArcGisAdapter` — not needed for Phase 1 datasets (all Socrata)
+- Raw JSONB storage / record hashing — data goes directly to `Parcel` table
+- Property Charges Balance dataset (`scjx-j6np`) — lien list + violations sufficient for scoring
+- Address standardization — BBL is the join key, addresses come from PLUTO
+- Individual violation records — only aggregates stored (total, open, by class)
+
+**SODA API lessons learned:**
+- Tax lien dataset has years of historical data. Must filter by `month` field (query `$order: 'month DESC', $limit: 1` first) to get only the latest cycle
+- PLUTO stores BBL as a float (`3001850041.00000000`). String comparison fails. Use numeric comparison: `bbl=3001850041 OR bbl=...`
+- HPD violations has 5M+ records per borough. Must batch-query by specific block+lot pairs (50 per request), not fetch entire borough
+- Borough codes differ across datasets: Tax Liens uses numeric ("1"-"5"), PLUTO uses abbreviations ("MN","BX","BK","QN","SI"), HPD uses numeric `boroid`
 
 ### Phase 2: Normalize & Enrich
 
+- [ ] `DataSource` / `RawIngestion` models — source registry with config-driven ingestion
+- [ ] `ArcGisAdapter` (generic, handles any ArcGIS FeatureServer)
+- [ ] Property Charges Balance (`scjx-j6np`) — outstanding balances as additional distress signal
 - [ ] Address standardization (Smarty or libpostal integration)
-- [ ] Parcel matching across NYC datasets (link lien data to PLUTO records)
 - [ ] Add ACRIS data (transactions, recorded liens) — joins across 3 Socrata datasets
 - [ ] Data quality validation pipeline
 - [ ] BullMQ scheduling for automated refresh
