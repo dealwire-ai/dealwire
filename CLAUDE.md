@@ -122,6 +122,21 @@ Any time make changes to the Prisma schema, generate a dev migration using cd ap
 
 ---
 
+## Keeping Docs Up to Date
+
+After implementing any feature, API change, or architectural change — update the relevant doc(s) in `/docs/` to reflect the new reality. Don't leave docs describing a state that no longer exists.
+
+| Change type | Update |
+|-------------|--------|
+| New or modified API endpoints | `TAX_LIEN_PLATFORM.md` (public data) or `BACKEND.md` |
+| New services, adapters, or architectural patterns | Relevant domain doc |
+| New or changed env vars | `apps/api/.env.example` + `BACKEND.md` |
+| Prisma schema changes | Note in `BACKEND.md` if it affects documented data model |
+| Roadmap item completed | Mark `[x]` in `ROADMAP.md` |
+| New feature added | Add to "What's Built" section in `ROADMAP.md` |
+
+---
+
 ## Git & PRs
 
 ### Commit Messages
