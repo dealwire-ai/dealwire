@@ -406,6 +406,28 @@ Example: Borough 3, Block 8026, Lot 42 → BBL `3080260042`
 
 Every dataset uses BBL in some form but with different field names and formats. The normalization layer must handle this cleanly.
 
+### Ingestion Behavior
+
+Ingestion is **fire-and-forget** — `POST /public-data/ingest` returns immediately with `{ message: 'Ingestion started', boroughs: [...] }` and runs the full pipeline in the background. A full ingest (tax liens → PLUTO enrichment → HPD violations → distress scoring) typically takes 2-5 minutes. Completion and errors are logged server-side only; there's no webhook or polling endpoint currently.
+
+### HPD Violation Query Optimization
+
+HPD violations are not fetched borough-wide (that would pull 5M+ records). Instead, `NycIngestionService` batches queries by block+lot pairs — 50 pairs per SODA request — only fetching violations for parcels already in the Parcel table from the lien ingestion step. This keeps HPD ingestion fast and avoids rate limit issues.
+
+### API Endpoints
+
+Full list of `PublicDataController` endpoints at `/public-data/*`:
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `POST` | `/public-data/ingest` | Trigger ingestion (optional `boroughs`, `sources` in body) |
+| `GET` | `/public-data/parcels` | Query parcels with filters, sorting, pagination |
+| `GET` | `/public-data/parcels/export` | CSV export (same filters as query) |
+| `GET` | `/public-data/parcels/:bbl` | Single parcel detail by 10-digit BBL |
+| `GET` | `/public-data/stats` | Aggregate statistics (totals, borough breakdown, avg score) |
+
+All endpoints require Clerk auth + `parcels` feature flag (returns 403 if flag is off).
+
 ---
 
 ## Commercial Terms (from SoW)
