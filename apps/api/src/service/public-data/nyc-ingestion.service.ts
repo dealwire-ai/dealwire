@@ -59,17 +59,9 @@ export class NycIngestionService {
     const lienResult = await this.ingestTaxLiens(boroughs);
     results.push(lienResult);
 
-    // 2. Enrich with PLUTO data (only for BBLs we have)
-    const bbls = await this.prisma.parcel.findMany({
-      where: { borough: { in: boroughs } },
-      select: { bbl: true },
-    });
-    const bblList = bbls.map((p) => p.bbl);
-
-    if (bblList.length > 0) {
-      const plutoResult = await this.ingestPlutoData(bblList);
-      results.push(plutoResult);
-    }
+    // 2. Enrich with PLUTO data (query by borough abbreviation)
+    const plutoResult = await this.ingestPlutoData(boroughs);
+    results.push(plutoResult);
 
     // 3. Ingest HPD violations
     const hpdResult = await this.ingestHpdViolations(boroughs);
@@ -174,38 +166,62 @@ export class NycIngestionService {
 
   /**
    * Enrich parcels with PLUTO property data.
-   * Fetches in batches by BBL to avoid loading all 860K PLUTO records.
+   * PLUTO stores BBL as a numeric float (e.g. 3001850041.00000000), so we query
+   * using numeric comparison (bbl=3001850041 OR bbl=...) in batches.
    */
-  async ingestPlutoData(bbls: string[]): Promise<IngestionResult> {
+  async ingestPlutoData(boroughs: string[]): Promise<IngestionResult> {
     const start = Date.now();
+
+    // Get the BBLs we need to enrich
+    const existingParcels = await this.prisma.parcel.findMany({
+      where: { borough: { in: boroughs } },
+      select: { bbl: true },
+    });
+    const bbls = existingParcels.map((p) => p.bbl);
     this.logger.log(`Enriching ${bbls.length} parcels with PLUTO data`);
+
+    if (bbls.length === 0) {
+      return { source: 'pluto', recordsProcessed: 0, recordsCreated: 0, recordsUpdated: 0, durationMs: Date.now() - start };
+    }
 
     let processed = 0;
     let updated = 0;
 
-    // Batch BBLs into groups of 100 for SODA queries
+    // Batch BBLs into groups for SODA queries using numeric comparison
     const batchSize = 100;
     for (let i = 0; i < bbls.length; i += batchSize) {
       const batch = bbls.slice(i, i + batchSize);
 
-      // Build SODA $where clause: bbl in ('...', '...')
-      const bblFilter = batch.map((b) => `'${b}'`).join(',');
+      // Use numeric OR conditions: bbl=3001850041 OR bbl=3001970016 OR ...
+      const bblFilter = batch.map((b) => `bbl=${b}`).join(' OR ');
 
       const records = await this.soda.fetch(NYC_PLUTO, {
-        $where: `bbl in (${bblFilter})`,
+        $where: bblFilter,
         $limit: batchSize,
       }) as Record<string, string>[];
 
       for (const record of records) {
-        const bbl = record.bbl?.trim();
-        if (!bbl) continue;
+        // Reconstruct the clean 10-char BBL from PLUTO's borough+block+lot
+        const boroughAbbr = record.borough?.trim();
+        const block = record.block?.trim();
+        const lot = record.lot?.trim();
+        if (!boroughAbbr || !block || !lot) continue;
+
+        const boroughNumeric = Object.entries(BOROUGH_NUMERIC_TO_ABBR)
+          .find(([, abbr]) => abbr === boroughAbbr)?.[0];
+        if (!boroughNumeric) continue;
+
+        const bbl = normalizeBbl(boroughNumeric, block, lot);
+        processed++;
 
         const assessTotal = parseFloat(record.assesstot) || null;
         const taxClass = record.taxclass || null;
         const buildingClass = record.bldgclass || null;
         const unitsTotal = parseInt(record.unitstotal) || null;
 
-        const plutoData = {
+        await this.prisma.parcel.updateMany({
+          where: { bbl },
+          data: {
             address: record.address || null,
             zipCode: record.zipcode || null,
             buildingClass,
@@ -223,24 +239,18 @@ export class NycIngestionService {
             estimatedMarketValue: estimateMarketValue(assessTotal, taxClass),
             isCoopExcluded: isCoopBuildingClass(buildingClass),
             plutoSyncedAt: new Date(),
-        };
-
-        // Use updateMany to gracefully handle BBLs that don't exist in our table
-        const result = await this.prisma.parcel.updateMany({
-          where: { bbl },
-          data: plutoData,
+          },
         });
-        if (result.count === 0) continue;
-
-        processed++;
         updated++;
       }
 
-      this.logger.debug(`PLUTO batch ${Math.floor(i / batchSize) + 1}: ${records.length} records`);
+      if ((i / batchSize) % 5 === 0) {
+        this.logger.log(`PLUTO progress: ${i + batch.length}/${bbls.length} BBLs queried, ${updated} updated`);
+      }
     }
 
     const duration = Date.now() - start;
-    this.logger.log(`PLUTO enrichment: ${processed} parcels updated in ${duration}ms`);
+    this.logger.log(`PLUTO enrichment: ${updated} parcels updated in ${duration}ms`);
 
     return {
       source: 'pluto',
