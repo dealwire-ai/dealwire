@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AppController } from './controller/app.controller';
+import { FeatureFlagsController } from './controller/feature-flags.controller';
 import { AppService } from './service/app.service';
+import { ClerkAuthGuard } from './guard/clerk-auth.guard';
 import { PrismaModule } from './module/prisma.module';
 import { MetricsModule } from './module/metrics.module';
 import { PreferencesModule } from './module/preferences.module';
@@ -14,6 +16,7 @@ import { EmailProcessorModule } from './module/email-processor.module';
 import { NotificationsModule } from './module/notifications.module';
 import { DealDigestModule } from './module/deal-digest.module';
 import { IngestionModule } from './module/ingestion.module';
+import { PublicDataModule } from './module/public-data.module';
 
 @Module({
   imports: [
@@ -30,8 +33,9 @@ import { IngestionModule } from './module/ingestion.module';
     NotificationsModule,
     DealDigestModule,
     IngestionModule,
+    PublicDataModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, FeatureFlagsController],
+  providers: [AppService, ClerkAuthGuard],
 })
 export class AppModule {}

@@ -1,0 +1,334 @@
+import { Injectable, Logger } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { SodaAdapter, SodaSourceConfig } from './soda.adapter';
+import { DistressScoringService } from './distress-scoring.service';
+import {
+  normalizeBbl,
+  BOROUGH_NUMERIC_TO_ABBR,
+  estimateMarketValue,
+  isCoopBuildingClass,
+} from './nyc-utils';
+
+// NYC Open Data source configurations
+const NYC_BASE_URL = 'https://data.cityofnewyork.us';
+
+const NYC_TAX_LIENS: SodaSourceConfig = {
+  baseUrl: NYC_BASE_URL,
+  datasetId: '9rz4-mjek',
+  name: 'NYC Tax Lien Sale List',
+};
+
+const NYC_PLUTO: SodaSourceConfig = {
+  baseUrl: NYC_BASE_URL,
+  datasetId: '64uk-42ks',
+  name: 'NYC PLUTO',
+};
+
+const NYC_HPD_VIOLATIONS: SodaSourceConfig = {
+  baseUrl: NYC_BASE_URL,
+  datasetId: 'wvxf-dwi5',
+  name: 'NYC HPD Violations',
+};
+
+export interface IngestionResult {
+  source: string;
+  recordsProcessed: number;
+  recordsCreated: number;
+  recordsUpdated: number;
+  durationMs: number;
+}
+
+@Injectable()
+export class NycIngestionService {
+  private readonly logger = new Logger(NycIngestionService.name);
+
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly soda: SodaAdapter,
+    private readonly scoring: DistressScoringService,
+  ) {}
+
+  /**
+   * Run full ingestion pipeline: tax liens → PLUTO enrichment → HPD violations → scoring.
+   */
+  async ingestAll(boroughs: string[]): Promise<IngestionResult[]> {
+    this.logger.log(`Starting full ingestion for boroughs: ${boroughs.join(', ')}`);
+    const results: IngestionResult[] = [];
+
+    // 1. Ingest tax lien list (creates Parcel rows)
+    const lienResult = await this.ingestTaxLiens(boroughs);
+    results.push(lienResult);
+
+    // 2. Enrich with PLUTO data (only for BBLs we have)
+    const bbls = await this.prisma.parcel.findMany({
+      where: { borough: { in: boroughs } },
+      select: { bbl: true },
+    });
+    const bblList = bbls.map((p) => p.bbl);
+
+    if (bblList.length > 0) {
+      const plutoResult = await this.ingestPlutoData(bblList);
+      results.push(plutoResult);
+    }
+
+    // 3. Ingest HPD violations
+    const hpdResult = await this.ingestHpdViolations(boroughs);
+    results.push(hpdResult);
+
+    // 4. Compute distress scores
+    await this.scoring.scoreAll();
+
+    this.logger.log(`Full ingestion complete. Results: ${JSON.stringify(results.map((r) => `${r.source}: ${r.recordsProcessed}`))}`);
+    return results;
+  }
+
+  /**
+   * Ingest tax lien sale list from NYC DOF.
+   * Creates/updates Parcel rows with lien status.
+   */
+  async ingestTaxLiens(boroughs: string[]): Promise<IngestionResult> {
+    const start = Date.now();
+    this.logger.log(`Ingesting tax liens for boroughs: ${boroughs.join(', ')}`);
+
+    let processed = 0;
+    let created = 0;
+    let updated = 0;
+
+    // Build borough filter for SODA query
+    const boroughFilter = boroughs.map((b) => `borough='${b}'`).join(' OR ');
+
+    for await (const page of this.soda.fetchAll(NYC_TAX_LIENS, {
+      $where: boroughFilter,
+      $order: 'borough,block,lot',
+    })) {
+      for (const record of page as Record<string, string>[]) {
+        const borough = record.borough?.trim();
+        const block = record.block?.trim();
+        const lot = record.lot?.trim();
+
+        if (!borough || !block || !lot) continue;
+
+        const bbl = normalizeBbl(borough, block, lot);
+
+        const result = await this.prisma.parcel.upsert({
+          where: { bbl },
+          create: {
+            bbl,
+            borough,
+            block: block.padStart(5, '0'),
+            lot: lot.padStart(4, '0'),
+            hasActiveLien: true,
+            lienCycle: record.cycle || null,
+            waterDebtOnly: (record.water_debt_only || '').toLowerCase() === 'yes',
+            liensSyncedAt: new Date(),
+          },
+          update: {
+            hasActiveLien: true,
+            lienCycle: record.cycle || null,
+            waterDebtOnly: (record.water_debt_only || '').toLowerCase() === 'yes',
+            liensSyncedAt: new Date(),
+          },
+        });
+
+        processed++;
+        if (result.createdAt.getTime() === result.updatedAt.getTime()) {
+          created++;
+        } else {
+          updated++;
+        }
+      }
+    }
+
+    const duration = Date.now() - start;
+    this.logger.log(`Tax liens: ${processed} processed (${created} created, ${updated} updated) in ${duration}ms`);
+
+    return {
+      source: 'tax_liens',
+      recordsProcessed: processed,
+      recordsCreated: created,
+      recordsUpdated: updated,
+      durationMs: duration,
+    };
+  }
+
+  /**
+   * Enrich parcels with PLUTO property data.
+   * Fetches in batches by BBL to avoid loading all 860K PLUTO records.
+   */
+  async ingestPlutoData(bbls: string[]): Promise<IngestionResult> {
+    const start = Date.now();
+    this.logger.log(`Enriching ${bbls.length} parcels with PLUTO data`);
+
+    let processed = 0;
+    let updated = 0;
+
+    // Batch BBLs into groups of 100 for SODA queries
+    const batchSize = 100;
+    for (let i = 0; i < bbls.length; i += batchSize) {
+      const batch = bbls.slice(i, i + batchSize);
+
+      // Build SODA $where clause: bbl in ('...', '...')
+      const bblFilter = batch.map((b) => `'${b}'`).join(',');
+
+      const records = await this.soda.fetch(NYC_PLUTO, {
+        $where: `bbl in (${bblFilter})`,
+        $limit: batchSize,
+      }) as Record<string, string>[];
+
+      for (const record of records) {
+        const bbl = record.bbl?.trim();
+        if (!bbl) continue;
+
+        const assessTotal = parseFloat(record.assesstot) || null;
+        const taxClass = record.taxclass || null;
+        const buildingClass = record.bldgclass || null;
+        const unitsTotal = parseInt(record.unitstotal) || null;
+
+        await this.prisma.parcel.update({
+          where: { bbl },
+          data: {
+            address: record.address || null,
+            zipCode: record.zipcode || null,
+            buildingClass,
+            unitsTotal,
+            unitsRes: parseInt(record.unitsres) || null,
+            buildingArea: parseInt(record.bldgarea) || null,
+            lotArea: parseInt(record.lotarea) || null,
+            numFloors: parseFloat(record.numfloors) || null,
+            yearBuilt: parseInt(record.yearbuilt) || null,
+            ownerName: record.ownername || null,
+            zoneDist1: record.zonedist1 || null,
+            landUse: record.landuse || null,
+            assessTotal,
+            taxClass,
+            estimatedMarketValue: estimateMarketValue(assessTotal, taxClass),
+            isCoopExcluded: isCoopBuildingClass(buildingClass),
+            plutoSyncedAt: new Date(),
+          },
+        });
+
+        processed++;
+        updated++;
+      }
+
+      this.logger.debug(`PLUTO batch ${Math.floor(i / batchSize) + 1}: ${records.length} records`);
+    }
+
+    const duration = Date.now() - start;
+    this.logger.log(`PLUTO enrichment: ${processed} parcels updated in ${duration}ms`);
+
+    return {
+      source: 'pluto',
+      recordsProcessed: processed,
+      recordsCreated: 0,
+      recordsUpdated: updated,
+      durationMs: duration,
+    };
+  }
+
+  /**
+   * Ingest HPD violations and aggregate counts per parcel.
+   * Fetches all violations for target boroughs, aggregates in memory, then batch-updates.
+   */
+  async ingestHpdViolations(boroughs: string[]): Promise<IngestionResult> {
+    const start = Date.now();
+    this.logger.log(`Ingesting HPD violations for boroughs: ${boroughs.join(', ')}`);
+
+    // Get BBLs we care about (parcels already in our DB)
+    const existingParcels = await this.prisma.parcel.findMany({
+      where: { borough: { in: boroughs } },
+      select: { bbl: true, unitsTotal: true },
+    });
+    const parcelMap = new Map(existingParcels.map((p) => [p.bbl, p.unitsTotal]));
+
+    if (parcelMap.size === 0) {
+      this.logger.log('No parcels to enrich with HPD data');
+      return { source: 'hpd_violations', recordsProcessed: 0, recordsCreated: 0, recordsUpdated: 0, durationMs: Date.now() - start };
+    }
+
+    // Aggregate violation counts in memory
+    const counts = new Map<string, {
+      total: number;
+      open: number;
+      classA: number;
+      classB: number;
+      classC: number;
+    }>();
+
+    const boroughFilter = boroughs.map((b) => `boroid='${b}'`).join(' OR ');
+
+    let totalFetched = 0;
+    for await (const page of this.soda.fetchAll(NYC_HPD_VIOLATIONS, {
+      $where: boroughFilter,
+      $select: 'boroid,block,lot,class,currentstatus',
+      $order: 'boroid,block,lot',
+    })) {
+      for (const record of page as Record<string, string>[]) {
+        const borough = record.boroid?.trim();
+        const block = record.block?.trim();
+        const lot = record.lot?.trim();
+
+        if (!borough || !block || !lot) continue;
+
+        const bbl = normalizeBbl(borough, block, lot);
+
+        // Only aggregate for parcels we have
+        if (!parcelMap.has(bbl)) continue;
+
+        if (!counts.has(bbl)) {
+          counts.set(bbl, { total: 0, open: 0, classA: 0, classB: 0, classC: 0 });
+        }
+        const c = counts.get(bbl)!;
+
+        c.total++;
+
+        const status = (record.currentstatus || '').toUpperCase();
+        if (status !== 'CLOSE') {
+          c.open++;
+        }
+
+        const violClass = (record.class || '').toUpperCase();
+        if (violClass === 'A') c.classA++;
+        else if (violClass === 'B') c.classB++;
+        else if (violClass === 'C') c.classC++;
+      }
+
+      totalFetched += page.length;
+      this.logger.debug(`HPD violations fetched: ${totalFetched} total`);
+    }
+
+    // Batch update parcels with aggregated violation counts
+    let updated = 0;
+    for (const [bbl, c] of counts) {
+      const unitsTotal = parcelMap.get(bbl);
+      const violationsPerUnit = unitsTotal && unitsTotal > 0
+        ? Math.round((c.open / unitsTotal) * 100) / 100
+        : null;
+
+      await this.prisma.parcel.update({
+        where: { bbl },
+        data: {
+          violationsTotal: c.total,
+          violationsOpen: c.open,
+          violationsClassA: c.classA,
+          violationsClassB: c.classB,
+          violationsClassC: c.classC,
+          violationsPerUnit,
+          violationsSyncedAt: new Date(),
+        },
+      });
+      updated++;
+    }
+
+    const duration = Date.now() - start;
+    this.logger.log(`HPD violations: ${totalFetched} fetched, ${counts.size} parcels aggregated, ${updated} updated in ${duration}ms`);
+
+    return {
+      source: 'hpd_violations',
+      recordsProcessed: totalFetched,
+      recordsCreated: 0,
+      recordsUpdated: updated,
+      durationMs: duration,
+    };
+  }
+}

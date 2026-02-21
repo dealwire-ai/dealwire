@@ -29,6 +29,7 @@ model Organization {
   name                String
   slug                String?                @unique
   imageUrl            String?
+  featureFlags        Json?                  // { parcels?: boolean, ... } — merged with defaults at app layer
   users                 User[]
   deals                 Deal[]
   screeningPreferences  ScreeningPreferences?
@@ -282,4 +283,69 @@ model ScreeningPreferences {
   digestTimeZone  String?  @default("America/New_York") // Timezone for schedule
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
+}
+
+// ============================================
+// PARCEL - Public data record for a tax parcel (by BBL)
+// ============================================
+model Parcel {
+  id        String @id @default(cuid())
+
+  // BBL (Borough-Block-Lot) — unique tax parcel identifier
+  borough   String   // "1"=Manhattan, "2"=Bronx, "3"=Brooklyn, "4"=Queens, "5"=Staten Island
+  block     String
+  lot       String
+  bbl       String   @unique // Composite 10-char: borough(1) + block(5, zero-padded) + lot(4, zero-padded)
+
+  // Address
+  address   String?
+  zipCode   String?
+
+  // PLUTO data (property characteristics from NYC Dept of City Planning)
+  buildingClass     String?
+  unitsTotal        Int?
+  unitsRes          Int?
+  buildingArea      Int?      // sqft
+  lotArea           Int?      // sqft
+  numFloors         Float?
+  yearBuilt         Int?
+  ownerName         String?
+  zoneDist1         String?
+  landUse           String?
+  assessTotal       Float?    // Total assessed value (from DOF)
+  taxClass          String?
+
+  // Computed / enriched
+  estimatedMarketValue  Float?   // assessTotal / rate (0.06 for class 1, 0.45 for class 2-4)
+  isCoopExcluded        Boolean @default(false) // True if buildingClass in coop exclusion list
+
+  // Tax lien data (from NYC DOF lien sale list)
+  hasActiveLien    Boolean  @default(false)
+  lienCycle        String?  // e.g., "90 Day Notice"
+  waterDebtOnly    Boolean  @default(false)
+
+  // HPD Violations (aggregated counts per parcel)
+  violationsTotal    Int    @default(0)
+  violationsOpen     Int    @default(0)
+  violationsClassA   Int    @default(0)  // Non-hazardous
+  violationsClassB   Int    @default(0)  // Hazardous
+  violationsClassC   Int    @default(0)  // Immediately hazardous
+  violationsPerUnit  Float?              // violationsOpen / unitsTotal
+
+  // Distress score (0-100, higher = more distressed)
+  distressScore   Float?
+
+  // Sync tracking
+  plutoSyncedAt       DateTime?
+  liensSyncedAt       DateTime?
+  violationsSyncedAt  DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([borough])
+  @@index([buildingClass])
+  @@index([distressScore(sort: Desc)])
+  @@index([hasActiveLien])
+  @@index([borough, hasActiveLien])
 }
