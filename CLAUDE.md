@@ -28,6 +28,8 @@ Build the ultimate private market analyst — an AI system with access to deep p
 
 When users connect their Microsoft Outlook account, the system monitors their inbox for deal-related emails (teasers, offering memorandums, etc.), extracts and analyzes the content using AI, and replies with a structured summary, deal narrative, action card (links to documents, deal rooms, broker intel), and go/no-go decision based on client-specific criteria. For promising deals, it also drafts relationship-aware broker reply emails. A scheduled digest surfaces all screened deals with inline action links.
 
+The platform also includes a **tax lien / distressed property intelligence** layer: ingests NYC public data (tax lien sale lists, PLUTO property records, HPD violations) via Socrata SODA API, computes distress scores (0-100), and surfaces results in a filterable parcel table at `/public-data/parcels` with CSV export and agent chat tools. Gated behind the `parcels` feature flag (org-level).
+
 See `docs/ROADMAP.md` for current product priorities and feature roadmap. Check it before proposing new features to ensure alignment with the current phase.
 
 See `docs/PUBLIC_DATA_PLATFORM.md` for the public data ingestion architecture. Read it before working on data sources, adapters, property data, ingestion pipelines, or anything in the data enrichment layer.
