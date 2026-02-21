@@ -50,6 +50,28 @@ See `docs/PUBLIC_DATA_PLATFORM.md` for the public data ingestion architecture. R
 - Frontend: Vercel (root dir: apps/web)
 - Backend: Railway (root dir: apps/api, uses Dockerfile)
 
+### Railway
+
+Railway MCP tools (`mcp__railway__*`) are available for deployments, logs, and service management.
+
+**Important:** The Railway CLI must be linked to a service before you can list deployments or get logs. The workspace path is always `apps/api`:
+
+```bash
+# Link the service (required once per session if not already linked)
+# Use mcp__railway__link-service with workspacePath=/Users/isaac/projects/analyzer/apps/api, serviceName=analyzer-api
+
+# Then use MCP tools:
+# mcp__railway__list-deployments — check deployment status
+# mcp__railway__get-logs — build/deploy logs (pass logType: "build" or "deploy")
+# mcp__railway__list-variables — check env vars
+# mcp__railway__set-variables — set env vars
+```
+
+- Service name: `analyzer-api`
+- Deploys automatically on push to `main`
+- Start script runs `prisma migrate deploy && node dist/src/main.js`
+- Prod DB uses port 5432 (direct Supabase URL), never 6543 (pooler) for migrations
+
 ### Package naming
 - Frontend: `@analyzer/web`
 - Backend: `@analyzer/api`
