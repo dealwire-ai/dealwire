@@ -277,43 +277,42 @@ This extended window (often 12-18+ months) creates opportunity for direct outrea
 Based on SoW deliverables, meeting notes, and Daniel's spreadsheet feedback:
 
 #### Data Aggregation
-- [ ] Ingest NYC Tax Lien Sale Lists (Socrata `9rz4-mjek`)
+- [x] Ingest NYC Tax Lien Sale Lists (Socrata `9rz4-mjek`) — latest cycle only
 - [ ] Ingest Property Charges Balance — outstanding balances (Socrata `scjx-j6np`)
-- [ ] Ingest PLUTO property data (Socrata `64uk-42ks` or ArcGIS endpoint) — building class, units, sqft, lot size, zoning, year built
-- [ ] Ingest HPD violations — all classes, count per building, breakout by class A/B/C
-- [ ] Filter to Brooklyn (borough 3) and Queens (borough 4) only
-- [ ] Join datasets by BBL (borough-block-lot) key
+- [x] Ingest PLUTO property data (Socrata `64uk-42ks`) — building class, units, sqft, lot size, zoning, year built
+- [x] Ingest HPD violations — all classes, count per building, breakout by class A/B/C
+- [x] Filter to Brooklyn (borough 3) and Queens (borough 4) by default
+- [x] Join datasets by BBL (borough-block-lot) key
 
 #### Building Intelligence
-- [ ] Show building class with full description
-- [ ] Auto-exclude coops (A8, C6, D4, H7) — filterable, not deleted
+- [x] Show building class with full description
+- [x] Auto-exclude coops (all 9 codes: A8, C6, C8, CC, D0, D4, DC, H7, R9) — filterable toggle
 - [ ] Flag vacant lots (V-class, Z-class)
 - [ ] Show construction type (frame vs. brick) from building class
-- [ ] Calculate violations per unit (total violations / unit count)
-- [ ] Breakout violation counts by class (A, B, C separately)
-- [ ] Show assessed value and estimated market value (using assessment ratios)
-- [ ] Add square footage from PLUTO
-- [ ] Show number of units from PLUTO
+- [x] Calculate violations per unit (open violations / unit count)
+- [x] Breakout violation counts by class (A, B, C separately)
+- [x] Show assessed value and estimated market value (using assessment ratios)
+- [x] Add square footage from PLUTO
+- [x] Show number of units from PLUTO
 
 #### Scoring System
-- [ ] AI-powered composite score weighing:
-  - Violations per unit (higher = more distressed = higher score)
-  - Building age (older = higher score)
-  - Property type / building class preference
-  - Lien status (active lien = signal of distress)
-  - Multi-family preference (more units = more value-add potential)
+- [x] Composite distress score (0-100) weighing:
+  - Active lien (+30 points)
+  - Violations per unit (+10 per viol/unit, capped at 40)
+  - Class C violations (+5 each, capped at 20)
+  - Class B violations (+2 each, capped at 10)
 - [ ] Score explanation for each property (why this score?)
 
 #### Interface
-- [ ] Secure web app with login (3-person team access)
-- [ ] Sortable/filterable data table with all fields
-- [ ] Chat-like natural language query interface ("show me properties in Crown Heights with 10+ violations per unit")
-- [ ] CSV export for offline analysis
-- [ ] Property detail view with all aggregated data
+- [x] Secure web app with login (Clerk auth + org-level `parcels` feature flag)
+- [x] Sortable/filterable data table with all fields
+- [x] Agent tools for natural language queries (`query_parcels`, `get_parcel_stats`)
+- [x] CSV export for offline analysis
+- [x] Expandable row detail view with all aggregated data
 
 #### Data Maintenance
 - [ ] Automated data refresh (at minimum weekly, ideally daily for violations)
-- [ ] Last-updated timestamps per data source
+- [x] Last-updated timestamps per data source (`plutoSyncedAt`, `liensSyncedAt`, `violationsSyncedAt`)
 
 ### Phase 2 — Enhanced Intelligence
 
