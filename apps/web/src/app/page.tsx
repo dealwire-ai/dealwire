@@ -53,16 +53,23 @@ export default function Home() {
           </div>
           <div className="flex items-center gap-4">
             {isSignedIn ? (
-              <Button
-                className="bg-zinc-800 hover:bg-zinc-700 text-white font-medium px-6"
-                onClick={() => {
-                  posthog.capture('cta_clicked', { cta_type: 'sign_out', location: 'header' });
-                  posthog.reset();
-                  signOut();
-                }}
-              >
-                Sign Out
-              </Button>
+              <>
+                <Link href="/dashboard" onClick={() => posthog.capture('cta_clicked', { cta_type: 'go_to_dashboard', location: 'header' })}>
+                  <Button className="bg-zinc-800 hover:bg-zinc-700 text-white font-medium px-6">
+                    Dashboard
+                  </Button>
+                </Link>
+                <Button
+                  className="bg-zinc-800 hover:bg-zinc-700 text-white font-medium px-6"
+                  onClick={() => {
+                    posthog.capture('cta_clicked', { cta_type: 'sign_out', location: 'header' });
+                    posthog.reset();
+                    signOut();
+                  }}
+                >
+                  Sign Out
+                </Button>
+              </>
             ) : (
               <Link href="/sign-in" onClick={() => posthog.capture('cta_clicked', { cta_type: 'sign_in', location: 'header' })}>
                 <Button className="bg-zinc-800 hover:bg-zinc-700 text-white font-medium px-6">
