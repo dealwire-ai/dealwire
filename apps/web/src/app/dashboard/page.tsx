@@ -19,6 +19,7 @@ import { TablePagination } from "@/components/table-pagination";
 import { TableSkeleton } from "@/components/table-skeleton";
 import { useApi } from "@/hooks/use-api";
 import { useTableState } from "@/hooks/use-table-state";
+import { useFeatureFlags } from "@/hooks/use-feature-flags";
 import { Chatbot } from "@/components/chat/chatbot";
 import posthog from "posthog-js";
 
@@ -83,6 +84,7 @@ export default function DashboardPage() {
   const { user } = useUser();
   const router = useRouter();
   const { apiCall } = useApi();
+  const { flags } = useFeatureFlags();
 
   const [deals, setDeals] = useState<Deal[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
@@ -258,16 +260,26 @@ export default function DashboardPage() {
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold">Dashboard</h1>
-          <a
-            href="/api/auth/signout"
-            onClick={() => {
-              posthog.capture("sign_out_clicked");
-              posthog.reset();
-            }}
-            className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-sm transition-colors"
-          >
-            Sign Out
-          </a>
+          <div className="flex items-center gap-3">
+            {flags.parcels && (
+              <a
+                href="/public-data/parcels"
+                className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-sm transition-colors"
+              >
+                NYC Parcels
+              </a>
+            )}
+            <a
+              href="/api/auth/signout"
+              onClick={() => {
+                posthog.capture("sign_out_clicked");
+                posthog.reset();
+              }}
+              className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-sm transition-colors"
+            >
+              Sign Out
+            </a>
+          </div>
         </div>
 
         <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6">
