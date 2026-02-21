@@ -263,25 +263,30 @@ export class NycIngestionService {
 
   /**
    * Ingest HPD violations and aggregate counts per parcel.
-   * Fetches all violations for target boroughs, aggregates in memory, then batch-updates.
+   * Queries HPD in batches by block+lot (since HPD has no single BBL field)
+   * to avoid fetching all 5M+ violations for a borough.
    */
   async ingestHpdViolations(boroughs: string[]): Promise<IngestionResult> {
     const start = Date.now();
     this.logger.log(`Ingesting HPD violations for boroughs: ${boroughs.join(', ')}`);
 
-    // Get BBLs we care about (parcels already in our DB)
+    // Get parcels we need to enrich — need borough, block, lot for HPD queries
     const existingParcels = await this.prisma.parcel.findMany({
       where: { borough: { in: boroughs } },
-      select: { bbl: true, unitsTotal: true },
+      select: { bbl: true, borough: true, block: true, lot: true, unitsTotal: true },
     });
-    const parcelMap = new Map(existingParcels.map((p) => [p.bbl, p.unitsTotal]));
 
-    if (parcelMap.size === 0) {
+    if (existingParcels.length === 0) {
       this.logger.log('No parcels to enrich with HPD data');
       return { source: 'hpd_violations', recordsProcessed: 0, recordsCreated: 0, recordsUpdated: 0, durationMs: Date.now() - start };
     }
 
-    // Aggregate violation counts in memory
+    this.logger.log(`Querying HPD violations for ${existingParcels.length} parcels`);
+
+    // Build a lookup from BBL to unitsTotal
+    const unitsMap = new Map(existingParcels.map((p) => [p.bbl, p.unitsTotal]));
+
+    // Aggregate violation counts by BBL
     const counts = new Map<string, {
       total: number;
       open: number;
@@ -290,52 +295,64 @@ export class NycIngestionService {
       classC: number;
     }>();
 
-    const boroughFilter = boroughs.map((b) => `boroid='${b}'`).join(' OR ');
-
     let totalFetched = 0;
-    for await (const page of this.soda.fetchAll(NYC_HPD_VIOLATIONS, {
-      $where: boroughFilter,
-      $select: 'boroid,block,lot,class,currentstatus',
-      $order: 'boroid,block,lot',
-    })) {
-      for (const record of page as Record<string, string>[]) {
-        const borough = record.boroid?.trim();
-        const block = record.block?.trim();
-        const lot = record.lot?.trim();
 
-        if (!borough || !block || !lot) continue;
+    // Group parcels by borough, then batch-query HPD by block+lot
+    for (const borough of boroughs) {
+      const boroughParcels = existingParcels.filter((p) => p.borough === borough);
+      if (boroughParcels.length === 0) continue;
 
-        const bbl = normalizeBbl(borough, block, lot);
+      // Batch into groups of 50 (HPD queries by block+lot pairs)
+      const batchSize = 50;
+      for (let i = 0; i < boroughParcels.length; i += batchSize) {
+        const batch = boroughParcels.slice(i, i + batchSize);
 
-        // Only aggregate for parcels we have
-        if (!parcelMap.has(bbl)) continue;
+        // Build HPD query: boroid='3' AND ((block='185' AND lot='41') OR (block='197' AND lot='16') OR ...)
+        // HPD uses unpadded block/lot
+        const pairFilter = batch
+          .map((p) => `(block='${parseInt(p.block)}' AND lot='${parseInt(p.lot)}')`)
+          .join(' OR ');
+        const whereClause = `boroid='${borough}' AND (${pairFilter})`;
 
-        if (!counts.has(bbl)) {
-          counts.set(bbl, { total: 0, open: 0, classA: 0, classB: 0, classC: 0 });
+        for await (const page of this.soda.fetchAll(NYC_HPD_VIOLATIONS, {
+          $where: whereClause,
+          $select: 'boroid,block,lot,class,currentstatus',
+        })) {
+          for (const record of page as Record<string, string>[]) {
+            const boroid = record.boroid?.trim();
+            const block = record.block?.trim();
+            const lot = record.lot?.trim();
+            if (!boroid || !block || !lot) continue;
+
+            const bbl = normalizeBbl(boroid, block, lot);
+
+            if (!counts.has(bbl)) {
+              counts.set(bbl, { total: 0, open: 0, classA: 0, classB: 0, classC: 0 });
+            }
+            const c = counts.get(bbl)!;
+            c.total++;
+
+            const status = (record.currentstatus || '').toUpperCase();
+            if (status !== 'CLOSE') c.open++;
+
+            const violClass = (record.class || '').toUpperCase();
+            if (violClass === 'A') c.classA++;
+            else if (violClass === 'B') c.classB++;
+            else if (violClass === 'C') c.classC++;
+          }
+          totalFetched += page.length;
         }
-        const c = counts.get(bbl)!;
 
-        c.total++;
-
-        const status = (record.currentstatus || '').toUpperCase();
-        if (status !== 'CLOSE') {
-          c.open++;
+        if ((i / batchSize) % 5 === 0) {
+          this.logger.log(`HPD progress: borough ${borough}, ${i + batch.length}/${boroughParcels.length} parcels queried, ${totalFetched} violations fetched`);
         }
-
-        const violClass = (record.class || '').toUpperCase();
-        if (violClass === 'A') c.classA++;
-        else if (violClass === 'B') c.classB++;
-        else if (violClass === 'C') c.classC++;
       }
-
-      totalFetched += page.length;
-      this.logger.debug(`HPD violations fetched: ${totalFetched} total`);
     }
 
     // Batch update parcels with aggregated violation counts
     let updated = 0;
     for (const [bbl, c] of counts) {
-      const unitsTotal = parcelMap.get(bbl);
+      const unitsTotal = unitsMap.get(bbl);
       const violationsPerUnit = unitsTotal && unitsTotal > 0
         ? Math.round((c.open / unitsTotal) * 100) / 100
         : null;
