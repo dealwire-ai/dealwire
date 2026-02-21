@@ -56,6 +56,56 @@ cd apps/api && npx prisma studio
 ```
 Opens a browser UI at `http://localhost:5555` for browsing/editing data.
 
+## Tax Lien / Parcel Data
+
+### Triggering Ingestion
+
+Ingestion is triggered via `POST /public-data/ingest`. The endpoint is async — it returns immediately and runs the pipeline in the background (~5 minutes for BK+QN).
+
+**Local (dev mode, no auth required):**
+```bash
+curl -X POST http://localhost:3001/public-data/ingest \
+  -H 'Content-Type: application/json' \
+  -d '{"boroughs": ["3", "4"]}'
+```
+
+**Production (requires Clerk JWT):**
+1. Sign in at `deals.frontstep.ai`
+2. Open browser console, run: `await window.Clerk.session.getToken()`
+3. Copy the token (expires in 60 seconds) and immediately run:
+```bash
+curl -X POST https://analyzer-api-production.up.railway.app/public-data/ingest \
+  -H 'Content-Type: application/json' \
+  -H 'Authorization: Bearer <TOKEN>' \
+  -d '{"boroughs": ["3", "4"]}'
+```
+
+The org must have the `parcels` feature flag enabled. Borough codes: 1=Manhattan, 2=Bronx, 3=Brooklyn, 4=Queens, 5=Staten Island.
+
+### Pipeline Stages
+
+1. **Tax liens** (~3K records, ~60s) — Fetches latest cycle from lien sale list, creates/updates `Parcel` rows
+2. **PLUTO enrichment** (~2.5K records, ~50s) — Enriches existing parcels with property data (building class, units, sqft, owner, assessed value)
+3. **HPD violations** (~100K violations, ~110s) — Aggregates violation counts per parcel (total, open, by class A/B/C)
+4. **Distress scoring** (~3K records, ~60s) — Computes 0-100 score based on lien status, violations per unit, class C violations
+
+### Parcel Queries
+```sql
+-- Count parcels by borough
+SELECT borough, COUNT(*) FROM "Parcel" GROUP BY borough;
+
+-- Average distress score by borough
+SELECT borough, ROUND(AVG("distressScore")::numeric, 1) as avg_score FROM "Parcel" GROUP BY borough;
+
+-- Top distressed parcels
+SELECT bbl, address, borough, "distressScore", "violationsOpen", "unitsTotal"
+FROM "Parcel" WHERE "distressScore" IS NOT NULL
+ORDER BY "distressScore" DESC LIMIT 20;
+
+-- Clear all parcel data (for re-ingestion)
+DELETE FROM "Parcel";
+```
+
 ## Troubleshooting
 
 1. **Testing email flow (E2E)**: Send a test deal email to a monitored Outlook inbox to trigger the full pipeline:
