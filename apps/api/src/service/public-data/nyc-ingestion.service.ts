@@ -205,9 +205,7 @@ export class NycIngestionService {
         const buildingClass = record.bldgclass || null;
         const unitsTotal = parseInt(record.unitstotal) || null;
 
-        await this.prisma.parcel.update({
-          where: { bbl },
-          data: {
+        const plutoData = {
             address: record.address || null,
             zipCode: record.zipcode || null,
             buildingClass,
@@ -225,8 +223,14 @@ export class NycIngestionService {
             estimatedMarketValue: estimateMarketValue(assessTotal, taxClass),
             isCoopExcluded: isCoopBuildingClass(buildingClass),
             plutoSyncedAt: new Date(),
-          },
+        };
+
+        // Use updateMany to gracefully handle BBLs that don't exist in our table
+        const result = await this.prisma.parcel.updateMany({
+          where: { bbl },
+          data: plutoData,
         });
+        if (result.count === 0) continue;
 
         processed++;
         updated++;
@@ -326,7 +330,7 @@ export class NycIngestionService {
         ? Math.round((c.open / unitsTotal) * 100) / 100
         : null;
 
-      await this.prisma.parcel.update({
+      await this.prisma.parcel.updateMany({
         where: { bbl },
         data: {
           violationsTotal: c.total,
