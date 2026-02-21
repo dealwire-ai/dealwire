@@ -5,7 +5,9 @@ import { z } from 'zod';
 import { PrismaService } from '../prisma/prisma.service';
 import { ScreeningPreferencesService } from '../preferences/screening-preferences.service';
 import { BrokerIntelligenceService } from '../deal/broker-intelligence.service';
+import { ParcelQueryService } from '../public-data/parcel-query.service';
 import { aiConfig } from '../../config/ai.config';
+import { BOROUGH_NAMES } from '../public-data/nyc-utils';
 
 const SYSTEM_PROMPT = `You are an AI acquisitions analyst for a real estate investment firm. You monitor their deal flow, track broker relationships, and help refine screening criteria. You communicate via email replies and web chat.
 
@@ -43,6 +45,12 @@ TOOL SELECTION:
 - Broker notes/tags → update_contact_notes/get_contact_notes/update_contact_tags
 - Generic deal/contact/asset search → get_deals/get_contacts/get_assets
 
+PUBLIC DATA (NYC PARCELS):
+- Search distressed parcels → query_parcels (filter by borough, score, liens, address)
+- Aggregate parcel stats → get_parcel_stats (counts, avg scores, by borough)
+- Parcels are public property records identified by BBL, enriched with PLUTO data, HPD violations, and tax lien status
+- Borough codes: 1=Manhattan, 2=Bronx, 3=Brooklyn, 4=Queens, 5=Staten Island
+
 Never fetch all data by paginating through everything. Use targeted queries.
 Respond briefly and directly. No markdown formatting, plain text.`;
 
@@ -59,6 +67,7 @@ export class AnalyzerAgentService {
     private readonly prisma: PrismaService,
     private readonly screeningPreferences: ScreeningPreferencesService,
     private readonly brokerIntelligence: BrokerIntelligenceService,
+    private readonly parcelQuery: ParcelQueryService,
   ) {}
 
   /**
@@ -584,6 +593,82 @@ export class AnalyzerAgentService {
               criteria: b.description,
               decision: b.isPass ? 'YES' : 'NO',
               action: b.action,
+            })),
+          };
+        }),
+      }),
+
+      // ==========================================
+      // PUBLIC DATA — NYC Parcel Tools
+      // ==========================================
+
+      query_parcels: tool({
+        description: 'Search NYC parcels from public data. Filter by borough, distress score, lien status, address, building class. Use for "show me distressed parcels in Brooklyn", "top 10 parcels by score", "parcels with liens in Queens".',
+        parameters: z.object({
+          boroughs: z.array(z.string()).optional().describe('Borough codes: 1=Manhattan, 2=Bronx, 3=Brooklyn, 4=Queens, 5=SI'),
+          minDistressScore: z.number().optional().describe('Minimum distress score (0-100)'),
+          hasActiveLien: z.boolean().optional().describe('Filter to parcels with active tax liens'),
+          excludeCoops: z.boolean().optional().default(true).describe('Exclude co-op buildings'),
+          search: z.string().optional().describe('Address or owner name search'),
+          minUnits: z.number().optional(),
+          maxUnits: z.number().optional(),
+          limit: z.number().optional().default(20),
+          sort: z.string().optional().default('distressScore'),
+          order: z.enum(['asc', 'desc']).optional().default('desc'),
+        }),
+        execute: async (params) => this.safeTool('query_parcels', async () => {
+          const result = await this.parcelQuery.queryParcels({
+            boroughs: params.boroughs,
+            minDistressScore: params.minDistressScore,
+            hasActiveLien: params.hasActiveLien,
+            excludeCoops: params.excludeCoops,
+            search: params.search,
+            minUnits: params.minUnits,
+            maxUnits: params.maxUnits,
+            limit: params.limit,
+            sort: params.sort,
+            order: params.order,
+            page: 1,
+          });
+          return {
+            parcels: result.data.map((p) => ({
+              bbl: p.bbl,
+              address: p.address,
+              borough: BOROUGH_NAMES[p.borough] || p.borough,
+              distressScore: p.distressScore,
+              buildingClass: p.buildingClass,
+              unitsTotal: p.unitsTotal,
+              buildingArea: p.buildingArea,
+              estimatedMarketValue: p.estimatedMarketValue,
+              yearBuilt: p.yearBuilt,
+              ownerName: p.ownerName,
+              hasActiveLien: p.hasActiveLien,
+              lienCycle: p.lienCycle,
+              violationsOpen: p.violationsOpen,
+              violationsClassC: p.violationsClassC,
+              violationsPerUnit: p.violationsPerUnit,
+            })),
+            total: result.pagination.total,
+          };
+        }),
+      }),
+
+      get_parcel_stats: tool({
+        description: 'Get aggregate statistics about NYC parcels. Use for "how many parcels have liens?", "average distress score in Brooklyn", "parcel counts by borough".',
+        parameters: z.object({
+          boroughs: z.array(z.string()).optional().describe('Borough codes to filter'),
+          excludeCoops: z.boolean().optional().default(true),
+        }),
+        execute: async (params) => this.safeTool('get_parcel_stats', async () => {
+          const stats = await this.parcelQuery.getStats({
+            boroughs: params.boroughs,
+            excludeCoops: params.excludeCoops,
+          });
+          return {
+            ...stats,
+            byBorough: stats.byBorough.map((b) => ({
+              ...b,
+              boroughName: BOROUGH_NAMES[b.borough] || b.borough,
             })),
           };
         }),
