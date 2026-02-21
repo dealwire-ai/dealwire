@@ -65,12 +65,16 @@ export class PublicDataController {
 
     this.logger.log(`Triggering ingestion for boroughs: ${boroughs.map((b) => BOROUGH_NAMES[b]).join(', ')}`);
 
-    const results = await this.ingestion.ingestAll(boroughs);
+    // Fire-and-forget — ingestion runs in the background
+    this.ingestion.ingestAll(boroughs).then((results) => {
+      this.logger.log(`Ingestion complete: ${JSON.stringify(results)}`);
+    }).catch((err) => {
+      this.logger.error(`Ingestion failed: ${err.message}`, err.stack);
+    });
 
     return {
-      message: 'Ingestion complete',
+      message: 'Ingestion started',
       boroughs: boroughs.map((b) => ({ code: b, name: BOROUGH_NAMES[b] })),
-      results,
     };
   }
 
