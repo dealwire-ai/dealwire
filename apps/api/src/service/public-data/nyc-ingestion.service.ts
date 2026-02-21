@@ -94,11 +94,26 @@ export class NycIngestionService {
     let created = 0;
     let updated = 0;
 
-    // Build borough filter for SODA query
+    // First, find the most recent lien cycle date (the dataset has years of history)
+    const [latestRecord] = await this.soda.fetch(NYC_TAX_LIENS, {
+      $select: 'month',
+      $order: 'month DESC',
+      $limit: 1,
+    }) as Record<string, string>[];
+
+    if (!latestRecord?.month) {
+      this.logger.warn('No tax lien records found');
+      return { source: 'tax_liens', recordsProcessed: 0, recordsCreated: 0, recordsUpdated: 0, durationMs: Date.now() - start };
+    }
+
+    const latestMonth = latestRecord.month;
+    this.logger.log(`Latest tax lien cycle: ${latestMonth}`);
+
+    // Build borough filter for SODA query — only fetch the most recent cycle
     const boroughFilter = boroughs.map((b) => `borough='${b}'`).join(' OR ');
 
     for await (const page of this.soda.fetchAll(NYC_TAX_LIENS, {
-      $where: boroughFilter,
+      $where: `month='${latestMonth}' AND (${boroughFilter})`,
       $order: 'borough,block,lot',
     })) {
       for (const record of page as Record<string, string>[]) {
@@ -110,6 +125,8 @@ export class NycIngestionService {
 
         const bbl = normalizeBbl(borough, block, lot);
 
+        const address = [record.house_number, record.street_name].filter(Boolean).join(' ') || null;
+
         const result = await this.prisma.parcel.upsert({
           where: { bbl },
           create: {
@@ -117,6 +134,10 @@ export class NycIngestionService {
             borough,
             block: block.padStart(5, '0'),
             lot: lot.padStart(4, '0'),
+            address,
+            zipCode: record.zip_code || null,
+            buildingClass: record.building_class || null,
+            taxClass: record.tax_class_code || null,
             hasActiveLien: true,
             lienCycle: record.cycle || null,
             waterDebtOnly: (record.water_debt_only || '').toLowerCase() === 'yes',
