@@ -1,0 +1,463 @@
+# Tax Lien Data Platform — Product & Domain Deep Dive
+
+## Overview
+
+A new platform capability for Analyzer: an AI-powered tax lien analysis and distressed property intelligence tool, starting with Brooklyn & Queens (NYC) and designed to expand to additional jurisdictions (Broward County FL next, then nationwide).
+
+**Client:** Daniel Gabay (investor), David Shorenstein (GP), Brett Shorenstein
+**Engagement:** $5,000 initial build + $500/month ongoing + 0.5% gross equity on properties purchased through platform data
+**Timeline:** 6-8 weeks for initial build (Brooklyn & Queens)
+
+### What We're Building
+
+A secure web application that aggregates public tax lien data, property records, violations, zoning, and valuations into a single queryable interface with AI-powered scoring, natural language chat, and CSV export. The platform surfaces distressed property investment opportunities by combining signals that are currently scattered across dozens of disconnected government portals.
+
+### Source Documents
+
+| Document | Location |
+|----------|----------|
+| Meeting notes (2/4, 2/12) | [Google Drive](https://drive.google.com/drive/folders/1CzNH0jYqpdi4GtP5XPu1z_1dVAq8G0ty) |
+| Statement of Work | Google Drive (same folder) |
+| Broward County notes | Google Drive (same folder) |
+| Daniel's data feedback | `DG Comments.xlsx` in Google Drive |
+| Public Data Platform arch | [`docs/PUBLIC_DATA_PLATFORM.md`](PUBLIC_DATA_PLATFORM.md) |
+
+---
+
+## The Problem
+
+### Why Tax Lien Investing is Hard
+
+Tax lien investing requires identifying distressed properties before other investors, evaluating whether the underlying property is worth the risk, and acting fast. Today this is almost entirely manual:
+
+1. **Data is fragmented** — Tax lien lists, property characteristics (PLUTO), code violations (HPD), comparable sales, and ownership records live in separate databases with different formats, APIs, and update schedules.
+
+2. **Analysis is labor-intensive** — An investor reviewing a lien sale list has to manually cross-reference each property against 4-6 data sources to determine if it's worth pursuing. For a list of 18,000+ properties (the size of NYC's 2025 lien sale), this is impossible without automation.
+
+3. **Context is missing** — A lien amount alone tells you nothing. Is the property a frame house or brick? How many units? Is it a coop (worthless for this strategy)? Are there active code violations suggesting physical distress? What's it actually worth vs. the assessed value? Each of these questions requires a different lookup.
+
+4. **Speed matters** — Tax lien sales are competitive. The 2025 NYC sale included ~18,000 properties and $163M in bonds (NYCTL 2025-A Trust). Investors who can identify the best opportunities first — and verify them — have a significant edge.
+
+5. **Lis pendens alerts create time-sensitive opportunity** — When a lis pendens (pre-foreclosure notice) is filed, there's a narrow window to contact the owner before other investors. Daniel currently does this manually via PropertyShark. A 5-minute advantage on lis pendens alerts could mean winning or losing a deal.
+
+### What Daniel Does Today
+
+- Subscribes to PropertyShark (~$500/month) for lis pendens alerts and property lookups
+- Manually searches NYC Open Data for tax lien sale lists
+- Cross-references properties by hand against PLUTO data, HPD violations, and comps
+- Exports to Excel and adds his own scoring columns
+- Wants violations per unit, building class filtering (remove coops), and property valuations — all manual today
+
+---
+
+## Domain Knowledge
+
+### How NYC Tax Lien Sales Work
+
+NYC sells tax liens on properties with outstanding tax, water, or sewer debt. The city doesn't sell individual liens to investors directly (unlike Florida). Instead:
+
+1. **The city publishes a lien sale list** — Properties with delinquent taxes/water charges appear on publicly available lists (Socrata dataset `9rz4-mjek`).
+
+2. **The NYCTL Trust buys the liens in bulk** — The city creates a Delaware statutory trust (NYCTL) that purchases liens at ~73% of the lien pool's total value, adds a 5% surcharge + ~$200 admin fee per lien, then issues AAA-rated bonds to institutional investors via J.P. Morgan. The 2025 trust (NYCTL 2025-A) issued $163.8M in bonds to J.P. Morgan + $8.6M to the city ($172.45M total). A private servicer collects payments; bondholders get paid from collections, residual goes to the city.
+
+3. **The trust collects** — Property owners must pay back the delinquent amount plus interest to redeem the lien. Interest rates: **18% annual (compounded daily)** for properties assessed over $250K, **5% annual (compounded daily)** for properties assessed at $250K or less. A 2016 analysis found interest and fees increased median debt by 65%, and after 18 months, total redemption cost was often double the original debt. If they don't pay, the trust can initiate judicial foreclosure.
+
+4. **Individual investors participate indirectly** — The opportunity for investors like Daniel isn't buying the liens themselves (that's institutional). It's identifying distressed properties on the lien sale list that may be acquisition opportunities — properties where the owner can't pay taxes, might be willing to sell at a discount, or are heading toward foreclosure.
+
+**Eligibility thresholds (2025):**
+- Tax Class 1 (1-3 family): $3,000+ in water/sewer charges outstanding 1+ year
+- Tax Class 2 (multi-family, condos): $1,000+ outstanding 1+ year
+- Tax Class 4 (commercial): $1,000+ outstanding 1+ year
+- HDFC rentals: $5,000+ outstanding 2+ years
+- Exempt: single-family homes with SCHE/DHE/veteran exemptions, HDFC condos/coops
+
+**Recent timeline:**
+
+| Year | Event |
+|------|-------|
+| May 2020 | Lien sale postponed due to COVID |
+| 2020-2024 | Extended moratorium — no lien sales held |
+| July 2024 | Local Law 82 (Home Preservation & Debt Resolution Reform Act) signed |
+| Feb 2025 | 90-day notice list published (~30,000 liens) |
+| June 3, 2025 | 2025 lien sale held — first since COVID. 85% of the 30,000 liens removed before sale. |
+| Nov 2025 | City Council advances land bank legislation (4 bills) to replace private trust model |
+| Jan 2026 | Mayor Adams vetoes land bank bills |
+| Feb 2026 | The Real Deal reports on pending reform — land bank would create a NYC Land Trust to acquire liens, transfer distressed properties to partners for income-restricted housing |
+
+**2024 reform impacts (Local Law 82):**
+- Easy Exit Program: owner-occupied 1-3 unit homes can delay inclusion up to 1 year if income-qualified
+- Foreclosure protection: can't foreclose on owner-occupied 1-3 unit properties until lien value reaches 15% of property value OR $70K (whichever is less)
+- Enhanced notification requirements
+- $2M allocated for outreach via Center for NYC Neighborhoods
+- **Commercial properties receive no special deferrals or protections** — this is where the investment opportunity remains strongest
+
+### Investment Strategy (How Daniel Makes Money)
+
+Daniel's strategy is NOT buying liens directly (that's institutional in NYC). His strategy uses the lien sale list and other distress signals to identify **acquisition opportunities**:
+
+1. **Pre-foreclosure direct purchase** — Identify properties on the lien sale list or with lis pendens filings. Contact the owner, who may be motivated to sell at 20-40% below market to avoid foreclosure and preserve credit.
+
+2. **Distressed property value-add** — Find properties with high violations per unit (indicating neglected maintenance), acquire at distress pricing, invest in rehabilitation, and either hold for cash flow or sell at improved value.
+
+3. **Vacant lot development** — Identify vacant lots (V-class, Z-class) with tax liens that indicate an absentee or financially distressed owner. Potential for below-market acquisition and development.
+
+4. **Data-driven screening** — Use the scoring system to filter the ~18,000 properties on the lien sale list down to the 50-100 best opportunities matching his specific criteria (borough, building type, unit count, distress level).
+
+The platform's value is turning a haystack of 18,000+ properties into a ranked shortlist of actionable opportunities, enriched with data that would take weeks to assemble manually.
+
+### How Florida Tax Liens Work (Broward County)
+
+Florida is both a tax lien AND tax deed state, with a different process than NYC:
+
+1. **Tax Certificate Sale** — If an owner doesn't pay property taxes, the county auctions a tax certificate (lien) in June. Unlike NYC's bulk trust model, individual investors buy individual certificates.
+
+2. **Bid-down interest** — Bidding starts at 18% annual interest and bidders compete by accepting lower rates. The lowest bidder wins the certificate.
+
+3. **Redemption period** — The property owner has 2 years to pay back taxes + interest. If they redeem, the certificate holder earns their interest rate. ~97% of certificates redeem.
+
+4. **Tax Deed Sale** — If not redeemed after 2 years, the certificate holder can apply to force a public auction of the property (tax deed sale). The property sells to the highest bidder, and the certificate holder gets paid from the proceeds.
+
+**Broward County data access:**
+- SFTP server: `crpublic@BCFTP.Broward.org` — updated every weekday
+- Contains official records index data: document recordings (liens, deeds, mortgages, foreclosures)
+- Tells you: recording date/time, property, event type, ownership transfers, creditor claims, IRS involvement
+- Does NOT include: property valuations, lien balances/payoffs, code violations (need other sources)
+- Export file layout documentation: [ExportFilesLayout.pdf](https://www.broward.org/RecordsTaxesTreasury/Records/Documents/ExportFilesLayout.pdf)
+- 10 days of free FTP access; bulk data via records@broward.org or 954-831-4000
+
+### NYC Property Data Signals
+
+#### HPD Violations (Distress Indicator)
+
+NYC Housing Preservation & Development (HPD) issues violations in classes:
+
+| Class | Severity | Examples | Correction Window |
+|-------|----------|----------|-------------------|
+| **A** | Non-hazardous | Missing peephole, improper toilet seat | 90 days |
+| **B** | Hazardous | Broken smoke detector, damaged stairs | 30 days |
+| **C** | Immediately hazardous | No heat, rodents, lead paint, mold, no hot water | 24 hours |
+
+**Why violations per unit matters:** A building with 50 violations and 200 units is probably fine. A building with 50 violations and 3 units is in severe distress. Daniel's key insight (from his spreadsheet comments) is that **violations per unit** is the real distress signal, not raw violation count.
+
+HPD uses open violations as a key input for identifying "distressed buildings" and enrolling them in the Alternative Enforcement Program (AEP). The platform should mirror this logic.
+
+**Data sources:**
+- **Open HPD Violations** (Socrata `csn4-vhvf`) — currently open violations, updated daily
+- **Housing Maintenance Code Violations** (Socrata `wvxf-dwi5`) — full history including resolved
+- **NYCDB** ([github.com/nycdb/nycdb](https://github.com/nycdb/nycdb)) — open-source aggregator of HPD violations, litigations, registrations, complaints, charges, repair/vacate orders, and AEP data
+
+#### Building Classes (NYC DOF)
+
+NYC Department of Finance classifies every property. Key codes for tax lien analysis:
+
+| Code | Description | Relevance |
+|------|-------------|-----------|
+| **A0** | Cape Cod | Single family |
+| **A1** | Two stories, detached | Single family |
+| **A5** | Attached or semi-detached | Single family |
+| **A8** | Bungalow colony / coop | **EXCLUDE — Coop** |
+| **B1** | Two family, brick | Two family |
+| **B2** | Two family, frame (wood) | Two family — Daniel notes frame = less desirable |
+| **B3** | Two family, converted from one family | Two family |
+| **C0** | Three families | Walk-up apartment |
+| **C2** | Five-six family walk-up | Walk-up apartment |
+| **C5** | Converted dwelling or rooming house | Walk-up apartment |
+| **C6** | Walk-up cooperative | **EXCLUDE — Coop** |
+| **D4** | Elevator cooperative | **EXCLUDE — Coop** |
+| **H7** | Hotel (coop) | **EXCLUDE — Coop** |
+| **K4** | Store building (1 story, commercial) | Commercial |
+| **S1** | Primarily 1 family with store | Mixed use |
+| **S2** | Primarily 2 family with store | Mixed use |
+| **V1** | Vacant land (zoned residential) | Vacant lot |
+| **Z7** | Vacant land (zoned commercial) | Vacant lot |
+
+**Official reference:** [NYC DOF Building Classification Codes](https://www.nyc.gov/assets/finance/jump/hlpbldgcode.html)
+
+**Complete coop building class codes (all should be excludable):**
+
+| Code | Description |
+|------|-------------|
+| A8 | Bungalow colony, cooperatively owned land |
+| C6 | Walk-up cooperative |
+| C8 | Walk-up co-op, conversion from loft/warehouse |
+| CC | Walk-up co-op apt, less than 11 units |
+| D0 | Elevator co-op, conversion from loft/warehouse |
+| D4 | Elevator cooperative |
+| DC | Elevator co-op apt, less than 11 units |
+| H7 | Apartment hotel, cooperatively owned |
+| R9 | Co-op within a condominium |
+
+Daniel's initial filter (A8, C6, D4, H7) covers the main ones, but the platform should exclude all 9 codes.
+
+**Daniel's filtering rules:**
+- Always exclude coops (all codes above)
+- Flag frame houses (B2 with frame construction) — less desirable than brick
+- Flag vacant lots (V-class, Z-class) — different investment thesis
+- Show building class prominently to enable quick visual filtering
+
+#### Property Valuations
+
+NYC assessed values are NOT market values. The assessment ratios are:
+
+| Tax Class | Description | Assessment Ratio | Cap |
+|-----------|-------------|-----------------|-----|
+| 1 | 1-3 family residential | 6% of market value | 6%/year, 20%/5yr |
+| 2 | Multi-family, condos, coops | 45% of market value | 8%/year, 30%/5yr (10 units or fewer) |
+| 3 | Utility properties | 45% | N/A |
+| 4 | Commercial/industrial | 45% | Phase-in over 5 years |
+
+**To estimate market value from assessed value:**
+- Class 1: Assessed Value / 0.06 = rough market value
+- Class 2/3/4: Assessed Value / 0.45 = rough market value
+
+This is a rough approximation. For real comps, we need:
+
+| Source | What It Provides | Cost | Notes |
+|--------|-----------------|------|-------|
+| **Property Shark** | Comps, lis pendens, owner data, foreclosures | ~$500/month | Daniel has a login (2 simultaneous users). Best for NYC. |
+| **ATTOM API** | Nationwide AVM, tax, deed, foreclosure data | ~$500+/month | 158M+ properties, 9,000 attributes per property. AVM includes confidence score. |
+| **NYC PLUTO** | Assessed values, building characteristics | Free (Socrata) | 90+ fields per lot but no market comps |
+| **NYC Property Valuation dataset** | Assessed/market values, exemptions | Free (Socrata `8y4t-faws`) | Annual DOF valuations |
+| **ACRIS** | Deed transfers with sale prices | Free (Socrata) | Historical transactions — build your own comps |
+
+### Lis Pendens (Pre-Foreclosure Alerts)
+
+A lis pendens is a legal filing that signals the beginning of foreclosure proceedings. It's recorded at the county level (ACRIS in NYC) when a lender files a foreclosure action.
+
+**Why this matters for Daniel:**
+- A lis pendens is the earliest public signal that a property owner is in financial distress
+- There's a 5-minute competitive advantage in being the first to contact the owner
+- Daniel currently subscribes to PropertyShark for lis pendens alerts — gets notifications within 24-48 hours of filing
+- He wants **same-day alerts via text/email** with: owner name + phone, property type + photo, lien amount
+
+**Data sources in NYC:**
+- **ACRIS** (primary): Real Property Master (Socrata `bnx9-e6tj`) — document type codes for lis pendens include `LP` and related filings. Cross-reference with Real Property Legals (`8h5j-fqxa`) for BBL linkage and Real Property Parties (`636b-3b5g`) for owner names. Bulk download available via [github.com/fitnr/acris-download](https://github.com/fitnr/acris-download) (requires 10GB+ disk space).
+- **PropertyShark**: Pre-foreclosure listings updated within 24-48 hours of filing, includes lien amount, owner name/address, title history
+- **CourtAlert**: Real-time lis pendens filing alert service for investors/attorneys
+- **NYLisPendens.com**: Dedicated lis pendens listing service for NY
+
+**NYC foreclosure timeline:** New York is a judicial foreclosure state — all foreclosures must go through court.
+
+| Scenario | Timeline |
+|----------|----------|
+| Uncontested (owner doesn't respond) | ~6 months minimum |
+| Typical contested foreclosure | 12-18 months |
+| Average from first missed payment to sale | ~445 days (15 months) |
+| Complex cases with multiple defenses | 2-4+ years |
+
+This extended window (often 12-18+ months) creates opportunity for direct outreach — owners may sell at 20-40% below market to avoid the credit impact of foreclosure.
+
+---
+
+## Competitive Landscape
+
+| Platform | Focus | Strengths | Gaps We Fill |
+|----------|-------|-----------|-------------|
+| **PropertyShark** | NYC property intelligence | Best NYC data, lis pendens, comps, 100% NYC coverage | Manual lookups only, no AI scoring, no aggregated lien analysis, expensive (~$500/mo) |
+| **Reonomy** (Altus Group) | CRE property intelligence | 50M+ commercial properties, LLC piercing, predictive scoring | Enterprise pricing, not focused on tax lien investing workflow |
+| **Tax Sale Resources** | Tax lien/deed auction research | Nationwide sale data, portfolio management, nationwide coverage | No property intelligence overlay, no AI, no violations/distress data |
+| **FastLien** | Tax lien sale list research | Clean UI for sale lists, county-by-county access | Limited data enrichment, no scoring, no alerts |
+| **GoliathData** | Real estate prospecting | AI-powered, property data with prospecting tools | General-purpose, not specialized for tax lien/distress analysis |
+| **ATTOM API** | Raw property data API | 158M properties, AVM, tax, deed data | Raw data only — no UI, no scoring, no workflow, requires engineering |
+
+### Where We Win
+
+1. **Aggregation** — Nobody combines tax lien lists + PLUTO + HPD violations + ACRIS + valuations into a single scored view. That's the product.
+2. **AI scoring** — Weighted scoring based on violations per unit, building age, property type, lien status, and building class. Not just data — intelligence.
+3. **Natural language interface** — "Show me brick multi-family buildings in Brooklyn with more than 5 violations per unit and a tax lien" → instant results.
+4. **Lis pendens alerts** — Same-day push notifications with owner contact info and property details. Faster than PropertyShark's 24-48 hours.
+5. **Custom for the workflow** — Built for Daniel's actual investment process, not a general-purpose tool adapted for it.
+
+---
+
+## Feature Requirements
+
+### MVP (Phase 1 — Brooklyn & Queens)
+
+Based on SoW deliverables, meeting notes, and Daniel's spreadsheet feedback:
+
+#### Data Aggregation
+- [ ] Ingest NYC Tax Lien Sale Lists (Socrata `9rz4-mjek`)
+- [ ] Ingest Property Charges Balance — outstanding balances (Socrata `scjx-j6np`)
+- [ ] Ingest PLUTO property data (Socrata `64uk-42ks` or ArcGIS endpoint) — building class, units, sqft, lot size, zoning, year built
+- [ ] Ingest HPD violations — all classes, count per building, breakout by class A/B/C
+- [ ] Filter to Brooklyn (borough 3) and Queens (borough 4) only
+- [ ] Join datasets by BBL (borough-block-lot) key
+
+#### Building Intelligence
+- [ ] Show building class with full description
+- [ ] Auto-exclude coops (A8, C6, D4, H7) — filterable, not deleted
+- [ ] Flag vacant lots (V-class, Z-class)
+- [ ] Show construction type (frame vs. brick) from building class
+- [ ] Calculate violations per unit (total violations / unit count)
+- [ ] Breakout violation counts by class (A, B, C separately)
+- [ ] Show assessed value and estimated market value (using assessment ratios)
+- [ ] Add square footage from PLUTO
+- [ ] Show number of units from PLUTO
+
+#### Scoring System
+- [ ] AI-powered composite score weighing:
+  - Violations per unit (higher = more distressed = higher score)
+  - Building age (older = higher score)
+  - Property type / building class preference
+  - Lien status (active lien = signal of distress)
+  - Multi-family preference (more units = more value-add potential)
+- [ ] Score explanation for each property (why this score?)
+
+#### Interface
+- [ ] Secure web app with login (3-person team access)
+- [ ] Sortable/filterable data table with all fields
+- [ ] Chat-like natural language query interface ("show me properties in Crown Heights with 10+ violations per unit")
+- [ ] CSV export for offline analysis
+- [ ] Property detail view with all aggregated data
+
+#### Data Maintenance
+- [ ] Automated data refresh (at minimum weekly, ideally daily for violations)
+- [ ] Last-updated timestamps per data source
+
+### Phase 2 — Enhanced Intelligence
+
+- [ ] **Property valuations via comps** — Integrate Property Shark API (Daniel's login) or ATTOM API for actual market values and comparable sales
+- [ ] **ACRIS integration** — Deed transfers, recorded liens (federal, state, mechanic's liens), lis pendens filings
+- [ ] **Lis pendens alert system** — Daily check of ACRIS for new lis pendens filings in target boroughs; push notification via text/email with:
+  - Property owner name and phone number
+  - Property type and photo (street view)
+  - Lien amount
+  - Property details (units, building class, violations)
+- [ ] **Expand to all NYC boroughs** — Same data pipeline, different borough filter parameter
+- [ ] **Owner contact lookup** — Cross-reference ACRIS parties with public records for phone/email
+
+### Phase 3 — Multi-Jurisdiction
+
+- [ ] **Broward County FL** — Ingest SFTP data from `BCFTP.Broward.org` (official records index: liens, deeds, mortgages, foreclosures). Supplement with county property appraiser data for valuations.
+- [ ] **Adapter pattern reuse** — Each jurisdiction = new source config, not new engineering (see `PUBLIC_DATA_PLATFORM.md` architecture)
+- [ ] **Florida tax certificate sale lists** — Ingest county tax certificate auction data for pre-sale analysis
+
+---
+
+## Architecture Notes
+
+### Relationship to Existing Analyzer Infrastructure
+
+This platform should be built within the Analyzer monorepo, leveraging existing infrastructure:
+
+| Existing | Reuse For Tax Lien Platform |
+|----------|---------------------------|
+| NestJS API (`apps/api`) | Add data ingestion endpoints, property query APIs, alert scheduling |
+| Next.js frontend (`apps/web`) | Property table, chat interface, detail views |
+| Prisma + PostgreSQL (Supabase) | Property data schema, raw ingestion tables |
+| OpenAI integration | Scoring engine, chat interface, natural language queries |
+| Clerk auth | User access control (Daniel's 3-person team) |
+| SQS pipeline | Async data ingestion jobs |
+| S3 | Cache downloaded datasets, store exported CSVs |
+
+### Key Data Pipeline
+
+```
+NYC Open Data (SODA API)
+├── Tax Lien Sale Lists (9rz4-mjek)
+├── Property Charges Balance (scjx-j6np)
+├── PLUTO (64uk-42ks)
+├── HPD Violations
+├── ACRIS Master/Legals/Parties (Phase 2)
+└── Property Valuation (8y4t-faws)
+         │
+         ▼
+    SodaAdapter (generic)
+         │
+         ▼
+    Field Mapping + Normalization
+    (borough, block, lot → canonical BBL key)
+         │
+         ▼
+    ┌─────────────────┐
+    │ Raw Storage      │  ← Append-only JSONB, never modify
+    │ (raw_ingestion)  │
+    └────────┬────────┘
+             │
+             ▼
+    ┌─────────────────┐
+    │ Canonical Tables │  ← Typed columns, queryable
+    │ property         │
+    │ property_tax_lien│
+    │ property_violation│
+    │ property_assessment│
+    └────────┬────────┘
+             │
+             ▼
+    ┌─────────────────┐
+    │ Scoring Engine   │  ← AI-weighted composite score
+    │ (per property)   │
+    └────────┬────────┘
+             │
+             ▼
+    ┌─────────────────┐
+    │ API + Frontend   │  ← Table view, chat, export
+    └─────────────────┘
+```
+
+### BBL (Borough-Block-Lot) as Primary Key
+
+All NYC property data joins on BBL — a 10-digit identifier:
+- Borough (1 digit): 1=Manhattan, 2=Bronx, 3=Brooklyn, 4=Queens, 5=Staten Island
+- Block (5 digits, zero-padded)
+- Lot (4 digits, zero-padded)
+
+Example: Borough 3, Block 8026, Lot 42 → BBL `3080260042`
+
+Every dataset uses BBL in some form but with different field names and formats. The normalization layer must handle this cleanly.
+
+---
+
+## Commercial Terms (from SoW)
+
+| Milestone | Description | Hours | Payment |
+|-----------|-------------|-------|---------|
+| Kickoff | Project initiation, API access setup, data pipeline architecture | 10 | $1,500 |
+| Data Validated | Tax lien, violations, property, valuation data aggregated/cleaned/validated | 20 | $1,500 |
+| Platform Live | Secure web app with AI query interface, scoring, full onboarding | 30 | $2,000 |
+| **Total** | | **60** | **$5,000** |
+
+**Ongoing:** $500/month for hosting, data maintenance, AI query functionality
+**Equity:** 0.5% gross ownership equity in any property purchased through platform data
+**Pass-through costs:** Hosting ~$150/mo, AI/LLM ~$100/mo, Property data APIs ~$500/mo (ATTOM, if used)
+
+---
+
+## Open Questions
+
+1. **Property Shark API access** — Daniel offered login credentials (2 simultaneous users). Is there an API, or is it web-only? If web-only, we'd need scraping or ATTOM as alternative for valuations/comps.
+
+2. **ATTOM API budget** — Starts at ~$500/month. Is this within Daniel/David's budget for property data APIs? It would give us nationwide coverage + AVM valuations.
+
+3. **Lis pendens alert delivery** — Text (SMS) vs email vs push notification? Daniel wants text/email. Need to choose a provider (Twilio for SMS, existing Resend for email?).
+
+4. **Scoring model weights** — Initial scoring in the demo weighted violations per unit, building age, property type, and lien status. Need Daniel to validate/adjust weights based on his investment criteria.
+
+5. **How does this relate to deal screening?** — When a property surfaces through this platform, should it feed into Analyzer's deal pipeline? Could the lis pendens alert trigger a "deal" in the main system?
+
+6. **Multi-tenant or single-tenant?** — Is this initially just for Daniel's team (single-tenant), or should we architect for multiple clients from the start? The SoW suggests a dedicated 3-person team.
+
+7. **Broward County timeline** — When does Daniel want to expand to Florida? After NYC is validated, or in parallel?
+
+8. **Regulatory risk** — NYC is actively reforming/replacing the lien sale system (land bank proposals, Local Law 82 protections). How does this affect the platform's value if the lien sale process changes? Note: commercial properties are unaffected by current reforms, and the underlying distress signals (violations, delinquencies, lis pendens) remain valuable regardless of lien sale mechanics.
+
+---
+
+## NYC Open Data Quick Reference
+
+All freely accessible datasets for the MVP:
+
+| Dataset | Socrata ID | Update Frequency | Key Fields |
+|---------|-----------|------------------|------------|
+| Tax Lien Sale Lists | `9rz4-mjek` | Annual (when sale occurs) | borough, block, lot, tax_class_code, building_class, zip_code |
+| Property Charges Balance | `scjx-j6np` | Varies | parid (BBL), sum_liab, sum_coll, sum_bal, due_date, taxyear |
+| PLUTO | `64uk-42ks` | Annual | ZoneDist, BldgClass, NumFloors, UnitsTotal, LotArea, BldgArea, AssessTot, YearBuilt, OwnerName |
+| Open HPD Violations | `csn4-vhvf` | Daily | BoroID, Block, Lot, Class, InspectionDate, ApprovedDate, CurrentStatus |
+| HPD Violations (full history) | `wvxf-dwi5` | Daily | Full violation history including resolved |
+| Property Valuation & Assessment | `8y4t-faws` | Annual | Assessed/market values, exemptions |
+| ACRIS Real Property Master | `bnx9-e6tj` | Daily | Document recordings: deeds, liens, lis pendens |
+| ACRIS Real Property Legals | `8h5j-fqxa` | Daily | BBL linkage for each ACRIS document |
+| ACRIS Real Property Parties | `636b-3b5g` | Daily | Grantor/grantee names |
+| ACRIS Document Control Codes | `7isb-wh4c` | Static | Decode document type codes (29 lien-related types) |
+| DOF Building Classification Codes | `nzvw-cjc2` | Static | Building class code → description mapping |
