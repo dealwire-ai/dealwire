@@ -8,13 +8,82 @@ Public real estate data (tax liens, zoning, permits, assessments, deed transfers
 
 ## How Public Data Presents Itself
 
-### Three Dominant Platforms (~80% of accessible data)
+### Five Adapter Types (in priority order)
 
-| Platform | What It Covers | API Pattern | Examples |
-|----------|---------------|-------------|----------|
-| **Socrata (SODA API)** | City/county open data portals | `GET /resource/{id}.json?$where=...&$limit=1000&$offset=0` | NYC, Chicago, SF, LA County, Cook County |
-| **ArcGIS REST** | GIS/parcel/zoning maps (~80% of US municipalities) | `GET /FeatureServer/{layer}/query?where=1=1&outFields=*&f=json` | Most cities' zoning, parcels, flood zones |
-| **County web portals** | Assessor lookups, tax collector, recorder | HTML scraping (Playwright) | Long tail of smaller counties |
+Most US property data is accessible without scraping. The access pattern hierarchy, from cleanest to most brittle:
+
+| Priority | Adapter Type | Coverage | API Pattern | Examples |
+|----------|-------------|----------|-------------|----------|
+| **1** | **Socrata (SODA API)** | City/county open data portals | `GET /resource/{id}.json?$where=...&$limit=50000&$offset=0` | NYC, Chicago, SF, LA County, Cook County, **CT (all 169 towns)**, NY State, MD, CO |
+| **2** | **ArcGIS REST** | GIS/parcel/zoning maps (~80% of US municipalities) | `GET /FeatureServer/{layer}/query?where=1=1&outFields=*&f=geojson` | Most cities' zoning, parcels, flood zones; **MA MassGIS statewide parcels** |
+| **3** | **Bulk file download** | State DOT/DOA bulk exports | Direct HTTP download (CSV, shapefile, GeoJSON) | FL statewide parcel export, many state DOT shapefiles |
+| **4** | **SFTP / FTP** | County data feeds | File transfer | Some county assessors publish quarterly CSV drops |
+| **5** | **Playwright scraper** | Last resort — CAMA web portals | HTML parsing, browser automation | Individual assessor lookups (Tyler iasWorld, VGSI portals) |
+
+### CAMA Vendor Landscape
+
+Most US counties run their assessment data on commercial **CAMA (Computer-Assisted Mass Appraisal)** software. Understanding the vendor landscape explains why so much data sits behind web portals — these vendors don't expose public APIs.
+
+| Vendor | Market Share | Portal Style | Access Path |
+|--------|-------------|--------------|-------------|
+| **Tyler Technologies (iasWorld)** | ~40% | Web portal, no public API | State aggregators, ArcGIS exports |
+| **Vision Government Solutions (VGSI)** | ~20% | Per-town web portal (e.g. `gis.vgsi.com/web/WestHartford`) | State aggregator (if available) or scraper |
+| **BS&A Software** | ~15% | Web portal | ArcGIS layers often published separately |
+| **Patriot Properties** | ~10% | Web portal | State aggregator preferred |
+| **Harris Govern (PACS)** | ~8% | Web portal | State aggregator preferred |
+| **Vanguard CAMAvision** | ~5% | Web portal | State aggregator preferred |
+
+**Key insight**: For any given county running Tyler or VGSI, the better access path is almost always a **state-level aggregator** that normalizes the data across all counties. Only fall back to scraping the CAMA portal if no state portal exists.
+
+### State-Level Aggregators (Free Government Sources)
+
+Many states publish normalized statewide parcel data, bypassing CAMA vendors entirely. This is the best path for covering entire states in one adapter config:
+
+| State | Platform | Dataset / URL | Notes |
+|-------|----------|---------------|-------|
+| **Connecticut** | Socrata (`data.ct.gov`) | `pqrn-qghw` | All 169 towns including West Hartford. Same `SodaAdapter` — zero new code. |
+| **New York State** | Socrata (`data.ny.gov`) | `xkwy-kqbc` | Statewide assessment roll. Complements NYC PLUTO. |
+| **Maryland** | Socrata (`opendata.maryland.gov`) | SDAT dataset | Statewide assessments. |
+| **Colorado** | Socrata (`data.colorado.gov`) | Per-county datasets | County-by-county, many on Socrata. |
+| **Massachusetts** | ArcGIS REST | MassGIS Level 3 Parcels FeatureService | Statewide, quarterly updates. ~3.5M parcels. |
+| **Florida** | ArcGIS + bulk CSV | DOR parcel data + county ArcGIS | Statewide CSV download + ArcGIS for boundaries. |
+| **New Jersey** | State MOD-IV | Annual CSV via NJ Division of Taxation | Free bulk download, all 566 municipalities. |
+| **North Carolina** | ArcGIS REST | NC OneMap FeatureService | Statewide parcel layer. |
+| **Washington** | ArcGIS REST | WA Dept. of Revenue parcels | Statewide. |
+| **Oregon** | ArcGIS REST | ORMAP statewide parcel layer | Statewide. |
+| **Virginia** | ArcGIS REST | VITA statewide parcel fabric | Statewide. |
+| **Wisconsin** | ArcGIS REST | Wisconsin Parcel Initiative | Statewide. |
+
+**Rule of thumb**: Before writing a scraper for any county, check if the state publishes a statewide aggregator. For Socrata states (CT, NY, MD, CO) this means literally zero new code — just a new `SourceConfig` record pointing to the dataset ID.
+
+### ArcGIS REST API — Technical Reference
+
+ArcGIS is the dominant municipal GIS platform (~80% of US municipalities). The REST API pattern is standard across all deployments but has important pagination gotchas:
+
+```
+# Standard query pattern
+GET {serviceUrl}/FeatureServer/{layerId}/query
+  ?where=1=1
+  &outFields=*
+  &resultOffset=0
+  &resultRecordCount=1000
+  &orderByFields=OBJECTID         ← REQUIRED for stable pagination
+  &f=geojson                      ← or f=json for raw Esri JSON
+
+# Pagination: use exceededTransferLimit flag, NOT features.length === pageSize
+# The response includes:
+{
+  "features": [...],
+  "exceededTransferLimit": true   ← present and true when more pages remain
+                                  ← absent or false on the last page
+}
+```
+
+**Critical gotchas:**
+- **Use `exceededTransferLimit`** to detect end of results — not comparing `features.length === pageSize`. Some services return fewer than `resultRecordCount` records on intermediate pages (not just the last one), causing premature termination if you use length comparison.
+- **Always include `orderByFields: OBJECTID`** to guarantee stable pagination. Without a stable sort, records can shift between pages as data changes.
+- **Max `resultRecordCount`** varies by server — some cap at 1000, others allow 10000. Discover via `GET /FeatureServer/{layerId}?f=json` → `maxRecordCount` field.
+- **Spatial queries** use `geometryType=esriGeometryEnvelope&geometry={xmin,ymin,xmax,ymax}&spatialRel=esriSpatialRelIntersects` — useful for bounding box filtering.
 
 ### Data Types (most → least accessible)
 
@@ -37,12 +106,17 @@ Public real estate data (tax liens, zoning, permits, assessments, deed transfers
 
 ### Commercial Aggregators (gap-filling, not primary)
 
-| Provider | Focus | Cost | When to Use |
-|----------|-------|------|-------------|
-| ATTOM | Nationwide property/tax/deed/foreclosure | $10-100K/yr | Fill gaps in jurisdictions without open data |
-| Regrid | Parcel boundaries nationally | $2-50K/yr | Parcel matching spine across sources |
-| Reonomy | CRE ownership/LLC piercing | $10-50K/yr | Owner identification behind entities |
-| CoreLogic | Deep mortgage/lien data | $100K+/yr | Enterprise-grade, probably overkill initially |
+Only consider these after exhausting free government sources. They're expensive and create vendor dependency.
+
+| Provider | Coverage | Cost | When to Use |
+|----------|----------|------|-------------|
+| **Regrid** | 159M parcels, 3,229 counties, standardized schema | $2-50K/yr; **30-day free sandbox** | Best first choice for gap-filling — standardized schema, REST API, good for parcel spine across sources |
+| **ATTOM** | 158M properties, 9,000 attributes, deed chains, foreclosures | $10-100K/yr | Deep enrichment where free sources don't reach; AVM, pre-foreclosure signals |
+| **Reonomy** | CRE ownership, LLC piercing, debt data | $10-50K/yr | Owner identification behind entities; CRE-specific |
+| **CoreLogic** | Deep mortgage/lien/MLS data | $100K+/yr | Enterprise-grade, overkill for Phase 1-2 |
+| ~~ZTRAX~~ | ~~Zillow transaction data~~ | ~~Discontinued 2023~~ | ~~No longer available~~ |
+
+**Regrid recommendation**: Start here for any jurisdiction not covered by free state portals. Their `parcel` API returns standardized fields (`ll_uuid`, `parcelnumb`, `owner`, `address`, `zoning`, `parval`) across all 3,229 counties — the same field names regardless of the source county. The 30-day free sandbox is enough to validate a new market before committing.
 
 ---
 
@@ -133,22 +207,26 @@ Source Config (DB)              Adapter Layer              Pipeline
 
 ```typescript
 interface DataAdapter {
-  fetch(params: FetchParams): AsyncGenerator<RawRecord[]>;
+  fetch(config: SourceConfig): AsyncGenerator<RawRecord[]>;
+  testConnection(config: SourceConfig): Promise<boolean>;
 }
 ```
 
-Every adapter — SODA, ArcGIS, Playwright scraper, PDF extractor — implements this one method. It yields pages of raw records.
+Every adapter — SODA, ArcGIS, Playwright scraper, PDF extractor — implements these two methods. `fetch` yields pages of raw records; `testConnection` validates config before scheduling.
 
 #### Generic vs Custom Adapters
 
 **Generic adapters** (written once, configured per-source):
-- `SodaAdapter` — any Socrata dataset. Config: base URL, dataset ID, SoQL filter.
-- `ArcGisAdapter` — any ArcGIS FeatureServer/MapServer layer. Config: service URL, layer ID, spatial/attribute filters.
+- `SodaAdapter` ✅ built — any Socrata dataset. Config: base URL, dataset ID, SoQL filter.
+- `ArcGisAdapter` — any ArcGIS FeatureServer/MapServer layer. Config: service URL, layer ID, spatial/attribute filters. See ArcGIS technical reference above for pagination pattern.
 - `BulkFileAdapter` — CSV/shapefile downloads. Config: download URL, file format, column mapping.
+- `SftpAdapter` — SFTP/FTP file drops. Config: host, credentials, remote path, file format.
 
 **Custom adapters** (bespoke code per source):
 - Extend a base class, override fetch logic for sources that need browser automation, multi-step auth, or unusual pagination.
 - Still implement the same interface, so the pipeline doesn't change.
+
+**Resilience**: Each adapter should have a per-adapter retry + circuit breaker policy. Use [Cockatiel](https://github.com/connor4312/cockatiel) (TypeScript) for configurable retry/circuit-breaker/timeout — attach the policy to each `SourceConfig` record so aggressive sources get conservative policies without affecting others.
 
 #### Source Configuration
 
@@ -245,6 +323,21 @@ Address standardization: libpostal (local, fast) for parsing → Smarty (API) fo
 
 Parcel ID normalization: strip formatting, apply jurisdiction-specific rules (stored in config).
 
+#### Universal Parcel Key
+
+**BBL is NYC-specific.** Outside NYC, the canonical property key is:
+
+```
+fips_code (5-digit county FIPS) + normalizedApn (strip all formatting)
+```
+
+- `fips_code`: Federal FIPS county code. Unambiguously identifies a county anywhere in the US. Example: `09003` = Hartford County CT, `36047` = Kings County (Brooklyn) NY.
+- `normalizedApn`: The Assessor's Parcel Number stripped of all separators. `123-45-678` → `12345678`. Each county has its own APN format; normalization rules live in `SourceConfig`.
+
+This composite key enables cross-source joins (e.g. matching a Regrid parcel to a state aggregator record) without a shared ID. Store it as `UNIQUE(fips_code, parcel_id)` on the canonical `property` table.
+
+**[Placekey](https://www.placekey.io/)** (open standard) is an alternative for POI-heavy use cases but is less useful for raw land parcels.
+
 ### Orchestration
 
 **Phase 1**: Manual trigger via API endpoint. Simple NestJS controller that runs the adapter → normalize → store pipeline synchronously.
@@ -307,7 +400,8 @@ Per-source tracking:
 ### Phase 2: Normalize & Enrich
 
 - [ ] `DataSource` / `RawIngestion` models — source registry with config-driven ingestion
-- [ ] `ArcGisAdapter` (generic, handles any ArcGIS FeatureServer)
+- [ ] `ArcGisAdapter` (generic, handles any ArcGIS FeatureServer — use `exceededTransferLimit` for pagination, require `orderByFields=OBJECTID`)
+- [ ] `BulkFileAdapter` (CSV/shapefile downloads via HTTP — for FL, NJ MOD-IV, etc.)
 - [ ] Property Charges Balance (`scjx-j6np`) — outstanding balances as additional distress signal
 - [ ] Address standardization (Smarty or libpostal integration)
 - [ ] Add ACRIS data (transactions, recorded liens) — joins across 3 Socrata datasets
@@ -317,17 +411,32 @@ Per-source tracking:
 
 ### Phase 3: Multi-Jurisdiction
 
-- [ ] Add Chicago (Socrata-based — mostly config, same SodaAdapter)
-- [ ] Add Miami-Dade (ArcGIS-based — mostly config, same ArcGisAdapter)
+New jurisdictions are roughly ordered by effort: **Socrata states first** (zero new adapter code — just a new SourceConfig), then **ArcGIS states**, then bulk file, then scrapers last.
+
+**Quick wins (Socrata — same SodaAdapter, new config only):**
+- [ ] Connecticut (`data.ct.gov`, dataset `pqrn-qghw`) — all 169 towns including West Hartford, Hartford County
+- [ ] New York State (`data.ny.gov`, dataset `xkwy-kqbc`) — statewide assessment roll
+- [ ] Chicago (`data.cityofchicago.org`) — Cook County + city datasets
+- [ ] Maryland (`opendata.maryland.gov`) — SDAT statewide assessments
+
+**ArcGIS states (need ArcGisAdapter, then config-only per county):**
+- [ ] Massachusetts (MassGIS Level 3 FeatureService — ~3.5M statewide parcels)
+- [ ] Miami-Dade (county ArcGIS FeatureServer)
+- [ ] North Carolina (NC OneMap statewide parcel layer)
+
+**Other:**
 - [ ] Source registry CRUD API + frontend config UI
 - [ ] Per-jurisdiction field mapping management
 - [ ] Federal enrichment layers (Census ACS, FEMA flood zones)
+- [ ] `fips_code + normalizedApn` universal parcel key on canonical `property` table
 
 ### Phase 4: Scale & Hard Sources
 
-- [ ] Playwright scraper adapter for counties without APIs
-- [ ] PDF extraction adapter for published reports
-- [ ] Evaluate ATTOM API for gap-filling
+- [ ] `SftpAdapter` for county data feeds published as file drops
+- [ ] Playwright scraper adapter for CAMA portals without state aggregators (Tyler iasWorld, VGSI)
+- [ ] PDF extraction adapter for published lien/assessment reports
+- [ ] Evaluate Regrid API (30-day free sandbox) for gap-filling in unsupported counties
+- [ ] Evaluate ATTOM for deep enrichment (deed chains, pre-foreclosure signals)
 - [ ] Historical backfill capability
 - [ ] SCD Type 2 change tracking
 - [ ] Advanced entity resolution (match properties across sources without common IDs)
