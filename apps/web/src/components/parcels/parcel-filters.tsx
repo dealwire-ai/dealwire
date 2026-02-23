@@ -10,11 +10,8 @@ import {
 import { Button } from "@/components/ui/button";
 
 const BOROUGHS = [
-  { code: "1", name: "Manhattan" },
-  { code: "2", name: "Bronx" },
   { code: "3", name: "Brooklyn" },
   { code: "4", name: "Queens" },
-  { code: "5", name: "Staten Island" },
 ];
 
 interface ParcelFiltersProps {
