@@ -1,16 +1,17 @@
 # TODO
 
 ## General Ops
-    
+
 ## Deal Screener
-    - Record demo for Marc Zegen 
-    - Record demo for Jared Epstein (granular folder sorting)
-    - Record demo for Quinn Breslin
-    - Build demo for the boutique hotel chain guy 
+    - Record demo for 
+        - Marc Zegen 
+        - Jared Epstein (granular folder sorting)
+        - Quinn Breslin
+        - Dale Hersowitz
+    - Record for the boutique hotel chain guy 
 
 ## Tax Lien Analyzer
-    - get proposal signed, verbally signed
-    - Isaac/Noah make plan of attack
+    - get proposal signed (verbally signed)
 
 ## Frontstep Acquisition
     - execute + track media outreach
