@@ -261,7 +261,7 @@ export default function DashboardPage() {
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold">Dashboard</h1>
           <div className="flex items-center gap-3">
-            {flags.parcels && (
+            {flags.parcels && user?.primaryEmailAddress?.emailAddress?.endsWith("@frontstep.ai") && (
               <a
                 href="/public-data/parcels"
                 className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-sm transition-colors"
