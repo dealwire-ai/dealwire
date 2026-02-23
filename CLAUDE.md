@@ -88,6 +88,7 @@ All project instructions live in `CLAUDE.md` (this file). `.cursorrules` points 
 
 | Document | Location | Purpose |
 |----------|----------|---------|
+| **Architecture** | `/docs/ARCHITECTURE.md` | ASCII system architecture diagram |
 | **Backend** | `/docs/BACKEND.md` | Services, email flow, auth, patterns, env vars |
 | **Frontend** | `/docs/FRONTEND.md` | API clients, CORS, env vars |
 | **Testing** | `/docs/TESTING.md` | Unit test philosophy, format, guidelines |
