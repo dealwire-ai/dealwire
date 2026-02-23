@@ -3,10 +3,11 @@
 ## General Ops
     
 ## Deal Screener
+    - JK - Automate more of the actual underwriting process 
     - Record demo for Marc Zegen 
     - Record demo for Jared Epstein (granular folder sorting)
     - Record demo for Quinn Breslin
-    - Build demo for the boutique hotel chain guy 
+    - Build and record demo for the boutique hotel chain guy 
 
 ## Tax Lien Analyzer
     - get proposal signed, verbally signed
