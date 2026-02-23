@@ -17,4 +17,5 @@
     - (Isaac) test property for Tyler
 
 ## Survey Platform
-    - get revised M3 scope from Milo/Josh
+    - get M3 approved and build
+    - get M2 payment
