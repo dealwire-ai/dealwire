@@ -3,11 +3,11 @@
 ## General Ops
     
 ## Deal Screener
-    - JK - Automate more of the actual underwriting process 
+    - Plan and start building out the automated underwriting process (t-12/rent roll parsing, filling out excel proforma, etc.) 
     - Record demo for Marc Zegen 
     - Record demo for Jared Epstein (granular folder sorting)
     - Record demo for Quinn Breslin
-    - Build and record demo for the boutique hotel chain guy 
+    - Record demo for Minas
 
 ## Tax Lien Analyzer
     - get proposal signed, verbally signed
@@ -18,4 +18,4 @@
     - (Isaac) test property for Tyler
 
 ## Survey Platform
-    - get revised M3 scope from Milo/Josh
+    - M3 due 3/5
