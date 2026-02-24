@@ -18,5 +18,5 @@
     - (Isaac) test property for Tyler
 
 ## Survey Platform
-    - get M3 approved and build
+    - build M3
     - get M2 payment
