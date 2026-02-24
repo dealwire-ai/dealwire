@@ -10,6 +10,7 @@
         - Quinn Breslin
         - Minas (boutique hotel)
         - Dale Hersowitz
+        - John Sazer
 
 ## Tax Lien Analyzer
     - get proposal signed (verbally signed)
