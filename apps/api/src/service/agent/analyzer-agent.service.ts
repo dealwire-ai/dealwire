@@ -422,7 +422,11 @@ export class AnalyzerAgentService {
           criteria: z.string().describe('The criteria to always skip (e.g. "retail deals", "emails from @broker.com")'),
         }),
         execute: async ({ criteria }) => this.safeTool('update_always_skip', async () => {
-          const updated = await this.screeningPreferences.updatePreferences(organizationId, { alwaysSkip: criteria });
+          const current = await this.screeningPreferences.getPreferences(organizationId);
+          this.logger.log(`[update_always_skip] before="${current.alwaysSkip ?? ''}" appending="${criteria}"`);
+          const merged = current.alwaysSkip ? `${current.alwaysSkip}, ${criteria}` : criteria;
+          const updated = await this.screeningPreferences.updatePreferences(organizationId, { alwaysSkip: merged });
+          this.logger.log(`[update_always_skip] after="${updated.alwaysSkip}"`);
           return { success: true, alwaysSkip: updated.alwaysSkip };
         }),
       }),
@@ -433,7 +437,11 @@ export class AnalyzerAgentService {
           criteria: z.string().describe('The deal criteria for evaluation'),
         }),
         execute: async ({ criteria }) => this.safeTool('update_deal_criteria', async () => {
-          const updated = await this.screeningPreferences.updatePreferences(organizationId, { dealCriteria: criteria });
+          const current = await this.screeningPreferences.getPreferences(organizationId);
+          this.logger.log(`[update_deal_criteria] before="${current.dealCriteria ?? ''}" appending="${criteria}"`);
+          const merged = current.dealCriteria ? `${current.dealCriteria}, ${criteria}` : criteria;
+          const updated = await this.screeningPreferences.updatePreferences(organizationId, { dealCriteria: merged });
+          this.logger.log(`[update_deal_criteria] after="${updated.dealCriteria}"`);
           return { success: true, dealCriteria: updated.dealCriteria };
         }),
       }),
