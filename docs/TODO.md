@@ -1,6 +1,10 @@
 # TODO
 
 ## General Ops
+   - Stripe taxes?
+
+## Biz Dev
+   - Rengage every single contact in our pipeline, send demos of updated work
 
 ## Deal Screener
     - Plan and start building out the automated underwriting process (t-12/rent roll parsing, filling out excel proforma, etc.)
@@ -13,7 +17,7 @@
         - John Sazer
 
 ## Tax Lien Analyzer
-    - get proposal signed (verbally signed)
+    - ensure current app is GTG for next wk's demo
 
 ## Frontstep Acquisition
     - execute + track media outreach
@@ -21,4 +25,3 @@
 
 ## Survey Platform
     - build M3 (due 3/5)
-    - get M2 payment
