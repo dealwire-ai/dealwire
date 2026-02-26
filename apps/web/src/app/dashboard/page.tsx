@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth, useUser, OrganizationSwitcher } from "@clerk/nextjs";
+import { dark } from "@clerk/themes";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
@@ -265,13 +266,7 @@ export default function DashboardPage() {
             {isFrontstepUser(user?.primaryEmailAddress?.emailAddress) && (
               <OrganizationSwitcher
                 hidePersonal
-                appearance={{
-                  elements: {
-                    rootBox: "text-sm",
-                    organizationSwitcherTrigger:
-                      "px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-sm text-white transition-colors border border-zinc-700",
-                  },
-                }}
+                appearance={{ baseTheme: dark }}
               />
             )}
             {flags.parcels && isFrontstepUser(user?.primaryEmailAddress?.emailAddress) && (
