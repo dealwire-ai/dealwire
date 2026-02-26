@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth, useUser } from "@clerk/nextjs";
+import { useAuth, useUser, OrganizationSwitcher } from "@clerk/nextjs";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
@@ -21,6 +21,7 @@ import { useApi } from "@/hooks/use-api";
 import { useTableState } from "@/hooks/use-table-state";
 import { useFeatureFlags } from "@/hooks/use-feature-flags";
 import { Chatbot } from "@/components/chat/chatbot";
+import { isFrontstepUser } from "@/lib/utils";
 import posthog from "posthog-js";
 
 interface Deal {
@@ -261,7 +262,19 @@ export default function DashboardPage() {
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold">Dashboard</h1>
           <div className="flex items-center gap-3">
-            {flags.parcels && user?.primaryEmailAddress?.emailAddress?.endsWith("@frontstep.ai") && (
+            {isFrontstepUser(user?.primaryEmailAddress?.emailAddress) && (
+              <OrganizationSwitcher
+                hidePersonal
+                appearance={{
+                  elements: {
+                    rootBox: "text-sm",
+                    organizationSwitcherTrigger:
+                      "px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-sm text-white transition-colors border border-zinc-700",
+                  },
+                }}
+              />
+            )}
+            {flags.parcels && isFrontstepUser(user?.primaryEmailAddress?.emailAddress) && (
               <a
                 href="/public-data/parcels"
                 className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-sm transition-colors"
