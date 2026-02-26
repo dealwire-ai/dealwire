@@ -20,7 +20,7 @@ A secure web application that aggregates public tax lien data, property records,
 | Statement of Work | Google Drive (same folder) |
 | Broward County notes | Google Drive (same folder) |
 | Daniel's data feedback | `DG Comments.xlsx` in Google Drive |
-| Public Data Platform arch | [`docs/PUBLIC_DATA_PLATFORM.md`](PUBLIC_DATA_PLATFORM.md) |
+| Public Data Platform arch | [`docs/product/PUBLIC_DATA_PLATFORM.md`](PUBLIC_DATA_PLATFORM.md) |
 
 ---
 

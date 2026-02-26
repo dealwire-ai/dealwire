@@ -21,6 +21,6 @@ gdrive files export <fileId> /tmp/tax-lien-doc.txt
 
 ## Related Project Docs
 
-- **Public Data Platform** (`docs/PUBLIC_DATA_PLATFORM.md`) — Full architecture for ingesting tax lien data from NYC SODA API and other sources
-- **ROADMAP.md** (`docs/ROADMAP.md`) — Tax lien features in the data enrichment phase
+- **Public Data Platform** (`docs/product/PUBLIC_DATA_PLATFORM.md`) — Full architecture for ingesting tax lien data from NYC SODA API and other sources
+- **ROADMAP.md** (`docs/product/ROADMAP.md`) — Tax lien features in the data enrichment phase
 - Key NYC datasets: Tax Lien Sale Lists (`9rz4-mjek`), Property Charges Balance (`scjx-j6np`)

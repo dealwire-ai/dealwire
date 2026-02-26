@@ -30,9 +30,9 @@ When users connect their Microsoft Outlook account, the system monitors their in
 
 The platform also includes a **tax lien / distressed property intelligence** layer: ingests NYC public data (tax lien sale lists, PLUTO property records, HPD violations) via Socrata SODA API, computes distress scores (0-100), and surfaces results in a filterable parcel table at `/public-data/parcels` with CSV export and agent chat tools. Gated behind the `parcels` feature flag (org-level).
 
-See `docs/ROADMAP.md` for current product priorities and feature roadmap. Check it before proposing new features to ensure alignment with the current phase.
+See `docs/product/ROADMAP.md` for current product priorities and feature roadmap. Check it before proposing new features to ensure alignment with the current phase.
 
-See `docs/PUBLIC_DATA_PLATFORM.md` for the public data ingestion architecture. Read it before working on data sources, adapters, property data, ingestion pipelines, or anything in the data enrichment layer.
+See `docs/product/PUBLIC_DATA_PLATFORM.md` for the public data ingestion architecture. Read it before working on data sources, adapters, property data, ingestion pipelines, or anything in the data enrichment layer.
 
 ## Architecture
 
@@ -84,36 +84,43 @@ Railway MCP tools (`mcp__railway__*`) are available for deployments, logs, and s
 
 All project instructions live in `CLAUDE.md` (this file). `.cursorrules` points here — do not duplicate rules there.
 
-#### Architecture & Development
+#### `docs/technical/` — Engineering & Infrastructure
 
-| Document | Location | Purpose |
-|----------|----------|---------|
-| **Architecture** | `/docs/ARCHITECTURE.md` | ASCII system architecture diagram |
-| **Backend** | `/docs/BACKEND.md` | Services, email flow, auth, patterns, env vars |
-| **Frontend** | `/docs/FRONTEND.md` | API clients, CORS, env vars |
-| **Testing** | `/docs/TESTING.md` | Unit test philosophy, format, guidelines |
-| **Development** | `/docs/DEVELOPMENT.md` | Troubleshooting, migrations, local dev tips |
+| Document | Purpose |
+|----------|---------|
+| `ARCHITECTURE.md` | ASCII system architecture diagram |
+| `BACKEND.md` | Services, email flow, auth, patterns, env vars |
+| `FRONTEND.md` | API clients, CORS, env vars |
+| `TESTING.md` | Unit test philosophy, format, guidelines |
+| `DEVELOPMENT.md` | Troubleshooting, migrations, local dev tips |
+| `GRAFANA_SETUP.md` | Monitoring/observability setup guide |
+| `CLERK_AUTH_SETUP.md` | Clerk authentication implementation details |
+| `DESKTOP_DEEP_LINK.md` | MAPI entry ID fetch + `outlook:` protocol for desktop Outlook deep links in digest |
 
-#### Product & Business
+#### `docs/product/` — Product & Features
 
-| Document | Location | Purpose |
-|----------|----------|---------|
-| **ROADMAP.md** | `/docs/ROADMAP.md` | Current product priorities and feature roadmap |
-| **Boutique Hotel Opportunity** | `/docs/BOUTIQUE_HOTEL_OPPORTUNITY.md` | Minas Terlidis / Bohopo lead — hotel acquisition sourcing vertical |
-| **Tax Lien Platform** | `/docs/TAX_LIEN_PLATFORM.md` | Tax lien data platform — domain knowledge, features, architecture, commercial terms |
-| **Tax Lien Notes** | `/docs/TAX_LIEN_NOTES.md` | Tax lien research, proposals, Google Drive folder |
-| **JK Notes** | `/docs/JK_NOTES.md` | Jordan Karlik meeting notes, Google Drive folder, Granola transcripts |
+| Document | Purpose |
+|----------|---------|
+| `ROADMAP.md` | Current product priorities and feature roadmap |
+| `TODO.md` | Active task list across workstreams |
+| `UNDERWRITING.md` | Acquisition underwriting plan — email trigger, rent roll/T-12 extraction, pro forma fill + export |
+| `PUBLIC_DATA_PLATFORM.md` | Architecture for public property data ingestion |
+| `TAX_LIEN_PLATFORM.md` | Tax lien data platform — domain knowledge, features, architecture, commercial terms |
 
-#### Infrastructure & Reference
+#### `docs/clients/` — Client-Specific Notes
 
-| Document | Location | Purpose |
-|----------|----------|---------|
-| **Public Data Platform** | `/docs/PUBLIC_DATA_PLATFORM.md` | Architecture for public property data ingestion |
-| **Desktop Deep Link** | `/docs/DESKTOP_DEEP_LINK.md` | MAPI entry ID fetch + `outlook:` protocol for desktop Outlook deep links in digest |
-| **Clerk Auth Setup** | `/docs/CLERK_AUTH_SETUP.md` | Clerk authentication implementation details |
-| **Grafana Setup** | `/docs/GRAFANA_SETUP.md` | Monitoring/observability setup guide |
-| **Prisma Schema** | `/apps/api/prisma/schema.prisma` | Database schema (source of truth for data model) |
-| **API .env.example** | `/apps/api/.env.example` | Required environment variables for backend |
+| Document | Client | Purpose |
+|----------|--------|---------|
+| `JK_NOTES.md` | Jordan Karlik | Meeting notes, Google Drive folder, Granola transcripts |
+| `TAX_LIEN_NOTES.md` | Daniel Gabay | Tax lien research, proposals, Google Drive folder |
+| `BOUTIQUE_HOTEL_OPPORTUNITY.md` | Minas Terlidis | Bohopo lead — hotel acquisition sourcing vertical |
+
+#### Reference (not in docs/)
+
+| Document | Purpose |
+|----------|---------|
+| `/apps/api/prisma/schema.prisma` | Database schema (source of truth for data model) |
+| `/apps/api/.env.example` | Required environment variables for backend |
 
 ---
 
@@ -129,12 +136,12 @@ After implementing any feature, API change, or architectural change — update t
 
 | Change type | Update |
 |-------------|--------|
-| New or modified API endpoints | `TAX_LIEN_PLATFORM.md` (public data) or `BACKEND.md` |
+| New or modified API endpoints | `docs/product/TAX_LIEN_PLATFORM.md` (public data) or `docs/technical/BACKEND.md` |
 | New services, adapters, or architectural patterns | Relevant domain doc |
-| New or changed env vars | `apps/api/.env.example` + `BACKEND.md` |
-| Prisma schema changes | Note in `BACKEND.md` if it affects documented data model |
-| Roadmap item completed | Mark `[x]` in `ROADMAP.md` |
-| New feature added | Add to "What's Built" section in `ROADMAP.md` |
+| New or changed env vars | `apps/api/.env.example` + `docs/technical/BACKEND.md` |
+| Prisma schema changes | Note in `docs/technical/BACKEND.md` if it affects documented data model |
+| Roadmap item completed | Mark `[x]` in `docs/product/ROADMAP.md` |
+| New feature added | Add to "What's Built" section in `docs/product/ROADMAP.md` |
 
 ---
 
