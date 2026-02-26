@@ -63,8 +63,8 @@ _The data Analyzer produces must be best-in-class. This is the foundation everyt
 ### Phase 2: Data Enrichment
 _Deep data is the moat. An analyst is only as good as their data access._
 
-- [x] **Tax lien platform (Phase 1)** — NYC public data ingestion from 3 sources (tax lien sale list, PLUTO property records, HPD violations). SODA adapter for Socrata API, lien-first ingestion (start from lien list, enrich with PLUTO + HPD), distress scoring (0-100), filterable parcel table UI at `/public-data/parcels` with CSV export, and agent tools (`query_parcels`, `get_parcel_stats`). See [`docs/TAX_LIEN_PLATFORM.md`](docs/TAX_LIEN_PLATFORM.md).
-- [ ] **Public data ingestion platform (Phase 2)** — Adapter-based system for pulling tax liens, zoning, permits, assessments, and deed data from municipal/county sources. Starts with NYC (Socrata SODA API + ArcGIS), designed to expand city-by-city via configuration. See [`docs/PUBLIC_DATA_PLATFORM.md`](docs/PUBLIC_DATA_PLATFORM.md) for full architecture.
+- [x] **Tax lien platform (Phase 1)** — NYC public data ingestion from 3 sources (tax lien sale list, PLUTO property records, HPD violations). SODA adapter for Socrata API, lien-first ingestion (start from lien list, enrich with PLUTO + HPD), distress scoring (0-100), filterable parcel table UI at `/public-data/parcels` with CSV export, and agent tools (`query_parcels`, `get_parcel_stats`). See [`docs/product/TAX_LIEN_PLATFORM.md`](TAX_LIEN_PLATFORM.md).
+- [ ] **Public data ingestion platform (Phase 2)** — Adapter-based system for pulling tax liens, zoning, permits, assessments, and deed data from municipal/county sources. Starts with NYC (Socrata SODA API + ArcGIS), designed to expand city-by-city via configuration. See [`docs/product/PUBLIC_DATA_PLATFORM.md`](PUBLIC_DATA_PLATFORM.md) for full architecture.
 - [ ] **Property data enrichment** — Pull from public records, assessor databases, census/demographic data to auto-fill details the email didn't include (year built, lot size, zoning, ownership history, tax assessments).
 - [ ] **Market context** — Auto-attach market comps, submarket stats, rent trends to deal summaries. "This is priced 15% above recent comps in the submarket."
 - [ ] **Deal scoring** — Quantitative scoring beyond yes/no. Rank deals by fit, upside potential, risk factors based on extracted + enriched data.
@@ -84,7 +84,12 @@ _More channels, more users, more deal flow._
 _Move beyond screening into the full deal pipeline._
 
 - [ ] **Pipeline stages** — Track deals through: Screening → Due Diligence → Underwriting → LOI → Closing. Each stage can have autonomous agent actions.
-- [ ] **Underwriting automation** — Auto-generate pro forma models from extracted deal data. Cash flow projections, return calculations.
+- [ ] **Underwriting automation** — Email deal documents ("underwrite this") → system extracts rent roll + T-12 → fills user's Excel pro forma template → renders in dashboard + exports. See [`docs/product/UNDERWRITING.md`](UNDERWRITING.md) for full plan.
+  - Step 1: Email trigger + document intake
+  - Step 2: Rent roll structured extraction (unit, type, sqft, current/market rent, lease expiry)
+  - Step 3: T-12 / trailing financial extraction (gross revenue, opex line items, NOI)
+  - Step 4: Template filling + Excel export (SheetJS, fills user's own template)
+  - Step 5: Web-native interactive pro forma with export
 - [ ] **Document management** — Organize OMs, rent rolls, financials, environmental reports per deal. OCR and structured extraction for each.
 
 ### Phase 5: Multi-Asset & Marketplace
