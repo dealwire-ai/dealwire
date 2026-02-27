@@ -1,5 +1,6 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { SchedulerRegistry } from '@nestjs/schedule';
+import { CronJob } from 'cron';
 import { PrismaService } from '../prisma/prisma.service';
 import { EmailSenderService } from '../email/email-sender.service';
 import { ScreeningPreferencesService } from '../preferences/screening-preferences.service';
@@ -20,7 +21,7 @@ interface DigestActionLinks {
 }
 
 @Injectable()
-export class DealDigestService {
+export class DealDigestService implements OnModuleInit {
   private readonly logger = new Logger(DealDigestService.name);
 
   constructor(
@@ -30,16 +31,20 @@ export class DealDigestService {
     private readonly microsoftGraphService: MicrosoftGraphService,
     private readonly s3Service: S3Service,
     private readonly brokerIntelligence: BrokerIntelligenceService,
+    private readonly schedulerRegistry: SchedulerRegistry,
   ) {}
 
-  /**
-   * Check and send digests for all organizations with configured schedules
-   * Runs every 30 minutes to check per-organization schedules
-   */
-  @Cron('*/30 * * * *', {
-    name: 'deal-digest-check',
-    timeZone: 'UTC',
-  })
+  onModuleInit() {
+    const cronExpression = process.env.DIGEST_CHECKER_CRON ?? '*/30 * * * *';
+    const job = new CronJob(cronExpression, () => {
+      this.logger.log('Running deal digest check job');
+      void this.sendDigestsForScheduledOrgs();
+    });
+    this.schedulerRegistry.addCronJob('deal-digest-check', job);
+    job.start();
+    this.logger.log(`Deal digest checker scheduled: ${cronExpression}`);
+  }
+
   async checkAndSendDigests(): Promise<void> {
     this.logger.log('Running deal digest check job');
     await this.sendDigestsForScheduledOrgs();
