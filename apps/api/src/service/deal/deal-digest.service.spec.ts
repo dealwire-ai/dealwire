@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { SchedulerRegistry } from '@nestjs/schedule';
 import { DealDigestService } from './deal-digest.service';
 import { BrokerIntelligenceService } from './broker-intelligence.service';
 import { PrismaService } from '../prisma/prisma.service';
@@ -71,6 +72,12 @@ describe('DealDigestService', () => {
               topMarkets: [],
             }),
             getLeaderboard: jest.fn().mockResolvedValue({ brokers: [] }),
+          },
+        },
+        {
+          provide: SchedulerRegistry,
+          useValue: {
+            addCronJob: jest.fn(),
           },
         },
       ],
