@@ -187,6 +187,21 @@ export class MicrosoftWebhookService {
         return;
       }
 
+      // Hard-block any email from frontstep.ai or any of its subdomains
+      const senderDomain = emailEvent.from.split('@')[1]?.toLowerCase() ?? '';
+      if (
+        senderDomain === 'frontstep.ai' ||
+        senderDomain.endsWith('.frontstep.ai')
+      ) {
+        this.logger.log(
+          `Skipping frontstep.ai email: ${emailEvent.messageId} - "${emailEvent.subject}" (from: ${emailEvent.from})`,
+        );
+        if (userEmail) {
+          this.metricsService.recordMicrosoftWebhookRequest(userEmail, 'success');
+        }
+        return;
+      }
+
       this.logger.log(
         `Processing Microsoft email: ${emailEvent.messageId} from ${emailEvent.from} to ${inboxOwner.email} - "${emailEvent.subject}"`,
       );
