@@ -7,6 +7,7 @@
    - Rengage every single contact in our pipeline, send demos of updated work
 
 ## Deal Screener
+    - ensure reply-to-update-screening works: search "update_deal_criteria" in logs (jordan updated at 9:35AM 2/26)
     - Plan and start building out the automated underwriting process (t-12/rent roll parsing, filling out excel proforma, etc.)
     - Record demo for
         - Marc Zegen
