@@ -133,6 +133,23 @@ export class MicrosoftWebhookService {
 
       userEmail = inboxOwner.email;
 
+      // Check if this inbox is the designated monitoring inbox for the org
+      const designatedInboxEmail =
+        await this.subscriptionService.resolveDesignatedMonitoringInboxEmailForOrganization(
+          inboxOwner.organizationId ?? '',
+        );
+
+      if (
+        designatedInboxEmail &&
+        inboxOwner.email.toLowerCase() !== designatedInboxEmail.toLowerCase()
+      ) {
+        this.logger.log(
+          `Skipping notification from non-designated inbox ${inboxOwner.email} ` +
+            `(designated: ${designatedInboxEmail}) for org ${inboxOwner.organizationId}`,
+        );
+        return;
+      }
+
       // Self-sent: either our bot reply (skip) or user replying to our analysis (run agent)
       if (emailEvent.from.toLowerCase() === inboxOwner.email.toLowerCase()) {
         const messageWithHeaders = await this.microsoftGraphService.getMessage(

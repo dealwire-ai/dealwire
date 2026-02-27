@@ -35,6 +35,7 @@ describe('MicrosoftWebhookService', () => {
           provide: MicrosoftSubscriptionService,
           useValue: {
             getUserBySubscriptionId: jest.fn().mockResolvedValue('user123'),
+            resolveDesignatedMonitoringInboxEmailForOrganization: jest.fn().mockResolvedValue(null),
           },
         },
         {

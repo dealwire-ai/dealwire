@@ -15,6 +15,8 @@ export interface ScreeningPreferences {
   digestSchedule?: string;
   /** Timezone for digest schedule (default: "America/New_York") */
   digestTimeZone?: string;
+  /** If set, only this user's inbox is monitored; falls back to oldest connected user */
+  designatedMonitoringInboxEmail?: string;
 }
 
 export const DEFAULT_PASSED_FOLDER = 'Passed Deals';
@@ -62,6 +64,7 @@ export class ScreeningPreferencesService {
         alwaysSkip: prefs.alwaysSkip || undefined,
         digestSchedule: prefs.digestSchedule || undefined,
         digestTimeZone: prefs.digestTimeZone || undefined,
+        designatedMonitoringInboxEmail: prefs.designatedMonitoringInboxEmail || undefined,
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
@@ -89,6 +92,7 @@ export class ScreeningPreferencesService {
         | 'digestTimeZone'
         | 'companyName'
         | 'brandColor'
+        | 'designatedMonitoringInboxEmail'
       >
     >,
   ): Promise<ScreeningPreferences> {
@@ -115,6 +119,8 @@ export class ScreeningPreferencesService {
       data.digestTimeZone = partial.digestTimeZone;
     if (partial.companyName !== undefined) data.companyName = partial.companyName;
     if (partial.brandColor !== undefined) data.brandColor = partial.brandColor;
+    if (partial.designatedMonitoringInboxEmail !== undefined)
+      data.designatedMonitoringInboxEmail = partial.designatedMonitoringInboxEmail;
 
     if (Object.keys(data).length === 0) {
       return this.getPreferences(organizationId) as Promise<ScreeningPreferences>;
@@ -141,6 +147,7 @@ export class ScreeningPreferencesService {
       alwaysSkip: updated.alwaysSkip || undefined,
       digestSchedule: updated.digestSchedule || undefined,
       digestTimeZone: updated.digestTimeZone || undefined,
+      designatedMonitoringInboxEmail: updated.designatedMonitoringInboxEmail || undefined,
     };
   }
 }
