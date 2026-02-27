@@ -187,14 +187,10 @@ export class MicrosoftWebhookService {
         return;
       }
 
-      // Hard-block any email from frontstep.ai or any of its subdomains
-      const senderDomain = emailEvent.from.split('@')[1]?.toLowerCase() ?? '';
-      if (
-        senderDomain === 'frontstep.ai' ||
-        senderDomain.endsWith('.frontstep.ai')
-      ) {
+      // Skip deal digest emails we sent — they match our own subject format
+      if (emailEvent.subject.startsWith('Deal Digest:')) {
         this.logger.log(
-          `Skipping frontstep.ai email: ${emailEvent.messageId} - "${emailEvent.subject}" (from: ${emailEvent.from})`,
+          `Skipping deal digest email: ${emailEvent.messageId} - "${emailEvent.subject}"`,
         );
         if (userEmail) {
           this.metricsService.recordMicrosoftWebhookRequest(userEmail, 'success');
