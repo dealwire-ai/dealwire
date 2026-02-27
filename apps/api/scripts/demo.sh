@@ -3,29 +3,37 @@
 # Full demo script — orchestrates the complete agentic loop for a live recording.
 #
 # What happens:
-#   1. Sends 10 diverse deal emails to the monitored inbox (burst)
-#   2. Tails Railway logs until all 10 are screened (or timeout)
+#   1. Sends 5 diverse deal emails to the monitored inbox (burst)
+#   2. Tails Railway logs until all 5 are screened (or timeout)
 #   3. Sends the deal digest email
 #
 # Usage:
-#   ./scripts/demo.sh <email>               # monitor Railway logs (default)
-#   ./scripts/demo.sh <email> --wait 90     # fixed sleep instead of log monitoring
+#   ./scripts/demo.sh --email <email>               # monitor Railway logs (default)
+#   ./scripts/demo.sh --email <email> --wait 90     # fixed sleep instead of log monitoring
 #
 # Requires: RESEND_API_KEY in .env (or exported), railway CLI linked to analyzer-api
 
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-EMAIL="${1:?Usage: demo.sh <email> [--wait <seconds>]}"
-TOTAL_DEALS=10
-MAX_WAIT=180  # hard timeout in seconds regardless of mode
-
-# Parse optional --wait flag
+# Parse flags
+EMAIL=""
 USE_FIXED_WAIT=false
 FIXED_WAIT=90
-if [ "${2:-}" = "--wait" ]; then
-  USE_FIXED_WAIT=true
-  FIXED_WAIT="${3:?--wait requires a number of seconds}"
+TOTAL_DEALS=5
+MAX_WAIT=180  # hard timeout in seconds regardless of mode
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --email) EMAIL="${2:?--email requires an address}"; shift 2 ;;
+    --wait)  USE_FIXED_WAIT=true; FIXED_WAIT="${2:?--wait requires a number of seconds}"; shift 2 ;;
+    *) echo "Unknown argument: $1"; echo "Usage: demo.sh --email <email> [--wait <seconds>]"; exit 1 ;;
+  esac
+done
+
+if [ -z "$EMAIL" ]; then
+  echo "Usage: demo.sh --email <email> [--wait <seconds>]"
+  exit 1
 fi
 
 echo ""
@@ -41,7 +49,7 @@ else
 fi
 echo ""
 
-# ── Step 1: Send burst of 10 deal emails ─────────────────────────────────────
+# ── Step 1: Send burst of 5 deal emails ──────────────────────────────────────
 echo "▶ Step 1/3  Sending ${TOTAL_DEALS} deal emails to $EMAIL..."
 bash "$SCRIPT_DIR/send-test-email.sh" "$EMAIL" --burst
 BURST_DONE_AT=$(date +%s)
