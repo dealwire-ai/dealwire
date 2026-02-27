@@ -217,6 +217,57 @@ export class MicrosoftSubscriptionService {
   }
 
   /**
+   * Resolve the designated monitoring inbox email for an organization.
+   *
+   * If the org has a designatedMonitoringInboxEmail set and that user has a live
+   * Microsoft subscription, returns that email. Otherwise falls back to the oldest
+   * user in the org who has a live subscription.
+   *
+   * Returns null if no users in the org have a subscription at all.
+   */
+  async resolveDesignatedMonitoringInboxEmailForOrganization(
+    organizationId: string,
+  ): Promise<string | null> {
+    if (!organizationId) return null;
+
+    // Load the designated email from preferences
+    const prefs = await this.prisma.screeningPreferences.findUnique({
+      where: { organizationId },
+      select: { designatedMonitoringInboxEmail: true },
+    });
+
+    const designatedEmail = prefs?.designatedMonitoringInboxEmail;
+
+    if (designatedEmail) {
+      // Verify a user with that email exists in this org and has a live subscription
+      const designatedUser = await this.prisma.user.findFirst({
+        where: {
+          organizationId,
+          email: { equals: designatedEmail, mode: 'insensitive' },
+          microsoftSubscription: { isNot: null },
+        },
+        select: { email: true },
+      });
+
+      if (designatedUser?.email) {
+        return designatedUser.email;
+      }
+    }
+
+    // Fallback: oldest user in the org with a live subscription
+    const fallbackUser = await this.prisma.user.findFirst({
+      where: {
+        organizationId,
+        microsoftSubscription: { isNot: null },
+      },
+      orderBy: { createdAt: 'asc' },
+      select: { email: true },
+    });
+
+    return fallbackUser?.email ?? null;
+  }
+
+  /**
    * Get user ID by Graph subscription ID (for webhook handling)
    */
   async getUserBySubscriptionId(subscriptionId: string): Promise<string | null> {
