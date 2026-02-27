@@ -124,20 +124,22 @@ EMAIL_10_HTML="<html><body><p>Good afternoon,</p><p>Offering a <b>Walgreens NNN<
 
 echo "Sending test deal email(s) to $TO..."
 
-send_email "$EMAIL_1_FROM" "$EMAIL_1_ADDR" "$EMAIL_1_SUBJECT" "$EMAIL_1_HTML"
-
 if [ "$BURST" = "--burst" ]; then
-  for i in 2 3 4 5 6 7 8 9 10; do
+  # 5-deal demo: Galleria Commons (YES + broker reply), MedPark (medical), then 3 NOs
+  # Order: retail YES, medical, office NO, hotel NO, dev site NO
+  send_email "$EMAIL_4_FROM" "$EMAIL_4_ADDR" "$EMAIL_4_SUBJECT" "$EMAIL_4_HTML"
+  for n in 7 2 5 9; do
     sleep 1
-    from_var="EMAIL_${i}_FROM"
-    addr_var="EMAIL_${i}_ADDR"
-    subj_var="EMAIL_${i}_SUBJECT"
-    html_var="EMAIL_${i}_HTML"
+    from_var="EMAIL_${n}_FROM"
+    addr_var="EMAIL_${n}_ADDR"
+    subj_var="EMAIL_${n}_SUBJECT"
+    html_var="EMAIL_${n}_HTML"
     send_email "${!from_var}" "${!addr_var}" "${!subj_var}" "${!html_var}"
   done
   echo ""
-  echo "Done — sent 10 deals across: multifamily, office, industrial, retail, hotel, self-storage, medical office, student housing, mixed-use dev site, NNN net lease."
+  echo "Done — sent 5 deals: retail/Galleria (YES), medical office, office (NO), hotel (NO), dev site (NO)."
 else
+  send_email "$EMAIL_1_FROM" "$EMAIL_1_ADDR" "$EMAIL_1_SUBJECT" "$EMAIL_1_HTML"
   echo "Check $TO inbox for the deal email, then watch for the screening reply."
-  echo "(Use --burst to send 10 diverse deals 1s apart)"
+  echo "(Use --burst to send 5 diverse deals 1s apart)"
 fi
