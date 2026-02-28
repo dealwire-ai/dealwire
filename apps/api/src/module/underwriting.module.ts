@@ -7,6 +7,7 @@ import { RentRollExtractorService } from '../service/underwriting/rent-roll-extr
 import { T12ExtractorService } from '../service/underwriting/t12-extractor.service';
 import { ProformaService } from '../service/underwriting/proforma.service';
 import { ProformaController } from '../controller/underwriting/proforma.controller';
+import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
 import { PrismaModule } from './prisma.module';
 import { S3Module } from './s3.module';
 
@@ -14,6 +15,7 @@ import { S3Module } from './s3.module';
   imports: [PrismaModule, S3Module],
   controllers: [ProformaController],
   providers: [
+    ClerkAuthGuard,
     UnderwritingListenerService,
     UnderwritingOrchestratorService,
     DocumentClassifierService,
