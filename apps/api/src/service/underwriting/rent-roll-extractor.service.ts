@@ -35,12 +35,16 @@ export class RentRollExtractorService {
 
   constructor(private readonly s3Service: S3Service) {}
 
-  async extract(doc: ClassifiedDocument): Promise<RentRollExtraction> {
+  async extract(doc: ClassifiedDocument, neededFields?: string[]): Promise<RentRollExtraction> {
     this.logger.log(`[rent-roll-extractor] Extracting from "${doc.filename}"`);
 
     const isPdf =
       doc.contentType === 'application/pdf' ||
       doc.filename.toLowerCase().endsWith('.pdf');
+
+    const fieldHint = neededFields?.length
+      ? `\n\nThe client's pro forma requires these specific fields: [${neededFields.join(', ')}]. Prioritize extracting these exact values.`
+      : '';
 
     let userText: string;
 
@@ -51,7 +55,7 @@ export class RentRollExtractorService {
         { type: 'file', data: buffer, mimeType: 'application/pdf' },
         {
           type: 'text',
-          text: `Filename: "${doc.filename}"\n\nExtract every unit from this Rent Roll.`,
+          text: `Filename: "${doc.filename}"\n\nExtract every unit from this Rent Roll.${fieldHint}`,
         },
       ];
 
@@ -72,7 +76,7 @@ export class RentRollExtractorService {
     // Excel / CSV — convert sheets to CSV text
     const buffer = await this.s3Service.downloadDealAttachment(doc.s3Key);
     const text = excelToText(buffer);
-    userText = `Filename: "${doc.filename}"\n\n${text}\n\nExtract every unit from this Rent Roll.`;
+    userText = `Filename: "${doc.filename}"\n\n${text}\n\nExtract every unit from this Rent Roll.${fieldHint}`;
 
     const { object } = await generateObject({
       model: anthropic('claude-sonnet-4-6'),
