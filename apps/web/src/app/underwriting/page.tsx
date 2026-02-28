@@ -7,44 +7,11 @@ import { useApi } from "@/hooks/use-api";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
-const EXTRACTED_FIELDS = [
-  "om.propertyAddress",
-  "om.city",
-  "om.state",
-  "om.propertyType",
-  "om.yearBuilt",
-  "om.totalUnits",
-  "om.totalSqFt",
-  "om.askingPrice",
-  "om.capRate",
-  "om.noi",
-  "om.occupancyRate",
-  "rentRoll.totalUnits",
-  "rentRoll.occupiedUnits",
-  "rentRoll.vacantUnits",
-  "rentRoll.grossPotentialRent",
-  "rentRoll.effectiveGrossRent",
-  "rentRoll.vacancyRate",
-  "rentRoll.averageRentPerUnit",
-  "t12.grossRentalIncome",
-  "t12.otherIncome",
-  "t12.effectiveGrossIncome",
-  "t12.operatingExpenses",
-  "t12.taxes",
-  "t12.insurance",
-  "t12.utilities",
-  "t12.repairsAndMaintenance",
-  "t12.managementFees",
-  "t12.otherExpenses",
-  "t12.noi",
-  "t12.expenseRatio",
-];
-
 interface FieldMapEntry {
-  extractedField: string;
+  name: string;
+  description: string;
   sheet: string;
   cell: string;
-  label: string;
 }
 
 interface Proforma {
@@ -68,7 +35,7 @@ function FieldMapEditor({
   const addRow = () => {
     onChange([
       ...fieldMap,
-      { extractedField: EXTRACTED_FIELDS[0], sheet: "", cell: "", label: "" },
+      { name: "", description: "", sheet: "", cell: "" },
     ]);
   };
 
@@ -85,79 +52,41 @@ function FieldMapEditor({
 
   return (
     <div className="mt-4">
-      <p className="text-xs text-zinc-400 mb-2">Field Map</p>
+      <p className="text-xs text-zinc-400 mb-2">Fields</p>
       {fieldMap.length === 0 && (
-        <p className="text-xs text-zinc-600 mb-2">No mappings yet. Add a row to map extracted fields to spreadsheet cells.</p>
+        <p className="text-xs text-zinc-600 mb-2">No fields yet. Add a field or upload a template to auto-discover them.</p>
       )}
       {fieldMap.length > 0 && (
-        <div className="overflow-x-auto mb-2">
-          <table className="w-full text-xs border-collapse">
-            <thead>
-              <tr className="text-zinc-400 border-b border-zinc-700">
-                <th className="text-left py-1 pr-3 font-medium">Extracted Field</th>
-                <th className="text-left py-1 pr-3 font-medium">Sheet</th>
-                <th className="text-left py-1 pr-3 font-medium">Cell</th>
-                <th className="text-left py-1 pr-3 font-medium">Label</th>
-                <th className="py-1" />
-              </tr>
-            </thead>
-            <tbody>
-              {fieldMap.map((row, i) => (
-                <tr key={i} className="border-b border-zinc-800">
-                  <td className="py-1 pr-3">
-                    <select
-                      value={row.extractedField}
-                      onChange={(e) => updateRow(i, { extractedField: e.target.value })}
-                      className="bg-zinc-900 border border-zinc-700 rounded px-2 py-1 text-white text-xs w-full"
-                    >
-                      {EXTRACTED_FIELDS.map((f) => (
-                        <option key={f} value={f}>{f}</option>
-                      ))}
-                    </select>
-                  </td>
-                  <td className="py-1 pr-3">
-                    <input
-                      value={row.sheet}
-                      onChange={(e) => updateRow(i, { sheet: e.target.value })}
-                      placeholder="e.g. Assumptions"
-                      className="bg-zinc-900 border border-zinc-700 rounded px-2 py-1 text-white text-xs w-full"
-                    />
-                  </td>
-                  <td className="py-1 pr-3">
-                    <input
-                      value={row.cell}
-                      onChange={(e) => updateRow(i, { cell: e.target.value })}
-                      placeholder="e.g. B5"
-                      className="bg-zinc-900 border border-zinc-700 rounded px-2 py-1 text-white text-xs w-24"
-                    />
-                  </td>
-                  <td className="py-1 pr-3">
-                    <input
-                      value={row.label}
-                      onChange={(e) => updateRow(i, { label: e.target.value })}
-                      placeholder="e.g. Purchase Price"
-                      className="bg-zinc-900 border border-zinc-700 rounded px-2 py-1 text-white text-xs w-full"
-                    />
-                  </td>
-                  <td className="py-1">
-                    <button
-                      onClick={() => removeRow(i)}
-                      className="text-zinc-500 hover:text-red-400 px-2"
-                    >
-                      ×
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="space-y-2 mb-3">
+          {fieldMap.map((row, i) => (
+            <div key={i} className="flex items-center gap-2">
+              <input
+                value={row.name}
+                onChange={(e) => updateRow(i, { name: e.target.value })}
+                placeholder="Field name"
+                className="bg-zinc-900 border border-zinc-700 rounded px-2 py-1 text-white text-xs w-36 flex-shrink-0"
+              />
+              <input
+                value={row.description}
+                onChange={(e) => updateRow(i, { description: e.target.value })}
+                placeholder="Description"
+                className="bg-zinc-900 border border-zinc-700 rounded px-2 py-1 text-white text-xs flex-1 min-w-0"
+              />
+              <button
+                onClick={() => removeRow(i)}
+                className="text-zinc-500 hover:text-red-400 px-2 flex-shrink-0"
+              >
+                ×
+              </button>
+            </div>
+          ))}
         </div>
       )}
       <button
         onClick={addRow}
         className="text-xs px-3 py-1 bg-zinc-800 hover:bg-zinc-700 rounded text-zinc-300 transition-colors"
       >
-        + Add Row
+        + Add Field
       </button>
     </div>
   );
@@ -184,6 +113,8 @@ function ProformaCard({
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const fieldCount = Array.isArray(proforma.fieldMap) ? proforma.fieldMap.length : 0;
 
   const handleSave = async () => {
     setSaving(true);
@@ -249,16 +180,18 @@ function ProformaCard({
               Draft
             </span>
           )}
-          <span className="text-xs text-zinc-600">
-            {Array.isArray(proforma.fieldMap) ? proforma.fieldMap.length : 0} mappings
-          </span>
+          {fieldCount > 0 && (
+            <span className="text-xs text-zinc-500">
+              {fieldCount} field{fieldCount !== 1 ? "s" : ""} discovered
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setExpanded((v) => !v)}
             className="text-xs px-3 py-1 bg-zinc-800 hover:bg-zinc-700 rounded text-zinc-300 transition-colors"
           >
-            {expanded ? "Cancel" : "Edit"}
+            {expanded ? "Cancel" : fieldCount > 0 ? "Review Fields" : "Edit"}
           </button>
           <button
             onClick={handleDelete}
@@ -432,7 +365,7 @@ export default function UnderwritingPage() {
               disabled={creating}
               className="px-5 py-2 bg-white text-black rounded-lg text-sm font-medium hover:bg-zinc-200 transition-colors disabled:opacity-50 whitespace-nowrap"
             >
-              {creating ? "Uploading..." : "Create"}
+              {creating ? "Scanning template..." : "Create"}
             </button>
           </div>
           {createError && (
