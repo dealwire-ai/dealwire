@@ -50,7 +50,13 @@ export class ProformaService {
 
   private async scanProformaFields(buffer: Buffer): Promise<FieldMapEntry[]> {
     try {
-      const text = excelToText(buffer);
+      const rawText = excelToText(buffer);
+      // Haiku limit is 200k tokens (~4 chars/token). Cap at 120k chars to stay well clear.
+      // Input cells are almost always in the first few sheets, so truncation is safe.
+      const MAX_CHARS = 120_000;
+      const text = rawText.length > MAX_CHARS
+        ? rawText.slice(0, MAX_CHARS) + '\n\n[... truncated for length ...]'
+        : rawText;
 
       const { object } = await generateObject({
         model: anthropic('claude-haiku-4-5-20251001'),
