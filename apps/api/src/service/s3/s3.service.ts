@@ -136,6 +136,48 @@ export class S3Service {
   }
 
   /**
+   * Upload a proforma template (.xlsx) to S3 and return the S3 key
+   * @param buffer File content
+   * @param filename Original filename
+   * @param orgId Organization ID for organizing files
+   * @returns S3 key (path) where file was stored
+   */
+  async uploadProformaTemplate(
+    buffer: Buffer,
+    filename: string,
+    orgId: string,
+  ): Promise<string> {
+    if (!this.config.dealAttachmentsBucket) {
+      throw new Error('AWS_DEAL_ATTACHMENTS_S3_BUCKET_NAME not configured');
+    }
+
+    const timestamp = Date.now();
+    const sanitizedFilename = filename.replace(/[^a-zA-Z0-9.-]/g, '_');
+    const s3Key = `proformas/${orgId}/${timestamp}-${sanitizedFilename}`;
+
+    try {
+      await this.s3Client.send(
+        new PutObjectCommand({
+          Bucket: this.config.dealAttachmentsBucket,
+          Key: s3Key,
+          Body: buffer,
+          ContentType: this.getContentType(filename),
+        }),
+      );
+
+      this.metricsService.recordS3Upload('success', buffer.length);
+      this.logger.log(`Uploaded proforma template ${filename} to S3: ${s3Key}`);
+      return s3Key;
+    } catch (error) {
+      this.metricsService.recordS3Upload('error');
+      this.metricsService.recordS3Error('upload');
+      const msg = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Failed to upload proforma template ${filename} to S3: ${msg}`);
+      throw new Error(`S3 upload failed: ${msg}`);
+    }
+  }
+
+  /**
    * Get content type from filename extension
    */
   private getContentType(filename: string): string {

@@ -5,11 +5,14 @@ import { DocumentClassifierService } from '../service/underwriting/document-clas
 import { OMExtractorService } from '../service/underwriting/om-extractor.service';
 import { RentRollExtractorService } from '../service/underwriting/rent-roll-extractor.service';
 import { T12ExtractorService } from '../service/underwriting/t12-extractor.service';
+import { ProformaService } from '../service/underwriting/proforma.service';
+import { ProformaController } from '../controller/underwriting/proforma.controller';
 import { PrismaModule } from './prisma.module';
 import { S3Module } from './s3.module';
 
 @Module({
   imports: [PrismaModule, S3Module],
+  controllers: [ProformaController],
   providers: [
     UnderwritingListenerService,
     UnderwritingOrchestratorService,
@@ -17,6 +20,7 @@ import { S3Module } from './s3.module';
     OMExtractorService,
     RentRollExtractorService,
     T12ExtractorService,
+    ProformaService,
   ],
   exports: [UnderwritingOrchestratorService],
 })
