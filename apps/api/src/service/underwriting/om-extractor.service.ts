@@ -23,17 +23,21 @@ export class OMExtractorService {
 
   constructor(private readonly s3Service: S3Service) {}
 
-  async extract(doc: ClassifiedDocument): Promise<OMExtraction> {
+  async extract(doc: ClassifiedDocument, neededFields?: string[]): Promise<OMExtraction> {
     this.logger.log(`[om-extractor] Extracting from "${doc.filename}"`);
 
     const isPdf =
       doc.contentType === 'application/pdf' ||
       doc.filename.toLowerCase().endsWith('.pdf');
 
+    const fieldHint = neededFields?.length
+      ? `\n\nThe client's pro forma requires these specific fields: [${neededFields.join(', ')}]. Prioritize extracting these exact values.`
+      : '';
+
     const content: Array<{ type: string; [key: string]: any }> = [
       {
         type: 'text',
-        text: `Filename: "${doc.filename}"\n\nExtract all OM fields from this Offering Memorandum.`,
+        text: `Filename: "${doc.filename}"\n\nExtract all OM fields from this Offering Memorandum.${fieldHint}`,
       },
     ];
 

@@ -1,13 +1,17 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException, Logger } from '@nestjs/common';
 import { Proforma, Prisma } from '@prisma/client';
+import { generateObject } from 'ai';
+import { anthropic } from '@ai-sdk/anthropic';
+import { z } from 'zod';
 import { PrismaService } from '../prisma/prisma.service';
 import { S3Service } from '../s3/s3.service';
+import { excelToText } from './extraction-types';
 
 export interface FieldMapEntry {
-  extractedField: string;
+  name: string;
+  description: string;
   sheet: string;
   cell: string;
-  label: string;
 }
 
 export interface ProformaPatch {
@@ -17,8 +21,21 @@ export interface ProformaPatch {
   fieldMap?: FieldMapEntry[];
 }
 
+const ScannedFieldSchema = z.object({
+  name: z.string(),
+  description: z.string(),
+  sheet: z.string(),
+  cell: z.string(),
+});
+
+const ScannedFieldsSchema = z.object({
+  fields: z.array(ScannedFieldSchema),
+});
+
 @Injectable()
 export class ProformaService {
+  private readonly logger = new Logger(ProformaService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly s3: S3Service,
@@ -29,6 +46,40 @@ export class ProformaService {
       where: { organizationId: orgId },
       orderBy: { createdAt: 'desc' },
     });
+  }
+
+  private async scanProformaFields(buffer: Buffer): Promise<FieldMapEntry[]> {
+    try {
+      const text = excelToText(buffer);
+
+      const { object } = await generateObject({
+        model: anthropic('claude-haiku-4-5-20251001'),
+        schema: ScannedFieldsSchema,
+        system: `You are analyzing a real estate pro forma Excel template to identify input cells.
+
+Your task: find all cells that are INPUTS (hard-coded values users enter), NOT formulas or outputs.
+
+For each input cell, return:
+- name: short plain-English label (e.g. "Purchase Price", "Cap Rate", "Total Units")
+- description: one sentence describing what this value represents
+- sheet: the Excel sheet name exactly as it appears
+- cell: the cell address (e.g. "B5", "C12")
+
+Focus on purchase terms, income assumptions, expense assumptions, financing parameters, and unit/property characteristics. Target 10-30 fields. Skip formula cells, headers, and labels.`,
+        messages: [
+          {
+            role: 'user',
+            content: `Here is the pro forma spreadsheet content:\n\n${text}\n\nIdentify all input cells (not formulas) and return them with plain-English names and descriptions.`,
+          },
+        ],
+      });
+
+      this.logger.log(`[proforma] Scanned ${object.fields.length} input fields from template`);
+      return object.fields;
+    } catch (err) {
+      this.logger.error('[proforma] Field scan failed, using empty fieldMap', err);
+      return [];
+    }
   }
 
   async create(
@@ -43,12 +94,15 @@ export class ProformaService {
     const existing = await this.prisma.proforma.count({ where: { organizationId: orgId } });
     const isDefault = existing === 0;
 
+    // AI-scan the template to discover input cells
+    const fieldMap = await this.scanProformaFields(buffer);
+
     return this.prisma.proforma.create({
       data: {
         organizationId: orgId,
         name,
         s3Key,
-        fieldMap: [],
+        fieldMap: fieldMap as unknown as Prisma.InputJsonValue,
         isDefault,
         isReady: false,
       },

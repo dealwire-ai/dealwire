@@ -27,12 +27,16 @@ export class T12ExtractorService {
 
   constructor(private readonly s3Service: S3Service) {}
 
-  async extract(doc: ClassifiedDocument): Promise<T12Extraction> {
+  async extract(doc: ClassifiedDocument, neededFields?: string[]): Promise<T12Extraction> {
     this.logger.log(`[t12-extractor] Extracting from "${doc.filename}"`);
 
     const isPdf =
       doc.contentType === 'application/pdf' ||
       doc.filename.toLowerCase().endsWith('.pdf');
+
+    const fieldHint = neededFields?.length
+      ? `\n\nThe client's pro forma requires these specific fields: [${neededFields.join(', ')}]. Prioritize extracting these exact values.`
+      : '';
 
     if (isPdf) {
       const buffer = await this.s3Service.downloadDealAttachment(doc.s3Key);
@@ -40,7 +44,7 @@ export class T12ExtractorService {
         { type: 'file', data: buffer, mimeType: 'application/pdf' },
         {
           type: 'text',
-          text: `Filename: "${doc.filename}"\n\nExtract all T-12 income and expense figures.`,
+          text: `Filename: "${doc.filename}"\n\nExtract all T-12 income and expense figures.${fieldHint}`,
         },
       ];
 
@@ -69,7 +73,7 @@ export class T12ExtractorService {
       messages: [
         {
           role: 'user',
-          content: `Filename: "${doc.filename}"\n\n${text}\n\nExtract all T-12 income and expense figures.`,
+          content: `Filename: "${doc.filename}"\n\n${text}\n\nExtract all T-12 income and expense figures.${fieldHint}`,
         },
       ],
     });
