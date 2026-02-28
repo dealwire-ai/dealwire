@@ -50,6 +50,6 @@ const sqsImports = enableSqs
   providers: [
     ...(enableSqs ? [] : [{ provide: SqsService, useValue: null }]),
   ],
-  exports: [SqsModule, ...(enableSqs ? [] : [SqsService])],
+  exports: enableSqs ? [SqsModule] : [SqsService],
 })
 export class SqsRegistrationModule {}

@@ -269,6 +269,14 @@ export default function DashboardPage() {
                 appearance={{ baseTheme: dark }}
               />
             )}
+            {isFrontstepUser(user?.primaryEmailAddress?.emailAddress) && (
+              <a
+                href="/underwriting"
+                className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-sm transition-colors"
+              >
+                Underwriting
+              </a>
+            )}
             {flags.parcels && isFrontstepUser(user?.primaryEmailAddress?.emailAddress) && (
               <a
                 href="/public-data/parcels"

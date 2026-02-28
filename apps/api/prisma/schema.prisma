@@ -35,6 +35,7 @@ model Organization {
   screeningPreferences  ScreeningPreferences?
   screeningBuckets      ScreeningBucket[]
   historicalIngestions   HistoricalIngestion[]
+  proformas             Proforma[]
   createdAt             DateTime               @default(now())
   updatedAt             DateTime               @updatedAt
 }
@@ -284,6 +285,31 @@ model ScreeningPreferences {
   designatedMonitoringInboxEmail String? // If set, only this user's inbox is monitored; falls back to oldest connected user
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
+}
+
+// ============================================
+// PROFORMA - Pro forma Excel template per org
+// ============================================
+model Proforma {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  name           String       // e.g. "Standard Multifamily Model"
+  s3Key          String       // S3 path to the .xlsx template file
+
+  // Cell mapping: array of { extractedField, sheet, cell, label }
+  // extractedField keys match the canonical extraction output schema.
+  // e.g. [{ "extractedField": "om.askingPrice", "sheet": "Assumptions", "cell": "B5", "label": "Purchase Price" }]
+  fieldMap       Json         @default("[]")
+
+  isDefault      Boolean      @default(false) // Pipeline uses this template when org has multiple
+  isReady        Boolean      @default(false) // False until fieldMap is confirmed via onboarding
+
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([organizationId])
 }
 
 // ============================================
