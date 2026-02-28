@@ -5,6 +5,7 @@ export interface EmailConfig {
   resendWebhookSecret: string;
   fromEmail: string;
   adminEmails: string[];
+  underwritingInboundEmail: string;
 }
 
 export const emailConfig = (): EmailConfig => ({
@@ -12,4 +13,5 @@ export const emailConfig = (): EmailConfig => ({
   resendWebhookSecret: process.env.RESEND_WEBHOOK_SECRET || '',
   fromEmail: process.env.FROM_EMAIL || 'Deal Analyzer <mail.deals@frontstep.ai>',
   adminEmails: ADMIN_EMAILS,
+  underwritingInboundEmail: process.env.UNDERWRITING_INBOUND_EMAIL || '',
 });
