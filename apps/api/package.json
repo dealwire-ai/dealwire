@@ -53,6 +53,7 @@
     "resend": "^6.6.0",
     "rxjs": "^7.8.1",
     "svix": "^1.82.0",
+    "xlsx": "^0.18.5",
     "zod": "^3.23.8"
   },
   "devDependencies": {
@@ -66,6 +67,7 @@
     "@types/node": "^22.10.7",
     "@types/react": "^19.2.7",
     "@types/supertest": "^6.0.2",
+    "@types/xlsx": "^0.0.36",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.2",
