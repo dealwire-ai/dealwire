@@ -72,6 +72,39 @@ export class SQSService {
   }
 
   /**
+   * Enqueue a document package for underwriting processing.
+   * Documents must already be uploaded to S3 before calling this.
+   */
+  async enqueueUnderwritingJob(messageBody: {
+    type: 'underwriting-job';
+    dealId: string;
+    orgId: string;
+    documents: Array<{ s3Key: string; filename: string; contentType: string }>;
+  }): Promise<void> {
+    if (!this.sqsService) {
+      this.logger.warn('SQS is disabled - skipping underwriting enqueue');
+      return;
+    }
+
+    try {
+      this.logger.log(`Enqueueing underwriting job: dealId=${messageBody.dealId} docs=${messageBody.documents.map((d) => d.filename).join(', ')}`);
+
+      const timestamp = Date.now();
+      const random = Math.random().toString(36).substring(2, 10);
+      const id = `underwriting-${timestamp}-${random}`.substring(0, 80);
+
+      await this.sqsService.send('underwriting', { id, body: messageBody });
+      this.metricsService.recordSqsMessageSent('underwriting', 'success');
+    } catch (error) {
+      this.metricsService.recordSqsMessageSent('underwriting', 'error');
+      this.metricsService.recordSqsError('underwriting', 'send');
+      const msg = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Failed to enqueue underwriting job: ${msg}`);
+      throw error;
+    }
+  }
+
+  /**
    * Enqueue a user reply command (self-sent email without X-Analyzer-Sent = user replying to our analysis)
    * Same queue as normalized-email; listener branches on type.
    */
