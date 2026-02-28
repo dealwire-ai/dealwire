@@ -85,7 +85,7 @@ export class DocumentClassifierService {
         `[classifier] "${doc.filename}" → ${object.documentType} (confidence=${object.confidence.toFixed(2)}) — ${object.reasoning}`,
       );
 
-      return { ...doc, ...object };
+      return { ...doc, ...object } as ClassifiedDocument;
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       this.logger.warn(
