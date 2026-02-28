@@ -20,7 +20,7 @@ const ClassificationSchema = z.object({
       'om = Offering Memorandum, rent-roll = Rent Roll / Schedule of Rent, t12 = Trailing 12-Month Financials, proforma = Pro Forma template, other = anything else',
     ),
   confidence: z.number().min(0).max(1).describe('Confidence score 0–1'),
-  reasoning: z.string().max(300).describe('Brief explanation of classification decision'),
+  reasoning: z.string().describe('Brief explanation of classification decision'),
 });
 
 const SYSTEM_PROMPT = `You are classifying commercial real estate documents for underwriting analysis.
