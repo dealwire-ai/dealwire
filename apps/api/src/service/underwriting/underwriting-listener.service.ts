@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { SqsMessageHandler, SqsConsumerEventHandler } from '@ssut/nestjs-sqs';
 import { Message } from '@aws-sdk/client-sqs';
-import { UnderwritingPipelineService, UnderwritingJobContext } from './underwriting-pipeline.service';
+import { UnderwritingOrchestratorService, UnderwritingJobContext } from './underwriting-orchestrator.service';
 
 export interface UnderwritingJobMessage {
   type: 'underwriting-job';
@@ -18,7 +18,7 @@ export interface UnderwritingJobMessage {
 export class UnderwritingListenerService {
   private readonly logger = new Logger(UnderwritingListenerService.name);
 
-  constructor(private readonly pipeline: UnderwritingPipelineService) {}
+  constructor(private readonly pipeline: UnderwritingOrchestratorService) {}
 
   @SqsMessageHandler('underwriting', false)
   async handleMessage(message: Message): Promise<void> {

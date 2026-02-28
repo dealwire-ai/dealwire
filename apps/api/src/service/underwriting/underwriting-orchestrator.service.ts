@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { DocumentClassifierService } from './document-classifier.service';
 
 export interface UnderwritingDocument {
   s3Key: string;
@@ -21,8 +22,10 @@ export interface UnderwritingResult {
 }
 
 @Injectable()
-export class UnderwritingPipelineService {
-  private readonly logger = new Logger(UnderwritingPipelineService.name);
+export class UnderwritingOrchestratorService {
+  private readonly logger = new Logger(UnderwritingOrchestratorService.name);
+
+  constructor(private readonly classifier: DocumentClassifierService) {}
 
   async run(ctx: UnderwritingJobContext): Promise<UnderwritingResult> {
     const startTime = Date.now();
@@ -32,13 +35,16 @@ export class UnderwritingPipelineService {
       `Starting underwriting pipeline: dealId=${dealId} orgId=${orgId} documents=${documents.map((d) => d.filename).join(', ')}`,
     );
 
-    // TODO Step 1: Classifier — haiku-4-5, generateObject, identify doc types
+    // Step 1: Classify — identify each document type before extraction
     this.logger.log(`[${dealId}] Step 1: Classify documents`);
+    const classified = await this.classifier.classify(documents);
+    this.logger.log(
+      `[${dealId}] Classification results: ${classified.map((d) => `${d.filename}=${d.documentType}(${d.confidence.toFixed(2)})`).join(', ')}`,
+    );
 
     // TODO Step 2: Parallel extractors — sonnet-4-6, generateObject per doc type
     //   PDF → Claude document block
     //   Excel → SheetJS → JSON → Claude text
-    //   Scanned → pdftoppm + vision (existing path)
     this.logger.log(`[${dealId}] Step 2: Extract rent roll / T-12 / OM in parallel`);
 
     // TODO Step 3: Normalizer — pure code
@@ -66,7 +72,9 @@ export class UnderwritingPipelineService {
     this.logger.log(`[${dealId}] Step 7: Deliver results`);
 
     const durationMs = Date.now() - startTime;
-    this.logger.log(`Underwriting pipeline complete: dealId=${dealId} duration=${durationMs}ms`);
+    this.logger.log(
+      `Underwriting pipeline complete: dealId=${dealId} duration=${durationMs}ms`,
+    );
 
     return {
       dealId,
