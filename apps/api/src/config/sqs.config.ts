@@ -3,6 +3,7 @@ export interface SQSConfig {
   secretAccessKey: string;
   region: string;
   normalizedEmailQueueUrl: string;
+  underwritingQueueUrl: string;
 }
 
 export const sqsConfig = (): SQSConfig => ({
@@ -10,4 +11,5 @@ export const sqsConfig = (): SQSConfig => ({
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || '',
   region: process.env.AWS_REGION || 'us-east-1',
   normalizedEmailQueueUrl: process.env.AWS_NORMALIZED_EMAIL_QUEUE_URL || '',
+  underwritingQueueUrl: process.env.AWS_UNDERWRITING_QUEUE_URL || '',
 });

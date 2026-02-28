@@ -3,6 +3,7 @@ import { ClerkWebhookController } from '../controller/webhook/clerk-webhook.cont
 import { ResendWebhookController } from '../controller/webhook/resend-webhook.controller';
 import { ClerkWebhookService } from '../service/clerk/clerk-webhook.service';
 import { ResendWebhookService } from '../service/resend/resend-webhook.service';
+import { UnderwritingInboundService } from '../service/underwriting/underwriting-inbound.service';
 import { EmailServicesModule } from './email.module';
 import { DealAnalysisModule } from './ai.module';
 import { PrismaModule } from './prisma.module';
@@ -14,6 +15,6 @@ import { PreferencesModule } from './preferences.module';
 @Module({
   imports: [EmailServicesModule, DealAnalysisModule, PrismaModule, MicrosoftModule, SQSModule, S3Module, PreferencesModule],
   controllers: [ClerkWebhookController, ResendWebhookController],
-  providers: [ClerkWebhookService, ResendWebhookService],
+  providers: [ClerkWebhookService, ResendWebhookService, UnderwritingInboundService],
 })
 export class WebhookModule {}
