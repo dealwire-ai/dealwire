@@ -17,10 +17,13 @@ import { NotificationsModule } from './module/notifications.module';
 import { DealDigestModule } from './module/deal-digest.module';
 import { IngestionModule } from './module/ingestion.module';
 import { PublicDataModule } from './module/public-data.module';
+import { SqsRegistrationModule } from './module/sqs-registration.module';
+import { UnderwritingModule } from './module/underwriting.module';
 
 @Module({
   imports: [
     ScheduleModule.forRoot(),
+    SqsRegistrationModule,
     PrismaModule,
     MetricsModule,
     PreferencesModule,
@@ -34,6 +37,7 @@ import { PublicDataModule } from './module/public-data.module';
     DealDigestModule,
     IngestionModule,
     PublicDataModule,
+    UnderwritingModule,
   ],
   controllers: [AppController, FeatureFlagsController],
   providers: [AppService, ClerkAuthGuard],
