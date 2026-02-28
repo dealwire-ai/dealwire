@@ -5,6 +5,7 @@ import { OMExtractorService } from './om-extractor.service';
 import { RentRollExtractorService } from './rent-roll-extractor.service';
 import { T12ExtractorService } from './t12-extractor.service';
 import { ExtractionResults } from './extraction-types';
+import { FieldMapEntry } from './proforma.service';
 
 export interface UnderwritingDocument {
   s3Key: string;
@@ -63,6 +64,10 @@ export class UnderwritingOrchestratorService {
       );
     }
 
+    const neededFields = proforma
+      ? (proforma.fieldMap as unknown as FieldMapEntry[]).map((f) => f.name)
+      : undefined;
+
     // ── Step 1: Classify ───────────────────────────────────────────────────────
     this.logger.log(`[${dealId}] Step 1: Classify documents`);
     const classified = await this.classifier.classify(documents);
@@ -78,9 +83,9 @@ export class UnderwritingOrchestratorService {
     const t12Docs = classified.filter((d) => d.documentType === 't12');
 
     const [omResults, rentRollResults, t12Results] = await Promise.all([
-      Promise.all(omDocs.map((d) => this.omExtractor.extract(d))),
-      Promise.all(rentRollDocs.map((d) => this.rentRollExtractor.extract(d))),
-      Promise.all(t12Docs.map((d) => this.t12Extractor.extract(d))),
+      Promise.all(omDocs.map((d) => this.omExtractor.extract(d, neededFields))),
+      Promise.all(rentRollDocs.map((d) => this.rentRollExtractor.extract(d, neededFields))),
+      Promise.all(t12Docs.map((d) => this.t12Extractor.extract(d, neededFields))),
     ]);
 
     // Use the first of each type (most deals have one of each)
