@@ -75,7 +75,7 @@ Focus on purchase terms, income assumptions, expense assumptions, financing para
       });
 
       this.logger.log(`[proforma] Scanned ${object.fields.length} input fields from template`);
-      return object.fields;
+      return object.fields as FieldMapEntry[];
     } catch (err) {
       this.logger.error('[proforma] Field scan failed, using empty fieldMap', err);
       return [];
