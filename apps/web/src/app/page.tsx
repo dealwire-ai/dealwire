@@ -199,7 +199,7 @@ export default function Home() {
       <section className="relative z-10 px-6 lg:px-16 py-14 border-t border-white/5">
         <div className="max-w-7xl mx-auto">
           <p className="text-xs font-mono text-white/25 tracking-widest uppercase text-center mb-10">
-            Trusted by firms and advisors who move fast
+            Backed by operators who&apos;ve moved $2B+ across private markets
           </p>
           <div className="flex flex-wrap items-center justify-center gap-x-14 gap-y-8">
             {[
