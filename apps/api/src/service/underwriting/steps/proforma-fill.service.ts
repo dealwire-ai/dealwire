@@ -88,7 +88,7 @@ Do not invent values — only use what's present in the extraction data.`,
         ],
       });
 
-      return object.mappings;
+      return object.mappings as Array<{ name: string; value: number | string | null }>;
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       this.logger.error(`[proforma-fill] AI mapping failed: ${msg}`);
