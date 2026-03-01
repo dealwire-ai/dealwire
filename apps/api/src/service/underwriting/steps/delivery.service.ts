@@ -1,12 +1,14 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { S3Service } from '../../s3/s3.service';
 import { EmailSenderService } from '../../email/email-sender.service';
+import { emailConfig } from '../../../config/email.config';
 import { NormalizedResult } from './normalizer.service';
 import { ExtractionResults } from '../extractors/extraction-types';
 
 @Injectable()
 export class DeliveryService {
   private readonly logger = new Logger(DeliveryService.name);
+  private readonly config = emailConfig();
 
   constructor(
     private readonly s3: S3Service,
@@ -34,6 +36,7 @@ export class DeliveryService {
       to: [senderEmail],
       subject,
       html,
+      from: this.config.underwritingInboundEmail || undefined,
       attachments: [
         {
           filename: 'proforma_filled.xlsx',
