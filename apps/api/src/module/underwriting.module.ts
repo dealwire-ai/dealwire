@@ -7,13 +7,17 @@ import { RentRollExtractorService } from '../service/underwriting/extractors/ren
 import { T12ExtractorService } from '../service/underwriting/extractors/t12-extractor.service';
 import { GenericExtractorService } from '../service/underwriting/extractors/generic-extractor.service';
 import { ProformaService } from '../service/underwriting/proforma.service';
+import { NormalizerService } from '../service/underwriting/steps/normalizer.service';
+import { ProformaFillService } from '../service/underwriting/steps/proforma-fill.service';
+import { DeliveryService } from '../service/underwriting/steps/delivery.service';
 import { ProformaController } from '../controller/underwriting/proforma.controller';
 import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
 import { PrismaModule } from './prisma.module';
 import { S3Module } from './s3.module';
+import { EmailServicesModule } from './email.module';
 
 @Module({
-  imports: [PrismaModule, S3Module],
+  imports: [PrismaModule, S3Module, EmailServicesModule],
   controllers: [ProformaController],
   providers: [
     ClerkAuthGuard,
@@ -25,6 +29,9 @@ import { S3Module } from './s3.module';
     T12ExtractorService,
     GenericExtractorService,
     ProformaService,
+    NormalizerService,
+    ProformaFillService,
+    DeliveryService,
   ],
   exports: [UnderwritingOrchestratorService],
 })

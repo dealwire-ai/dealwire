@@ -7,6 +7,9 @@ import { T12ExtractorService } from './extractors/t12-extractor.service';
 import { ExtractionResults } from './extractors/extraction-types';
 import { FieldMapEntry } from './proforma.service';
 import { GenericExtractorService } from './extractors/generic-extractor.service';
+import { NormalizerService } from './steps/normalizer.service';
+import { ProformaFillService } from './steps/proforma-fill.service';
+import { DeliveryService } from './steps/delivery.service';
 
 export interface UnderwritingDocument {
   s3Key: string;
@@ -40,11 +43,14 @@ export class UnderwritingOrchestratorService {
     private readonly rentRollExtractor: RentRollExtractorService,
     private readonly t12Extractor: T12ExtractorService,
     private readonly genericExtractor: GenericExtractorService,
+    private readonly normalizer: NormalizerService,
+    private readonly proformaFill: ProformaFillService,
+    private readonly delivery: DeliveryService,
   ) {}
 
   async run(ctx: UnderwritingJobContext): Promise<UnderwritingResult> {
     const startTime = Date.now();
-    const { dealId, orgId, documents } = ctx;
+    const { dealId, orgId, senderEmail, documents } = ctx;
 
     this.logger.log(
       `Starting underwriting pipeline: dealId=${dealId} orgId=${orgId} documents=${documents.map((d) => d.filename).join(', ')}`,
@@ -113,38 +119,88 @@ export class UnderwritingOrchestratorService {
       `[${dealId}] Extraction summary: om=${extraction.om ? `confidence=${extraction.om.confidence.toFixed(2)}` : 'none'} rentRoll=${extraction.rentRoll ? `units=${extraction.rentRoll.totalUnits} confidence=${extraction.rentRoll.confidence.toFixed(2)}` : 'none'} t12=${extraction.t12 ? `noi=${extraction.t12.noi} confidence=${extraction.t12.confidence.toFixed(2)}` : 'none'} generic=${extraction.generic.length} doc(s)`,
     );
 
-    // ── Step 3: Normalize ──────────────────────────────────────────────────────
-    // Pure-code derivations on top of extracted data.
-    this.logger.log(`[${dealId}] Step 3: Normalize extracted data`);
-    // TODO: compute derived fields (EGI, vacancy rate from unit counts, expense ratio)
+    // ── Steps 3+4: Normalize + Reconcile ──────────────────────────────────────
+    this.logger.log(`[${dealId}] Steps 3+4: Normalize and reconcile`);
+    const normalized = this.normalizer.normalize(extraction);
+    if (normalized.flags.length > 0) {
+      this.logger.warn(
+        `[${dealId}] Reconciliation flags (${normalized.flags.length}): ${normalized.flags.join(' | ')}`,
+      );
+    }
+    this.logger.log(
+      `[${dealId}] Normalized: noi=${normalized.reconciledNoi} occupancy=${normalized.reconciledOccupancyRate} units=${normalized.reconciledTotalUnits} egi=${normalized.effectiveGrossIncome}`,
+    );
 
-    // TODO Step 4: Reconciler — opus-4-6 + extended thinking, retry loop (max 2)
-    //   Cross-check OM NOI vs T-12 computed NOI
-    //   Cross-check OM occupancy vs rent roll vacancy count
-    this.logger.log(`[${dealId}] Step 4: Reconcile cross-document conflicts`);
-
-    // TODO Step 5: Confidence gate — pure code
-    //   >= 0.85 → pass, 0.60–0.85 → flag, < 0.60 → null + flag
+    // ── Step 5: Confidence gate ────────────────────────────────────────────────
     this.logger.log(`[${dealId}] Step 5: Confidence gate`);
+    const confidenceFlags: string[] = [];
+    if (extraction.om && extraction.om.confidence < 0.6) {
+      confidenceFlags.push(`Low OM confidence (${extraction.om.confidence.toFixed(2)}) — values may be unreliable`);
+    } else if (extraction.om && extraction.om.confidence < 0.85) {
+      confidenceFlags.push(`Moderate OM confidence (${extraction.om.confidence.toFixed(2)}) — review key figures`);
+    }
+    if (extraction.rentRoll && extraction.rentRoll.confidence < 0.6) {
+      confidenceFlags.push(`Low rent roll confidence (${extraction.rentRoll.confidence.toFixed(2)}) — review unit data`);
+    }
+    if (extraction.t12 && extraction.t12.confidence < 0.6) {
+      confidenceFlags.push(`Low T-12 confidence (${extraction.t12.confidence.toFixed(2)}) — review expense data`);
+    }
 
-    // TODO Step 6: Pro forma fill — pure code
-    //   Use proforma.fieldMap to write extracted values into the .xlsx template
-    //   xlsx-populate writes to input cells only (XML passthrough)
-    //   Save filled .xlsx to S3: deals/{dealId}/proforma_filled.xlsx
-    this.logger.log(`[${dealId}] Step 6: Fill pro forma template`);
+    const allFlags = [...normalized.flags, ...confidenceFlags];
 
-    // TODO Step 7: Deliver — Resend email + dashboard notification
-    this.logger.log(`[${dealId}] Step 7: Deliver results`);
+    // ── Step 6: Proforma fill ──────────────────────────────────────────────────
+    let proformaS3Key: string | undefined;
+    if (proforma) {
+      this.logger.log(`[${dealId}] Step 6: Fill pro forma template`);
+      try {
+        const fieldMap = proforma.fieldMap as unknown as FieldMapEntry[];
+        proformaS3Key = await this.proformaFill.fill(
+          proforma.s3Key,
+          fieldMap,
+          extraction,
+          normalized,
+          dealId,
+        );
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        this.logger.error(`[${dealId}] Proforma fill failed: ${msg}`);
+        allFlags.push('Pro forma fill failed — see logs');
+      }
+    } else {
+      this.logger.log(`[${dealId}] Step 6: Skipped (no ready proforma for org)`);
+    }
+
+    // ── Step 7: Deliver ────────────────────────────────────────────────────────
+    if (senderEmail && proformaS3Key) {
+      this.logger.log(`[${dealId}] Step 7: Deliver results to ${senderEmail}`);
+      try {
+        await this.delivery.deliver({
+          senderEmail,
+          dealId,
+          proformaS3Key,
+          normalized,
+          extraction,
+        });
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        this.logger.error(`[${dealId}] Delivery failed: ${msg}`);
+      }
+    } else {
+      this.logger.log(
+        `[${dealId}] Step 7: Skipped (${!senderEmail ? 'no senderEmail' : 'no filled proforma'})`,
+      );
+    }
 
     const durationMs = Date.now() - startTime;
     this.logger.log(
-      `Underwriting pipeline complete: dealId=${dealId} duration=${durationMs}ms`,
+      `Underwriting pipeline complete: dealId=${dealId} duration=${durationMs}ms flags=${allFlags.length}`,
     );
 
     return {
       dealId,
       status: 'completed',
-      humanReviewFlags: [],
+      proformaS3Key,
+      humanReviewFlags: allFlags,
       durationMs,
     };
   }
