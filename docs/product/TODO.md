@@ -2,6 +2,7 @@
 
 ## General Ops
    - Stripe taxes?
+   - shortlist of 10 domains by Wed
 
 ## Biz Dev
    - Rengage every single contact in our pipeline, send demos of updated work
