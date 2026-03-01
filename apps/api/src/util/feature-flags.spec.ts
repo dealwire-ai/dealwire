@@ -6,7 +6,7 @@ describe('resolveFeatureFlags', () => {
     const flags = resolveFeatureFlags(null);
 
     // Assert
-    expect(flags).toEqual({ parcels: false });
+    expect(flags).toEqual({ parcels: false, underwriting: true });
   });
 
   it('should return all defaults when raw is undefined', () => {
@@ -14,7 +14,7 @@ describe('resolveFeatureFlags', () => {
     const flags = resolveFeatureFlags(undefined);
 
     // Assert
-    expect(flags).toEqual({ parcels: false });
+    expect(flags).toEqual({ parcels: false, underwriting: true });
   });
 
   it('should return all defaults when raw is empty object', () => {
@@ -22,7 +22,7 @@ describe('resolveFeatureFlags', () => {
     const flags = resolveFeatureFlags({});
 
     // Assert
-    expect(flags).toEqual({ parcels: false });
+    expect(flags).toEqual({ parcels: false, underwriting: true });
   });
 
   it('should override default when flag is set to true', () => {
@@ -46,7 +46,7 @@ describe('resolveFeatureFlags', () => {
     const flags = resolveFeatureFlags({ parcels: true, unknownFlag: true });
 
     // Assert
-    expect(flags).toEqual({ parcels: true });
+    expect(flags).toEqual({ parcels: true, underwriting: true });
     expect((flags as any).unknownFlag).toBeUndefined();
   });
 
@@ -63,7 +63,7 @@ describe('resolveFeatureFlags', () => {
     const flags = resolveFeatureFlags([1, 2, 3]);
 
     // Assert
-    expect(flags).toEqual({ parcels: false });
+    expect(flags).toEqual({ parcels: false, underwriting: true });
   });
 
   it('should handle string input gracefully', () => {
@@ -71,6 +71,6 @@ describe('resolveFeatureFlags', () => {
     const flags = resolveFeatureFlags('not an object');
 
     // Assert
-    expect(flags).toEqual({ parcels: false });
+    expect(flags).toEqual({ parcels: false, underwriting: true });
   });
 });
