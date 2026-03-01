@@ -288,8 +288,8 @@ export default function Home() {
               { value: "24 / 7", label: "Always running", desc: "Deal flow doesn't stop on weekends. Neither does it." },
               { value: "Hours", label: "Time to deploy", desc: "Custom-built, tested against your deal history, live in hours." },
             ].map((stat, index) => (
-              <FadeInSection key={index} delay={index * 0.1}>
-                <div className="p-7 bg-white/[0.02] border border-white/5 rounded-2xl hover:border-white/10 transition-colors">
+              <FadeInSection key={index} delay={index * 0.1} className="h-full">
+                <div className="h-full p-7 bg-white/[0.02] border border-white/5 rounded-2xl hover:border-white/10 transition-colors">
                   <div className="text-4xl font-mono text-white mb-2">{stat.value}</div>
                   <div className="text-[#3ECFA0] text-sm font-mono tracking-wider uppercase mb-2">{stat.label}</div>
                   <div className="text-white/40 text-sm leading-relaxed">{stat.desc}</div>
