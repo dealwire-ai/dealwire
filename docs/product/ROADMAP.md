@@ -8,7 +8,7 @@ The deal screener is the wedge. The endgame is an autonomous acquisitions analys
 
 **The most important thing is data quality and fidelity.** Every deal that flows through Analyzer should produce richer, more accurate, more structured intelligence than a human analyst could assemble manually. If the data isn't trustworthy, nothing else matters.
 
-## What's Built (as of Feb 2026)
+## What's Built (as of Mar 2026)
 
 ### Deal Screening (Core)
 - Outlook inbox monitoring via Microsoft Graph webhooks
@@ -38,12 +38,21 @@ The deal screener is the wedge. The endgame is an autonomous acquisitions analys
 - Write tools: update criteria, always-skip, buy box, digest schedule, screening buckets, contact notes/tags
 - Preference updates via email (e.g., email the system to adjust buy box)
 
+### Underwriting (Phase 1 — Email trigger → Excel delivery)
+- Email-triggered pipeline: forward deal docs → get filled pro forma back by email
+- 7-step pipeline: classify → extract (OM + rent roll + T-12 in parallel) → normalize + reconcile → confidence gate → pro forma fill → deliver
+- Excel fill via xlsx-populate (preserves formulas, charts, styles)
+- AI field mapper (Sonnet) maps extracted data to org's template field names
+- Delivery via Resend from `UNDERWRITING_INBOUND_EMAIL` with filled .xlsx attachment
+- Template management: upload org's Excel template → Claude maps fields → stored as FieldMap
+- Web pro forma rendering (dashboard view) is NOT yet built — see ROADMAP Phase 4
+
 ### Platform
 - Multi-tenant with Clerk orgs
 - Scheduled deal digest emails with per-org timezone support
 - Dashboard: deals, contacts, assets with search/filter/pagination
 - S3 document storage for attachments with pre-signed URL downloads
-- SQS async processing pipeline
+- SQS async processing pipeline (two queues: email screening + underwriting)
 
 ## Roadmap
 
@@ -84,12 +93,15 @@ _More channels, more users, more deal flow._
 _Move beyond screening into the full deal pipeline._
 
 - [ ] **Pipeline stages** — Track deals through: Screening → Due Diligence → Underwriting → LOI → Closing. Each stage can have autonomous agent actions.
-- [ ] **Underwriting automation** — Email deal documents ("underwrite this") → system extracts rent roll + T-12 → fills user's Excel pro forma template → renders in dashboard + exports. See [`docs/product/UNDERWRITING.md`](UNDERWRITING.md) for full plan.
-  - Step 1: Email trigger + document intake
-  - Step 2: Rent roll structured extraction (unit, type, sqft, current/market rent, lease expiry)
-  - Step 3: T-12 / trailing financial extraction (gross revenue, opex line items, NOI)
-  - Step 4: Template filling + Excel export (SheetJS, fills user's own template)
-  - Step 5: Web-native interactive pro forma with export
+- [~] **Underwriting automation** — Email deal documents ("underwrite this") → system extracts rent roll + T-12 → fills user's Excel pro forma template → delivers filled Excel by email. See [`docs/product/UNDERWRITING.md`](UNDERWRITING.md) for implementation status + full plan.
+  - [x] Email trigger + document intake (Resend inbound → S3 → SQS)
+  - [x] Document classification (Haiku, by filename)
+  - [x] Rent roll + T-12 + OM structured extraction (Sonnet-4-6, parallel)
+  - [x] Normalize + reconcile cross-document conflicts (pure code)
+  - [x] Confidence gate with human review flags
+  - [x] Template filling + Excel export (AI mapper + xlsx-populate)
+  - [x] Email delivery with filled .xlsx attachment
+  - [ ] Web-native interactive pro forma (dashboard rendering)
 - [ ] **Document management** — Organize OMs, rent rolls, financials, environmental reports per deal. OCR and structured extraction for each.
 
 ### Phase 5: Multi-Asset & Marketplace
