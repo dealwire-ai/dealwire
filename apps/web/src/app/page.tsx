@@ -205,6 +205,7 @@ export default function Home() {
             {[
               { file: "hildreth.png", alt: "Hildreth Real Estate Advisors" },
               { file: "jke.svg", alt: "JK Equities" },
+              { file: "dg-development.svg", alt: "DG Development Partners" },
             ].map(({ file, alt }) => (
               <div key={file} className="opacity-35 hover:opacity-70 transition-opacity duration-300" style={{ filter: 'brightness(0) invert(1)' }}>
                 <Image
