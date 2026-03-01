@@ -1,12 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { DocumentClassifierService } from './document-classifier.service';
-import { OMExtractorService } from './om-extractor.service';
-import { RentRollExtractorService } from './rent-roll-extractor.service';
-import { T12ExtractorService } from './t12-extractor.service';
-import { ExtractionResults } from './extraction-types';
+import { DocumentClassifierService } from './extractors/document-classifier.service';
+import { OMExtractorService } from './extractors/om-extractor.service';
+import { RentRollExtractorService } from './extractors/rent-roll-extractor.service';
+import { T12ExtractorService } from './extractors/t12-extractor.service';
+import { ExtractionResults } from './extractors/extraction-types';
 import { FieldMapEntry } from './proforma.service';
-import { GenericExtractorService } from './generic-extractor.service';
+import { GenericExtractorService } from './extractors/generic-extractor.service';
 
 export interface UnderwritingDocument {
   s3Key: string;

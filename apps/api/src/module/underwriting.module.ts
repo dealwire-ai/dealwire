@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { UnderwritingListenerService } from '../service/underwriting/underwriting-listener.service';
 import { UnderwritingOrchestratorService } from '../service/underwriting/underwriting-orchestrator.service';
-import { DocumentClassifierService } from '../service/underwriting/document-classifier.service';
-import { OMExtractorService } from '../service/underwriting/om-extractor.service';
-import { RentRollExtractorService } from '../service/underwriting/rent-roll-extractor.service';
-import { T12ExtractorService } from '../service/underwriting/t12-extractor.service';
-import { GenericExtractorService } from '../service/underwriting/generic-extractor.service';
+import { DocumentClassifierService } from '../service/underwriting/extractors/document-classifier.service';
+import { OMExtractorService } from '../service/underwriting/extractors/om-extractor.service';
+import { RentRollExtractorService } from '../service/underwriting/extractors/rent-roll-extractor.service';
+import { T12ExtractorService } from '../service/underwriting/extractors/t12-extractor.service';
+import { GenericExtractorService } from '../service/underwriting/extractors/generic-extractor.service';
 import { ProformaService } from '../service/underwriting/proforma.service';
 import { ProformaController } from '../controller/underwriting/proforma.controller';
 import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
