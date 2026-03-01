@@ -672,7 +672,7 @@ export default function Home() {
             <span className="text-sm text-white/40">Levine & Weinstein</span>
           </div>
           <p className="text-xs font-mono text-white/20 tracking-wider">
-            © {new Date().getFullYear()} · AI for private market acquisition teams
+            © {new Date().getFullYear()} · Frontstep AI, LLC. 
           </p>
         </div>
       </footer>
