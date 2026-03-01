@@ -17,6 +17,7 @@ export interface UnderwritingDocument {
 export interface UnderwritingJobContext {
   dealId: string;
   orgId: string;
+  senderEmail: string;
   documents: UnderwritingDocument[];
 }
 

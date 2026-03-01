@@ -102,6 +102,7 @@ export class UnderwritingInboundService {
       type: 'underwriting-job',
       dealId: jobId,
       orgId,
+      senderEmail: fromEmail,
       documents,
     });
 
