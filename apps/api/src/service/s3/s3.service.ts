@@ -178,6 +178,39 @@ export class S3Service {
   }
 
   /**
+   * Upload a filled proforma (.xlsx) to S3 and return the S3 key.
+   * Key: deals/{dealId}/proforma_filled.xlsx
+   */
+  async uploadFilledProforma(buffer: Buffer, dealId: string): Promise<string> {
+    if (!this.config.dealAttachmentsBucket) {
+      throw new Error('AWS_DEAL_ATTACHMENTS_S3_BUCKET_NAME not configured');
+    }
+
+    const s3Key = `deals/${dealId}/proforma_filled.xlsx`;
+
+    try {
+      await this.s3Client.send(
+        new PutObjectCommand({
+          Bucket: this.config.dealAttachmentsBucket,
+          Key: s3Key,
+          Body: buffer,
+          ContentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        }),
+      );
+
+      this.metricsService.recordS3Upload('success', buffer.length);
+      this.logger.log(`Uploaded filled proforma to S3: ${s3Key}`);
+      return s3Key;
+    } catch (error) {
+      this.metricsService.recordS3Upload('error');
+      this.metricsService.recordS3Error('upload');
+      const msg = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Failed to upload filled proforma to S3: ${msg}`);
+      throw new Error(`S3 upload failed: ${msg}`);
+    }
+  }
+
+  /**
    * Get content type from filename extension
    */
   private getContentType(filename: string): string {

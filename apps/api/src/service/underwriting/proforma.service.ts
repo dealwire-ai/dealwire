@@ -5,7 +5,7 @@ import { anthropic } from '@ai-sdk/anthropic';
 import { z } from 'zod';
 import { PrismaService } from '../prisma/prisma.service';
 import { S3Service } from '../s3/s3.service';
-import { excelToText } from './extraction-types';
+import { excelToText } from './extractors/extraction-types';
 
 export interface FieldMapEntry {
   name: string;

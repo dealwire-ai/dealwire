@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { generateObject } from 'ai';
 import { anthropic } from '@ai-sdk/anthropic';
 import { z } from 'zod';
-import { S3Service } from '../s3/s3.service';
+import { S3Service } from '../../s3/s3.service';
 import { ClassifiedDocument } from './document-classifier.service';
 import { excelToText, GenericExtraction } from './extraction-types';
 
