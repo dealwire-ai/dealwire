@@ -23,13 +23,14 @@ export class EmailSenderService {
     to: string[];
     subject: string;
     html: string;
+    from?: string;
     text?: string;
     replyToMessageId?: string;
     attachments?: Array<{ filename: string; content: string }>;
   }): Promise<string | null> {
     try {
       const emailParams: any = {
-        from: this.config.fromEmail,
+        from: params.from ?? this.config.fromEmail,
         to: params.to,
         subject: params.subject,
         html: params.html,
