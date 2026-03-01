@@ -69,7 +69,7 @@
 | Service | Purpose |
 |---------|---------|
 | `EmailProcessingService` | Extract text from emails and PDFs |
-| `EmailSenderService` | Send emails via Resend (fallback, not primary) |
+| `EmailSenderService` | Send emails via Resend. Accepts optional `from` override — used by underwriting delivery to send as "AI Underwriting Analyst" |
 | `EmailTemplateService` | Format HTML email with branding |
 
 ### Preferences Module (`src/module/preferences.module.ts`)
@@ -87,6 +87,44 @@
 | `ClerkWebhookController` | Handle Clerk user lifecycle events |
 | `MicrosoftWebhookController` | Handle Microsoft Graph notifications |
 | `ResendWebhookController` | Handle Resend email events (legacy) |
+
+### Underwriting Module (`src/module/underwriting.module.ts`)
+
+End-to-end pipeline: email inbound → classify → extract → normalize → fill pro forma → deliver.
+
+| Service | Purpose |
+|---------|---------|
+| `UnderwritingInboundService` | Resend inbound handler — downloads attachments, uploads to S3, enqueues SQS job |
+| `UnderwritingListenerService` | SQS consumer for `underwriting` queue (600s visibility timeout) |
+| `UnderwritingOrchestratorService` | Pipeline runner — coordinates Steps 1-7 |
+| `DocumentClassifierService` | Step 1: classify documents by filename (Haiku) |
+| `OMExtractorService` | Step 2: extract OM fields (Sonnet-4-6) |
+| `RentRollExtractorService` | Step 2: extract rent roll unit data (Sonnet-4-6) |
+| `T12ExtractorService` | Step 2: extract T-12 financials (Sonnet-4-6) |
+| `GenericExtractorService` | Step 2: extract fields from unclassified docs (Sonnet-4-6) |
+| `NormalizerService` | Steps 3+4: derive computed fields + reconcile cross-doc conflicts (pure code) |
+| `ProformaFillService` | Step 6: AI field mapper (Sonnet-4-6) + xlsx-populate write |
+| `DeliveryService` | Step 7: build HTML summary + send filled .xlsx via Resend |
+| `ProformaService` | Template CRUD + field map management |
+
+**SQS queue:** `underwriting` — env var `AWS_UNDERWRITING_QUEUE_URL`, visibility timeout 600s
+
+**Pipeline summary:**
+```
+Resend inbound → UnderwritingInboundService
+  → S3 upload → SQS enqueue
+  → UnderwritingListenerService → UnderwritingOrchestratorService.run()
+      Step 1: classify (Haiku)
+      Step 2: extract in parallel — OM + rent roll + T-12 + generic (Sonnet-4-6)
+      Steps 3+4: normalize + reconcile (pure code)
+      Step 5: confidence gate (pure code)
+      Step 6: AI mapper + proforma fill (Sonnet-4-6 + xlsx-populate)
+      Step 7: deliver email with .xlsx attachment (Resend)
+```
+
+**Rate limiting:** Sonnet 10k TPM — `ProformaFillService` retries with 65s → 90s backoff on 429.
+
+**Env vars:** `AWS_UNDERWRITING_QUEUE_URL`, `ANTHROPIC_API_KEY`, `UNDERWRITING_INBOUND_EMAIL`
 
 ### Other Services
 
@@ -122,13 +160,23 @@ Preferences are automatically created when an Organization is created via Clerk 
 | `DIRECT_URL` | Direct PostgreSQL connection (for migrations) |
 | `CLERK_SECRET_KEY` | Clerk backend SDK |
 | `CLERK_WEBHOOK_SECRET` | Verify Clerk webhooks |
-| `OPENAI_API_KEY` | AI services |
-| `RESEND_API_KEY` | Email sending (fallback) |
+| `OPENAI_API_KEY` | AI services (deal screening, agent) |
+| `ANTHROPIC_API_KEY` | Claude models (underwriting pipeline) |
+| `RESEND_API_KEY` | Email sending via Resend |
 | `API_BASE_URL` | Production URL (https://api.deals.frontstep.ai) |
 | `MICROSOFT_WEBHOOK_SECRET` | Graph webhook clientState validation |
 | `FRONTEND_URL` | Frontend origin for CORS (http://localhost:3000 or production URL) |
 | `REQUIRE_AUTH` | Optional. Set to `true` to require Clerk JWT on protected routes even when not in production (default: auth required only when `NODE_ENV === 'production'`) |
 | `ENABLE_SQS` | Optional. Set to `true` to enable SQS consumer in development (default: only enabled in production) |
+| `AWS_REGION` | AWS region for S3 + SQS |
+| `AWS_ACCESS_KEY_ID` | AWS credentials |
+| `AWS_SECRET_ACCESS_KEY` | AWS credentials |
+| `AWS_S3_BUCKET` | S3 bucket for deal attachments + pro formas |
+| `AWS_NORMALIZED_EMAIL_QUEUE_URL` | SQS queue URL for email screening pipeline |
+| `AWS_UNDERWRITING_QUEUE_URL` | SQS queue URL for underwriting pipeline |
+| `FROM_EMAIL` | Default Resend sender address |
+| `UNDERWRITING_INBOUND_EMAIL` | Resend inbound address for underwriting trigger emails |
+| `NYC_OPEN_DATA_APP_TOKEN` | Optional. Socrata app token for NYC Open Data (avoids rate limits) |
 
 ---
 
