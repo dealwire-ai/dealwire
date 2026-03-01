@@ -335,6 +335,12 @@ export default function Home() {
                 title: "Market Intelligence",
                 tagline: "Know what others don't.",
                 description: "Tracks submarket cap rate compression by asset class, flags SOFR-driven distress events and loan maturities, and surfaces comp sales before they're published. Populates your underwriting assumptions with live market data — going-in yields, exit cap assumptions, rent growth by submarket — so every model starts from ground truth, not a broker's pitch deck."
+              },
+              {
+                icon: Building2,
+                title: "Deal History & Broker Intelligence",
+                tagline: "Every deal you've ever seen. Every broker ranked.",
+                description: "Every OM, teaser, and broker blast that flows through the system gets indexed. Search your entire deal history in seconds — comp a live deal against everything you've screened in the same submarket, or surface that opportunity from eight months ago you didn't pull the trigger on. Over time, the system builds a broker intelligence layer: which reps consistently send deals in your buy box, which ones blast noise, and where your best opportunities have actually come from."
               }
             ].map((service, index) => (
               <FadeInSection key={index} delay={index * 0.05}>
