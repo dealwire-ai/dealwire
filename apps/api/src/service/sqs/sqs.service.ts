@@ -79,6 +79,7 @@ export class SQSService {
     type: 'underwriting-job';
     dealId: string;
     orgId: string;
+    senderEmail: string;
     documents: Array<{ s3Key: string; filename: string; contentType: string }>;
   }): Promise<void> {
     if (!this.sqsService) {
