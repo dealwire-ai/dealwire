@@ -22,7 +22,6 @@
 
 ## Frontstep Acquisition
     - execute + track media outreach
-    - (Isaac) test property for Tyler
-
+    
 ## Survey Platform
     - build M3 (due 3/5)
