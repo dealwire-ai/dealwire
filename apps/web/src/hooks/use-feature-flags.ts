@@ -6,10 +6,12 @@ import { useApi } from "./use-api";
 
 export interface FeatureFlags {
   parcels: boolean;
+  underwriting: boolean;
 }
 
 const DEFAULTS: FeatureFlags = {
   parcels: false,
+  underwriting: true,
 };
 
 export function useFeatureFlags() {
