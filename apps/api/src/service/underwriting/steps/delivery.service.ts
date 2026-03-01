@@ -36,7 +36,9 @@ export class DeliveryService {
       to: [senderEmail],
       subject,
       html,
-      from: this.config.underwritingInboundEmail || undefined,
+      from: this.config.underwritingInboundEmail
+        ? `AI Underwriting Analyst <${this.config.underwritingInboundEmail}>`
+        : undefined,
       attachments: [
         {
           filename: 'proforma_filled.xlsx',
