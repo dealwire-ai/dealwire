@@ -72,27 +72,45 @@ export class ProformaFillService {
     const fieldList = fieldMap.map((f) => `- ${f.name}: ${f.description}`).join('\n');
     const extractionJson = JSON.stringify({ extraction, normalized }, null, 2);
 
-    try {
-      const { object } = await generateObject({
-        model: anthropic('claude-sonnet-4-6'),
-        schema: MappingSchema,
-        system: `You are mapping real estate deal data to pro forma input fields.
+    const MAX_ATTEMPTS = 3;
+    const RATE_LIMIT_WAIT_MS = 65_000;
+
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+      try {
+        const { object } = await generateObject({
+          model: anthropic('claude-sonnet-4-6'),
+          maxRetries: 0,
+          schema: MappingSchema,
+          system: `You are mapping real estate deal data to pro forma input fields.
 For each field, find the best matching value from the extraction data.
 Return null if no confident match exists. Use numbers for numeric fields (not strings).
 Do not invent values — only use what's present in the extraction data.`,
-        messages: [
-          {
-            role: 'user',
-            content: `Pro forma fields:\n${fieldList}\n\nExtraction data:\n${extractionJson}\n\nMap each field to the best available value. Return null for any field without a confident match.`,
-          },
-        ],
-      });
+          messages: [
+            {
+              role: 'user',
+              content: `Pro forma fields:\n${fieldList}\n\nExtraction data:\n${extractionJson}\n\nMap each field to the best available value. Return null for any field without a confident match.`,
+            },
+          ],
+        });
 
-      return object.mappings as Array<{ name: string; value: number | string | null }>;
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      this.logger.error(`[proforma-fill] AI mapping failed: ${msg}`);
-      return fieldMap.map((f) => ({ name: f.name, value: null }));
+        return object.mappings as Array<{ name: string; value: number | string | null }>;
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        const isRateLimit = msg.toLowerCase().includes('rate limit') || msg.includes('429');
+
+        if (isRateLimit && attempt < MAX_ATTEMPTS) {
+          this.logger.warn(
+            `[proforma-fill] Rate limit hit (attempt ${attempt}/${MAX_ATTEMPTS}) — waiting ${RATE_LIMIT_WAIT_MS / 1000}s before retry`,
+          );
+          await new Promise((resolve) => setTimeout(resolve, RATE_LIMIT_WAIT_MS));
+          continue;
+        }
+
+        this.logger.error(`[proforma-fill] AI mapping failed after ${attempt} attempt(s): ${msg}`);
+        return fieldMap.map((f) => ({ name: f.name, value: null }));
+      }
     }
+
+    return fieldMap.map((f) => ({ name: f.name, value: null }));
   }
 }
