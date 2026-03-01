@@ -25,6 +25,7 @@ export class EmailSenderService {
     html: string;
     text?: string;
     replyToMessageId?: string;
+    attachments?: Array<{ filename: string; content: string }>;
   }): Promise<string | null> {
     try {
       const emailParams: any = {
@@ -43,6 +44,10 @@ export class EmailSenderService {
           'In-Reply-To': params.replyToMessageId,
           References: params.replyToMessageId,
         };
+      }
+
+      if (params.attachments?.length) {
+        emailParams.attachments = params.attachments;
       }
 
       const response = await this.resend.emails.send(emailParams);
