@@ -499,7 +499,7 @@ export default function Home() {
             <h2 className="text-4xl md:text-5xl font-normal tracking-tight mb-6">
               Built by engineers.
               <br />
-              <span className="text-white/40">Backed by operators.</span>
+              <span className="text-white/40">Backed by top operators.</span>
             </h2>
             <p className="text-white/45 max-w-2xl text-lg leading-relaxed mb-16">
               We&apos;re two students at Northeastern University who built, scaled, and sold a proptech software company before most of our classmates had their first internship. We don&apos;t have decades of industry experience. We have something rarer: the technical depth to build what the industry actually needs, backed by operators who&apos;ve seen every type of deal there is.
@@ -571,9 +571,9 @@ export default function Home() {
                   bio: "Principal at JK Equities. Began his real estate career at Deutsche Bank and Ernst & Young in CMBS. Currently oversees all aspects of JK Equities, which has owned, operated and developed property in more than 15 states valued at nearly $2 billion."
                 }
               ].map((advisor, index) => (
-                <div key={index} className="relative group">
+                <div key={index} className="relative group h-full">
                   <div className="absolute inset-0 bg-gradient-to-br from-[#3ECFA0]/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <div className="relative p-6 bg-white/[0.02] border border-white/5 rounded-2xl">
+                  <div className="relative h-full p-6 bg-white/[0.02] border border-white/5 rounded-2xl">
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-4">
                         <div className="relative w-12 h-12 rounded-xl overflow-hidden border border-[#3ECFA0]/20 shrink-0">
