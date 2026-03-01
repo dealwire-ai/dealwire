@@ -1,5 +1,28 @@
 # Acquisition Underwriting Platform
 
+## Implementation Status (as of Mar 2026)
+
+The email-trigger → Excel delivery pipeline is **end-to-end working in production**.
+
+| Step | Status | Notes |
+|------|--------|-------|
+| Email trigger + inbound handling | ✅ Built | Resend inbound webhook → `UnderwritingInboundService` |
+| Document classification | ✅ Built | Haiku, by filename |
+| Parallel extraction (OM, rent roll, T-12) | ✅ Built | Sonnet-4-6, `Promise.all` |
+| Normalize + reconcile | ✅ Built | Pure code in `NormalizerService` (not Opus) |
+| Confidence gate | ✅ Built | Flags low/moderate confidence fields |
+| Pro forma fill + AI mapper | ✅ Built | Sonnet-4-6 mapper + xlsx-populate write |
+| Email delivery | ✅ Built | Resend from `UNDERWRITING_INBOUND_EMAIL`, "AI Underwriting Analyst" |
+| Web pro forma rendering | ❌ Not built | Dashboard view of filled pro forma |
+
+**Key divergences from original plan (below):**
+- Reconciler (Step 4) is **pure code** in `NormalizerService`, NOT Opus + extended thinking
+- Step 7 (Delivery) was added — not in original plan
+- AI mapper sub-step is in `ProformaFillService` — not in original plan
+- No BullMQ — uses SQS directly (same pattern as email pipeline)
+
+---
+
 ## Overview
 
 The underwriting feature moves Analyzer beyond deal screening into the full acquisition analysis workflow. The goal: JK (and similar users) should be able to email deal documents to Analyzer and get back a filled pro forma — no manual spreadsheet work required.
@@ -103,27 +126,74 @@ SQS job (enqueued same way as email processing)
   │   Compute derived fields: EGI, NOI, vacancy rate
   │   Output: DealSnapshot
   │
-  ├─ STEP 4: RECONCILER  (the only agentic loop)
-  │   Model: claude-opus-4-6 + extended thinking
-  │   SDK: Vercel AI SDK generateObject
-  │
-  │   Checks OM-stated NOI vs. T-12 computed NOI, occupancy vs. rent roll, etc.
-  │   On conflict: targeted re-query on the source doc (max 2 retries)
-  │   On unresolvable: adds to humanReviewFlags[], continues with lower-confidence value
-  │   Extended thinking block stored verbatim as audit trail per conflict
+  ├─ STEP 4: RECONCILER  (pure code — see NormalizerService)
+  │   ⚠ PLAN vs REALITY: This is NOT Opus + extended thinking.
+  │   NormalizerService handles both Steps 3 and 4 in pure TypeScript:
+  │   - NOI conflict (>10% delta): flags, prefers T-12 if confidence > 0.7
+  │   - Unit count mismatch (>5% delta): flags
+  │   - Occupancy mismatch (>5% delta): flags
+  │   All flags go to humanReviewFlags[]; pipeline continues with best available value
   │
   ├─ STEP 5: CONFIDENCE GATE  (pure code)
   │   >= 0.85 → pass
   │   0.60–0.85 → flag for review, include in output
   │   < 0.60 → null in pro forma cell + marker, add to humanReviewFlags[]
   │
-  └─ STEP 6: PRO FORMA FILL  (pure code)
-      Load FieldMap from DB (set up once at template onboarding)
-      xlsx-populate: write extracted values to input cells only
-      Formula cells are never touched — xlsx-populate passes through OOXML
-        directly so charts, styles, and formula dependencies survive intact
-      Output: filled .xlsx buffer → S3 + email attachment
+  ├─ STEP 6: PRO FORMA FILL  (AI mapper + xlsx-populate write)
+  │   Sub-step A: Sonnet-4-6 maps field names → best values from extraction data
+  │   Sub-step B: xlsx-populate writes mapped values to input cells only
+  │   Formula cells are never touched — xlsx-populate passes through OOXML
+  │     directly so charts, styles, and formula dependencies survive intact
+  │   Output: filled .xlsx buffer → S3 (deals/{dealId}/proforma_filled.xlsx)
+  │   Rate limit retry: 65s wait → 90s wait (Sonnet 10k TPM limit)
+  │
+  └─ STEP 7: DELIVER  (added in implementation — not in original plan)
+      Build HTML email with key metrics table + reconciliation flags
+      Send via Resend from UNDERWRITING_INBOUND_EMAIL ("AI Underwriting Analyst")
+      Attach filled .xlsx
+      Skipped if no filled pro forma available
 ```
+
+---
+
+## File Structure (actual implementation)
+
+```
+apps/api/src/
+  service/underwriting/
+    underwriting-inbound.service.ts      # Resend inbound handler: download attachments → S3 → SQS
+    underwriting-listener.service.ts     # SQS consumer for 'underwriting' queue
+    underwriting-orchestrator.service.ts # Pipeline runner (Steps 1-7)
+    proforma.service.ts                  # Template CRUD + field map management
+    extractors/
+      document-classifier.service.ts     # Step 1: classify by filename — Haiku
+      om-extractor.service.ts            # Step 2: OM extraction — Sonnet-4-6
+      rent-roll-extractor.service.ts     # Step 2: rent roll extraction — Sonnet-4-6
+      t12-extractor.service.ts           # Step 2: T-12 extraction — Sonnet-4-6
+      generic-extractor.service.ts       # Step 2: unclassified docs — Sonnet-4-6
+      extraction-types.ts                # Shared types (ExtractionResults, field schemas)
+    steps/
+      normalizer.service.ts              # Steps 3+4: derive fields + reconcile (pure code)
+      proforma-fill.service.ts           # Step 6: AI mapper (Sonnet) + xlsx-populate write
+      delivery.service.ts                # Step 7: HTML email + Resend send
+  controller/underwriting/
+    proforma.controller.ts               # /underwriting/proforma REST endpoints
+  module/
+    underwriting.module.ts
+```
+
+---
+
+## Rate Limiting
+
+Sonnet-4-6 has a 10k TPM limit on lower-tier plans. The extraction step runs multiple Sonnet calls in parallel (`Promise.all`), and the AI mapper in Step 6 also uses Sonnet.
+
+`ProformaFillService.mapFieldsWithAI()` handles rate limits with a retry loop:
+- Attempt 1 fails with 429 → wait 65s → retry
+- Attempt 2 fails with 429 → wait 90s → retry
+- Attempt 3 fails → return all-null mappings (pro forma fill skipped)
+
+If rate limiting is a persistent issue in production, the extractors may need sequential execution instead of `Promise.all`.
 
 ---
 
@@ -170,7 +240,8 @@ SQS job (enqueued same way as email processing)
 ### Extraction SDK: Vercel AI SDK + claude-sonnet-4-6
 - `generateObject` with Zod schemas handles schema enforcement and auto-retry
 - Claude is the underlying model for all extractors — the SDK is just plumbing
-- Model routing: haiku-4-5 for classifier, sonnet-4-6 for extractors, opus-4-6 for reconciler
+- Model routing: haiku-4-5 for classifier, sonnet-4-6 for extractors + AI mapper
+- ⚠ Opus is NOT used in the production path — reconciliation is pure code
 
 ### Document format handling
 - **PDF (digital):** Send as Claude `document` block (base64). 100-page limit — most rent rolls and T-12s are well under. Large OMs: use Files API and split if needed.
