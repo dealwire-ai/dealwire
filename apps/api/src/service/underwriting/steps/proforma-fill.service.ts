@@ -74,7 +74,7 @@ export class ProformaFillService {
 
     try {
       const { object } = await generateObject({
-        model: anthropic('claude-haiku-4-5-20251001'),
+        model: anthropic('claude-sonnet-4-6'),
         schema: MappingSchema,
         system: `You are mapping real estate deal data to pro forma input fields.
 For each field, find the best matching value from the extraction data.
