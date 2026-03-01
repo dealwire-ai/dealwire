@@ -57,24 +57,45 @@ function FieldMapEditor({
         <p className="text-xs text-zinc-600 mb-2">No fields yet. Add a field or upload a template to auto-discover them.</p>
       )}
       {fieldMap.length > 0 && (
-        <div className="space-y-2 mb-3">
+        <div className="space-y-1 mb-3">
           {fieldMap.map((row, i) => (
-            <div key={i} className="flex items-center gap-2">
-              <input
-                value={row.name}
-                onChange={(e) => updateRow(i, { name: e.target.value })}
-                placeholder="Field name"
-                className="bg-zinc-900 border border-zinc-700 rounded px-2 py-1 text-white text-xs w-36 flex-shrink-0"
-              />
-              <input
-                value={row.description}
-                onChange={(e) => updateRow(i, { description: e.target.value })}
-                placeholder="Description"
-                className="bg-zinc-900 border border-zinc-700 rounded px-2 py-1 text-white text-xs flex-1 min-w-0"
-              />
+            <div key={i} className="flex items-start gap-2">
+              <div className="flex flex-col gap-1 flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <input
+                    value={row.name}
+                    onChange={(e) => updateRow(i, { name: e.target.value })}
+                    placeholder="Field name"
+                    className="bg-zinc-900 border border-zinc-700 rounded px-2 py-1 text-white text-xs w-36 flex-shrink-0"
+                  />
+                  <input
+                    value={row.description}
+                    onChange={(e) => updateRow(i, { description: e.target.value })}
+                    placeholder="Description"
+                    className="bg-zinc-900 border border-zinc-700 rounded px-2 py-1 text-white text-xs flex-1 min-w-0"
+                  />
+                </div>
+                {(row.sheet || row.cell) && (
+                  <div className="flex items-center gap-2 pl-0.5">
+                    <input
+                      value={row.sheet}
+                      onChange={(e) => updateRow(i, { sheet: e.target.value })}
+                      placeholder="Sheet"
+                      className="bg-transparent border border-zinc-800 rounded px-2 py-0.5 text-zinc-500 text-xs w-36 flex-shrink-0"
+                    />
+                    <input
+                      value={row.cell}
+                      onChange={(e) => updateRow(i, { cell: e.target.value })}
+                      placeholder="Cell"
+                      className="bg-transparent border border-zinc-800 rounded px-2 py-0.5 text-zinc-500 text-xs w-20 flex-shrink-0"
+                    />
+                    <span className="text-xs text-zinc-700">cell ref</span>
+                  </div>
+                )}
+              </div>
               <button
                 onClick={() => removeRow(i)}
-                className="text-zinc-500 hover:text-red-400 px-2 flex-shrink-0"
+                className="text-zinc-500 hover:text-red-400 px-2 flex-shrink-0 mt-1"
               >
                 ×
               </button>
