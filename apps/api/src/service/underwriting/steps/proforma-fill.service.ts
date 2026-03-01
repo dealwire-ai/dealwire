@@ -73,7 +73,7 @@ export class ProformaFillService {
     const extractionJson = JSON.stringify({ extraction, normalized }, null, 2);
 
     const MAX_ATTEMPTS = 3;
-    const RATE_LIMIT_WAIT_MS = 65_000;
+    const RATE_LIMIT_WAITS_MS = [65_000, 90_000];
 
     for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
       try {
@@ -99,10 +99,11 @@ Do not invent values — only use what's present in the extraction data.`,
         const isRateLimit = msg.toLowerCase().includes('rate limit') || msg.includes('429');
 
         if (isRateLimit && attempt < MAX_ATTEMPTS) {
+          const waitMs = RATE_LIMIT_WAITS_MS[attempt - 1] ?? 90_000;
           this.logger.warn(
-            `[proforma-fill] Rate limit hit (attempt ${attempt}/${MAX_ATTEMPTS}) — waiting ${RATE_LIMIT_WAIT_MS / 1000}s before retry`,
+            `[proforma-fill] Rate limit hit (attempt ${attempt}/${MAX_ATTEMPTS}) — waiting ${waitMs / 1000}s before retry`,
           );
-          await new Promise((resolve) => setTimeout(resolve, RATE_LIMIT_WAIT_MS));
+          await new Promise((resolve) => setTimeout(resolve, waitMs));
           continue;
         }
 
