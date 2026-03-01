@@ -59,7 +59,7 @@ export default function Home() {
                   posthog.capture('nav_section_clicked', { section: id });
                   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
                 }}
-                className="text-xs font-mono tracking-widest uppercase text-white/50 hover:text-white transition-colors"
+                className="text-xs font-mono tracking-widest uppercase text-white/50 hover:text-white transition-colors cursor-pointer"
               >
                 {label}
               </button>
@@ -128,7 +128,7 @@ export default function Home() {
               </h1>
 
               <p className="text-lg text-white/50 max-w-lg leading-relaxed mb-10">
-                A deal hits your inbox. Our system reads the OM, screens it against your buy box, and fires the right action automatically — skip it, draft a broker reply, or kick off a full underwriting that populates your Excel pro forma. Every morning, a digest of everything overnight. Everything is configurable to your criteria.
+                A deal hits your inbox. Our system reads the OM, screens against your buy box, and fires the right action: skip it, draft a broker reply, or run a full underwriting that populates your Excel pro forma. Every morning, a digest of overnight deal flow. All configurable.
               </p>
 
               <Link href="/book" onClick={() => posthog.capture('cta_clicked', { cta_type: 'book_your_call', location: 'hero' })}>
@@ -237,22 +237,22 @@ export default function Home() {
               {
                 num: "01",
                 title: "Analysts buried in OMs",
-                body: "Your $150K analysts spend 3+ hours per offering memorandum — extracting T-12s, rebuilding rent rolls, formatting prelim models. That's table stakes work that doesn't move the needle."
+                body: "Your $150K analysts spend 3+ hours per OM extracting T-12s and rebuilding rent rolls. That's table stakes work. It shouldn't require a senior hire."
               },
               {
                 num: "02",
                 title: "Speed wins deals",
-                body: "By the time your team manually screens an OM, a faster firm has already toured the asset. The LOI window closes faster than most shops can load a spreadsheet."
+                body: "By the time your team manually screens an OM, a faster firm has already toured the asset. The LOI window closes faster than most shops open a spreadsheet."
               },
               {
                 num: "03",
                 title: "Scaling means hiring",
-                body: "Want to evaluate 3× the deal flow? That's 3× the headcount — months of recruiting, onboarding, and training. The unit economics don't work."
+                body: "Evaluating 3x the deal flow means 3x the headcount. Months of recruiting and onboarding. The unit economics don't work."
               },
               {
                 num: "04",
                 title: "The edge is already moving",
-                body: "The top-performing GP shops have AI in production. They're not announcing it — they're using it to send credible LOIs while others are still reading the exec summary."
+                body: "Top GP shops already have AI in production. They're not announcing it. They're sending LOIs while everyone else reads page one."
               }
             ].map(({ num, title, body }, index) => (
               <FadeInSection key={num} delay={index * 0.1}>
@@ -277,16 +277,16 @@ export default function Home() {
                 <span className="text-white/40">End to end.</span>
               </h2>
               <p className="text-white/45 text-lg leading-relaxed mb-12">
-                Not a screening tool. Not a dashboard. A custom AI analyst that does the entire job — from the moment a deal hits your inbox to a populated pro forma sitting in your model folder — without you touching it.
+                Not a screening tool. Not a dashboard. A custom AI analyst that handles the entire job: from inbox to populated pro forma. Without you touching it.
               </p>
             </div>
           </FadeInSection>
 
           <div className="grid md:grid-cols-3 gap-4 mt-8">
             {[
-              { value: "< 4 min", label: "OM to decision", desc: "From inbox receipt to screened output, pro forma populated, broker reply drafted" },
-              { value: "24 / 7", label: "Always running", desc: "Nights, weekends, holidays — deal flow doesn't stop and neither does it" },
-              { value: "Hours", label: "Time to deploy", desc: "Custom-built, tested against your real deal history, live in your inbox fast" },
+              { value: "< 4 min", label: "OM to decision", desc: "Inbox to screened decision, pro forma populated, broker reply sent." },
+              { value: "24 / 7", label: "Always running", desc: "Deal flow doesn't stop on weekends. Neither does it." },
+              { value: "Hours", label: "Time to deploy", desc: "Custom-built, tested against your deal history, live in hours." },
             ].map((stat, index) => (
               <FadeInSection key={index} delay={index * 0.1}>
                 <div className="p-7 bg-white/[0.02] border border-white/5 rounded-2xl hover:border-white/10 transition-colors">
@@ -317,31 +317,31 @@ export default function Home() {
                 icon: TrendingUp,
                 title: "Off-Market Deal Sourcing",
                 tagline: "Deals your competitors will never see.",
-                description: "Monitors public records, delinquent tax filings, CMBS watchlists, and ownership transfer data daily. Surfaces pre-market opportunities by asset type, distress signal, debt maturity, and ownership structure — before they hit CoStar or CREXI. Ranked by fit against your buy box. Ready to outreach."
+                description: "Monitors public records, delinquent tax filings, CMBS watchlists, and ownership transfers daily. Surfaces distressed and pre-market opportunities ranked by fit against your buy box. Before they hit CoStar."
               },
               {
                 icon: Building2,
                 title: "Deal Screening & Full Underwriting",
                 tagline: "Inbox to populated pro forma in under 5 minutes.",
-                description: "Reads every OM and teaser that hits your inbox. Screens against your buy box. For deals worth pursuing, it extracts the T-12, rent roll, and operating expense detail from the attached documents — then runs your acquisition model end-to-end, populating your Excel pro forma with levered IRR, cash-on-cash, equity multiple, and sensitivity tables. Drafts the IC memo and broker reply. All configurable: which documents to parse, which model to use, which assumptions to apply."
+                description: "Reads every OM and teaser in your inbox, screens against your buy box, and for deals worth pursuing, extracts the T-12, rent roll, and opex detail. Runs your acquisition model end-to-end: levered IRR, CoC, equity multiple, sensitivity tables. Drafts the IC memo and broker reply. Configurable: documents, model, assumptions."
               },
               {
                 icon: Workflow,
                 title: "Operations",
                 tagline: "Back office that runs itself.",
-                description: "Automated CAM reconciliations, lease abstract extraction, SNDA tracking, and tenant notice management. NOI reporting that stays current without touching a spreadsheet. Your ops team focuses on exceptions, not data entry."
+                description: "CAM reconciliations, lease abstract extraction, SNDA tracking, tenant notices. NOI reporting that stays current without a spreadsheet. Your ops team handles exceptions, not data entry."
               },
               {
                 icon: Sparkles,
                 title: "Market Intelligence",
                 tagline: "Know what others don't.",
-                description: "Tracks submarket cap rate compression by asset class, flags SOFR-driven distress events and loan maturities, and surfaces comp sales before they're published. Populates your underwriting assumptions with live market data — going-in yields, exit cap assumptions, rent growth by submarket — so every model starts from ground truth, not a broker's pitch deck."
+                description: "Tracks cap rate compression by submarket, flags SOFR-driven distress and loan maturities, surfaces comp sales before publication. Feeds live going-in yields, exit caps, and rent growth into your underwriting assumptions. Every model starts from ground truth, not a broker's pitch deck."
               },
               {
                 icon: Building2,
                 title: "Deal History & Broker Intelligence",
                 tagline: "Every deal you've ever seen. Every broker ranked.",
-                description: "Every OM, teaser, and broker blast that flows through the system gets indexed. Search your entire deal history in seconds — comp a live deal against everything you've screened in the same submarket, or surface that opportunity from eight months ago you didn't pull the trigger on. Over time, the system builds a broker intelligence layer: which reps consistently send deals in your buy box, which ones blast noise, and where your best opportunities have actually come from."
+                description: "Every OM and teaser that flows through gets indexed. Search your full deal history in seconds. Comp a live deal against everything you've screened in the same submarket. Over time: a broker intelligence layer showing which reps send quality deals, which blast noise, and where your best opportunities actually come from."
               }
             ].map((service, index) => (
               <FadeInSection key={index} delay={index * 0.05}>
@@ -373,7 +373,7 @@ export default function Home() {
               <span className="text-white/40">a set of automatic rules.</span>
             </h2>
             <p className="text-white/45 text-lg leading-relaxed max-w-2xl mb-12">
-              Every deal that hits your inbox is assessed in real time. The right action fires automatically — no clicks, no manual triage. You configure the criteria; the system handles the rest.
+              Every deal in your inbox is assessed in real time. The right action fires automatically. You set the criteria. The system runs it.
             </p>
           </FadeInSection>
 
@@ -384,14 +384,14 @@ export default function Home() {
                 labelColor: "text-white/30",
                 rowBorder: "border-white/5",
                 condition: "Doesn't fit your buy box",
-                action: "Archived silently. Logged and searchable. Never touches your inbox or digest.",
+                action: "Moved to a designated Outlook folder. Logged and searchable. Never touches your inbox or digest.",
               },
               {
                 label: "FLAG IN DIGEST",
                 labelColor: "text-yellow-400",
                 rowBorder: "border-yellow-500/15",
-                condition: "In range — worth a look",
-                action: "Surfaced in your morning digest with a one-paragraph summary. Broker reply drafted and queued for your review.",
+                condition: "In range, worth a look",
+                action: "Moved to your review folder and surfaced in your morning digest with a summary. Broker reply drafted and queued.",
               },
               {
                 label: "FULL UNDERWRITING",
@@ -430,7 +430,7 @@ export default function Home() {
                   <h3 className="text-sm font-medium">Daily Deal Digest</h3>
                 </div>
                 <p className="text-white/45 text-sm leading-relaxed">
-                  Every morning — or whenever you want it — a digest of every deal from the last 24 hours lands in your inbox. Best opportunities at the top, ranked by fit against your buy box. One-click actions on each. Nothing slips through. Nothing wastes your time.
+                  Every morning, a digest of the last 24 hours lands in your inbox. Best deals at the top, ranked by fit. One-click actions on each. Nothing slips. Nothing wastes your time.
                 </p>
               </div>
             </FadeInSection>
@@ -441,7 +441,7 @@ export default function Home() {
                 <div className="space-y-2.5">
                   {[
                     "Buy box criteria and fit thresholds",
-                    "Action rules per tier — skip, reply, or underwrite",
+                    "Action rules per tier: skip, reply, or underwrite",
                     "Digest schedule and format (daily, real-time, weekly)",
                     "Excel model, underwriting assumptions, and output fields",
                   ].map((item, i) => (
@@ -473,17 +473,17 @@ export default function Home() {
               {
                 step: "01",
                 title: "Discovery Call",
-                description: "30 minutes. We map your buy box, your underwriting model, and where deals are slipping through. You walk away knowing exactly what we'll build and what it'll cost. No pitch deck."
+                description: "30 minutes. We map your buy box, your model, and where deals slip. You leave knowing exactly what we'll build and what it costs. No pitch deck."
               },
               {
                 step: "02",
                 title: "We Configure & Build",
-                description: "We wire your AI analyst into your inbox and your Excel underwriting model. We configure your buy box rules, action thresholds, digest schedule, and underwriting assumptions. You tell us what a great deal looks like — we make sure the system knows it too."
+                description: "We wire your AI analyst into your inbox and Excel model. Configure buy box rules, action thresholds, and digest schedule. You define what a great deal looks like. We make sure the system knows it."
               },
               {
                 step: "03",
                 title: "Live in Hours",
-                description: "Goes live in your inbox in hours, not weeks. Every incoming deal gets read, underwritten, and returned as a populated model with a go/no-go recommendation. We monitor, refine, and improve. ROI within 90 days — or we keep working until you see it."
+                description: "Live in hours. Every incoming deal is read, underwritten, and returned as a populated model with a go/no-go. We monitor, refine, and improve. ROI within 90 days or we keep working."
               }
             ].map((item, index) => (
               <FadeInSection key={index} delay={index * 0.1}>
@@ -509,7 +509,7 @@ export default function Home() {
               <span className="text-white/40">Backed by top operators.</span>
             </h2>
             <p className="text-white/45 max-w-2xl text-lg leading-relaxed mb-16">
-              We&apos;re two students at Northeastern University who built, scaled, and sold a proptech software company before most of our classmates had their first internship. We don&apos;t have decades of industry experience. We have something rarer: the technical depth to build what the industry actually needs, backed by operators who&apos;ve seen every type of deal there is.
+              Two Northeastern students who built, scaled, and sold a proptech company before most classmates had their first internship. We don&apos;t have decades of experience. We have something rarer: the depth to build what the industry needs, backed by operators who&apos;ve seen every type of deal.
             </p>
           </FadeInSection>
 
@@ -568,14 +568,14 @@ export default function Home() {
                   role: "Advisor",
                   headshot: "/headshots/david.png",
                   linkedin: "https://www.linkedin.com/in/davidshorenstein/",
-                  bio: "Principal at Hildreth Real Estate Advisors. Previously co-founded Silvershore Properties and assembled a $300M+ NYC portfolio across 250+ properties. Former CIO at Forrest Shorenstein Capital Partners, and Senior Associate at Marcus & Millichap with $250M+ in sales."
+                  bio: "Principal at Hildreth Real Estate Advisors. Co-founded Silvershore Properties, assembling a $300M+ NYC portfolio across 250+ assets. Former CIO at Forrest Shorenstein Capital Partners. $250M+ in sales at Marcus & Millichap."
                 },
                 {
                   name: "Jordan Karlik",
                   role: "Advisor",
                   headshot: "/headshots/jordan.jpeg",
                   linkedin: "https://www.linkedin.com/in/jordan-karlik-b546b83/",
-                  bio: "Principal at JK Equities. Began his real estate career at Deutsche Bank and Ernst & Young in CMBS. Currently oversees all aspects of JK Equities, which has owned, operated and developed property in more than 15 states valued at nearly $2 billion."
+                  bio: "Principal at JK Equities. Started at Deutsche Bank and Ernst & Young in CMBS. JK Equities has owned, operated, and developed nearly $2B in property across 15+ states."
                 }
               ].map((advisor, index) => (
                 <div key={index} className="relative group h-full">
@@ -616,7 +616,7 @@ export default function Home() {
                 </div>
                 <div className="lg:border-l lg:border-white/8 lg:pl-12">
                   <p className="text-white/50 leading-relaxed text-sm mb-4">
-                    Built in 3 months. Won a cash prize at Northeastern&apos;s startup competition. Acquired within weeks of launch. The platform automatically qualified thousands of rental applicants — underwriting renters the same way we now underwrite deals.
+                    Built in 3 months. Won a cash prize at Northeastern&apos;s startup competition. Acquired within weeks of launch. The platform automatically qualified thousands of renters, underwriting applicants the same way we now underwrite deals.
                   </p>
                   <div className="flex flex-wrap gap-x-6 gap-y-1">
                     {["Built in 3 months", "Northeastern startup prize winner", "Acquired post-launch", "Thousands of renters qualified"].map((tag) => (
@@ -644,7 +644,7 @@ export default function Home() {
                     See what a fully underwritten<br />deal looks like in 4 minutes.
                   </h2>
                   <p className="text-white/50 text-lg mb-10 leading-relaxed">
-                    30 minutes. No pitch deck. Show us a deal — we&apos;ll show you what the output looks like. T-12 extracted, rent roll reconciled, pro forma populated, IC memo drafted.
+                    30 minutes. No pitch deck. Show us a deal. We&apos;ll show you the output: T-12 extracted, rent roll reconciled, pro forma populated, IC memo drafted.
                   </p>
                   <Link href="/book" onClick={() => posthog.capture('cta_clicked', { cta_type: 'book_your_call', location: 'final_cta' })}>
                     <Button
