@@ -54,6 +54,7 @@
     "rxjs": "^7.8.1",
     "svix": "^1.82.0",
     "xlsx": "^0.18.5",
+    "xlsx-populate": "^1.21.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {

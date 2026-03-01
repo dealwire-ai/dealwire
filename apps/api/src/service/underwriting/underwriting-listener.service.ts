@@ -7,6 +7,7 @@ export interface UnderwritingJobMessage {
   type: 'underwriting-job';
   dealId: string;
   orgId: string;
+  senderEmail: string;
   documents: Array<{
     s3Key: string;
     filename: string;
@@ -40,7 +41,7 @@ export class UnderwritingListenerService {
       return;
     }
 
-    if (!parsed.dealId || !parsed.orgId || !parsed.documents?.length) {
+    if (!parsed.dealId || !parsed.orgId || !parsed.documents?.length || !parsed.senderEmail) {
       this.logger.error(`Invalid underwriting message — missing required fields: ${message.Body}`);
       return;
     }
@@ -52,6 +53,7 @@ export class UnderwritingListenerService {
     const ctx: UnderwritingJobContext = {
       dealId: parsed.dealId,
       orgId: parsed.orgId,
+      senderEmail: parsed.senderEmail,
       documents: parsed.documents,
     };
 
