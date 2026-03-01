@@ -4,18 +4,19 @@ import React, { useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, useInView } from 'framer-motion';
-import { Building2, Workflow, Sparkles, Linkedin, Mail, TrendingUp, Clock, DollarSign, ArrowRight } from 'lucide-react';
+import { Building2, Workflow, Sparkles, Linkedin, Mail, TrendingUp, ArrowRight } from 'lucide-react';
 import { Button } from "../components/ui/button";
 import { useAuth, useClerk } from '@clerk/nextjs';
 import posthog from 'posthog-js';
 
-const FadeInSection = ({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) => {
+const FadeInSection = ({ children, delay = 0, className }: { children: React.ReactNode; delay?: number; className?: string }) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
-  
+
   return (
     <motion.div
       ref={ref}
+      className={className}
       initial={{ opacity: 0, y: 40 }}
       animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
       transition={{ duration: 0.8, delay, ease: [0.25, 0.4, 0.25, 1] }}
@@ -40,16 +41,29 @@ export default function Home() {
       {/* Navigation */}
       <nav className="relative z-50 px-6 lg:px-16 py-6">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-[#3ECFA0] rounded-lg flex items-center justify-center">
               <Building2 className="w-4 h-4 text-black" />
             </div>
             <span className="text-xl font-semibold tracking-tight">Levine & Weinstein</span>
           </div>
-          <div className="hidden md:flex items-center gap-8 text-sm text-white/60">
-            <button onClick={() => { posthog.capture('nav_section_clicked', { section: 'services' }); document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' }); }} className="hover:text-white transition-colors">Services</button>
-            <button onClick={() => { posthog.capture('nav_section_clicked', { section: 'how-it-works' }); document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' }); }} className="hover:text-white transition-colors">How It Works</button>
-            <button onClick={() => { posthog.capture('nav_section_clicked', { section: 'about' }); document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' }); }} className="hover:text-white transition-colors">About</button>
+          <div className="hidden md:flex items-center gap-8">
+            {[
+              { label: 'Services', id: 'services' },
+              { label: 'How It Works', id: 'how-it-works' },
+              { label: 'About', id: 'about' },
+            ].map(({ label, id }) => (
+              <button
+                key={id}
+                onClick={() => {
+                  posthog.capture('nav_section_clicked', { section: id });
+                  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="text-xs font-mono tracking-widest uppercase text-white/50 hover:text-white transition-colors cursor-pointer"
+              >
+                {label}
+              </button>
+            ))}
           </div>
           <div className="flex items-center gap-4">
             {isSignedIn ? (
@@ -79,7 +93,7 @@ export default function Home() {
             )}
             <Link href="/book" onClick={() => posthog.capture('cta_clicked', { cta_type: 'lets_talk', location: 'header' })}>
               <Button className="bg-[#3ECFA0] hover:bg-[#35b88f] text-black font-medium px-6">
-                 Let&apos;s Talk
+                Let&apos;s Talk
               </Button>
             </Link>
           </div>
@@ -87,40 +101,36 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative z-10 px-6 lg:px-16 pt-20 pb-24 lg:pt-28 lg:pb-36" style={{
+      <section className="relative z-10 px-6 lg:px-16 pt-16 pb-24 lg:pt-24 lg:pb-36" style={{
         backgroundImage: `
-          linear-gradient(to right, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
-          linear-gradient(to bottom, rgba(255, 255, 255, 0.08) 1px, transparent 1px)
+          linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px)
         `,
         backgroundSize: '80px 80px'
       }}>
         <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, ease: [0.25, 0.4, 0.25, 1] }}
-            className="max-w-4xl"
-          >
-            {/* <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#3ECFA0]/10 border border-[#3ECFA0]/20 rounded-full mb-8">
-              <TrendingUp className="w-4 h-4 text-[#3ECFA0]" />
-              <span className="text-sm text-[#3ECFA0] font-medium">AI employees that pay for themselves in 90 days</span>
-            </div> */}
-            
-            <h1 className="text-5xl md:text-7xl lg:text-[5.5rem] font-normal tracking-tight leading-[0.95] mb-8">
-              Your next hire works<br />
-              <span className="text-[#3ECFA0]">24/7.</span> Never quits.<br />
-              Costs 90% less.
-            </h1>
-            
-            <p className="text-xl md:text-2xl text-white/60 max-w-2xl leading-relaxed mb-6">
-              We build custom AI employees for real estate firms. They source off market opportunities, screen deals while you sleep, and handle investor reports— so you can focus on what actually moves the needle.
-            </p>
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            {/* Left: Copy */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, ease: [0.25, 0.4, 0.25, 1] }}
+            >
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#3ECFA0]/10 border border-[#3ECFA0]/20 rounded-full mb-8">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#3ECFA0] animate-pulse" />
+                <span className="text-xs font-mono text-[#3ECFA0] tracking-wider uppercase">Live · Monitoring active inboxes</span>
+              </div>
 
-            {/* <p className="text-lg text-white/40 max-w-xl mb-12">
-              The firms adopting AI now will outperform. The rest will wonder what happened.
-            </p> */}
-            
-            <div className="flex flex-col sm:flex-row gap-4">
+              <h1 className="text-5xl md:text-6xl lg:text-[4.5rem] font-normal tracking-tight leading-[1.0] mb-6">
+                Deal intelligence.<br />
+                <span className="text-[#3ECFA0]">From inbox</span><br />
+                to IC memo.
+              </h1>
+
+              <p className="text-lg text-white/50 max-w-lg leading-relaxed mb-10">
+                A deal hits your inbox. Our system reads the OM, screens against your buy box, and fires the right action: skip it, draft a broker reply, or run a full underwriting that populates your Excel pro forma. Every morning, a digest of overnight deal flow. All configurable.
+              </p>
+
               <Link href="/book" onClick={() => posthog.capture('cta_clicked', { cta_type: 'book_your_call', location: 'hero' })}>
                 <Button
                   size="lg"
@@ -130,93 +140,159 @@ export default function Home() {
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </Link>
-            </div>
-          </motion.div>
+            </motion.div>
+
+            {/* Right: Terminal widget */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 1, delay: 0.3, ease: [0.25, 0.4, 0.25, 1] }}
+              className="hidden lg:block"
+            >
+              <div className="relative p-[1px] rounded-2xl" style={{ background: 'linear-gradient(135deg, rgba(62,207,160,0.3), rgba(62,207,160,0.05))' }}>
+                <div className="bg-[#080808] rounded-2xl p-6 font-mono text-xs">
+                  {/* Terminal header bar */}
+                  <div className="flex items-center justify-between mb-5 pb-4 border-b border-white/5">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-[#3ECFA0] animate-pulse" />
+                      <span className="text-white/30 tracking-widest uppercase text-[10px]">Deal Screener · Active</span>
+                    </div>
+                    <span className="text-white/20 text-[10px]">03/01/2026 · 06:42 AM</span>
+                  </div>
+
+                  {/* Deal header */}
+                  <p className="text-white/70 mb-1">INCOMING OM</p>
+                  <p className="text-white mb-4">84,500 SF Retail Strip · Salt Lake City, UT</p>
+
+                  {/* Metrics grid */}
+                  <div className="space-y-2 mb-5">
+                    {[
+                      { label: 'Cap Rate (In-Place)', value: '7.1%', flag: '↑ Above market', flagColor: 'text-[#3ECFA0]' },
+                      { label: 'NOI (T-12, extracted)', value: '$452,000', flag: '✓ Reconciled', flagColor: 'text-[#3ECFA0]' },
+                      { label: 'Occupancy (rent roll)', value: '94.2%', flag: '✓ Stable', flagColor: 'text-[#3ECFA0]' },
+                      { label: 'WALT', value: '3.2 yrs', flag: '⚠ Near-term rollover', flagColor: 'text-yellow-500' },
+                      { label: 'Levered IRR (5-yr)', value: '14.8%', flag: '✓ Clears hurdle', flagColor: 'text-[#3ECFA0]' },
+                      { label: 'Equity Multiple', value: '1.87×', flag: '─ Model sensitivity', flagColor: 'text-white/30' },
+                      { label: 'DSCR', value: '1.31×', flag: '✓ Passes threshold', flagColor: 'text-[#3ECFA0]' },
+                    ].map(({ label, value, flag, flagColor }) => (
+                      <div key={label} className="grid grid-cols-[1fr_auto_auto] gap-x-4 items-baseline">
+                        <span className="text-white/40">{label}</span>
+                        <span className="text-white tabular-nums">{value}</span>
+                        <span className={`${flagColor} text-[10px] text-right`}>{flag}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Decision */}
+                  <div className="pt-4 border-t border-white/5">
+                    <p className="text-[#3ECFA0] font-medium mb-1">→ PRO FORMA POPULATED · PROCEED TO IC</p>
+                    <p className="text-white/25">Broker reply sent · IC memo drafted · 4m 12s</p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
         </div>
       </section>
 
-      {/* The Problem Section
+      {/* Logos Section */}
+      <section className="relative z-10 px-6 lg:px-16 py-14 border-t border-white/5">
+        <div className="max-w-7xl mx-auto">
+          <p className="text-xs font-mono text-white/25 tracking-widest uppercase text-center mb-10">
+            Backed by operators who&apos;ve moved $2B+ across private markets
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-x-14 gap-y-8">
+            {[
+              { file: "hildreth.png", alt: "Hildreth Real Estate Advisors" },
+              { file: "jke.svg", alt: "JK Equities" },
+              { file: "dg-development.svg", alt: "DG Development Partners" },
+            ].map(({ file, alt }) => (
+              <div key={file} className="opacity-35 hover:opacity-70 transition-opacity duration-300" style={{ filter: 'brightness(0) invert(1)' }}>
+                <Image
+                  src={`/logos/${file}`}
+                  alt={alt}
+                  width={140}
+                  height={40}
+                  className="object-contain h-8 w-auto"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* The Problem Section */}
       <section id="problem" className="relative z-10 px-6 lg:px-16 py-20 lg:py-28 border-t border-white/5">
         <div className="max-w-7xl mx-auto">
           <FadeInSection>
-            <p className="text-[#3ECFA0] text-sm font-medium tracking-wider uppercase mb-4">The Reality</p>
+            <p className="text-[#3ECFA0] text-xs font-mono tracking-widest uppercase mb-4">The Reality</p>
             <h2 className="text-4xl md:text-5xl font-normal tracking-tight mb-6 max-w-3xl">
-              Your best people are drowning in work that doesn&apos;t require their talent.
+              Broker blasts go to 200 firms.<br />
+              <span className="text-white/40">You have 48 hours.</span>
             </h2>
           </FadeInSection>
-          
-          <div className="grid md:grid-cols-2 gap-8 mt-12">
-            <FadeInSection delay={0.1}>
-              <div className="p-8 bg-white/[0.02] border border-white/5 rounded-2xl">
-                <div className="text-5xl font-light text-white/20 mb-4">01</div>
-                <h3 className="text-xl font-medium mb-3">Analysts buried in busywork</h3>
-                <p className="text-white/50 leading-relaxed">
-                  Your $150K analysts spend 60% of their time on data entry, formatting reports, and chasing documents. That&apos;s $90K/year in wasted salary—per person.
-                </p>
-              </div>
-            </FadeInSection>
-            
-            <FadeInSection delay={0.2}>
-              <div className="p-8 bg-white/[0.02] border border-white/5 rounded-2xl">
-                <div className="text-5xl font-light text-white/20 mb-4">02</div>
-                <h3 className="text-xl font-medium mb-3">Deals slipping through</h3>
-                <p className="text-white/50 leading-relaxed">
-                  While your team manually screens OMs, faster firms are already sending LOIs. Every hour of delay costs you leverage—or the deal entirely.
-                </p>
-              </div>
-            </FadeInSection>
-            
-            <FadeInSection delay={0.3}>
-              <div className="p-8 bg-white/[0.02] border border-white/5 rounded-2xl">
-                <div className="text-5xl font-light text-white/20 mb-4">03</div>
-                <h3 className="text-xl font-medium mb-3">Scaling means hiring</h3>
-                <p className="text-white/50 leading-relaxed">
-                  Want to evaluate 2x the deals? That means 2x the headcount, 2x the overhead, and months of recruiting and training. The math doesn&apos;t work.
-                </p>
-              </div>
-            </FadeInSection>
-            
-            <FadeInSection delay={0.4}>
-              <div className="p-8 bg-white/[0.02] border border-white/5 rounded-2xl">
-                <div className="text-5xl font-light text-white/20 mb-4">04</div>
-                <h3 className="text-xl font-medium mb-3">Competitors are moving</h3>
-                <p className="text-white/50 leading-relaxed">
-                  The top PE firms already have AI in production. They&apos;re not talking about it—they&apos;re using it. Every quarter you wait, they pull further ahead.
-                </p>
-              </div>
-            </FadeInSection>
+
+          <div className="grid md:grid-cols-2 gap-4 mt-12">
+            {[
+              {
+                num: "01",
+                title: "Analysts buried in OMs",
+                body: "Your $150K analysts spend 3+ hours per OM extracting T-12s and rebuilding rent rolls. That's table stakes work. It shouldn't require a senior hire."
+              },
+              {
+                num: "02",
+                title: "Speed wins deals",
+                body: "By the time your team manually screens an OM, a faster firm has already toured the asset. The LOI window closes faster than most shops open a spreadsheet."
+              },
+              {
+                num: "03",
+                title: "Scaling means hiring",
+                body: "Evaluating 3x the deal flow means 3x the headcount. Months of recruiting and onboarding. The unit economics don't work."
+              },
+              {
+                num: "04",
+                title: "The edge is already moving",
+                body: "Top GP shops already have AI in production. They're not announcing it. They're sending LOIs while everyone else reads page one."
+              }
+            ].map(({ num, title, body }, index) => (
+              <FadeInSection key={num} delay={index * 0.1}>
+                <div className="p-8 bg-white/[0.02] border border-white/5 rounded-2xl hover:border-white/10 transition-colors">
+                  <div className="text-4xl font-mono text-white/10 mb-4">{num}</div>
+                  <h3 className="text-lg font-medium mb-3">{title}</h3>
+                  <p className="text-white/45 leading-relaxed text-sm">{body}</p>
+                </div>
+              </FadeInSection>
+            ))}
           </div>
         </div>
-      </section> */}
+      </section>
 
       {/* Value Proposition Section */}
       <section className="relative z-10 px-6 lg:px-16 py-20 lg:py-28 border-t border-white/5">
         <div className="max-w-7xl mx-auto">
           <FadeInSection>
             <div className="max-w-3xl">
-              {/* <p className="text-[#3ECFA0] text-sm font-medium tracking-wider uppercase mb-4">The Solution</p> */}
               <h2 className="text-4xl md:text-5xl font-normal tracking-tight mb-6">
-                Hire AI employees.<br />
-                <span className="text-white/40">Not more headcount.</span>
+                Full-stack acquisition intelligence.<br />
+                <span className="text-white/40">End to end.</span>
               </h2>
-              <p className="text-white/50 text-xl leading-relaxed mb-12">
-                We don&apos;t sell software. We deliver working AI employees—custom-built for your firm, trained on your criteria, deployed in weeks.
+              <p className="text-white/45 text-lg leading-relaxed mb-12">
+                Not a screening tool. Not a dashboard. A custom AI analyst that handles the entire job: from inbox to populated pro forma. Without you touching it.
               </p>
             </div>
           </FadeInSection>
-          
-          <div className="grid md:grid-cols-3 gap-6 mt-8">
+
+          <div className="grid md:grid-cols-3 gap-4 mt-8">
             {[
-              { icon: Clock, value: "24/7", label: "Always on", desc: "Works nights, weekends, holidays" },
-              { icon: DollarSign, value: "90%", label: "Cost reduction", desc: "vs. equivalent human labor" },
-              { icon: Sparkles, value: "Weeks", label: "Time to deploy", desc: "vs. months of hiring and training" },
+              { value: "< 4 min", label: "OM to decision", desc: "Inbox to screened decision, pro forma populated, broker reply sent." },
+              { value: "24 / 7", label: "Always running", desc: "Deal flow doesn't stop on weekends. Neither does it." },
+              { value: "Hours", label: "Time to deploy", desc: "Custom-built, tested against your deal history, live in hours." },
             ].map((stat, index) => (
               <FadeInSection key={index} delay={index * 0.1}>
-                <div className="p-6 bg-white/[0.02] border border-white/5 rounded-2xl text-center">
-                  <stat.icon className="w-6 h-6 text-[#3ECFA0] mx-auto mb-4" />
-                  <div className="text-4xl font-light text-white mb-1">{stat.value}</div>
-                  <div className="text-white font-medium mb-1">{stat.label}</div>
-                  <div className="text-white/40 text-sm">{stat.desc}</div>
+                <div className="p-7 bg-white/[0.02] border border-white/5 rounded-2xl hover:border-white/10 transition-colors">
+                  <div className="text-4xl font-mono text-white mb-2">{stat.value}</div>
+                  <div className="text-[#3ECFA0] text-sm font-mono tracking-wider uppercase mb-2">{stat.label}</div>
+                  <div className="text-white/40 text-sm leading-relaxed">{stat.desc}</div>
                 </div>
               </FadeInSection>
             ))}
@@ -228,54 +304,155 @@ export default function Home() {
       <section id="services" className="relative z-10 px-6 lg:px-16 py-20 lg:py-28 border-t border-white/5">
         <div className="max-w-7xl mx-auto">
           <FadeInSection>
-            <p className="text-[#3ECFA0] text-sm font-medium tracking-wider uppercase mb-4">What We Build</p>
+            <p className="text-[#3ECFA0] text-xs font-mono tracking-widest uppercase mb-4">What We Build</p>
             <h2 className="text-4xl md:text-5xl font-normal tracking-tight mb-6">
-              AI employees for every function.
+              One platform. Every function<br />
+              <span className="text-white/40">in the acquisition stack.</span>
             </h2>
           </FadeInSection>
-          
-          <div className="space-y-4">
+
+          <div className="space-y-3 mt-12">
             {[
               {
                 icon: TrendingUp,
                 title: "Off-Market Deal Sourcing",
                 tagline: "Deals your competitors will never see.",
-                description: "An AI agent that continuously scans public records, monitors ownership changes, identifies distressed assets, and surfaces off-market opportunities that match your criteria—before they hit the market."
+                description: "Monitors public records, delinquent tax filings, CMBS watchlists, and ownership transfers daily. Surfaces distressed and pre-market opportunities ranked by fit against your buy box. Before they hit CoStar."
               },
               {
                 icon: Building2,
-                title: "Deal Screening",
-                tagline: "From 500 emails to 5 qualified leads.",
-                description: "Auto-parse every OM and teaser that hits your inbox. Screen against your buy box instantly. Generate preliminary underwriting and draft LOIs before competitors even open the email."
+                title: "Deal Screening & Full Underwriting",
+                tagline: "Inbox to populated pro forma in under 5 minutes.",
+                description: "Reads every OM and teaser in your inbox, screens against your buy box, and for deals worth pursuing, extracts the T-12, rent roll, and opex detail. Runs your acquisition model end-to-end: levered IRR, CoC, equity multiple, sensitivity tables. Drafts the IC memo and broker reply. Configurable: documents, model, assumptions."
               },
               {
                 icon: Workflow,
                 title: "Operations",
                 tagline: "Back office that runs itself.",
-                description: "Lease abstracts in seconds. CAM reconciliations automated. Tenant notices on autopilot. NOI tracking in real-time. Your ops team focuses on exceptions, not data entry."
+                description: "CAM reconciliations, lease abstract extraction, SNDA tracking, tenant notices. NOI reporting that stays current without a spreadsheet. Your ops team handles exceptions, not data entry."
               },
               {
                 icon: Sparkles,
                 title: "Market Intelligence",
                 tagline: "Know what others don't.",
-                description: "An AI analyst that monitors market trends, tracks comp sales and zoning changes and delivers insights before you grab coffee."
+                description: "Tracks cap rate compression by submarket, flags SOFR-driven distress and loan maturities, surfaces comp sales before publication. Feeds live going-in yields, exit caps, and rent growth into your underwriting assumptions. Every model starts from ground truth, not a broker's pitch deck."
+              },
+              {
+                icon: Building2,
+                title: "Deal History & Broker Intelligence",
+                tagline: "Every deal you've ever seen. Every broker ranked.",
+                description: "Every OM and teaser that flows through gets indexed. Search your full deal history in seconds. Comp a live deal against everything you've screened in the same submarket. Over time: a broker intelligence layer showing which reps send quality deals, which blast noise, and where your best opportunities actually come from."
               }
             ].map((service, index) => (
               <FadeInSection key={index} delay={index * 0.05}>
-                <div className="group flex flex-col md:flex-row md:items-center gap-6 p-6 md:p-8 bg-white/[0.02] border border-white/5 rounded-2xl hover:bg-white/[0.04] hover:border-white/10 transition-all duration-500">
+                <div className="group flex flex-col md:flex-row md:items-center gap-6 p-6 md:p-8 bg-white/[0.02] border border-white/5 rounded-2xl hover:bg-white/[0.03] hover:border-white/10 transition-all duration-500">
                   <div className="flex items-center gap-5 md:w-80 shrink-0">
                     <div className="w-12 h-12 bg-[#3ECFA0]/10 rounded-xl flex items-center justify-center group-hover:bg-[#3ECFA0]/20 transition-colors shrink-0">
-                      <service.icon className="w-6 h-6 text-[#3ECFA0]" />
+                      <service.icon className="w-5 h-5 text-[#3ECFA0]" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-medium">{service.title}</h3>
-                      <p className="text-[#3ECFA0] text-sm">{service.tagline}</p>
+                      <h3 className="text-base font-medium">{service.title}</h3>
+                      <p className="text-[#3ECFA0] text-xs font-mono mt-0.5">{service.tagline}</p>
                     </div>
                   </div>
-                  <p className="text-white/50 leading-relaxed">{service.description}</p>
+                  <p className="text-white/45 leading-relaxed text-sm">{service.description}</p>
                 </div>
               </FadeInSection>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Automated Triage Section */}
+      <section className="relative z-10 px-6 lg:px-16 py-20 lg:py-28 border-t border-white/5">
+        <div className="max-w-7xl mx-auto">
+          <FadeInSection>
+            <p className="text-[#3ECFA0] text-xs font-mono tracking-widest uppercase mb-4">Automated Triage</p>
+            <h2 className="text-4xl md:text-5xl font-normal tracking-tight mb-4">
+              Your buy box becomes<br />
+              <span className="text-white/40">a set of automatic rules.</span>
+            </h2>
+            <p className="text-white/45 text-lg leading-relaxed max-w-2xl mb-12">
+              Every deal in your inbox is assessed in real time. The right action fires automatically. You set the criteria. The system runs it.
+            </p>
+          </FadeInSection>
+
+          <div className="space-y-2">
+            {[
+              {
+                label: "SKIP INBOX",
+                labelColor: "text-white/30",
+                rowBorder: "border-white/5",
+                condition: "Doesn't fit your buy box",
+                action: "Moved to a designated Outlook folder. Logged and searchable. Never touches your inbox or digest.",
+              },
+              {
+                label: "FLAG IN DIGEST",
+                labelColor: "text-yellow-400",
+                rowBorder: "border-yellow-500/15",
+                condition: "In range, worth a look",
+                action: "Moved to your review folder and surfaced in your morning digest with a summary. Broker reply drafted and queued.",
+              },
+              {
+                label: "FULL UNDERWRITING",
+                labelColor: "text-[#3ECFA0]",
+                rowBorder: "border-[#3ECFA0]/20",
+                condition: "Matches your target profile",
+                action: "T-12 and rent roll extracted. Excel pro forma populated end-to-end. IC memo drafted. Broker reply sent. You open your laptop to a completed analysis.",
+              },
+            ].map(({ label, labelColor, rowBorder, condition, action }, i) => (
+              <FadeInSection key={i} delay={i * 0.1}>
+                <div className={`flex flex-col md:flex-row md:items-center gap-4 md:gap-0 p-5 md:p-6 bg-white/[0.02] border ${rowBorder} rounded-2xl`}>
+                  <div className="md:w-52 shrink-0">
+                    <span className={`text-xs font-mono tracking-widest ${labelColor}`}>{label}</span>
+                  </div>
+                  <div className="flex-1 flex flex-col md:flex-row gap-4 md:items-center">
+                    <div className="md:w-52 shrink-0">
+                      <span className="text-white/40 text-sm">{condition}</span>
+                    </div>
+                    <div className="flex-1 md:border-l md:border-white/5 md:pl-6">
+                      <span className="text-white/55 text-sm leading-relaxed">{action}</span>
+                    </div>
+                  </div>
+                </div>
+              </FadeInSection>
+            ))}
+          </div>
+
+          {/* Deal digest + configurable callouts */}
+          <div className="grid md:grid-cols-2 gap-4 mt-4">
+            <FadeInSection delay={0.3}>
+              <div className="h-full p-6 bg-[#3ECFA0]/5 border border-[#3ECFA0]/15 rounded-2xl">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-8 h-8 bg-[#3ECFA0]/15 rounded-lg flex items-center justify-center shrink-0">
+                    <span className="text-[#3ECFA0] text-[10px] font-mono font-bold">6AM</span>
+                  </div>
+                  <h3 className="text-sm font-medium">Daily Deal Digest</h3>
+                </div>
+                <p className="text-white/45 text-sm leading-relaxed">
+                  Every morning, a digest of the last 24 hours lands in your inbox. Best deals at the top, ranked by fit. One-click actions on each. Nothing slips. Nothing wastes your time.
+                </p>
+              </div>
+            </FadeInSection>
+
+            <FadeInSection delay={0.35}>
+              <div className="h-full p-6 bg-white/[0.02] border border-white/5 rounded-2xl">
+                <p className="text-xs font-mono text-white/30 tracking-widest uppercase mb-4">Fully Configurable</p>
+                <div className="space-y-2.5">
+                  {[
+                    "Buy box criteria and fit thresholds",
+                    "Action rules per tier: skip, reply, or underwrite",
+                    "Digest schedule and format (daily, real-time, weekly)",
+                    "Excel model, underwriting assumptions, and output fields",
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-start gap-2">
+                      <span className="text-[#3ECFA0] text-xs mt-0.5 shrink-0">→</span>
+                      <span className="text-white/45 text-sm">{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </FadeInSection>
           </div>
         </div>
       </section>
@@ -284,36 +461,36 @@ export default function Home() {
       <section id="how-it-works" className="relative z-10 px-6 lg:px-16 py-20 lg:py-28 border-t border-white/5">
         <div className="max-w-7xl mx-auto">
           <FadeInSection>
-            <p className="text-[#3ECFA0] text-sm font-medium tracking-wider uppercase mb-4">The Process</p>
+            <p className="text-[#3ECFA0] text-xs font-mono tracking-widest uppercase mb-4">The Process</p>
             <h2 className="text-4xl md:text-5xl font-normal tracking-tight mb-16">
               From call to deployed.<br />
-              <span className="text-white/40">In weeks, not months.</span>
+              <span className="text-white/40">In hours, not weeks.</span>
             </h2>
           </FadeInSection>
-          
+
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
                 step: "01",
                 title: "Discovery Call",
-                description: "30 minutes. We learn your workflows, pain points, and criteria. You learn if we're the right fit. No pressure, no pitch deck."
+                description: "30 minutes. We map your buy box, your model, and where deals slip. You leave knowing exactly what we'll build and what it costs. No pitch deck."
               },
               {
                 step: "02",
-                title: "We Build",
-                description: "Custom AI employee, trained on your specific criteria and workflows. We handle the technical complexity—you provide the domain expertise."
+                title: "We Configure & Build",
+                description: "We wire your AI analyst into your inbox and Excel model. Configure buy box rules, action thresholds, and digest schedule. You define what a great deal looks like. We make sure the system knows it."
               },
               {
                 step: "03",
-                title: "Deploy & Iterate",
-                description: "Your AI employee goes live. We monitor, refine, and improve. You see ROI within 90 days or we keep working until you do."
+                title: "Live in Hours",
+                description: "Live in hours. Every incoming deal is read, underwritten, and returned as a populated model with a go/no-go. We monitor, refine, and improve. ROI within 90 days or we keep working."
               }
             ].map((item, index) => (
               <FadeInSection key={index} delay={index * 0.1}>
-                <div className="relative">
-                  <div className="text-7xl font-light text-[#3ECFA0]/30 mb-4">{item.step}</div>
-                  <h3 className="text-xl font-medium mb-3">{item.title}</h3>
-                  <p className="text-white/50 leading-relaxed">{item.description}</p>
+                <div>
+                  <div className="text-6xl font-mono text-[#3ECFA0]/20 mb-5">{item.step}</div>
+                  <h3 className="text-lg font-medium mb-3">{item.title}</h3>
+                  <p className="text-white/45 leading-relaxed text-sm">{item.description}</p>
                 </div>
               </FadeInSection>
             ))}
@@ -325,24 +502,23 @@ export default function Home() {
       <section id="about" className="relative z-10 px-6 lg:px-16 py-20 lg:py-28 border-t border-white/5">
         <div className="max-w-7xl mx-auto">
           <FadeInSection>
-            <p className="text-[#3ECFA0] text-sm font-medium tracking-wider uppercase mb-4">Who We Are</p>
+            <p className="text-[#3ECFA0] text-xs font-mono tracking-widest uppercase mb-4">Who We Are</p>
             <h2 className="text-4xl md:text-5xl font-normal tracking-tight mb-6">
               Built by engineers.
               <br />
-              <span className="text-white/40">Backed by RE titans.</span>
+              <span className="text-white/40">Backed by top operators.</span>
             </h2>
-            <p className="text-white/50 max-w-2xl text-lg leading-relaxed mb-16">
-              We&apos;re Isaac and Noah—two computer science majors from Northeastern University 
-              who believe the real estate industry deserves better technology.
+            <p className="text-white/45 max-w-2xl text-lg leading-relaxed mb-16">
+              Two Northeastern students who built, scaled, and sold a proptech company before most classmates had their first internship. We don&apos;t have decades of experience. We have something rarer: the depth to build what the industry needs, backed by operators who&apos;ve seen every type of deal.
             </p>
           </FadeInSection>
 
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid md:grid-cols-2 gap-6">
             {[
               {
                 name: "Isaac Levine",
                 role: "Co-Founder",
-                bio: "Computer Science at Northeastern. Previously co-founded frontstep.ai. Software Engineer at CarGurus",
+                bio: "Software Engineer at CarGurus (NASDAQ: CARG), where he architects agentic AI systems at scale. Computer Science at Northeastern. Co-founded and sold frontstep.ai.",
                 linkedin: "https://www.linkedin.com/in/isaac-levine/",
                 email: "isaac@frontstep.ai",
                 headshot: "/headshots/isaac.webp",
@@ -350,24 +526,19 @@ export default function Home() {
               {
                 name: "Noah Weinstein",
                 role: "Co-Founder",
-                bio: "Computer Science at Northeastern. Previously co-founded frontstep.ai. Previous Software Engineer at Flexcar.",
+                bio: "Technical Product Manager at SiphoX, a venture-backed health tech startup, where he works directly with enterprise customers to identify and solve their highest-value problems. Computer Science at Northeastern. Co-founded and sold frontstep.ai.",
                 linkedin: "https://www.linkedin.com/in/noahweinstein/",
                 email: "noah@frontstep.ai",
                 headshot: "/headshots/noah.webp",
               }
             ].map((founder, index) => (
-              <FadeInSection key={index} delay={index * 0.15}>
-                <div className="relative group">
+              <FadeInSection key={index} delay={index * 0.15} className="h-full">
+                <div className="relative group h-full">
                   <div className="absolute inset-0 bg-gradient-to-br from-[#3ECFA0]/10 to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <div className="relative p-8 lg:p-10 bg-gradient-to-br from-white/[0.03] to-transparent border border-white/5 rounded-3xl">
+                  <div className="relative h-full p-8 lg:p-10 bg-gradient-to-br from-white/[0.03] to-transparent border border-white/5 rounded-3xl">
                     <div className="flex items-start justify-between mb-6">
                       <div className="relative w-16 h-16 rounded-2xl overflow-hidden border border-[#3ECFA0]/20">
-                        <Image
-                          src={founder.headshot}
-                          alt={founder.name}
-                          fill
-                          className="object-cover"
-                        />
+                        <Image src={founder.headshot} alt={founder.name} fill className="object-cover" />
                       </div>
                       <div className="flex gap-2">
                         <a href={founder.linkedin} target="_blank" rel="noopener noreferrer" onClick={() => posthog.capture('founder_linkedin_clicked', { founder_name: founder.name })} className="p-2 bg-white/5 rounded-lg hover:bg-white/10 transition-colors">
@@ -378,9 +549,9 @@ export default function Home() {
                         </a>
                       </div>
                     </div>
-                    <h3 className="text-2xl font-medium mb-1">{founder.name}</h3>
-                    <p className="text-[#3ECFA0] text-sm mb-4">{founder.role}</p>
-                    <p className="text-white/50 leading-relaxed">{founder.bio}</p>
+                    <h3 className="text-xl font-medium mb-1">{founder.name}</h3>
+                    <p className="text-[#3ECFA0] text-xs font-mono tracking-wider uppercase mb-4">{founder.role}</p>
+                    <p className="text-white/45 leading-relaxed text-sm">{founder.bio}</p>
                   </div>
                 </div>
               </FadeInSection>
@@ -389,47 +560,42 @@ export default function Home() {
 
           {/* Strategic Advisors */}
           <FadeInSection delay={0.3}>
-            <p className="text-[#3ECFA0] text-sm font-medium tracking-wider uppercase mb-4 mt-20">Strategic Advisors</p>
-            <div className="grid md:grid-cols-2 gap-6">
+            <p className="text-[#3ECFA0] text-xs font-mono tracking-widest uppercase mb-4 mt-20">Strategic Advisors</p>
+            <div className="grid md:grid-cols-2 gap-4">
               {[
                 {
                   name: "David Shorenstein",
                   role: "Advisor",
                   headshot: "/headshots/david.png",
                   linkedin: "https://www.linkedin.com/in/davidshorenstein/",
-                  bio: "Principal at Hildreth Real Estate Advisors. Previously co-founded Silvershore Properties and assembled a $300M+ NYC portfolio across 250+ properties. Former CIO at Forrest Shorenstein Capital Partners, and Senior Associate at Marcus & Millichap with $250M+ in sales."
+                  bio: "Principal at Hildreth Real Estate Advisors. Co-founded Silvershore Properties, assembling a $300M+ NYC portfolio across 250+ assets. Former CIO at Forrest Shorenstein Capital Partners. $250M+ in sales at Marcus & Millichap."
                 },
                 {
                   name: "Jordan Karlik",
                   role: "Advisor",
                   headshot: "/headshots/jordan.jpeg",
                   linkedin: "https://www.linkedin.com/in/jordan-karlik-b546b83/",
-                  bio: "Principal at JK Equities. Began his real estate career at Deutsche Bank and Ernst & Young in CMBS. Currently oversees all aspects of JK Equities, which has owned, operated and developed property in more than 15 states valued at nearly $2 billion."
+                  bio: "Principal at JK Equities. Started at Deutsche Bank and Ernst & Young in CMBS. JK Equities has owned, operated, and developed nearly $2B in property across 15+ states."
                 }
               ].map((advisor, index) => (
-                <div key={index} className="relative group">
+                <div key={index} className="relative group h-full">
                   <div className="absolute inset-0 bg-gradient-to-br from-[#3ECFA0]/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <div className="relative p-6 bg-white/[0.02] border border-white/5 rounded-2xl">
+                  <div className="relative h-full p-6 bg-white/[0.02] border border-white/5 rounded-2xl">
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-4">
                         <div className="relative w-12 h-12 rounded-xl overflow-hidden border border-[#3ECFA0]/20 shrink-0">
-                          <Image
-                            src={advisor.headshot}
-                            alt={advisor.name}
-                            fill
-                            className="object-cover"
-                          />
+                          <Image src={advisor.headshot} alt={advisor.name} fill className="object-cover" />
                         </div>
                         <div>
-                          <h3 className="text-lg font-medium">{advisor.name}</h3>
-                          <p className="text-[#3ECFA0] text-sm">{advisor.role}</p>
+                          <h3 className="text-base font-medium">{advisor.name}</h3>
+                          <p className="text-[#3ECFA0] text-xs font-mono tracking-wider uppercase">{advisor.role}</p>
                         </div>
                       </div>
                       <a href={advisor.linkedin} target="_blank" rel="noopener noreferrer" onClick={() => posthog.capture('founder_linkedin_clicked', { founder_name: advisor.name, role: 'advisor' })} className="p-2 bg-white/5 rounded-lg hover:bg-white/10 transition-colors shrink-0">
                         <Linkedin className="w-4 h-4 text-white/50" />
                       </a>
                     </div>
-                    <p className="text-white/50 text-sm leading-relaxed">{advisor.bio}</p>
+                    <p className="text-white/40 text-sm leading-relaxed">{advisor.bio}</p>
                   </div>
                 </div>
               ))}
@@ -437,22 +603,26 @@ export default function Home() {
           </FadeInSection>
 
           <FadeInSection delay={0.4}>
-            <div className="mt-16 p-8 lg:p-12 bg-gradient-to-r from-[#3ECFA0]/5 to-transparent border border-[#3ECFA0]/10 rounded-3xl">
+            <div className="mt-12 p-8 lg:p-10 bg-gradient-to-r from-[#3ECFA0]/5 to-transparent border border-[#3ECFA0]/10 rounded-2xl">
               <div className="flex flex-col lg:flex-row lg:items-center gap-6 lg:gap-12">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-[#3ECFA0]/20 rounded-xl flex items-center justify-center">
-                    <Sparkles className="w-6 h-6 text-[#3ECFA0]" />
+                  <div className="w-10 h-10 bg-[#3ECFA0]/15 rounded-xl flex items-center justify-center">
+                    <Sparkles className="w-5 h-5 text-[#3ECFA0]" />
                   </div>
                   <div>
-                    <p className="text-sm text-white/50">Previously built</p>
-                    <p className="text-xl font-medium">frontstep.ai</p>
+                    <p className="text-xs text-white/30 font-mono tracking-wider uppercase mb-0.5">Previously built</p>
+                    <p className="text-lg font-medium">frontstep.ai</p>
                   </div>
                 </div>
-                <div className="lg:border-l lg:border-white/10 lg:pl-12">
-                  <p className="text-white/60 leading-relaxed">
-                    Our experience building, scaling, and exiting frontstep.ai taught us what actually works in RE tech—
-                    and more importantly, what doesn&apos;t. We only build what delivers real ROI.
+                <div className="lg:border-l lg:border-white/8 lg:pl-12">
+                  <p className="text-white/50 leading-relaxed text-sm mb-4">
+                    Built in 3 months. Won a cash prize at Northeastern&apos;s startup competition. Acquired within weeks of launch. The platform automatically qualified thousands of renters, underwriting applicants the same way we now underwrite deals.
                   </p>
+                  <div className="flex flex-wrap gap-x-6 gap-y-1">
+                    {["Built in 3 months", "Northeastern startup prize winner", "Acquired post-launch", "Thousands of renters qualified"].map((tag) => (
+                      <span key={tag} className="text-xs font-mono text-[#3ECFA0]/60 tracking-wider">→ {tag}</span>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -464,16 +634,17 @@ export default function Home() {
       <section id="contact" className="relative z-10 px-6 lg:px-16 py-20 lg:py-28 border-t border-white/5">
         <div className="max-w-7xl mx-auto">
           <FadeInSection>
-            <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#111111] to-black border border-white/5">
-              <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#3ECFA0]/10 rounded-full blur-[150px] -translate-y-1/2 translate-x-1/4" />
-              
+            <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#0a0a0a] to-black border border-white/5">
+              <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#3ECFA0]/8 rounded-full blur-[180px] -translate-y-1/2 translate-x-1/4" />
+
               <div className="relative px-8 py-16 lg:p-20">
                 <div className="max-w-2xl">
+                  <p className="text-[#3ECFA0] text-xs font-mono tracking-widest uppercase mb-6">Get Started</p>
                   <h2 className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight mb-6">
-                    Ready to see what we can build?
+                    See what a fully underwritten<br />deal looks like in 4 minutes.
                   </h2>
-                  <p className="text-white/70 text-lg mb-10">
-                    30 minutes. No pitch deck. Just an honest conversation about whether AI can help your firm.
+                  <p className="text-white/50 text-lg mb-10 leading-relaxed">
+                    30 minutes. No pitch deck. Show us a deal. We&apos;ll show you the output: T-12 extracted, rent roll reconciled, pro forma populated, IC memo drafted.
                   </p>
                   <Link href="/book" onClick={() => posthog.capture('cta_clicked', { cta_type: 'book_your_call', location: 'final_cta' })}>
                     <Button
@@ -492,16 +663,16 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="relative z-10 px-6 lg:px-16 py-12 border-t border-white/5">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+      <footer className="relative z-10 px-6 lg:px-16 py-10 border-t border-white/5">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <div className="w-6 h-6 bg-[#3ECFA0] rounded-md flex items-center justify-center">
               <Building2 className="w-3 h-3 text-black" />
             </div>
-            <span className="text-sm text-white/50">Levine & Weinstein</span>
+            <span className="text-sm text-white/40">Levine & Weinstein</span>
           </div>
-          <p className="text-sm text-white/30">
-            © {new Date().getFullYear()} All rights reserved.
+          <p className="text-xs font-mono text-white/20 tracking-wider">
+            © {new Date().getFullYear()} · Frontstep AI, LLC. 
           </p>
         </div>
       </footer>
