@@ -1,7 +1,6 @@
 # TODO
 
 ## General Ops
-   - Stripe taxes?
    - shortlist of 10 domains by Wed
 
 ## Biz Dev
