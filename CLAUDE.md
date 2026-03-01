@@ -88,6 +88,7 @@ All project instructions live in `CLAUDE.md` (this file). `.cursorrules` points 
 
 | Document | Purpose |
 |----------|---------|
+| `SUBSYSTEMS.md` | **Codebase map** — what each subsystem does, key service files, data flow, env vars. Read this before touching any subsystem. |
 | `ARCHITECTURE.md` | ASCII system architecture diagram |
 | `BACKEND.md` | Services, email flow, auth, patterns, env vars |
 | `FRONTEND.md` | API clients, CORS, env vars |
@@ -103,7 +104,7 @@ All project instructions live in `CLAUDE.md` (this file). `.cursorrules` points 
 |----------|---------|
 | `ROADMAP.md` | Current product priorities and feature roadmap |
 | `TODO.md` | Active task list across workstreams |
-| `UNDERWRITING.md` | Acquisition underwriting plan — email trigger, rent roll/T-12 extraction, pro forma fill + export |
+| `UNDERWRITING.md` | Acquisition underwriting — implementation status (top) + full plan. Email trigger → extract → pro forma fill + Excel delivery. |
 | `PUBLIC_DATA_PLATFORM.md` | Architecture for public property data ingestion |
 | `TAX_LIEN_PLATFORM.md` | Tax lien data platform — domain knowledge, features, architecture, commercial terms |
 
@@ -142,6 +143,7 @@ After implementing any feature, API change, or architectural change — update t
 | Prisma schema changes | Note in `docs/technical/BACKEND.md` if it affects documented data model |
 | Roadmap item completed | Mark `[x]` in `docs/product/ROADMAP.md` |
 | New feature added | Add to "What's Built" section in `docs/product/ROADMAP.md` |
+| New subsystem or major service refactor | Update `docs/technical/SUBSYSTEMS.md` |
 
 ---
 
