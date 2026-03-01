@@ -6,6 +6,7 @@ import { RentRollExtractorService } from './rent-roll-extractor.service';
 import { T12ExtractorService } from './t12-extractor.service';
 import { ExtractionResults } from './extraction-types';
 import { FieldMapEntry } from './proforma.service';
+import { GenericExtractorService } from './generic-extractor.service';
 
 export interface UnderwritingDocument {
   s3Key: string;
@@ -37,6 +38,7 @@ export class UnderwritingOrchestratorService {
     private readonly omExtractor: OMExtractorService,
     private readonly rentRollExtractor: RentRollExtractorService,
     private readonly t12Extractor: T12ExtractorService,
+    private readonly genericExtractor: GenericExtractorService,
   ) {}
 
   async run(ctx: UnderwritingJobContext): Promise<UnderwritingResult> {
@@ -81,22 +83,33 @@ export class UnderwritingOrchestratorService {
     const omDocs = classified.filter((d) => d.documentType === 'om');
     const rentRollDocs = classified.filter((d) => d.documentType === 'rent-roll');
     const t12Docs = classified.filter((d) => d.documentType === 't12');
+    const otherDocs = classified.filter((d) => d.documentType === 'other');
 
-    const [omResults, rentRollResults, t12Results] = await Promise.all([
+    const [omResults, rentRollResults, t12Results, genericResults] = await Promise.all([
       Promise.all(omDocs.map((d) => this.omExtractor.extract(d, neededFields))),
       Promise.all(rentRollDocs.map((d) => this.rentRollExtractor.extract(d, neededFields))),
       Promise.all(t12Docs.map((d) => this.t12Extractor.extract(d, neededFields))),
+      neededFields?.length
+        ? Promise.all(otherDocs.map((d) => this.genericExtractor.extract(d, neededFields)))
+        : Promise.resolve([]),
     ]);
+
+    if (otherDocs.length > 0) {
+      this.logger.log(
+        `[${dealId}] Generic extraction: ${otherDocs.length} unclassified doc(s) → ${genericResults.reduce((n, r) => n + r.fields.filter((f) => f.value !== null).length, 0)} fields found`,
+      );
+    }
 
     // Use the first of each type (most deals have one of each)
     const extraction: ExtractionResults = {
       om: omResults[0] ?? null,
       rentRoll: rentRollResults[0] ?? null,
       t12: t12Results[0] ?? null,
+      generic: genericResults,
     };
 
     this.logger.log(
-      `[${dealId}] Extraction summary: om=${extraction.om ? `confidence=${extraction.om.confidence.toFixed(2)}` : 'none'} rentRoll=${extraction.rentRoll ? `units=${extraction.rentRoll.totalUnits} confidence=${extraction.rentRoll.confidence.toFixed(2)}` : 'none'} t12=${extraction.t12 ? `noi=${extraction.t12.noi} confidence=${extraction.t12.confidence.toFixed(2)}` : 'none'}`,
+      `[${dealId}] Extraction summary: om=${extraction.om ? `confidence=${extraction.om.confidence.toFixed(2)}` : 'none'} rentRoll=${extraction.rentRoll ? `units=${extraction.rentRoll.totalUnits} confidence=${extraction.rentRoll.confidence.toFixed(2)}` : 'none'} t12=${extraction.t12 ? `noi=${extraction.t12.noi} confidence=${extraction.t12.confidence.toFixed(2)}` : 'none'} generic=${extraction.generic.length} doc(s)`,
     );
 
     // ── Step 3: Normalize ──────────────────────────────────────────────────────

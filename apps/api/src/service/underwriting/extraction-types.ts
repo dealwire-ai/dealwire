@@ -100,10 +100,24 @@ export const T12ExtractionSchema = z.object({
 
 export type T12Extraction = z.infer<typeof T12ExtractionSchema>;
 
+// ─── Generic (unclassified docs) ──────────────────────────────────────────────
+
+export interface GenericExtractionField {
+  name: string;
+  value: number | string | null;
+  confidence: number;
+}
+
+export interface GenericExtraction {
+  fields: GenericExtractionField[];
+  flags: string[];
+}
+
 // ─── Aggregate ────────────────────────────────────────────────────────────────
 
 export interface ExtractionResults {
   om: OMExtraction | null;
   rentRoll: RentRollExtraction | null;
   t12: T12Extraction | null;
+  generic: GenericExtraction[];
 }
