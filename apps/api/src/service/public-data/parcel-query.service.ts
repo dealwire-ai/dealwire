@@ -7,11 +7,12 @@ export interface ParcelQueryFilters {
   excludeCoops?: boolean;
   hasActiveLien?: boolean;
   minDistressScore?: number;
+  maxDistressScore?: number;
   minUnits?: number;
   maxUnits?: number;
   zipCode?: string;
-  search?: string;        // Address text search
-  buildingClass?: string;
+  search?: string;
+  buildingClasses?: string[];
   sort?: string;
   order?: 'asc' | 'desc';
   page?: number;
@@ -40,8 +41,14 @@ export class ParcelQueryService {
       where.hasActiveLien = filters.hasActiveLien;
     }
 
-    if (filters.minDistressScore !== undefined) {
-      where.distressScore = { gte: filters.minDistressScore };
+    if (filters.minDistressScore !== undefined || filters.maxDistressScore !== undefined) {
+      where.distressScore = {};
+      if (filters.minDistressScore !== undefined) {
+        (where.distressScore as Prisma.IntNullableFilter).gte = filters.minDistressScore;
+      }
+      if (filters.maxDistressScore !== undefined) {
+        (where.distressScore as Prisma.IntNullableFilter).lte = filters.maxDistressScore;
+      }
     }
 
     if (filters.minUnits !== undefined || filters.maxUnits !== undefined) {
@@ -58,8 +65,8 @@ export class ParcelQueryService {
       where.zipCode = filters.zipCode;
     }
 
-    if (filters.buildingClass) {
-      where.buildingClass = filters.buildingClass;
+    if (filters.buildingClasses && filters.buildingClasses.length > 0) {
+      where.buildingClass = { in: filters.buildingClasses };
     }
 
     if (filters.search) {
