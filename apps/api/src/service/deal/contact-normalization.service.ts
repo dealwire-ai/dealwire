@@ -65,6 +65,18 @@ export class ContactNormalizationService {
       return false;
     }
     const trimmed = name.trim();
+
+    // Reject if the display name is itself an email address
+    if (trimmed.includes('@')) {
+      return false;
+    }
+
+    // Reject if the display name looks like multiple people
+    // e.g. "Ryan Wold & Alex Gerdak", "Steve Golubchik, Darren Hollak", "Jr., Dane Wilson, Ross Wettersten"
+    if (this.looksLikeMultiplePeople(trimmed)) {
+      return false;
+    }
+
     if (trimmed.toLowerCase() === email.toLowerCase()) {
       return false;
     }
@@ -77,6 +89,27 @@ export class ContactNormalizationService {
       return false;
     }
     return true;
+  }
+
+  /**
+   * Returns true if the display name appears to be multiple people rather than one person.
+   * "John Smith & Jane Doe" → true
+   * "John Smith, Jane Doe" (first part has a space = full name, not "Last, First") → true
+   * "Smith, John" (first part has no space = "Last, First" format) → false
+   */
+  private looksLikeMultiplePeople(name: string): boolean {
+    if (name.includes(' & ') || name.toLowerCase().includes(', &')) {
+      return true;
+    }
+    const parts = name.split(',');
+    if (parts.length > 2) {
+      return true;
+    }
+    if (parts.length === 2 && parts[0].trim().includes(' ')) {
+      // First part is a full name (e.g. "John Smith"), not a last name — it's two people
+      return true;
+    }
+    return false;
   }
 
   /**
