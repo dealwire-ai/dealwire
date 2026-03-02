@@ -12,6 +12,18 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata: Metadata = {
   title: "Levine & Weinstein",
   description: "AI Employees for Real Estate",
+  metadataBase: new URL("https://deals.frontstep.ai"),
+  openGraph: {
+    title: "Levine & Weinstein",
+    description: "AI Employees for Real Estate",
+    images: ["/og-image.jpg"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Levine & Weinstein",
+    description: "AI Employees for Real Estate",
+    images: ["/og-image.jpg"],
+  },
 };
 
 export default function RootLayout({
