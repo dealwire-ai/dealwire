@@ -17,4 +17,4 @@
    - find dev's for tyler
     
 ## Survey Platform
-   - build M3 (due 3/5)
+   - test M3 b4 demo on Fri
