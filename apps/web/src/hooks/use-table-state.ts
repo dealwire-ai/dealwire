@@ -12,16 +12,25 @@ interface PaginationMeta {
 interface UseTableStateOptions {
   defaultLimit?: number;
   defaultFilters?: Record<string, string>;
+  defaultSort?: string;
+  defaultOrder?: "asc" | "desc";
 }
 
 export function useTableState(options: UseTableStateOptions = {}) {
-  const { defaultLimit = 20, defaultFilters = {} } = options;
+  const {
+    defaultLimit = 20,
+    defaultFilters = {},
+    defaultSort,
+    defaultOrder = "desc",
+  } = options;
 
   const [page, setPage] = useState(1);
   const [limit] = useState(defaultLimit);
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [filters, setFilters] = useState<Record<string, string>>(defaultFilters);
+  const [sort, setSortState] = useState<string | undefined>(defaultSort);
+  const [order, setOrderState] = useState<"asc" | "desc">(defaultOrder);
   const [meta, setMeta] = useState<PaginationMeta>({
     total: 0,
     page: 1,
@@ -60,6 +69,15 @@ export function useTableState(options: UseTableStateOptions = {}) {
     setPage(1);
   }, []);
 
+  const setSort = useCallback((field: string) => {
+    setSortState((prev) => {
+      const sameColumn = prev === field;
+      setOrderState((o) => (sameColumn && o === "desc" ? "asc" : "desc"));
+      return field;
+    });
+    setPage(1);
+  }, []);
+
   const hasActiveFilters = search !== "" || Object.keys(filters).length > 0;
 
   // Build query string
@@ -71,8 +89,12 @@ export function useTableState(options: UseTableStateOptions = {}) {
     for (const [key, value] of Object.entries(filters)) {
       if (value) params.set(key, value);
     }
+    if (sort) {
+      params.set("sort", sort);
+      params.set("order", order);
+    }
     return params.toString();
-  }, [page, limit, debouncedSearch, filters]);
+  }, [page, limit, debouncedSearch, filters, sort, order]);
 
   return {
     page,
@@ -88,5 +110,8 @@ export function useTableState(options: UseTableStateOptions = {}) {
     meta,
     setMeta,
     queryString,
+    sort,
+    order,
+    setSort,
   };
 }
