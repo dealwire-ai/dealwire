@@ -71,6 +71,7 @@ export class SQSService {
     orgId: string;
     senderEmail: string;
     documents: Array<{ s3Key: string; filename: string; contentType: string }>;
+    inReplyToMessageId?: string;
   }): Promise<void> {
     if (!this.sqsService) {
       this.logger.warn('SQS is disabled - skipping underwriting enqueue');
