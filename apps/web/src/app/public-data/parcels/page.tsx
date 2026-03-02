@@ -156,7 +156,7 @@ export default function ParcelsPage() {
               value={stats.avgDistressScore.toString()}
             />
             <StatCard
-              label="Boroughs"
+              label="Proportions per Borough"
               value={stats.byBorough
                 .map(
                   (b) =>
