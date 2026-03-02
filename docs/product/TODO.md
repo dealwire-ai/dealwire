@@ -12,7 +12,6 @@
     - Record demo for
         - Marc Zegen
         - Jared Epstein (granular folder sorting)
-        - Quinn Breslin
         - Minas (boutique hotel)
         - Dale Hersowitz
         - John Sazer
@@ -22,6 +21,7 @@
 
 ## Frontstep Acquisition
     - execute + track media outreach
+    - find dev's for tyler
     
 ## Survey Platform
     - build M3 (due 3/5)
