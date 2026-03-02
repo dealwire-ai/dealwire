@@ -65,22 +65,28 @@ export class ClerkAuthGuard implements CanActivate {
         return true;
       }
 
+      // Prefer org_id from the JWT — this is what the Clerk org switcher sets.
+      // Fall back to the DB-stored organizationId for users without multi-org support.
+      const orgIdFromToken = (result as any).org_id ?? null;
+
       const user = await this.prisma.user.findUnique({
         where: { id: clerkUserId },
         select: { id: true, organizationId: true, email: true },
       });
 
-      this.logger.log(`User lookup: found=${!!user}, userId=${user?.id}, organizationId=${user?.organizationId}`);
+      const organizationId = orgIdFromToken ?? user?.organizationId ?? null;
+
+      this.logger.log(`User lookup: found=${!!user}, userId=${user?.id}, organizationId=${organizationId} (source: ${orgIdFromToken ? 'jwt' : 'db'})`);
 
       if (!user) {
         this.logger.warn(`User not found in database - needs sync via Clerk webhook`);
-      } else if (!user.organizationId) {
+      } else if (!organizationId) {
         this.logger.warn(`User found but has no organizationId - needs org assignment in Clerk`);
       }
 
       request.auth = {
         userId: clerkUserId,
-        organizationId: user?.organizationId ?? null,
+        organizationId,
       };
       return true;
     } catch (error) {
