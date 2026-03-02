@@ -4,10 +4,12 @@ import { PrismaService } from '../prisma/prisma.service';
 import { AnalyzerAgentService } from '../agent/analyzer-agent.service';
 import { EmailSenderService } from '../email/email-sender.service';
 import { EmailProcessingService } from '../email/email-processing.service';
+import { emailConfig } from '../../config/email.config';
 
 @Injectable()
 export class ScreeningInboundService {
   private readonly logger = new Logger(ScreeningInboundService.name);
+  private readonly config = emailConfig();
 
   constructor(
     private readonly prisma: PrismaService,
@@ -73,8 +75,18 @@ export class ScreeningInboundService {
 
     const htmlBody = `<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">${marked.parse(responseText) as string}</div>`;
 
+    // Reply-to address: the screening inbound address (same address user emailed)
+    const toAddress: string | string[] = emailData.to || '';
+    const toAddresses = Array.isArray(toAddress) ? toAddress : [toAddress];
+    const screeningAddr = toAddresses.find(
+      (a) =>
+        a.toLowerCase() ===
+        (this.config.screeningInboundEmail || '').toLowerCase(),
+    );
+
     await this.emailSender.sendEmail({
       to: [fromEmail],
+      from: screeningAddr || this.config.screeningInboundEmail || undefined,
       subject: subject.toLowerCase().startsWith('re:') ? subject : `Re: ${subject}`,
       html: htmlBody,
       replyToMessageId: emailData.headers?.['message-id'] || emailId,
