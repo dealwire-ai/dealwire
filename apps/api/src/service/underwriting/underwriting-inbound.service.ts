@@ -104,6 +104,7 @@ export class UnderwritingInboundService {
       orgId,
       senderEmail: fromEmail,
       documents,
+      inReplyToMessageId: emailData.headers?.['message-id'] || undefined,
     });
 
     this.logger.log(

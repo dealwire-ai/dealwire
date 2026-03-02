@@ -13,6 +13,7 @@ export interface UnderwritingJobMessage {
     filename: string;
     contentType: string;
   }>;
+  inReplyToMessageId?: string;
 }
 
 @Injectable()
@@ -55,6 +56,7 @@ export class UnderwritingListenerService {
       orgId: parsed.orgId,
       senderEmail: parsed.senderEmail,
       documents: parsed.documents,
+      inReplyToMessageId: parsed.inReplyToMessageId,
     };
 
     // Run the full pipeline synchronously within this handler.
