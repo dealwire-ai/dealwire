@@ -7,10 +7,32 @@ A new platform capability for Analyzer: an AI-powered tax lien analysis and dist
 **Client:** Daniel Gabay (investor), David Shorenstein (GP), Brett Shorenstein
 **Engagement:** $5,000 initial build + $500/month ongoing + 0.5% gross equity on properties purchased through platform data
 **Timeline:** 6-8 weeks for initial build (Brooklyn & Queens)
+**Started:** Feb 2026
 
 ### What We're Building
 
 A secure web application that aggregates public tax lien data, property records, violations, zoning, and valuations into a single queryable interface with AI-powered scoring, natural language chat, and CSV export. The platform surfaces distressed property investment opportunities by combining signals that are currently scattered across dozens of disconnected government portals.
+
+**The core insight:** Daniel's value isn't "look at a table of 3,000 parcels." It's: *"The moment a property enters lis pendens, I get a text with owner name, phone, property type, photo, and lien amount — before my competitors even know it exists."* The dashboard is useful, but the **alert system** is the product.
+
+### Implementation Status (as of Mar 2026)
+
+| Component | Status | Notes |
+|-----------|--------|-------|
+| Tax lien list ingestion | ✅ Done | SODA adapter, latest cycle filtering |
+| PLUTO enrichment | ✅ Done | Building class, units, sqft, year built, owner, zoning |
+| HPD violations | ✅ Done | Aggregated counts by class, violations/unit |
+| Distress scoring | ✅ Done | 0-100 weighted score |
+| Parcel table UI | ✅ Done | Filterable, sortable, expandable rows |
+| CSV export | ✅ Done | All filters apply |
+| Agent tools | ✅ Done | `query_parcels`, `get_parcel_stats` |
+| Feature flag | ✅ Done | `parcels` org-level flag |
+| **Lis pendens ingestion** | ❌ Not started | ACRIS integration needed |
+| **Push alerts (SMS/email)** | ❌ Not started | Time-sensitive advantage |
+| **Accurate valuations** | ❌ Not started | Currently rough formula; need comps |
+| **Owner phone lookup** | ❌ Not started | Skip tracing integration |
+| **Property photos** | ❌ Not started | Street View API |
+| **Property Charges Balance** | ❌ Not started | `scjx-j6np` dataset |
 
 ### Source Documents
 
@@ -21,6 +43,43 @@ A secure web application that aggregates public tax lien data, property records,
 | Broward County notes | Google Drive (same folder) |
 | Daniel's data feedback | `DG Comments.xlsx` in Google Drive |
 | Public Data Platform arch | [`docs/product/PUBLIC_DATA_PLATFORM.md`](PUBLIC_DATA_PLATFORM.md) |
+| Granola meeting transcripts | [2/4](https://notes.granola.ai/t/648f69bf-f9af-439c-9ff5-74ac5d8ff6fb), [2/12](https://notes.granola.ai/t/873b558a-84ce-4bd6-bd9f-5cb1fea9f91b) |
+
+---
+
+## Roadmap & Priorities
+
+### Current Weakness
+
+The system is **reactive** (Daniel has to check the dashboard) not **proactive** (system notifies Daniel). The real value is alerting on **new lis pendens filings** — the time-sensitive signal that creates competitive advantage. Daniel pays ~$500/month for PropertyShark primarily for this (24-48 hour delay). We can beat that.
+
+### 6-Week Priority Stack
+
+| Week | Focus | Deliverable |
+|------|-------|-------------|
+| 1-2 | **Lis pendens ingestion** | ACRIS integration, detect new filings, match to parcels |
+| 2-3 | **Alert system** | SMS + email when criteria match |
+| 3-4 | **Valuations** | Property Shark comps or ATTOM API |
+| 4-5 | **Owner contact + photos** | Skip tracing for phone, Street View for photos |
+| 5-6 | **Polish** | Parcel detail page, alert history, borough expansion |
+
+---
+
+## Meeting Notes
+
+### 2/4 — Data Demo
+
+- Showed tax liens + HPD violations + PLUTO → ranked CSV output
+- **Valuations:** Daniel offered Property Shark login (2 users). ATTOM API also available.
+- **Focus:** Brooklyn + Queens (easier data, can visit properties)
+- **Borough codes:** 1=MN, 2=BX, 3=BK, 4=QN, 5=SI
+- **Timeline:** 3-8 weeks for BK/QN
+
+### 2/12 — Scope & Lis Pendens
+
+- **Lis pendens alerts:** Daily text/email when properties enter lis pendens. Include owner name + phone, property type + photo, lien amount. **5-minute competitive advantage.**
+- Daniel currently uses Property Shark for manual searches
+- Iterative development with weekly/bi-weekly feedback
 
 ---
 
@@ -314,19 +373,27 @@ Based on SoW deliverables, meeting notes, and Daniel's spreadsheet feedback:
 - [ ] Automated data refresh (at minimum weekly, ideally daily for violations)
 - [x] Last-updated timestamps per data source (`plutoSyncedAt`, `liensSyncedAt`, `violationsSyncedAt`)
 
-### Phase 2 — Enhanced Intelligence
+### Phase 2 — Lis Pendens Alerts (PRIORITY)
 
-- [ ] **Property valuations via comps** — Integrate Property Shark API (Daniel's login) or ATTOM API for actual market values and comparable sales
-- [ ] **ACRIS integration** — Deed transfers, recorded liens (federal, state, mechanic's liens), lis pendens filings
-- [ ] **Lis pendens alert system** — Daily check of ACRIS for new lis pendens filings in target boroughs; push notification via text/email with:
-  - Property owner name and phone number
-  - Property type and photo (street view)
-  - Lien amount
-  - Property details (units, building class, violations)
+This is the **highest value feature** — transforms the platform from a dashboard Daniel has to check into an alert system that brings opportunities to him.
+
+- [ ] **ACRIS lis pendens ingestion** — Daily poll of Real Property Master (`bnx9-e6tj`) filtered for lis pendens document types (`LP`, related codes). Cross-ref with Legals (`8h5j-fqxa`) for BBL linkage.
+- [ ] **New filing detection** — Track `lastAcrisSyncedAt`, detect filings since last run, match to existing parcels or create new
+- [ ] **Alert system** — When new lis pendens matches criteria (borough, score threshold), send:
+  - **SMS via Twilio** + **email via Resend**
+  - Content: property address, owner name, lien amount, property type, building class, distress score, link to detail
+- [ ] **Alert preferences** — User-configurable: boroughs, score threshold, alert frequency
+- [ ] **Alert history** — Store all sent alerts, show in UI ("alerts I've received")
+
+### Phase 3 — Valuations & Enrichment
+
+- [ ] **Property valuations via comps** — Integrate Property Shark (Daniel's login) or ATTOM API for actual market values and comparable sales
+- [ ] **Owner contact lookup** — Skip tracing service (Spokeo, BeenVerified, or CRM data provider) for phone numbers
+- [ ] **Property photos** — Google Street View Static API (free tier: 28K/month) or Zillow API
+- [ ] **Property Charges Balance** — Ingest `scjx-j6np` for outstanding balance data (additional distress signal)
 - [ ] **Expand to all NYC boroughs** — Same data pipeline, different borough filter parameter
-- [ ] **Owner contact lookup** — Cross-reference ACRIS parties with public records for phone/email
 
-### Phase 3 — Multi-Jurisdiction
+### Phase 4 — Multi-Jurisdiction
 
 - [ ] **Broward County FL** — Ingest SFTP data from `BCFTP.Broward.org` (official records index: liens, deeds, mortgages, foreclosures). Supplement with county property appraiser data for valuations.
 - [ ] **Adapter pattern reuse** — Each jurisdiction = new source config, not new engineering (see `PUBLIC_DATA_PLATFORM.md` architecture)
