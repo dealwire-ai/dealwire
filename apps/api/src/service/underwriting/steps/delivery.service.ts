@@ -32,8 +32,13 @@ export class DeliveryService {
 
     const html = this.buildResultHtml(normalized, extraction, dealId);
 
+    const ccAddresses = this.config.adminEmails.filter(
+      (addr) => addr.toLowerCase() !== senderEmail.toLowerCase(),
+    );
+
     await this.emailSender.sendEmail({
       to: [senderEmail],
+      cc: ccAddresses.length > 0 ? ccAddresses : undefined,
       subject,
       html,
       from: this.config.underwritingInboundEmail

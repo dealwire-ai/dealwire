@@ -24,6 +24,7 @@ export class EmailSenderService {
     subject: string;
     html: string;
     from?: string;
+    cc?: string[];
     text?: string;
     replyToMessageId?: string;
     attachments?: Array<{ filename: string; content: string }>;
@@ -35,6 +36,10 @@ export class EmailSenderService {
         subject: params.subject,
         html: params.html,
       };
+
+      if (params.cc?.length) {
+        emailParams.cc = params.cc;
+      }
 
       if (params.text) {
         emailParams.text = params.text;
