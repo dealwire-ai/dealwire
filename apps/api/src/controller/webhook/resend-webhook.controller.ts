@@ -11,6 +11,7 @@ import { Request } from 'express';
 import { BaseWebhookController } from './base-webhook.controller';
 import { ResendWebhookService } from '../../service/resend/resend-webhook.service';
 import { UnderwritingInboundService } from '../../service/underwriting/underwriting-inbound.service';
+import { ScreeningInboundService } from '../../service/screening/screening-inbound.service';
 import { emailConfig } from '../../config/email.config';
 
 @Controller('webhooks')
@@ -21,6 +22,7 @@ export class ResendWebhookController extends BaseWebhookController {
   constructor(
     private readonly resendWebhookService: ResendWebhookService,
     private readonly underwritingInboundService: UnderwritingInboundService,
+    private readonly screeningInboundService: ScreeningInboundService,
   ) {
     super();
   }
@@ -52,6 +54,8 @@ export class ResendWebhookController extends BaseWebhookController {
     try {
       if (this.isUnderwritingEmail(emailData)) {
         await this.underwritingInboundService.handleEmail(emailData);
+      } else if (this.isScreeningEmail(emailData)) {
+        await this.screeningInboundService.handleEmail(emailData);
       } else {
         await this.resendWebhookService.handleEmailReceived(emailData);
       }
@@ -65,6 +69,22 @@ export class ResendWebhookController extends BaseWebhookController {
     }
 
     return { status: 'ok' };
+  }
+
+  /**
+   * Returns true if any recipient matches the configured screening inbound address.
+   */
+  private isScreeningEmail(emailData: any): boolean {
+    const screeningAddr = this.emailConfig.screeningInboundEmail;
+    if (!screeningAddr) return false;
+
+    const toAddresses: string[] = Array.isArray(emailData.to)
+      ? emailData.to
+      : [emailData.to || ''];
+
+    return toAddresses.some(
+      (addr) => addr.toLowerCase() === screeningAddr.toLowerCase(),
+    );
   }
 
   /**
