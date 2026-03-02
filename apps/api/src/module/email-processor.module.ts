@@ -3,7 +3,6 @@ import { EmailProcessorService } from '../service/email/email-processor.service'
 import { NormalizedEmailListenerService } from '../service/email/normalized-email-listener.service';
 import { SQSService } from '../service/sqs/sqs.service';
 import { DealAnalysisModule } from './ai.module';
-import { AgentModule } from './agent.module';
 import { EmailServicesModule } from './email.module';
 import { PrismaModule } from './prisma.module';
 import { MicrosoftModule } from './microsoft.module';
@@ -14,7 +13,6 @@ import { PreferencesModule } from './preferences.module';
 @Module({
   imports: [
     DealAnalysisModule,
-    AgentModule,
     EmailServicesModule,
     PrismaModule,
     S3Module,

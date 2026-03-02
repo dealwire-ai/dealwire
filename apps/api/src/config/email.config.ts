@@ -6,6 +6,7 @@ export interface EmailConfig {
   fromEmail: string;
   adminEmails: string[];
   underwritingInboundEmail: string;
+  screeningInboundEmail: string;
 }
 
 export const emailConfig = (): EmailConfig => ({
@@ -14,4 +15,5 @@ export const emailConfig = (): EmailConfig => ({
   fromEmail: process.env.FROM_EMAIL || 'Deal Analyzer <mail.deals@frontstep.ai>',
   adminEmails: ADMIN_EMAILS,
   underwritingInboundEmail: process.env.UNDERWRITING_INBOUND_EMAIL || '',
+  screeningInboundEmail: process.env.SCREENING_INBOUND_EMAIL || '',
 });
