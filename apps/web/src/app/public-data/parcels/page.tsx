@@ -48,6 +48,8 @@ export default function ParcelsPage() {
   const table = useTableState({
     defaultLimit: 50,
     defaultFilters: { excludeCoops: "true", borough: "3,4" },
+    defaultSort: "distressScore",
+    defaultOrder: "desc",
   });
 
   const fetchParcels = useCallback(async () => {
@@ -56,7 +58,7 @@ export default function ParcelsPage() {
       setLoading(true);
       setError(null);
       const response = await apiCall(
-        `/public-data/parcels?${table.queryString}&sort=distressScore&order=desc`
+        `/public-data/parcels?${table.queryString}`
       );
       setParcels(response.data || []);
       if (response.pagination) table.setMeta(response.pagination);
@@ -109,7 +111,7 @@ export default function ParcelsPage() {
 
   useEffect(() => {
     setExpandedRows(new Set());
-  }, [table.page]);
+  }, [table.page, table.sort, table.order]);
 
   if (!isLoaded) {
     return (
@@ -206,6 +208,9 @@ export default function ParcelsPage() {
               }}
               hasActiveFilters={table.hasActiveFilters}
               onClearFilters={table.clearFilters}
+              sort={table.sort}
+              order={table.order}
+              onSortChange={table.setSort}
             />
           )}
 

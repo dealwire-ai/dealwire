@@ -1,7 +1,7 @@
 "use client";
 
 import { Fragment } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowDown, ArrowUp, ChevronDown, ChevronUp } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { ScoreBadge } from "./score-badge";
+import { formatBuildingClass } from "@/lib/building-class-labels";
 
 const BOROUGH_NAMES: Record<string, string> = {
   "1": "Manhattan",
@@ -55,12 +56,30 @@ export interface Parcel {
   distressScore: number | null;
 }
 
+const SORTABLE_COLUMNS: { label: string; field: string; align?: "right" }[] = [
+  { label: "Score", field: "distressScore" },
+  { label: "Address", field: "address" },
+  { label: "Borough", field: "borough" },
+  { label: "Class", field: "buildingClass" },
+  { label: "Units", field: "unitsTotal", align: "right" },
+  { label: "Sqft", field: "buildingArea", align: "right" },
+  { label: "Est. Value", field: "estimatedMarketValue", align: "right" },
+  { label: "Year", field: "yearBuilt", align: "right" },
+  { label: "Open Viol.", field: "violationsOpen", align: "right" },
+  { label: "V/Unit", field: "violationsPerUnit", align: "right" },
+  { label: "Class C", field: "violationsClassC", align: "right" },
+  { label: "Lien", field: "hasActiveLien" },
+];
+
 interface ParcelTableProps {
   parcels: Parcel[];
   expandedRows: Set<string>;
   onToggleRow: (id: string) => void;
   hasActiveFilters?: boolean;
   onClearFilters?: () => void;
+  sort?: string;
+  order?: "asc" | "desc";
+  onSortChange?: (field: string) => void;
 }
 
 function formatCurrency(value: number | null | undefined): string {
@@ -83,6 +102,9 @@ export function ParcelTable({
   onToggleRow,
   hasActiveFilters,
   onClearFilters,
+  sort,
+  order,
+  onSortChange,
 }: ParcelTableProps) {
   if (parcels.length === 0) {
     return (
@@ -109,18 +131,30 @@ export function ParcelTable({
       <TableHeader>
         <TableRow>
           <TableHead className="w-10"></TableHead>
-          <TableHead>Score</TableHead>
-          <TableHead>Address</TableHead>
-          <TableHead>Borough</TableHead>
-          <TableHead>Class</TableHead>
-          <TableHead className="text-right">Units</TableHead>
-          <TableHead className="text-right">Sqft</TableHead>
-          <TableHead className="text-right">Est. Value</TableHead>
-          <TableHead className="text-right">Year</TableHead>
-          <TableHead className="text-right">Open Viol.</TableHead>
-          <TableHead className="text-right">V/Unit</TableHead>
-          <TableHead className="text-right">Class C</TableHead>
-          <TableHead>Lien</TableHead>
+          {SORTABLE_COLUMNS.map(({ label, field, align }) => {
+            const isActive = sort === field;
+            return (
+              <TableHead
+                key={field}
+                className={
+                  align === "right"
+                    ? "text-right cursor-pointer hover:text-white select-none"
+                    : "cursor-pointer hover:text-white select-none"
+                }
+                onClick={() => onSortChange?.(field)}
+              >
+                <span className="inline-flex items-center gap-1">
+                  {label}
+                  {isActive &&
+                    (order === "desc" ? (
+                      <ArrowDown className="h-3.5 w-3.5" />
+                    ) : (
+                      <ArrowUp className="h-3.5 w-3.5" />
+                    ))}
+                </span>
+              </TableHead>
+            );
+          })}
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -148,7 +182,9 @@ export function ParcelTable({
                 <TableCell>
                   {BOROUGH_NAMES[parcel.borough] || parcel.borough}
                 </TableCell>
-                <TableCell>{parcel.buildingClass || "-"}</TableCell>
+                <TableCell>
+                  {formatBuildingClass(parcel.buildingClass)}
+                </TableCell>
                 <TableCell className="text-right">
                   {parcel.unitsTotal ?? "-"}
                 </TableCell>
