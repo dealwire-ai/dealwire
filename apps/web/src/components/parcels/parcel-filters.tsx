@@ -8,6 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { BUILDING_CLASS_LABELS } from "@/lib/building-class-labels";
 
 const BOROUGHS = [
   { code: "3", name: "Brooklyn" },
@@ -90,6 +91,28 @@ export function ParcelFilters({ filters, onSetFilter }: ParcelFiltersProps) {
           <SelectItem value="50">Score 50+</SelectItem>
           <SelectItem value="60">Score 60+</SelectItem>
           <SelectItem value="80">Score 80+</SelectItem>
+        </SelectContent>
+      </Select>
+
+      {/* Building class */}
+      <Select
+        value={filters.buildingClass || "all"}
+        onValueChange={(value) =>
+          onSetFilter("buildingClass", value === "all" ? "" : value)
+        }
+      >
+        <SelectTrigger className="w-[220px] bg-zinc-950 border-zinc-800 text-white">
+          <SelectValue placeholder="Building Class" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All Classes</SelectItem>
+          {Object.entries(BUILDING_CLASS_LABELS)
+            .sort(([a], [b]) => a.localeCompare(b))
+            .map(([code, label]) => (
+              <SelectItem key={code} value={code}>
+                {code} — {label}
+              </SelectItem>
+            ))}
         </SelectContent>
       </Select>
     </div>
