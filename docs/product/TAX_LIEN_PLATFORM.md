@@ -22,15 +22,19 @@ A secure web application that aggregates public tax lien data, property records,
 | Tax lien list ingestion | ✅ Done | SODA adapter, latest cycle filtering |
 | PLUTO enrichment | ✅ Done | Building class, units, sqft, year built, owner, zoning |
 | HPD violations | ✅ Done | Aggregated counts by class, violations/unit |
-| Distress scoring | ✅ Done | 0-100 weighted score |
+| Distress scoring | ✅ Done | 0-100 weighted score (needs update — Class C only, see 3/4 feedback) |
 | Parcel table UI | ✅ Done | Filterable, sortable, expandable rows |
 | CSV export | ✅ Done | All filters apply |
 | Agent tools | ✅ Done | `query_parcels`, `get_parcel_stats` |
 | Feature flag | ✅ Done | `parcels` org-level flag |
+| **Building class grouped filters** | ❌ Not started | 3 checkbox categories (see 3/4 feedback). Exclude D class entirely. |
+| **Tax lien dollar amounts** | ❌ Not started | NYC DOF account history, MTAG/Tower servicer data |
+| **Outstanding tax bills** | ❌ Not started | NYC DOF tax bill amounts per property |
+| **Owner phone lookup** | ❌ Not started | Skip tracing — Brett ready to cold call |
+| **Manhattan expansion** | ❌ Not started | Same criteria as BK/QN |
+| **Accurate valuations** | ❌ Not started | Property Shark (login received) or ATTOM API |
 | **Lis pendens ingestion** | ❌ Not started | ACRIS integration needed |
 | **Push alerts (SMS/email)** | ❌ Not started | Time-sensitive advantage |
-| **Accurate valuations** | ❌ Not started | Currently rough formula; need comps |
-| **Owner phone lookup** | ❌ Not started | Skip tracing integration |
 | **Property photos** | ❌ Not started | Street View API |
 | **Property Charges Balance** | ❌ Not started | `scjx-j6np` dataset |
 
@@ -38,12 +42,12 @@ A secure web application that aggregates public tax lien data, property records,
 
 | Document | Location |
 |----------|----------|
-| Meeting notes (2/4, 2/12) | [Google Drive](https://drive.google.com/drive/folders/1CzNH0jYqpdi4GtP5XPu1z_1dVAq8G0ty) |
+| Meeting notes (2/4, 2/12, 3/4) | [Google Drive](https://drive.google.com/drive/folders/1CzNH0jYqpdi4GtP5XPu1z_1dVAq8G0ty) |
 | Statement of Work | Google Drive (same folder) |
 | Broward County notes | Google Drive (same folder) |
-| Daniel's data feedback | `DG Comments.xlsx` in Google Drive |
+| Daniel's data feedback | `DG Comments.xlsx` in Google Drive + [email 3/4](https://mail.google.com/mail/u/0/#all/19cbb1ce331e71a2) |
 | Public Data Platform arch | [`docs/product/PUBLIC_DATA_PLATFORM.md`](PUBLIC_DATA_PLATFORM.md) |
-| Granola meeting transcripts | [2/4](https://notes.granola.ai/t/648f69bf-f9af-439c-9ff5-74ac5d8ff6fb), [2/12](https://notes.granola.ai/t/873b558a-84ce-4bd6-bd9f-5cb1fea9f91b) |
+| Granola meeting transcripts | [2/4](https://notes.granola.ai/t/648f69bf-f9af-439c-9ff5-74ac5d8ff6fb), [2/12](https://notes.granola.ai/t/873b558a-84ce-4bd6-bd9f-5cb1fea9f91b), [3/4](https://notes.granola.ai/d/c7f8f518-3326-49ee-9ef0-ec825441e010) |
 
 ---
 
@@ -53,15 +57,24 @@ A secure web application that aggregates public tax lien data, property records,
 
 The system is **reactive** (Daniel has to check the dashboard) not **proactive** (system notifies Daniel). The real value is alerting on **new lis pendens filings** — the time-sensitive signal that creates competitive advantage. Daniel pays ~$500/month for PropertyShark primarily for this (24-48 hour delay). We can beat that.
 
-### 6-Week Priority Stack
+Additionally, the dashboard is missing key data Daniel needs to act: **lien dollar amounts**, **outstanding tax bills**, and **owner contact info** for cold calling. Brett is ready to start calling but needs this data first.
 
-| Week | Focus | Deliverable |
-|------|-------|-------------|
-| 1-2 | **Lis pendens ingestion** | ACRIS integration, detect new filings, match to parcels |
-| 2-3 | **Alert system** | SMS + email when criteria match |
-| 3-4 | **Valuations** | Property Shark comps or ATTOM API |
-| 4-5 | **Owner contact + photos** | Skip tracing for phone, Street View for photos |
-| 5-6 | **Polish** | Parcel detail page, alert history, borough expansion |
+### Priority Stack (Updated 3/4 — Post-Meeting)
+
+_Reprioritized based on 3/4 meeting + Daniel's email feedback. Cold calling enablement is now the primary driver._
+
+| Priority | Focus | Deliverable |
+|----------|-------|-------------|
+| **P0** | **Scoring fix** | Remove Class A/B violations from score — only Class C matters per Daniel |
+| **P0** | **Building class grouped filters** | 3 checkbox categories: (A,B,C), (E-Z), (C1-C7). Exclude D class entirely. |
+| **P1** | **Tax lien dollar amounts** | Scrape/integrate NYC DOF account history for lien $$ and servicer (MTAG/Tower). Also check MTAG (station31partners.com) and Tower (tcmfc.com) sites. |
+| **P1** | **Outstanding tax bills** | Pull current tax bill amounts from NYC DOF. Example: BBL 3004050058 owes $8,530. DOF has PDF tax bills at `a836-edms.nyc.gov` but dynamic site — research API/scraping options. |
+| **P2** | **Owner contact lookup (skip tracing)** | Phone numbers for cold calling. Brett is ready to start. Research providers (Spokeo, BeenVerified, batch skip trace APIs). |
+| **P2** | **Manhattan expansion** | Add borough 1 with same criteria as BK/QN |
+| **P3** | **Property Shark integration** | Daniel sent login (dgabay@gmail.com). Use for comps/valuations. Research if API exists or web-only. |
+| **P3** | **Lis pendens alerts** | ACRIS integration + SMS/email push. Still high value but cold calling data comes first. |
+| **P4** | **Property photos** | Street View API |
+| **P4** | **Property Charges Balance** | Socrata `scjx-j6np` |
 
 ---
 
@@ -80,6 +93,22 @@ The system is **reactive** (Daniel has to check the dashboard) not **proactive**
 - **Lis pendens alerts:** Daily text/email when properties enter lis pendens. Include owner name + phone, property type + photo, lien amount. **5-minute competitive advantage.**
 - Daniel currently uses Property Shark for manual searches
 - Iterative development with weekly/bi-weekly feedback
+
+### 3/4 — Platform Demo & Feedback
+
+- Demoed live platform with 3 datasets (PLUTO, HPD, tax liens)
+- **Building class filters:** Daniel wants 3 grouped checkbox categories, not a long dropdown:
+  - Group 1: A, B, C
+  - Group 2: E, F, G, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z
+  - Group 3: C1, C2, C3, C4, C5, C6, C7
+  - **Exclude D class entirely** (for now)
+- **Only Class C violations matter** — Drop A and B from scoring/display. "Not meaningful."
+- **Tax lien dollar amounts needed** — Platform shows lien existence but not $$. NYC DOF account history has lien amounts + servicer (MTAG/Tower). Old search features on servicer sites (station31partners.com, tcmfc.com) have changed.
+- **Outstanding tax bills** — Show current tax bill on dashboard. NYC DOF search at `a836-pts-access.nyc.gov`. Example: 213 Butler St (BBL 3004050058) owes $8,530. Lien 1 for $58K sold to Tower (status: Sold = unpaid). Tax bill PDFs available at `a836-edms.nyc.gov`.
+- **Contact info is top priority** — Brett ready to start cold calling once data is complete
+- **Manhattan expansion** — Same criteria as BK/QN being discussed
+- **Property Shark login sent** — dgabay@gmail.com at propertyshark.com
+- **Follow-up with David Shorenstein** at 6pm same day
 
 ---
 
@@ -346,6 +375,7 @@ Based on SoW deliverables, meeting notes, and Daniel's spreadsheet feedback:
 #### Building Intelligence
 - [x] Show building class with full description
 - [x] Auto-exclude coops (all 9 codes: A8, C6, C8, CC, D0, D4, DC, H7, R9) — filterable toggle
+- [ ] **Grouped building class filter** — 3 checkbox categories: (A,B,C), (E-Z), (C1-C7). Exclude all D class entirely. _3/4 feedback._
 - [ ] Flag vacant lots (V-class, Z-class)
 - [ ] Show construction type (frame vs. brick) from building class
 - [x] Calculate violations per unit (open violations / unit count)
@@ -359,7 +389,8 @@ Based on SoW deliverables, meeting notes, and Daniel's spreadsheet feedback:
   - Active lien (+30 points)
   - Violations per unit (+10 per viol/unit, capped at 40)
   - Class C violations (+5 each, capped at 20)
-  - Class B violations (+2 each, capped at 10)
+  - ~~Class B violations (+2 each, capped at 10)~~ — **REMOVE per 3/4 feedback. Only Class C matters.**
+- [ ] **Update scoring to Class C only** — Drop A and B violations from score. Redistribute weight (e.g. increase C violation cap or violations/unit weight).
 - [ ] Score explanation for each property (why this score?)
 
 #### Interface
@@ -373,9 +404,20 @@ Based on SoW deliverables, meeting notes, and Daniel's spreadsheet feedback:
 - [ ] Automated data refresh (at minimum weekly, ideally daily for violations)
 - [x] Last-updated timestamps per data source (`plutoSyncedAt`, `liensSyncedAt`, `violationsSyncedAt`)
 
-### Phase 2 — Lis Pendens Alerts (PRIORITY)
+### Phase 2 — Cold Calling Enablement (PRIORITY — 3/4 meeting)
 
-This is the **highest value feature** — transforms the platform from a dashboard Daniel has to check into an alert system that brings opportunities to him.
+_Reprioritized from lis pendens. Brett is ready to cold call — he needs lien amounts, tax bills, and phone numbers first._
+
+- [ ] **Tax lien dollar amounts** — Integrate NYC DOF account history for lien $$ per property. Shows servicer (MTAG or Tower), lien status (Sold vs Redeemed), and lien amount. DOF search: `a836-pts-access.nyc.gov`. Research scraping or API approach — site is dynamic. Also check servicer sites: [MTAG/Station 31](https://station31partners.com/mtag-services-2/), [Tower](https://www.tcmfc.com).
+- [ ] **Outstanding tax bills** — Pull current tax bill amounts from NYC DOF. PDF tax bills available at `a836-edms.nyc.gov/dctm-rest/repositories/dofedmspts/StatementSearch?bbl={bbl}&stmtDate={date}&stmtType=SOA`. Research batch approach.
+- [ ] **Owner contact lookup** — Skip tracing for phone numbers. Brett ready to start cold calling. Research batch providers (Spokeo, BeenVerified, BatchSkipTracing, REISkip).
+- [ ] **Scoring update** — Remove Class A/B violations. Only Class C matters. Redistribute weight.
+- [ ] **Building class grouped filters** — 3 checkbox categories replacing individual dropdown.
+- [ ] **Manhattan expansion** — Add borough 1 with same criteria.
+
+### Phase 3 — Lis Pendens Alerts
+
+_Still high value but deprioritized behind cold calling data needs._
 
 - [ ] **ACRIS lis pendens ingestion** — Daily poll of Real Property Master (`bnx9-e6tj`) filtered for lis pendens document types (`LP`, related codes). Cross-ref with Legals (`8h5j-fqxa`) for BBL linkage.
 - [ ] **New filing detection** — Track `lastAcrisSyncedAt`, detect filings since last run, match to existing parcels or create new
@@ -385,15 +427,13 @@ This is the **highest value feature** — transforms the platform from a dashboa
 - [ ] **Alert preferences** — User-configurable: boroughs, score threshold, alert frequency
 - [ ] **Alert history** — Store all sent alerts, show in UI ("alerts I've received")
 
-### Phase 3 — Valuations & Enrichment
+### Phase 4 — Valuations & Enrichment
 
-- [ ] **Property valuations via comps** — Integrate Property Shark (Daniel's login) or ATTOM API for actual market values and comparable sales
-- [ ] **Owner contact lookup** — Skip tracing service (Spokeo, BeenVerified, or CRM data provider) for phone numbers
+- [ ] **Property valuations via comps** — Integrate Property Shark (Daniel's login: dgabay@gmail.com) or ATTOM API for actual market values and comparable sales. Research if Property Shark has an API or is web-only.
 - [ ] **Property photos** — Google Street View Static API (free tier: 28K/month) or Zillow API
 - [ ] **Property Charges Balance** — Ingest `scjx-j6np` for outstanding balance data (additional distress signal)
-- [ ] **Expand to all NYC boroughs** — Same data pipeline, different borough filter parameter
 
-### Phase 4 — Multi-Jurisdiction
+### Phase 5 — Multi-Jurisdiction
 
 - [ ] **Broward County FL** — Ingest SFTP data from `BCFTP.Broward.org` (official records index: liens, deeds, mortgages, foreclosures). Supplement with county property appraiser data for valuations.
 - [ ] **Adapter pattern reuse** — Each jurisdiction = new source config, not new engineering (see `PUBLIC_DATA_PLATFORM.md` architecture)
