@@ -9,7 +9,6 @@
 
 ## Deal Screener
    - Plan and start building out the automated underwriting process (t-12/rent roll parsing, filling out excel proforma, etc.)
-   - Send invoice
 
 ## Tax Lien Analyzer
    - ensure current app is GTG for next wk's demo
