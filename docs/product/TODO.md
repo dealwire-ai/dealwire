@@ -17,6 +17,7 @@
 ## Frontstep Acquisition
    - execute + track media outreach
    - find dev's for tyler
+   - scope and price calendly + lead scoring build
     
 ## Survey Platform
    - test M3 b4 demo on Fri
