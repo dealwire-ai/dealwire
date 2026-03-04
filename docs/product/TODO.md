@@ -16,8 +16,12 @@
 
 ## Frontstep Acquisition
    - execute + track media outreach
+<<<<<<< HEAD
    - find dev's for tyler
    - scope and price calendly + lead scoring build
+=======
+   - send proposal to Tyler (cal integration + lead scoring)
+>>>>>>> 3eb2e34d3a6364aa5b3e60b58e2f4e823558a4e8
     
 ## Survey Platform
    - test M3 b4 demo on Fri
