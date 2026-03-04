@@ -65,7 +65,7 @@ _The data Analyzer produces must be best-in-class. This is the foundation everyt
 - [x] **Two-stage screening** — Data extraction runs before screening. Structured fields (price, cap rate, units, location, property type) are passed into the screening prompt so the model evaluates clean data against buy box criteria, not garbled OCR text.
 - [ ] **Attachment intelligence** — Handle rent rolls, financial statements, and multi-page OMs. Extract tables, charts, and structured financial data — not just text blobs.
 - [ ] **Data extraction accuracy** — Validate and cross-reference extracted fields. Flag low-confidence extractions. Structured output for every deal metric (price, NOI, cap rate, occupancy, units, sqft, year built, tenant mix, etc.).
-- [ ] **Screening feedback loop** — User corrects wrong decisions → system learns. Track accuracy over time. Confidence-based routing for borderline deals.
+- [ ] **Screening feedback loop** — User corrects wrong decisions → system learns. Track accuracy over time. Confidence-based routing for borderline deals. _JK feedback Mar 3: still receiving irrelevant deals (e.g. 500–600k sq ft warehouses); improve property type/size filtering._
 - [ ] **Deal deduplication** — Detect when multiple brokers send the same deal (same property, different packaging). Merge data from multiple sources into one canonical deal record.
 - [ ] **Richer deal detail view** — Full deal page showing all extracted data, source documents, screening rationale, and confidence levels for each field.
 
@@ -83,6 +83,7 @@ _Deep data is the moat. An analyst is only as good as their data access._
 ### Phase 3: Expand the Platform
 _More channels, more users, more deal flow._
 
+- [ ] **Criteria update button in deal emails** — One-click from deal summary/digest to update buy box or screening criteria. Eliminates need to find original screening address. _JK feedback Mar 3: high priority._
 - [ ] **Gmail support** — Expand beyond Outlook. Many acquisitions teams use Google Workspace.
 - [ ] **Improved email templates** — More polished analysis emails. Configurable formatting.
 - [ ] **Follow-up sequences** — Auto-draft follow-up emails to brokers for promising deals. Request additional info, schedule calls.
@@ -101,6 +102,9 @@ _Move beyond screening into the full deal pipeline._
   - [x] Confidence gate with human review flags
   - [x] Template filling + Excel export (AI mapper + xlsx-populate)
   - [x] Email delivery with filled .xlsx attachment
+  - [ ] Rent roll unit type classification — Handle variations ("renovated" vs "premium renovation", etc.). _JK feedback Mar 3._
+  - [ ] Template variations by deal type — Value-add vs ground-up development require different templates. _JK feedback Mar 3._
+  - [ ] Traceability — Email/platform showing document source for each extracted value. Blue cells = AI inputs. _JK feedback Mar 3._
   - [ ] Web-native interactive pro forma (dashboard rendering)
 - [ ] **Document management** — Organize OMs, rent rolls, financials, environmental reports per deal. OCR and structured extraction for each.
 
