@@ -16,7 +16,7 @@
 
 ## Frontstep Acquisition
    - execute + track media outreach
-   - find dev's for tyler
+   - send proposal to Tyler (cal integration + lead scoring)
     
 ## Survey Platform
    - test M3 b4 demo on Fri
