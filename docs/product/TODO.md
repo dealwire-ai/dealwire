@@ -1,7 +1,7 @@
 # TODO
 
 ## General Ops
-   - shortlist of 10 domains by Wed
+   - set plan for domain migration
 
 ## Biz Dev
    - Rengage every single contact in our pipeline, send demos of updated work
@@ -15,12 +15,8 @@
 
 ## Frontstep Acquisition
    - execute + track media outreach
-<<<<<<< HEAD
-   - find dev's for tyler
    - scope and price calendly + lead scoring build
-=======
-   - send proposal to Tyler (cal integration + lead scoring)
->>>>>>> 3eb2e34d3a6364aa5b3e60b58e2f4e823558a4e8
+   -    send proposal to Tyler (cal integration + lead scoring)
     
 ## Survey Platform
    - test M3 b4 demo on Fri
