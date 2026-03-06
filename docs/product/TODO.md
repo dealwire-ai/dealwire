@@ -18,8 +18,7 @@
 
 ## Frontstep Acquisition
    - execute + track media outreach
-   - scope and price calendly + lead scoring build
-   -    send proposal to Tyler (cal integration + lead scoring)
+   - lead scoring + auto-scheduling feature (proposal sent)
     
 ## Survey Platform
    - test M3 b4 demo on Fri
