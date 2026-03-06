@@ -6,6 +6,9 @@
 ## Biz Dev
    - Rengage every single contact in our pipeline, send demos of updated work
    -    for many leads: just offer deal screener for free
+   -    Demos:
+   -       Thomas Dolan -- customer identity enrichment automation
+   -       Jacob Palmer -- internal accountant AI for cashflow analysis (need some example input data from him)
 
 ## Deal Screener
    - Plan and start building out the automated underwriting process (t-12/rent roll parsing, filling out excel proforma, etc.)
@@ -15,8 +18,8 @@
 
 ## Frontstep Acquisition
    - execute + track media outreach
-   - scope and price calendly + lead scoring build
-   -    send proposal to Tyler (cal integration + lead scoring)
+   - lead scoring + auto-scheduling feature (proposal sent)
+   - respond to Alex with high amt
     
 ## Survey Platform
    - test M3 b4 demo on Fri
