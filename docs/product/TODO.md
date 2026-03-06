@@ -19,6 +19,7 @@
 ## Frontstep Acquisition
    - execute + track media outreach
    - lead scoring + auto-scheduling feature (proposal sent)
+   - respond to Alex with high amt
     
 ## Survey Platform
    - test M3 b4 demo on Fri
