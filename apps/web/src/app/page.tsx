@@ -526,7 +526,7 @@ export default function Home() {
               {
                 name: "Noah Weinstein",
                 role: "Co-Founder",
-                bio: "Technical Product Manager at SiphoX, a venture-backed health tech startup, where he works directly with enterprise customers to identify and solve their highest-value problems. Computer Science at Northeastern. Co-founded and sold frontstep.ai.",
+                bio: "Former Software Engineer at Flexcar and Technical Product Manager at Siphox, a venture-backed health tech startup, where he worked on consumer-facing AI systems. Computer Science at Northeastern. Co-founded and sold frontstep.ai.",
                 linkedin: "https://www.linkedin.com/in/noahweinstein/",
                 email: "noah@frontstep.ai",
                 headshot: "/headshots/noah.webp",
