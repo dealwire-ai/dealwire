@@ -1,7 +1,8 @@
 # TODO
 
 ## General Ops
-   - set plan for domain migration
+   - (isaac) eng migration
+   - (noah) gsuite + related accounts
 
 ## Biz Dev
    - Rengage every single contact in our pipeline, send demos of updated work
