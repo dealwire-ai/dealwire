@@ -30,7 +30,7 @@ export function TableToolbar({
           placeholder="Search..."
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="pl-9 bg-zinc-950 border-zinc-800 text-white placeholder:text-zinc-500 focus-visible:ring-[#3ECFA0]/50"
+          className="pl-9 bg-zinc-950 border-zinc-800 text-white placeholder:text-zinc-500 focus-visible:ring-[#C8A96E]/50"
         />
         {search && (
           <button

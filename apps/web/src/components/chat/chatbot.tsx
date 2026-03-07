@@ -41,11 +41,11 @@ export function Chatbot() {
         className={cn(
           "fixed bottom-6 right-6 z-50",
           "h-14 w-14 rounded-full",
-          "bg-[#3ECFA0] hover:bg-[#35b88f] text-black",
+          "bg-[#C8A96E] hover:bg-[#b8952a] text-black",
           "shadow-lg hover:shadow-xl hover:scale-105",
           "flex items-center justify-center",
           "transition-all duration-200",
-          "focus:outline-none focus:ring-2 focus:ring-[#3ECFA0] focus:ring-offset-2 focus:ring-offset-black",
+          "focus:outline-none focus:ring-2 focus:ring-[#C8A96E] focus:ring-offset-2 focus:ring-offset-black",
         )}
         aria-label="Open chat"
       >
@@ -66,7 +66,7 @@ export function Chatbot() {
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-zinc-800">
               <div className="flex items-center gap-3">
-                <div className="h-8 w-8 rounded-full bg-[#3ECFA0] flex items-center justify-center">
+                <div className="h-8 w-8 rounded-full bg-[#C8A96E] flex items-center justify-center">
                   <Bot className="h-4 w-4 text-black" />
                 </div>
                 <div>
@@ -119,7 +119,7 @@ export function Chatbot() {
                       className={cn(
                         "max-w-[75%] rounded-lg px-4 py-2.5",
                         message.role === "user"
-                          ? "bg-[#3ECFA0] text-black"
+                          ? "bg-[#C8A96E] text-black"
                           : "bg-zinc-800 text-white",
                       )}
                     >
@@ -129,7 +129,7 @@ export function Chatbot() {
                     </div>
                     {message.role === "user" && (
                       <Avatar className="h-8 w-8 shrink-0">
-                        <AvatarFallback className="bg-[#3ECFA0] text-black">
+                        <AvatarFallback className="bg-[#C8A96E] text-black">
                           <User className="h-4 w-4" />
                         </AvatarFallback>
                       </Avatar>
@@ -173,7 +173,7 @@ export function Chatbot() {
                   onChange={handleInputChange}
                   placeholder="Ask about deals, contacts, or properties..."
                   disabled={isLoading}
-                  className="dark:bg-zinc-800 dark:border-zinc-700 dark:text-white dark:placeholder:text-zinc-500 dark:focus-visible:ring-[#3ECFA0]"
+                  className="dark:bg-zinc-800 dark:border-zinc-700 dark:text-white dark:placeholder:text-zinc-500 dark:focus-visible:ring-[#C8A96E]"
                 />
                 <Button
                   type="submit"
