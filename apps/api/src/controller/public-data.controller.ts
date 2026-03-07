@@ -19,6 +19,7 @@ import { AuthUser } from '../decorator/auth-user.decorator';
 import { PrismaService } from '../service/prisma/prisma.service';
 import { NycIngestionService } from '../service/public-data/nyc-ingestion.service';
 import { ParcelQueryService } from '../service/public-data/parcel-query.service';
+import { SkipTraceService } from '../service/public-data/skip-trace.service';
 import { BOROUGH_NAMES } from '../service/public-data/nyc-utils';
 import { resolveFeatureFlags } from '../util/feature-flags';
 
@@ -31,6 +32,7 @@ export class PublicDataController {
     private readonly prisma: PrismaService,
     private readonly ingestion: NycIngestionService,
     private readonly parcelQuery: ParcelQueryService,
+    private readonly skipTrace: SkipTraceService,
   ) {}
 
   private async assertParcelsEnabled(organizationId: string | null) {
@@ -43,7 +45,10 @@ export class PublicDataController {
     });
     const flags = resolveFeatureFlags(org?.featureFlags);
     if (!flags.parcels) {
-      throw new HttpException('Parcels feature is not enabled for this organization', HttpStatus.FORBIDDEN);
+      throw new HttpException(
+        'Parcels feature is not enabled for this organization',
+        HttpStatus.FORBIDDEN,
+      );
     }
   }
 
@@ -59,18 +64,26 @@ export class PublicDataController {
     // Validate borough codes
     for (const b of boroughs) {
       if (!BOROUGH_NAMES[b]) {
-        throw new HttpException(`Invalid borough code: ${b}. Valid: 1-5`, HttpStatus.BAD_REQUEST);
+        throw new HttpException(
+          `Invalid borough code: ${b}. Valid: 1-5`,
+          HttpStatus.BAD_REQUEST,
+        );
       }
     }
 
-    this.logger.log(`Triggering ingestion for boroughs: ${boroughs.map((b) => BOROUGH_NAMES[b]).join(', ')}`);
+    this.logger.log(
+      `Triggering ingestion for boroughs: ${boroughs.map((b) => BOROUGH_NAMES[b]).join(', ')}`,
+    );
 
     // Fire-and-forget — ingestion runs in the background
-    this.ingestion.ingestAll(boroughs).then((results) => {
-      this.logger.log(`Ingestion complete: ${JSON.stringify(results)}`);
-    }).catch((err) => {
-      this.logger.error(`Ingestion failed: ${err.message}`, err.stack);
-    });
+    this.ingestion
+      .ingestAll(boroughs)
+      .then((results) => {
+        this.logger.log(`Ingestion complete: ${JSON.stringify(results)}`);
+      })
+      .catch((err) => {
+        this.logger.error(`Ingestion failed: ${err.message}`, err.stack);
+      });
 
     return {
       message: 'Ingestion started',
@@ -104,15 +117,22 @@ export class PublicDataController {
       boroughs: borough ? borough.split(',') : undefined,
       excludeCoops: excludeCoops === 'true',
       excludeDClass: excludeDClass === 'false' ? false : true,
-      hasActiveLien: hasActiveLien !== undefined ? hasActiveLien === 'true' : undefined,
-      minDistressScore: minDistressScore ? parseFloat(minDistressScore) : undefined,
-      maxDistressScore: maxDistressScore ? parseFloat(maxDistressScore) : undefined,
+      hasActiveLien:
+        hasActiveLien !== undefined ? hasActiveLien === 'true' : undefined,
+      minDistressScore: minDistressScore
+        ? parseFloat(minDistressScore)
+        : undefined,
+      maxDistressScore: maxDistressScore
+        ? parseFloat(maxDistressScore)
+        : undefined,
       minUnits: minUnits ? parseInt(minUnits) : undefined,
       maxUnits: maxUnits ? parseInt(maxUnits) : undefined,
       zipCode,
       search,
       buildingClasses: buildingClass ? buildingClass.split(',') : undefined,
-      buildingClassGroups: buildingClassGroups ? buildingClassGroups.split(',') : undefined,
+      buildingClassGroups: buildingClassGroups
+        ? buildingClassGroups.split(',')
+        : undefined,
       sort,
       order,
       page,
@@ -145,28 +165,58 @@ export class PublicDataController {
       boroughs: borough ? borough.split(',') : undefined,
       excludeCoops: excludeCoops === 'true',
       excludeDClass: excludeDClass === 'false' ? false : true,
-      hasActiveLien: hasActiveLien !== undefined ? hasActiveLien === 'true' : undefined,
-      minDistressScore: minDistressScore ? parseFloat(minDistressScore) : undefined,
-      maxDistressScore: maxDistressScore ? parseFloat(maxDistressScore) : undefined,
+      hasActiveLien:
+        hasActiveLien !== undefined ? hasActiveLien === 'true' : undefined,
+      minDistressScore: minDistressScore
+        ? parseFloat(minDistressScore)
+        : undefined,
+      maxDistressScore: maxDistressScore
+        ? parseFloat(maxDistressScore)
+        : undefined,
       minUnits: minUnits ? parseInt(minUnits) : undefined,
       maxUnits: maxUnits ? parseInt(maxUnits) : undefined,
       zipCode,
       search,
       buildingClasses: buildingClass ? buildingClass.split(',') : undefined,
-      buildingClassGroups: buildingClassGroups ? buildingClassGroups.split(',') : undefined,
+      buildingClassGroups: buildingClassGroups
+        ? buildingClassGroups.split(',')
+        : undefined,
       sort,
       order,
     });
 
     // Build CSV
     const headers = [
-      'BBL', 'Borough', 'Address', 'Zip', 'Building Class', 'Units Total',
-      'Units Residential', 'Building Area (sqft)', 'Lot Area (sqft)', 'Floors',
-      'Year Built', 'Owner', 'Zone', 'Tax Class', 'Assessed Value',
-      'Est. Market Value', 'Is Coop', 'Has Active Lien', 'Lien Cycle',
-      'Water Debt Only', 'Outstanding Tax Bill', 'Lien Charge Amount',
-      'Total Outstanding Balance', 'Violations Total', 'Violations Open',
-      'Class A', 'Class B', 'Class C', 'Violations/Unit', 'Distress Score',
+      'BBL',
+      'Borough',
+      'Address',
+      'Zip',
+      'Building Class',
+      'Units Total',
+      'Units Residential',
+      'Building Area (sqft)',
+      'Lot Area (sqft)',
+      'Floors',
+      'Year Built',
+      'Owner',
+      'Zone',
+      'Tax Class',
+      'Assessed Value',
+      'Est. Market Value',
+      'Is Coop',
+      'Has Active Lien',
+      'Lien Cycle',
+      'Water Debt Only',
+      'Outstanding Tax Bill',
+      'Lien Charge Amount',
+      'Total Outstanding Balance',
+      'Violations Total',
+      'Violations Open',
+      'Class A',
+      'Class B',
+      'Class C',
+      'Violations/Unit',
+      'Distress Score',
     ];
 
     const rows = parcels.map((p) => [
@@ -205,19 +255,24 @@ export class PublicDataController {
     const csvContent = [
       headers.join(','),
       ...rows.map((row) =>
-        row.map((cell) => {
-          const str = String(cell);
-          // Escape fields containing commas or quotes
-          if (str.includes(',') || str.includes('"') || str.includes('\n')) {
-            return `"${str.replace(/"/g, '""')}"`;
-          }
-          return str;
-        }).join(','),
+        row
+          .map((cell) => {
+            const str = String(cell);
+            // Escape fields containing commas or quotes
+            if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+              return `"${str.replace(/"/g, '""')}"`;
+            }
+            return str;
+          })
+          .join(','),
       ),
     ].join('\n');
 
     res.setHeader('Content-Type', 'text/csv');
-    res.setHeader('Content-Disposition', 'attachment; filename=parcels-export.csv');
+    res.setHeader(
+      'Content-Disposition',
+      'attachment; filename=parcels-export.csv',
+    );
     res.send(csvContent);
   }
 
@@ -247,5 +302,92 @@ export class PublicDataController {
       throw new HttpException('Parcel not found', HttpStatus.NOT_FOUND);
     }
     return parcel;
+  }
+
+  @Post('parcels/skip-trace')
+  async batchSkipTrace(
+    @AuthUser('organizationId') organizationId: string | null,
+    @Body() body: { bbls: string[]; force?: boolean },
+  ) {
+    await this.assertParcelsEnabled(organizationId);
+
+    if (!body.bbls || body.bbls.length === 0) {
+      throw new HttpException('bbls array is required', HttpStatus.BAD_REQUEST);
+    }
+    if (body.bbls.length > 500) {
+      throw new HttpException(
+        'Maximum 500 BBLs per request',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    let result: { queueId: string; queued: string[]; skipped: number };
+    try {
+      result = await this.skipTrace.submitBatch(body.bbls, body.force ?? false);
+    } catch (err) {
+      const message = (err as Error).message;
+      if (
+        message.includes('credit cap') ||
+        message.includes('already traced')
+      ) {
+        throw new HttpException(message, HttpStatus.TOO_MANY_REQUESTS);
+      }
+      if (message.includes('not configured')) {
+        throw new HttpException(
+          'Skip tracing is not configured on this server',
+          HttpStatus.SERVICE_UNAVAILABLE,
+        );
+      }
+      throw new HttpException(message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    // Fire-and-forget polling
+    this.skipTrace.pollAndStore(result.queueId, result.queued);
+
+    return {
+      queued: result.queued.length,
+      skipped: result.skipped,
+      queueId: result.queueId,
+      estimatedCostUsd: +(result.queued.length * 0.02).toFixed(2),
+    };
+  }
+
+  @Post('parcels/:bbl/skip-trace')
+  async singleSkipTrace(
+    @AuthUser('organizationId') organizationId: string | null,
+    @Param('bbl') bbl: string,
+    @Body() body: { force?: boolean },
+  ) {
+    await this.assertParcelsEnabled(organizationId);
+
+    let result: { queueId: string; queued: string[]; skipped: number };
+    try {
+      result = await this.skipTrace.submitBatch([bbl], body.force ?? false);
+    } catch (err) {
+      const message = (err as Error).message;
+      if (
+        message.includes('credit cap') ||
+        message.includes('already traced')
+      ) {
+        throw new HttpException(message, HttpStatus.TOO_MANY_REQUESTS);
+      }
+      if (message.includes('not configured')) {
+        throw new HttpException(
+          'Skip tracing is not configured on this server',
+          HttpStatus.SERVICE_UNAVAILABLE,
+        );
+      }
+      throw new HttpException(message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    // Fire-and-forget polling
+    this.skipTrace.pollAndStore(result.queueId, result.queued);
+
+    return {
+      queued: result.queued.length,
+      skipped: result.skipped,
+      queueId: result.queueId,
+      estimatedCostUsd: +(result.queued.length * 0.02).toFixed(2),
+    };
   }
 }
