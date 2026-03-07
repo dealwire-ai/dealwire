@@ -24,6 +24,8 @@ export interface ParcelQueryFilters {
   maxDistressScore?: number;
   minUnits?: number;
   maxUnits?: number;
+  minOutstandingTaxBill?: number;
+  maxOutstandingTaxBill?: number;
   zipCode?: string;
   search?: string;
   buildingClasses?: string[];
@@ -73,6 +75,16 @@ export class ParcelQueryService {
       }
       if (filters.maxUnits !== undefined) {
         (where.unitsTotal as Prisma.IntNullableFilter).lte = filters.maxUnits;
+      }
+    }
+
+    if (filters.minOutstandingTaxBill !== undefined || filters.maxOutstandingTaxBill !== undefined) {
+      where.outstandingTaxBill = {};
+      if (filters.minOutstandingTaxBill !== undefined) {
+        (where.outstandingTaxBill as Prisma.IntNullableFilter).gte = filters.minOutstandingTaxBill;
+      }
+      if (filters.maxOutstandingTaxBill !== undefined) {
+        (where.outstandingTaxBill as Prisma.IntNullableFilter).lte = filters.maxOutstandingTaxBill;
       }
     }
 
@@ -147,7 +159,7 @@ export class ParcelQueryService {
       'distressScore', 'address', 'borough', 'buildingClass', 'unitsTotal',
       'buildingArea', 'estimatedMarketValue', 'yearBuilt', 'violationsOpen',
       'violationsPerUnit', 'violationsClassC', 'hasActiveLien', 'ownerName',
-      'outstandingTaxBill', 'lienChargeAmount', 'totalOutstandingBalance',
+      'outstandingTaxBill', 'totalOutstandingBalance',
       'createdAt', 'updatedAt',
     ];
 

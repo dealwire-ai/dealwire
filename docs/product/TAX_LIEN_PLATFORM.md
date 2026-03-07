@@ -28,7 +28,7 @@ A secure web application that aggregates public tax lien data, property records,
 | Agent tools | ✅ Done | `query_parcels`, `get_parcel_stats` with financial fields |
 | Feature flag | ✅ Done | `parcels` org-level flag |
 | Building class grouped filters | ✅ Done 3/7 | 3 checkbox groups (Residential, Commercial, Walk-up). D class excluded by default. |
-| Property Charges Balance | ✅ Done 3/7 | `scjx-j6np` dataset. Outstanding tax bills (CHG), lien amounts (SAC), total balance. Validated against Daniel's test BBL. |
+| Property Charges Balance | ✅ Done 3/7 | `scjx-j6np` dataset. Outstanding tax bills (CHG) and total DOF balance. **Note:** SAC rows are small special assessments (water/sewer, ECB fines), NOT the lien sale amount. Actual lien sale amounts require DOF CARE portal scraping or PDF tax bill parsing. |
 | **Owner phone lookup** | ❌ Not started | Skip tracing — Brett ready to cold call |
 | **Manhattan expansion** | ❌ Not started | Same criteria as BK/QN |
 | **Servicer info (MTAG/Tower)** | ❌ Not started | PDF tax bill parsing. MTAG/Tower sites are dead ends (no search). |
@@ -56,7 +56,7 @@ A secure web application that aggregates public tax lien data, property records,
 
 The system is **reactive** (Daniel has to check the dashboard) not **proactive** (system notifies Daniel). The real value is alerting on **new lis pendens filings** — the time-sensitive signal that creates competitive advantage. Daniel pays ~$500/month for PropertyShark primarily for this (24-48 hour delay). We can beat that.
 
-Additionally, the dashboard is missing key data Daniel needs to act: **lien dollar amounts**, **outstanding tax bills**, and **owner contact info** for cold calling. Brett is ready to start calling but needs this data first.
+Additionally, the dashboard is missing key data Daniel needs to act: **actual lien sale amounts** (the $$ sold to NYCTL Trust), and **owner contact info** for cold calling. Outstanding tax bills are now ingested (3/7). Brett is ready to start calling but needs contact data first.
 
 ### Priority Stack (Updated 3/7)
 
@@ -66,8 +66,8 @@ _Cold calling enablement is the primary driver. Scoring fix, building class filt
 |----------|-------|--------|-------------|
 | ~~P0~~ | ~~Scoring fix~~ | **DONE 3/7** | Removed Class A/B, Class C cap increased to 30 |
 | ~~P0~~ | ~~Building class grouped filters~~ | **DONE 3/7** | 3 checkbox groups + D class excluded by default |
-| ~~P1~~ | ~~Tax lien dollar amounts~~ | **DONE 3/7** | Via `scjx-j6np` SAC charges (not DOF scraping) |
 | ~~P1~~ | ~~Outstanding tax bills~~ | **DONE 3/7** | Via `scjx-j6np` CHG charges. Validated: $8,530.35 |
+| **P1** | **Actual lien sale amounts** | Research | SAC in `scjx-j6np` is special assessments (water/sewer, ECB), NOT lien sale $$. Need DOF CARE portal scraping or PDF tax bill parsing. |
 | **P1** | **Owner contact lookup (skip tracing)** | Not started | Phone numbers for cold calling. Brett is ready. Research batch providers. |
 | **P2** | **Manhattan expansion** | Not started | Add borough 1 with same criteria as BK/QN |
 | **P2** | **Servicer info (MTAG vs Tower)** | Not started | PDF tax bill parsing from `a836-edms.nyc.gov`. MTAG/Tower sites are dead ends. |
