@@ -94,6 +94,10 @@ model Deal {
   documents         Document[]
   initialScreening  InitialScreening?
 
+  isMuted           Boolean   @default(false)
+  mutedAt           DateTime?
+  mutedReason       String?   @db.Text
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
