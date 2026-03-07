@@ -122,7 +122,7 @@ export class DealDigestService implements OnModuleInit {
   /**
    * Send digest for a specific organization
    */
-  private async sendDigestForOrganization(organizationId: string): Promise<void> {
+  async sendDigestForOrganization(organizationId: string): Promise<void> {
     try {
       // Get organization with users and Microsoft subscriptions
       const org = await this.prismaService.organization.findUnique({
@@ -495,6 +495,7 @@ export class DealDigestService implements OnModuleInit {
     const companyName = preferences?.companyName || EMAIL_DEFAULTS.companyName;
     const brandColor = preferences?.brandColor || EMAIL_DEFAULTS.brandColor;
     const organizationImageUrl = preferences?.organizationImageUrl;
+    const inboundEmail = process.env.SCREENING_INBOUND_EMAIL || '';
 
     // Separate YES and NO deals
     type ScreeningType = typeof screenings[0];
@@ -581,6 +582,7 @@ export class DealDigestService implements OnModuleInit {
                 </p>
               </div>
               ${this.renderDealActionLinks(screening.deal.id, actionLinksMap)}
+              ${inboundEmail ? this.buildCommandLink(subject, reason, isYes, location, inboundEmail) : ''}
             </td>
           </tr>
         </table>
@@ -761,6 +763,48 @@ export class DealDigestService implements OnModuleInit {
     return `
               <div style="border-top: 1px solid #f3f4f6; padding-top: 10px; margin-top: 10px;">
                 ${items.join(separator)}
+              </div>`;
+  }
+
+  private buildCommandLink(
+    subject: string,
+    reason: string,
+    isYes: boolean,
+    location: string,
+    inboundEmail: string,
+  ): string {
+    const truncatedSubject = subject.length > 60 ? subject.slice(0, 57) + '...' : subject;
+    const decisionLabel = isYes ? 'YES' : 'NO';
+    const sharedContext = `Deal: ${subject}\nLocation: ${location}\nAI Decision: ${decisionLabel}\nAI Reason: ${reason}`;
+
+    let label: string;
+    let emailSubject: string;
+    let body: string;
+
+    if (isYes) {
+      label = 'Skip deals like this';
+      emailSubject = `Skip deals like this: ${truncatedSubject}`;
+      body = `${sharedContext}\n\nPlease update my criteria to skip deals like this in the future. Feel free to add to my always-skip list or tighten my screening buckets based on the characteristics of this deal.`;
+    } else {
+      label = 'Accept deals like this';
+      emailSubject = `Accept deals like this: ${truncatedSubject}`;
+      body = `${sharedContext}\n\nI think deals like this should be approved. Please adjust my buy box or screening criteria so similar deals pass in the future.`;
+    }
+
+    const href = `mailto:${inboundEmail}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(body)}`;
+    const linkStyle = 'color: #6b7280; text-decoration: none; font-size: 12px; font-weight: 600;';
+
+    const muteSubject = `Mute this deal: ${truncatedSubject}`;
+    const muteBody = `Deal: ${subject}\nLocation: ${location}\n\nPlease mute this specific deal. I've already made my decision and don't want future emails about this property to ever surface as YES.`;
+    const muteHref = `mailto:${inboundEmail}?subject=${encodeURIComponent(muteSubject)}&body=${encodeURIComponent(muteBody)}`;
+    const muteLinkStyle = 'color: #9ca3af; text-decoration: none; font-size: 12px; font-weight: 600;';
+
+    return `
+              <div style="padding-top: 8px; margin-top: 6px;">
+                <span style="font-size: 12px; color: #d1d5db; margin-right: 6px;">Agent:</span>
+                <a href="${href}" style="${linkStyle}">${label}</a>
+                <span style="color: #e5e7eb; margin: 0 6px;">·</span>
+                <a href="${muteHref}" style="${muteLinkStyle}">Mute this deal</a>
               </div>`;
   }
 

@@ -163,6 +163,34 @@ export class EmailProcessorService {
         this.logger.log(`Associated deal ${dealId} with contact ${decision.contactId}`);
       }
 
+      // Step 4.8: Check if this deal is muted (same property + same broker)
+      if (decision.assetId && decision.contactId) {
+        const mutedDeal = await this.prismaService.deal.findFirst({
+          where: {
+            organizationId,
+            assetId: decision.assetId,
+            contactId: decision.contactId,
+            isMuted: true,
+            id: { not: dealId },
+          },
+          select: { id: true, mutedReason: true },
+        });
+        if (mutedDeal) {
+          const muteReason = mutedDeal.mutedReason || 'Deal muted by user';
+          this.logger.log(`Deal ${dealId} suppressed — muted by deal ${mutedDeal.id}: ${muteReason}`);
+          await this.prismaService.initialScreening.create({
+            data: {
+              dealId,
+              decision: 'NO',
+              reason: `Muted: ${muteReason}`,
+              screenedAt: new Date(),
+            },
+          });
+          this.metricsService.recordDealSkipped('muted');
+          return { processed: true, dealId, decision: 'no', reason: `Muted: ${muteReason}` };
+        }
+      }
+
       // Step 5: Find the matched bucket and dispatch on its action
       const matchedBucket = buckets.find((b) => b.id === decision.bucketId) || buckets[buckets.length - 1];
 
