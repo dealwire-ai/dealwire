@@ -28,6 +28,7 @@ When a user gives feedback about deals, interpret it as a criteria change:
 - "Actually this looks interesting" or "we'd consider this type" → suggest expanding criteria
 - "Stop sending me deals like this" → update alwaysSkip
 - "I don't care about ones from [broker]" → update alwaysSkip with sender filter
+- "I already passed on this" / "mute this deal" / "don't show this again" → mute_deal
 
 After any criteria update, ALWAYS confirm back what you changed and ask if the user wants to adjust further. Be specific about what changed.
 
@@ -44,6 +45,7 @@ TOOL SELECTION:
 - Deals in a location → get_deals_by_location
 - Broker notes/tags → update_contact_notes/get_contact_notes/update_contact_tags
 - Generic deal/contact/asset search → get_deals/get_contacts/get_assets
+- Mute a specific deal (suppress future follow-ups) → mute_deal
 
 PUBLIC DATA (NYC PARCELS):
 - Search distressed parcels → query_parcels (filter by borough, score, liens, address)
@@ -603,6 +605,30 @@ export class AnalyzerAgentService {
               action: b.action,
             })),
           };
+        }),
+      }),
+
+      mute_deal: tool({
+        description: 'Mute a specific deal so future emails about the same property from the same broker always auto-screen as NO. Use when user says "mute this deal", "I already passed on this", "suppress future follow-ups on this".',
+        parameters: z.object({
+          dealSearch: z.string().describe('Deal subject line or identifier to find the deal to mute'),
+          reason: z.string().describe('Why this deal is being muted (used as the auto-NO reason for future screenings)'),
+        }),
+        execute: async ({ dealSearch, reason }) => this.safeTool('mute_deal', async () => {
+          const deal = await this.prisma.deal.findFirst({
+            where: {
+              organizationId,
+              sourceSubject: { contains: dealSearch, mode: 'insensitive' },
+            },
+            orderBy: { createdAt: 'desc' },
+            select: { id: true, sourceSubject: true },
+          });
+          if (!deal) return { error: `No deal found matching "${dealSearch}"` };
+          await this.prisma.deal.update({
+            where: { id: deal.id },
+            data: { isMuted: true, mutedAt: new Date(), mutedReason: reason },
+          });
+          return { success: true, dealId: deal.id, subject: deal.sourceSubject, mutedReason: reason };
         }),
       }),
 
