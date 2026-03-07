@@ -73,7 +73,7 @@ export class NycIngestionService {
     const hpdResult = await this.ingestHpdViolations(boroughs);
     results.push(hpdResult);
 
-    // 4. Ingest property charges (outstanding tax bills + lien amounts)
+    // 4. Ingest property charges (outstanding tax bills)
     const chargesResult = await this.ingestPropertyCharges(boroughs);
     results.push(chargesResult);
 
@@ -396,7 +396,7 @@ export class NycIngestionService {
 
   /**
    * Ingest property charges from DOF Property Charges Balance (scjx-j6np).
-   * Aggregates outstanding tax bills (CHG), lien charges (SAC), and total balance per parcel.
+   * Aggregates outstanding tax bills (CHG) and total balance per parcel.
    *
    * Dataset structure: one row per property × charge type × billing period × extract date.
    * We filter to the latest extractdt and sum_bal > 0, then aggregate per BBL.
@@ -433,8 +433,8 @@ export class NycIngestionService {
     const latestExtractDt = latestExtract.extractdt;
     this.logger.log(`Latest property charges extract: ${latestExtractDt}`);
 
-    // Aggregate charges per BBL: { bbl -> { chg, sac, total } }
-    const charges = new Map<string, { chg: number; sac: number; total: number }>();
+    // Aggregate charges per BBL: { bbl -> { chg, total } }
+    const charges = new Map<string, { chg: number; total: number }>();
     let totalRecords = 0;
 
     // Batch BBLs into groups of 250 (URL length limit for IN clause)
@@ -460,7 +460,7 @@ export class NycIngestionService {
         if (sumBal <= 0) continue;
 
         if (!charges.has(parid)) {
-          charges.set(parid, { chg: 0, sac: 0, total: 0 });
+          charges.set(parid, { chg: 0, total: 0 });
         }
         const c = charges.get(parid)!;
         c.total += sumBal;
@@ -468,8 +468,6 @@ export class NycIngestionService {
         const code = (record.code || '').toUpperCase();
         if (code === 'CHG') {
           c.chg += sumBal;
-        } else if (code === 'SAC') {
-          c.sac += sumBal;
         }
 
         totalRecords++;
@@ -489,7 +487,6 @@ export class NycIngestionService {
       where: { borough: { in: boroughs } },
       data: {
         outstandingTaxBill: null,
-        lienChargeAmount: null,
         totalOutstandingBalance: null,
         chargesSyncedAt: now,
       },
@@ -501,7 +498,6 @@ export class NycIngestionService {
         where: { bbl },
         data: {
           outstandingTaxBill: Math.round(c.chg * 100) / 100,
-          lienChargeAmount: Math.round(c.sac * 100) / 100,
           totalOutstandingBalance: Math.round(c.total * 100) / 100,
           chargesSyncedAt: now,
         },
