@@ -49,18 +49,20 @@ See `docs/product/PUBLIC_DATA_PLATFORM.md` for the public data ingestion archite
 - Backend: http://localhost:3001
 
 ### Deployment
-- Frontend: Vercel (root dir: apps/web)
-- Backend: Railway (root dir: apps/api, uses Dockerfile)
+- Frontend: Railway (service: analyzer-web, root dir: apps/web)
+- Backend: Railway (service: analyzer-api, root dir: apps/api, uses Dockerfile)
 
 ### Railway
 
 Railway MCP tools (`mcp__railway__*`) are available for deployments, logs, and service management.
 
-**Important:** The Railway CLI must be linked to a service before you can list deployments or get logs. The workspace path is always `apps/api`:
+**Project:** `analyzer` (contains two services: `analyzer-api` and `analyzer-web`)
+
+**Important:** The Railway CLI must be linked to a service before you can list deployments or get logs. Use the workspace path for the relevant service:
 
 ```bash
-# Link the service (required once per session if not already linked)
-# Use mcp__railway__link-service with workspacePath=/Users/isaac/projects/analyzer/apps/api, serviceName=analyzer-api
+# API service — workspacePath=/Users/isaac/projects/analyzer/apps/api, serviceName=analyzer-api
+# Web service — workspacePath=/Users/isaac/projects/analyzer/apps/web, serviceName=analyzer-web
 
 # Then use MCP tools:
 # mcp__railway__list-deployments — check deployment status
@@ -69,8 +71,7 @@ Railway MCP tools (`mcp__railway__*`) are available for deployments, logs, and s
 # mcp__railway__set-variables — set env vars
 ```
 
-- Service name: `analyzer-api`
-- Deploys automatically on push to `main`
+- Both services deploy automatically on push to `main`
 - Start script runs `prisma migrate deploy && node dist/src/main.js`
 - Prod DB uses port 5432 (direct Supabase URL), never 6543 (pooler) for migrations
 
