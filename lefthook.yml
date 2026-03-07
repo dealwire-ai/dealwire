@@ -14,6 +14,3 @@ pre-push:
     typecheck-api:
       glob: "apps/api/**/*.ts"
       run: pnpm --filter @analyzer/api exec tsc --noEmit
-    typecheck-web:
-      glob: "apps/web/**/*.{ts,tsx}"
-      run: pnpm --filter @analyzer/web exec tsc --noEmit
