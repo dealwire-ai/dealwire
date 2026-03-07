@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AppController } from './controller/app.controller';
 import { FeatureFlagsController } from './controller/feature-flags.controller';
@@ -19,6 +19,7 @@ import { IngestionModule } from './module/ingestion.module';
 import { PublicDataModule } from './module/public-data.module';
 import { SqsRegistrationModule } from './module/sqs-registration.module';
 import { UnderwritingModule } from './module/underwriting.module';
+import { CorrelationIdMiddleware } from './middleware/correlation-id.middleware';
 
 @Module({
   imports: [
@@ -42,4 +43,8 @@ import { UnderwritingModule } from './module/underwriting.module';
   controllers: [AppController, FeatureFlagsController],
   providers: [AppService, ClerkAuthGuard],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(CorrelationIdMiddleware).forRoutes('*path');
+  }
+}
