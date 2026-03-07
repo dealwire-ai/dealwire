@@ -351,6 +351,12 @@ model Parcel {
   lienCycle        String?  // e.g., "90 Day Notice"
   waterDebtOnly    Boolean  @default(false)
 
+  // Property charges (from DOF Property Charges Balance — Socrata scjx-j6np)
+  outstandingTaxBill       Float?    // Sum of CHG (property tax) balances
+  lienChargeAmount         Float?    // Sum of SAC (special assessment/lien) balances
+  totalOutstandingBalance  Float?    // Sum of ALL outstanding balances (CHG+SAC+SAF+SAT)
+  chargesSyncedAt          DateTime? // When charges data was last synced
+
   // HPD Violations (aggregated counts per parcel)
   violationsTotal    Int    @default(0)
   violationsOpen     Int    @default(0)
