@@ -59,7 +59,7 @@ export default function DebugPage() {
             {user.organizationMemberships?.[0] ? (
               <div className="space-y-4">
                 <p className="text-sm text-zinc-300">
-                  ✅ YouYou're in Clerkapos;re in Clerk organization:{" "}
+                  ✅ You&apos;re in Clerk organization:{" "}
                   <strong>
                     {user.organizationMemberships[0].organization.name}
                   </strong>
@@ -96,8 +96,8 @@ export default function DebugPage() {
             ) : (
               <div className="space-y-4">
                 <p className="text-sm text-zinc-300">
-                  ⚠️ YouYou're not inapos;re not in a Clerk organization. Please
-                  create or join an organization in your Clerk dashboard first.
+                  ⚠️ You&apos;re not in a Clerk organization. Please create or
+                  join an organization in your Clerk dashboard first.
                 </p>
               </div>
             )}
