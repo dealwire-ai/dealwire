@@ -9,6 +9,7 @@ interface TableToolbarProps {
   totalLabel: string;
   total: number;
   filterSlot?: React.ReactNode;
+  actionSlot?: React.ReactNode;
   hasActiveFilters?: boolean;
   onClearFilters?: () => void;
 }
@@ -19,6 +20,7 @@ export function TableToolbar({
   totalLabel,
   total,
   filterSlot,
+  actionSlot,
   hasActiveFilters,
   onClearFilters,
 }: TableToolbarProps) {
@@ -42,6 +44,7 @@ export function TableToolbar({
         )}
       </div>
       {filterSlot}
+      {actionSlot}
       <div className="ml-auto flex items-center gap-3">
         {hasActiveFilters && onClearFilters && (
           <button
