@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import {
   Select,
   SelectContent,
@@ -14,16 +14,44 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { ChevronDown, Search, X } from "lucide-react";
-import { BUILDING_CLASS_LABELS } from "@/lib/building-class-labels";
+import { ChevronDown } from "lucide-react";
 
-const BUILDING_CLASS_OPTIONS = Object.entries(BUILDING_CLASS_LABELS).sort(
-  ([a], [b]) => a.localeCompare(b)
-);
+/**
+ * Building class groups per Daniel's 3/4 feedback:
+ * - Residential: A, B, C (1-3 family homes)
+ * - Commercial/Other: E through Z (commercial, industrial, mixed-use, vacant)
+ * - Walk-up Apartments: C1-C7 (walk-up multi-family)
+ * D class excluded entirely (elevator apartments, mostly coops)
+ */
+const BUILDING_CLASS_GROUPS = [
+  {
+    id: "residential",
+    label: "Residential (A, B, C)",
+    description: "1-3 family homes",
+    prefixes: ["A", "B", "C"],
+    // C1-C7 are in the walk-up group, not here
+    excludePrefixes: ["C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "CC"],
+  },
+  {
+    id: "commercial",
+    label: "Commercial/Other (E-Z)",
+    description: "Commercial, industrial, mixed-use, vacant",
+    prefixes: [
+      "E", "F", "G", "H", "I", "J", "K", "L", "M",
+      "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+    ],
+    excludePrefixes: [],
+  },
+  {
+    id: "walkup",
+    label: "Walk-up Apartments (C1-C7)",
+    description: "Walk-up multi-family buildings",
+    prefixes: ["C1", "C2", "C3", "C4", "C5", "C6", "C7"],
+    excludePrefixes: [],
+  },
+] as const;
 
-function BuildingClassMultiSelect({
+function BuildingClassGroupFilter({
   value,
   onChange,
 }: {
@@ -31,37 +59,25 @@ function BuildingClassMultiSelect({
   onChange: (v: string) => void;
 }) {
   const [open, setOpen] = useState(false);
-  const [search, setSearch] = useState("");
-  const selected = value ? value.split(",").map((c) => c.trim()).filter(Boolean) : [];
+  const selectedGroups = value ? value.split(",").filter(Boolean) : [];
 
-  const filtered = useMemo(() => {
-    if (!search.trim()) return BUILDING_CLASS_OPTIONS;
-    const s = search.toLowerCase();
-    return BUILDING_CLASS_OPTIONS.filter(
-      ([code, label]) =>
-        code.toLowerCase().includes(s) || label.toLowerCase().includes(s)
-    );
-  }, [search]);
-
-  const toggle = (code: string) => {
-    const next = selected.includes(code)
-      ? selected.filter((c) => c !== code)
-      : [...selected, code];
-    onChange(next.length ? next.join(",") : "");
+  const toggle = (groupId: string) => {
+    const next = selectedGroups.includes(groupId)
+      ? selectedGroups.filter((g) => g !== groupId)
+      : [...selectedGroups, groupId];
+    onChange(next.join(","));
   };
 
-  const clear = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onChange("");
-    setSearch("");
-  };
-
+  const groupCount = selectedGroups.length;
   const label =
-    selected.length === 0
+    groupCount === 0
       ? "Building Class"
-      : selected.length <= 2
-        ? selected.map((c) => `${c} — ${BUILDING_CLASS_LABELS[c] || c}`).join(", ")
-        : `${selected.length} classes`;
+      : groupCount === 3
+        ? "All Classes"
+        : selectedGroups
+            .map((id) => BUILDING_CLASS_GROUPS.find((g) => g.id === id)?.label.split(" (")[0])
+            .filter(Boolean)
+            .join(", ");
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -72,61 +88,50 @@ function BuildingClassMultiSelect({
           className="w-[220px] justify-between bg-zinc-950 border-zinc-800 text-white hover:bg-zinc-900 font-normal text-left"
         >
           <span className="truncate">{label}</span>
-          <div className="flex items-center gap-1 shrink-0">
-            {selected.length > 0 && (
-              <X
-                className="h-3.5 w-3.5 opacity-60 hover:opacity-100"
-                onClick={clear}
-              />
-            )}
-            <ChevronDown className="h-4 w-4 opacity-50" />
-          </div>
+          <ChevronDown className="h-4 w-4 opacity-50 shrink-0" />
         </Button>
       </PopoverTrigger>
       <PopoverContent
-        className="w-[320px] p-0 bg-zinc-950 border-zinc-800"
+        className="w-[300px] p-2 bg-zinc-950 border-zinc-800"
         align="start"
-        onOpenAutoFocus={(e) => e.preventDefault()}
       >
-        <div className="p-2 border-b border-zinc-800">
-          <div className="relative">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-500" />
-            <Input
-              placeholder="Search building classes..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-8 h-8 bg-zinc-900 border-zinc-800 text-white text-sm placeholder:text-zinc-500"
-            />
+        <div className="space-y-1">
+          {BUILDING_CLASS_GROUPS.map((group) => (
+            <label
+              key={group.id}
+              className="flex items-start gap-2 px-2 py-2 rounded hover:bg-zinc-800/50 cursor-pointer"
+            >
+              <input
+                type="checkbox"
+                checked={selectedGroups.includes(group.id)}
+                onChange={() => toggle(group.id)}
+                className="mt-0.5 rounded border-zinc-600 accent-[#3ECFA0]"
+              />
+              <div>
+                <div className="text-sm text-zinc-200">{group.label}</div>
+                <div className="text-xs text-zinc-500">{group.description}</div>
+              </div>
+            </label>
+          ))}
+          <div className="px-2 pt-1 text-xs text-zinc-600">
+            D class (elevator apts/coops) always excluded
           </div>
         </div>
-        <ScrollArea className="h-[280px]">
-          <div className="p-1">
-            {filtered.map(([code, label]) => (
-              <label
-                key={code}
-                className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-zinc-800/50 cursor-pointer text-sm"
-              >
-                <input
-                  type="checkbox"
-                  checked={selected.includes(code)}
-                  onChange={() => toggle(code)}
-                  className="rounded border-zinc-600 accent-[#3ECFA0]"
-                />
-                <span className="text-zinc-200 truncate">
-                  {code} — {label}
-                </span>
-              </label>
-            ))}
-            {filtered.length === 0 && (
-              <div className="px-2 py-4 text-sm text-zinc-500 text-center">
-                No matches
-              </div>
-            )}
-          </div>
-        </ScrollArea>
       </PopoverContent>
     </Popover>
   );
+}
+
+/** Expand selected group IDs into building class prefix filters for the API */
+export function expandBuildingClassGroups(groupIds: string[]): string[] {
+  const prefixes: string[] = [];
+  for (const id of groupIds) {
+    const group = BUILDING_CLASS_GROUPS.find((g) => g.id === id);
+    if (group) {
+      prefixes.push(...group.prefixes);
+    }
+  }
+  return prefixes;
 }
 
 const BOROUGHS = [
@@ -213,10 +218,10 @@ export function ParcelFilters({ filters, onSetFilter }: ParcelFiltersProps) {
         </SelectContent>
       </Select>
 
-      {/* Building class */}
-      <BuildingClassMultiSelect
-        value={filters.buildingClass || ""}
-        onChange={(v) => onSetFilter("buildingClass", v)}
+      {/* Building class groups */}
+      <BuildingClassGroupFilter
+        value={filters.buildingClassGroups || ""}
+        onChange={(v) => onSetFilter("buildingClassGroups", v)}
       />
     </div>
   );

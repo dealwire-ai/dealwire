@@ -93,6 +93,8 @@ export class PublicDataController {
     @Query('zipCode') zipCode?: string,
     @Query('search') search?: string,
     @Query('buildingClass') buildingClass?: string,
+    @Query('buildingClassGroups') buildingClassGroups?: string,
+    @Query('excludeDClass') excludeDClass?: string,
     @Query('sort') sort?: string,
     @Query('order') order?: 'asc' | 'desc',
   ) {
@@ -101,6 +103,7 @@ export class PublicDataController {
     return this.parcelQuery.queryParcels({
       boroughs: borough ? borough.split(',') : undefined,
       excludeCoops: excludeCoops === 'true',
+      excludeDClass: excludeDClass === 'false' ? false : true,
       hasActiveLien: hasActiveLien !== undefined ? hasActiveLien === 'true' : undefined,
       minDistressScore: minDistressScore ? parseFloat(minDistressScore) : undefined,
       maxDistressScore: maxDistressScore ? parseFloat(maxDistressScore) : undefined,
@@ -109,6 +112,7 @@ export class PublicDataController {
       zipCode,
       search,
       buildingClasses: buildingClass ? buildingClass.split(',') : undefined,
+      buildingClassGroups: buildingClassGroups ? buildingClassGroups.split(',') : undefined,
       sort,
       order,
       page,
@@ -130,6 +134,8 @@ export class PublicDataController {
     @Query('zipCode') zipCode?: string,
     @Query('search') search?: string,
     @Query('buildingClass') buildingClass?: string,
+    @Query('buildingClassGroups') buildingClassGroups?: string,
+    @Query('excludeDClass') excludeDClass?: string,
     @Query('sort') sort?: string,
     @Query('order') order?: 'asc' | 'desc',
   ) {
@@ -138,6 +144,7 @@ export class PublicDataController {
     const parcels = await this.parcelQuery.getAllForExport({
       boroughs: borough ? borough.split(',') : undefined,
       excludeCoops: excludeCoops === 'true',
+      excludeDClass: excludeDClass === 'false' ? false : true,
       hasActiveLien: hasActiveLien !== undefined ? hasActiveLien === 'true' : undefined,
       minDistressScore: minDistressScore ? parseFloat(minDistressScore) : undefined,
       maxDistressScore: maxDistressScore ? parseFloat(maxDistressScore) : undefined,
@@ -146,6 +153,7 @@ export class PublicDataController {
       zipCode,
       search,
       buildingClasses: buildingClass ? buildingClass.split(',') : undefined,
+      buildingClassGroups: buildingClassGroups ? buildingClassGroups.split(',') : undefined,
       sort,
       order,
     });
