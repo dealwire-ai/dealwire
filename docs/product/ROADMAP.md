@@ -76,7 +76,8 @@ _Deep data is the moat. An analyst is only as good as their data access._
 - [~] **Tax lien platform (Phase 2 — cold calling enablement)** — _3/4 meeting reprioritized this ahead of lis pendens — Brett is ready to cold call._ See [`docs/product/TAX_LIEN_PLATFORM.md`](TAX_LIEN_PLATFORM.md).
   - [x] Scoring update: Class C violations only (removed Class A/B from score, increased Class C cap to 30)
   - [x] Grouped building class filters: 3 checkbox groups (Residential, Commercial, Walk-up). D class excluded by default.
-  - [x] Outstanding tax bills + lien charge amounts: Ingested from DOF Property Charges Balance (`scjx-j6np`). Validated against Daniel's test case.
+  - [x] Outstanding tax bills: Ingested from DOF Property Charges Balance (`scjx-j6np`). CHG = property tax, total = all DOF charges. Note: actual lien sale amounts (e.g. $58K sold to NYCTL) are NOT in this dataset — requires DOF web portal scraping or PDF parsing.
+  - [ ] Actual lien sale amounts — not available via Socrata. Requires scraping DOF CARE portal or parsing PDF tax bills. Research in progress.
   - [ ] Owner contact lookup (skip tracing) — phone numbers for cold calling. Brett waiting on this.
   - [ ] Manhattan expansion — add borough 1 with same criteria
   - [ ] Servicer info (MTAG vs Tower) — requires PDF tax bill parsing, deferred
