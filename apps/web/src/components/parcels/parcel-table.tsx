@@ -11,7 +11,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { ScoreBadge } from "./score-badge";
+import { SkipTraceButton } from "./skip-trace-button";
 import { formatBuildingClass } from "@/lib/building-class-labels";
 
 const BOROUGH_NAMES: Record<string, string> = {
@@ -21,6 +23,12 @@ const BOROUGH_NAMES: Record<string, string> = {
   "4": "Queens",
   "5": "Staten Island",
 };
+
+export interface OwnerPhone {
+  number: string;
+  type: string;
+  rank: number;
+}
 
 export interface Parcel {
   id: string;
@@ -57,6 +65,11 @@ export interface Parcel {
   outstandingTaxBill: number | null;
   lienChargeAmount: number | null;
   totalOutstandingBalance: number | null;
+  // Skip tracing
+  ownerPhones: OwnerPhone[] | null;
+  ownerEmails: string[] | null;
+  skipTracedAt: string | null;
+  skipTraceStatus: "pending" | "found" | "not_found" | "error" | null;
 }
 
 const SORTABLE_COLUMNS: { label: string; field: string; align?: "right" }[] = [
@@ -75,17 +88,22 @@ const SORTABLE_COLUMNS: { label: string; field: string; align?: "right" }[] = [
   { label: "Tax Bill", field: "outstandingTaxBill", align: "right" },
   { label: "Lien Amt", field: "lienChargeAmount", align: "right" },
   { label: "Total Owed", field: "totalOutstandingBalance", align: "right" },
+  { label: "Phone", field: "ownerPhones" },
 ];
 
 interface ParcelTableProps {
   parcels: Parcel[];
   expandedRows: Set<string>;
   onToggleRow: (id: string) => void;
+  selectedBbls?: Set<string>;
+  onToggleSelect?: (bbl: string) => void;
+  onSelectAll?: (bbls: string[]) => void;
   hasActiveFilters?: boolean;
   onClearFilters?: () => void;
   sort?: string;
   order?: "asc" | "desc";
   onSortChange?: (field: string) => void;
+  onParcelUpdated?: (bbl: string, updates: Partial<Parcel>) => void;
 }
 
 function formatCurrency(value: number | null | undefined): string {
@@ -106,12 +124,18 @@ export function ParcelTable({
   parcels,
   expandedRows,
   onToggleRow,
+  selectedBbls,
+  onToggleSelect,
+  onSelectAll,
   hasActiveFilters,
   onClearFilters,
   sort,
   order,
   onSortChange,
+  onParcelUpdated,
 }: ParcelTableProps) {
+  const allSelected =
+    parcels.length > 0 && parcels.every((p) => selectedBbls?.has(p.bbl));
   if (parcels.length === 0) {
     return (
       <div className="text-center py-12 text-zinc-400">
@@ -136,6 +160,19 @@ export function ParcelTable({
     <Table>
       <TableHeader>
         <TableRow>
+          <TableHead className="w-10">
+            <Checkbox
+              checked={allSelected}
+              onCheckedChange={(checked) => {
+                if (checked) {
+                  onSelectAll?.(parcels.map((p) => p.bbl));
+                } else {
+                  onSelectAll?.([]);
+                }
+              }}
+              onClick={(e) => e.stopPropagation()}
+            />
+          </TableHead>
           <TableHead className="w-10"></TableHead>
           {SORTABLE_COLUMNS.map(({ label, field, align }) => {
             const isActive = sort === field;
@@ -172,6 +209,12 @@ export function ParcelTable({
                 className="cursor-pointer hover:bg-zinc-900/70"
                 onClick={() => onToggleRow(parcel.id)}
               >
+                <TableCell onClick={(e) => e.stopPropagation()}>
+                  <Checkbox
+                    checked={selectedBbls?.has(parcel.bbl) ?? false}
+                    onCheckedChange={() => onToggleSelect?.(parcel.bbl)}
+                  />
+                </TableCell>
                 <TableCell>
                   {isExpanded ? (
                     <ChevronUp className="w-4 h-4 text-zinc-400" />
@@ -246,11 +289,14 @@ export function ParcelTable({
                 <TableCell className="text-right font-medium">
                   {formatCurrency(parcel.totalOutstandingBalance)}
                 </TableCell>
+                <TableCell onClick={(e) => e.stopPropagation()}>
+                  <PhoneCell parcel={parcel} />
+                </TableCell>
               </TableRow>
               {isExpanded && (
                 <TableRow>
                   <TableCell
-                    colSpan={16}
+                    colSpan={18}
                     className="bg-zinc-950/50 p-0 transition-all duration-200"
                   >
                     <div className="border-l-2 border-[#C8A96E] pl-4 py-4 pr-4">
@@ -265,6 +311,14 @@ export function ParcelTable({
                             <DetailRow label="Address" value={parcel.address} />
                             <DetailRow label="Zip" value={parcel.zipCode} />
                             <DetailRow label="Owner" value={parcel.ownerName} />
+                            <div className="mt-2">
+                              <SkipTraceButton
+                                parcel={parcel}
+                                onUpdated={(updates) =>
+                                  onParcelUpdated?.(parcel.bbl, updates)
+                                }
+                              />
+                            </div>
                             <DetailRow
                               label="Zoning"
                               value={parcel.zoneDist1}
@@ -388,6 +442,38 @@ export function ParcelTable({
       </TableBody>
     </Table>
   );
+}
+
+function PhoneCell({ parcel }: { parcel: Parcel }) {
+  const status = parcel.skipTraceStatus;
+
+  if (status === "pending") {
+    return (
+      <span className="inline-flex items-center gap-1 text-xs text-zinc-400">
+        <span className="h-2 w-2 rounded-full bg-yellow-500 animate-pulse" />
+        Looking up...
+      </span>
+    );
+  }
+
+  if (
+    status === "found" &&
+    parcel.ownerPhones &&
+    parcel.ownerPhones.length > 0
+  ) {
+    const primary = parcel.ownerPhones[0];
+    return (
+      <a
+        href={`tel:${primary.number}`}
+        className="text-xs text-[#C8A96E] hover:underline"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {primary.number}
+      </a>
+    );
+  }
+
+  return <span className="text-zinc-600 text-xs">—</span>;
 }
 
 function DetailRow({
