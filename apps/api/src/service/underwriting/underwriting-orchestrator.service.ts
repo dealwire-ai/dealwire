@@ -22,6 +22,7 @@ export interface UnderwritingJobContext {
   orgId: string;
   senderEmail: string;
   documents: UnderwritingDocument[];
+  inReplyToMessageId?: string;
 }
 
 export interface UnderwritingResult {
@@ -50,7 +51,7 @@ export class UnderwritingOrchestratorService {
 
   async run(ctx: UnderwritingJobContext): Promise<UnderwritingResult> {
     const startTime = Date.now();
-    const { dealId, orgId, senderEmail, documents } = ctx;
+    const { dealId, orgId, senderEmail, documents, inReplyToMessageId } = ctx;
 
     this.logger.log(
       `Starting underwriting pipeline: dealId=${dealId} orgId=${orgId} documents=${documents.map((d) => d.filename).join(', ')}`,
@@ -180,6 +181,7 @@ export class UnderwritingOrchestratorService {
           proformaS3Key,
           normalized,
           extraction,
+          inReplyToMessageId,
         });
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
