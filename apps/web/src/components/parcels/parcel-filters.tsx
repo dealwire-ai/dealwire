@@ -30,15 +30,46 @@ const BUILDING_CLASS_GROUPS = [
     description: "1-3 family homes",
     prefixes: ["A", "B", "C"],
     // C1-C7 are in the walk-up group, not here
-    excludePrefixes: ["C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "CC"],
+    excludePrefixes: [
+      "C1",
+      "C2",
+      "C3",
+      "C4",
+      "C5",
+      "C6",
+      "C7",
+      "C8",
+      "C9",
+      "CC",
+    ],
   },
   {
     id: "commercial",
     label: "Commercial/Other (E-Z)",
     description: "Commercial, industrial, mixed-use, vacant",
     prefixes: [
-      "E", "F", "G", "H", "I", "J", "K", "L", "M",
-      "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+      "E",
+      "F",
+      "G",
+      "H",
+      "I",
+      "J",
+      "K",
+      "L",
+      "M",
+      "N",
+      "O",
+      "P",
+      "Q",
+      "R",
+      "S",
+      "T",
+      "U",
+      "V",
+      "W",
+      "X",
+      "Y",
+      "Z",
     ],
     excludePrefixes: [],
   },
@@ -75,7 +106,12 @@ function BuildingClassGroupFilter({
       : groupCount === 3
         ? "All Classes"
         : selectedGroups
-            .map((id) => BUILDING_CLASS_GROUPS.find((g) => g.id === id)?.label.split(" (")[0])
+            .map(
+              (id) =>
+                BUILDING_CLASS_GROUPS.find((g) => g.id === id)?.label.split(
+                  " (",
+                )[0],
+            )
             .filter(Boolean)
             .join(", ");
 
@@ -105,7 +141,7 @@ function BuildingClassGroupFilter({
                 type="checkbox"
                 checked={selectedGroups.includes(group.id)}
                 onChange={() => toggle(group.id)}
-                className="mt-0.5 rounded border-zinc-600 accent-[#3ECFA0]"
+                className="mt-0.5 rounded border-zinc-600 accent-[#C8A96E]"
               />
               <div>
                 <div className="text-sm text-zinc-200">{group.label}</div>
@@ -175,7 +211,7 @@ export function ParcelFilters({ filters, onSetFilter }: ParcelFiltersProps) {
         onClick={() =>
           onSetFilter(
             "excludeCoops",
-            filters.excludeCoops === "true" ? "" : "true"
+            filters.excludeCoops === "true" ? "" : "true",
           )
         }
         className="text-xs"
@@ -190,7 +226,7 @@ export function ParcelFilters({ filters, onSetFilter }: ParcelFiltersProps) {
         onClick={() =>
           onSetFilter(
             "hasActiveLien",
-            filters.hasActiveLien === "true" ? "" : "true"
+            filters.hasActiveLien === "true" ? "" : "true",
           )
         }
         className="text-xs"

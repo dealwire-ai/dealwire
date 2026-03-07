@@ -39,11 +39,15 @@ export function ContactsTable({
   if (contacts.length === 0) {
     return (
       <div className="text-center py-12 text-zinc-400">
-        <p>{hasActiveFilters ? "No contacts match your search." : "No contacts found."}</p>
+        <p>
+          {hasActiveFilters
+            ? "No contacts match your search."
+            : "No contacts found."}
+        </p>
         {hasActiveFilters && onClearFilters && (
           <button
             onClick={onClearFilters}
-            className="mt-2 text-sm text-[#3ECFA0] hover:underline"
+            className="mt-2 text-sm text-[#C8A96E] hover:underline"
           >
             Clear filters
           </button>
@@ -82,9 +86,7 @@ export function ContactsTable({
                 <TableCell className="font-medium">{contact.email}</TableCell>
                 <TableCell>{contact.firstName || "-"}</TableCell>
                 <TableCell>{contact.lastName || "-"}</TableCell>
-                <TableCell>
-                  {formatRelativeDate(contact.createdAt)}
-                </TableCell>
+                <TableCell>{formatRelativeDate(contact.createdAt)}</TableCell>
               </TableRow>
               {isExpanded && (
                 <TableRow>
@@ -92,7 +94,7 @@ export function ContactsTable({
                     colSpan={5}
                     className="bg-zinc-950/50 p-0 transition-all duration-200"
                   >
-                    <div className="border-l-2 border-[#3ECFA0] pl-4 py-4 pr-4">
+                    <div className="border-l-2 border-[#C8A96E] pl-4 py-4 pr-4">
                       <div className="grid grid-cols-2 gap-4 text-sm">
                         <div>
                           <div className="text-zinc-400 mb-2 font-medium">
@@ -117,7 +119,9 @@ export function ContactsTable({
                             )}
                             {contact.lastName && (
                               <div>
-                                <span className="text-zinc-500">Last Name: </span>
+                                <span className="text-zinc-500">
+                                  Last Name:{" "}
+                                </span>
                                 <span className="text-zinc-300">
                                   {contact.lastName}
                                 </span>
