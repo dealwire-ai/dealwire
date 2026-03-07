@@ -21,8 +21,9 @@ export class DeliveryService {
     proformaS3Key: string;
     normalized: NormalizedResult;
     extraction: ExtractionResults;
+    inReplyToMessageId?: string;
   }): Promise<void> {
-    const { senderEmail, dealId, proformaS3Key, normalized, extraction } = params;
+    const { senderEmail, dealId, proformaS3Key, normalized, extraction, inReplyToMessageId } = params;
 
     // Download filled proforma
     const buffer = await this.s3.downloadDealAttachment(proformaS3Key);
@@ -44,6 +45,7 @@ export class DeliveryService {
       from: this.config.underwritingInboundEmail
         ? `AI Underwriting Analyst <${this.config.underwritingInboundEmail}>`
         : undefined,
+      replyToMessageId: inReplyToMessageId,
       attachments: [
         {
           filename: 'proforma_filled.xlsx',
