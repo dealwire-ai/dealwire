@@ -1,0 +1,19 @@
+pre-commit:
+  parallel: true
+  commands:
+    lint-staged:
+      run: npx lint-staged
+
+commit-msg:
+  commands:
+    commitlint:
+      run: npx --no -- commitlint --edit {1}
+
+pre-push:
+  commands:
+    typecheck-api:
+      glob: "apps/api/**/*.ts"
+      run: pnpm --filter @analyzer/api exec tsc --noEmit
+    typecheck-web:
+      glob: "apps/web/**/*.{ts,tsx}"
+      run: pnpm --filter @analyzer/web exec tsc --noEmit
