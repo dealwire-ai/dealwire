@@ -30,6 +30,12 @@ const NYC_HPD_VIOLATIONS: SodaSourceConfig = {
   name: 'NYC HPD Violations',
 };
 
+const NYC_PROPERTY_CHARGES: SodaSourceConfig = {
+  baseUrl: NYC_BASE_URL,
+  datasetId: 'scjx-j6np',
+  name: 'NYC Property Charges Balance',
+};
+
 export interface IngestionResult {
   source: string;
   recordsProcessed: number;
@@ -67,7 +73,11 @@ export class NycIngestionService {
     const hpdResult = await this.ingestHpdViolations(boroughs);
     results.push(hpdResult);
 
-    // 4. Compute distress scores
+    // 4. Ingest property charges (outstanding tax bills + lien amounts)
+    const chargesResult = await this.ingestPropertyCharges(boroughs);
+    results.push(chargesResult);
+
+    // 5. Compute distress scores
     await this.scoring.scoreAll();
 
     this.logger.log(`Full ingestion complete. Results: ${JSON.stringify(results.map((r) => `${r.source}: ${r.recordsProcessed}`))}`);
@@ -378,6 +388,133 @@ export class NycIngestionService {
     return {
       source: 'hpd_violations',
       recordsProcessed: totalFetched,
+      recordsCreated: 0,
+      recordsUpdated: updated,
+      durationMs: duration,
+    };
+  }
+
+  /**
+   * Ingest property charges from DOF Property Charges Balance (scjx-j6np).
+   * Aggregates outstanding tax bills (CHG), lien charges (SAC), and total balance per parcel.
+   *
+   * Dataset structure: one row per property × charge type × billing period × extract date.
+   * We filter to the latest extractdt and sum_bal > 0, then aggregate per BBL.
+   */
+  async ingestPropertyCharges(boroughs: string[]): Promise<IngestionResult> {
+    const start = Date.now();
+    this.logger.log(`Ingesting property charges for boroughs: ${boroughs.join(', ')}`);
+
+    // Get BBLs we need to query
+    const existingParcels = await this.prisma.parcel.findMany({
+      where: { borough: { in: boroughs } },
+      select: { bbl: true },
+    });
+    const bbls = existingParcels.map((p) => p.bbl);
+
+    if (bbls.length === 0) {
+      return { source: 'property_charges', recordsProcessed: 0, recordsCreated: 0, recordsUpdated: 0, durationMs: Date.now() - start };
+    }
+
+    this.logger.log(`Querying property charges for ${bbls.length} parcels`);
+
+    // Find the latest extract date in the dataset
+    const [latestExtract] = await this.soda.fetch(NYC_PROPERTY_CHARGES, {
+      $select: 'extractdt',
+      $order: 'extractdt DESC',
+      $limit: 1,
+    }) as Record<string, string>[];
+
+    if (!latestExtract?.extractdt) {
+      this.logger.warn('No property charges records found');
+      return { source: 'property_charges', recordsProcessed: 0, recordsCreated: 0, recordsUpdated: 0, durationMs: Date.now() - start };
+    }
+
+    const latestExtractDt = latestExtract.extractdt;
+    this.logger.log(`Latest property charges extract: ${latestExtractDt}`);
+
+    // Aggregate charges per BBL: { bbl -> { chg, sac, total } }
+    const charges = new Map<string, { chg: number; sac: number; total: number }>();
+    let totalRecords = 0;
+
+    // Batch BBLs into groups of 250 (URL length limit for IN clause)
+    const batchSize = 250;
+    for (let i = 0; i < bbls.length; i += batchSize) {
+      const batch = bbls.slice(i, i + batchSize);
+
+      // Build IN clause: parid IN ('3004050058','3004050059',...)
+      const paridList = batch.map((b) => `'${b}'`).join(',');
+      const whereClause = `parid IN (${paridList}) AND extractdt='${latestExtractDt}' AND sum_bal > 0`;
+
+      const records = await this.soda.fetch(NYC_PROPERTY_CHARGES, {
+        $where: whereClause,
+        $select: 'parid,code,sum_bal',
+        $limit: 50000,
+      }) as Record<string, string>[];
+
+      for (const record of records) {
+        const parid = record.parid?.trim();
+        if (!parid) continue;
+
+        const sumBal = parseFloat(record.sum_bal) || 0;
+        if (sumBal <= 0) continue;
+
+        if (!charges.has(parid)) {
+          charges.set(parid, { chg: 0, sac: 0, total: 0 });
+        }
+        const c = charges.get(parid)!;
+        c.total += sumBal;
+
+        const code = (record.code || '').toUpperCase();
+        if (code === 'CHG') {
+          c.chg += sumBal;
+        } else if (code === 'SAC') {
+          c.sac += sumBal;
+        }
+
+        totalRecords++;
+      }
+
+      if ((i / batchSize) % 3 === 0) {
+        this.logger.log(`Property charges progress: ${i + batch.length}/${bbls.length} BBLs queried, ${charges.size} with balances`);
+      }
+    }
+
+    // Batch update parcels with aggregated charges
+    let updated = 0;
+    const now = new Date();
+
+    // First, reset charges for all parcels in scope (some may no longer have balances)
+    await this.prisma.parcel.updateMany({
+      where: { borough: { in: boroughs } },
+      data: {
+        outstandingTaxBill: null,
+        lienChargeAmount: null,
+        totalOutstandingBalance: null,
+        chargesSyncedAt: now,
+      },
+    });
+
+    // Then set values for parcels that have outstanding charges
+    for (const [bbl, c] of charges) {
+      await this.prisma.parcel.updateMany({
+        where: { bbl },
+        data: {
+          outstandingTaxBill: Math.round(c.chg * 100) / 100,
+          lienChargeAmount: Math.round(c.sac * 100) / 100,
+          totalOutstandingBalance: Math.round(c.total * 100) / 100,
+          chargesSyncedAt: now,
+        },
+      });
+      updated++;
+    }
+
+    const duration = Date.now() - start;
+    this.logger.log(`Property charges: ${totalRecords} records, ${charges.size} parcels with balances, ${updated} updated in ${duration}ms`);
+
+    return {
+      source: 'property_charges',
+      recordsProcessed: totalRecords,
       recordsCreated: 0,
       recordsUpdated: updated,
       durationMs: duration,

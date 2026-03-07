@@ -402,7 +402,7 @@ Per-source tracking:
 - [ ] `DataSource` / `RawIngestion` models — source registry with config-driven ingestion
 - [ ] `ArcGisAdapter` (generic, handles any ArcGIS FeatureServer — use `exceededTransferLimit` for pagination, require `orderByFields=OBJECTID`)
 - [ ] `BulkFileAdapter` (CSV/shapefile downloads via HTTP — for FL, NJ MOD-IV, etc.)
-- [ ] Property Charges Balance (`scjx-j6np`) — outstanding balances as additional distress signal
+- [ ] Property Charges Balance (`scjx-j6np`) — outstanding balances + lien charge amounts. **Researched 3/7:** 109M rows, quarterly updates, `CHG` = tax bills, `SAC` = lien charges, `sum_bal` = current balance. Validated against Daniel's example ($8,530.35). See `3_7_WEEKEND_PLAN.md`.
 - [ ] Address standardization (Smarty or libpostal integration)
 - [ ] Add ACRIS data (transactions, recorded liens) — joins across 3 Socrata datasets
 - [ ] Data quality validation pipeline

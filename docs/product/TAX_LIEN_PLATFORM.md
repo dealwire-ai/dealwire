@@ -15,28 +15,27 @@ A secure web application that aggregates public tax lien data, property records,
 
 **The core insight:** Daniel's value isn't "look at a table of 3,000 parcels." It's: *"The moment a property enters lis pendens, I get a text with owner name, phone, property type, photo, and lien amount — before my competitors even know it exists."* The dashboard is useful, but the **alert system** is the product.
 
-### Implementation Status (as of Mar 2026)
+### Implementation Status (as of Mar 7, 2026)
 
 | Component | Status | Notes |
 |-----------|--------|-------|
 | Tax lien list ingestion | ✅ Done | SODA adapter, latest cycle filtering |
 | PLUTO enrichment | ✅ Done | Building class, units, sqft, year built, owner, zoning |
 | HPD violations | ✅ Done | Aggregated counts by class, violations/unit |
-| Distress scoring | ✅ Done | 0-100 weighted score (needs update — Class C only, see 3/4 feedback) |
+| Distress scoring | ✅ Done | 0-100 weighted score. **Updated 3/7:** Class C only (A/B removed), cap increased to 30. |
 | Parcel table UI | ✅ Done | Filterable, sortable, expandable rows |
-| CSV export | ✅ Done | All filters apply |
-| Agent tools | ✅ Done | `query_parcels`, `get_parcel_stats` |
+| CSV export | ✅ Done | All filters apply, includes financial columns |
+| Agent tools | ✅ Done | `query_parcels`, `get_parcel_stats` with financial fields |
 | Feature flag | ✅ Done | `parcels` org-level flag |
-| **Building class grouped filters** | ❌ Not started | 3 checkbox categories (see 3/4 feedback). Exclude D class entirely. |
-| **Tax lien dollar amounts** | ❌ Not started | NYC DOF account history, MTAG/Tower servicer data |
-| **Outstanding tax bills** | ❌ Not started | NYC DOF tax bill amounts per property |
+| Building class grouped filters | ✅ Done 3/7 | 3 checkbox groups (Residential, Commercial, Walk-up). D class excluded by default. |
+| Property Charges Balance | ✅ Done 3/7 | `scjx-j6np` dataset. Outstanding tax bills (CHG), lien amounts (SAC), total balance. Validated against Daniel's test BBL. |
 | **Owner phone lookup** | ❌ Not started | Skip tracing — Brett ready to cold call |
 | **Manhattan expansion** | ❌ Not started | Same criteria as BK/QN |
+| **Servicer info (MTAG/Tower)** | ❌ Not started | PDF tax bill parsing. MTAG/Tower sites are dead ends (no search). |
 | **Accurate valuations** | ❌ Not started | Property Shark (login received) or ATTOM API |
 | **Lis pendens ingestion** | ❌ Not started | ACRIS integration needed |
 | **Push alerts (SMS/email)** | ❌ Not started | Time-sensitive advantage |
 | **Property photos** | ❌ Not started | Street View API |
-| **Property Charges Balance** | ❌ Not started | `scjx-j6np` dataset |
 
 ### Source Documents
 
@@ -59,22 +58,22 @@ The system is **reactive** (Daniel has to check the dashboard) not **proactive**
 
 Additionally, the dashboard is missing key data Daniel needs to act: **lien dollar amounts**, **outstanding tax bills**, and **owner contact info** for cold calling. Brett is ready to start calling but needs this data first.
 
-### Priority Stack (Updated 3/4 — Post-Meeting)
+### Priority Stack (Updated 3/7)
 
-_Reprioritized based on 3/4 meeting + Daniel's email feedback. Cold calling enablement is now the primary driver._
+_Cold calling enablement is the primary driver. Scoring fix, building class filters, and financial data shipped 3/7._
 
-| Priority | Focus | Deliverable |
-|----------|-------|-------------|
-| **P0** | **Scoring fix** | Remove Class A/B violations from score — only Class C matters per Daniel |
-| **P0** | **Building class grouped filters** | 3 checkbox categories: (A,B,C), (E-Z), (C1-C7). Exclude D class entirely. |
-| **P1** | **Tax lien dollar amounts** | Scrape/integrate NYC DOF account history for lien $$ and servicer (MTAG/Tower). Also check MTAG (station31partners.com) and Tower (tcmfc.com) sites. |
-| **P1** | **Outstanding tax bills** | Pull current tax bill amounts from NYC DOF. Example: BBL 3004050058 owes $8,530. DOF has PDF tax bills at `a836-edms.nyc.gov` but dynamic site — research API/scraping options. |
-| **P2** | **Owner contact lookup (skip tracing)** | Phone numbers for cold calling. Brett is ready to start. Research providers (Spokeo, BeenVerified, batch skip trace APIs). |
-| **P2** | **Manhattan expansion** | Add borough 1 with same criteria as BK/QN |
-| **P3** | **Property Shark integration** | Daniel sent login (dgabay@gmail.com). Use for comps/valuations. Research if API exists or web-only. |
-| **P3** | **Lis pendens alerts** | ACRIS integration + SMS/email push. Still high value but cold calling data comes first. |
-| **P4** | **Property photos** | Street View API |
-| **P4** | **Property Charges Balance** | Socrata `scjx-j6np` |
+| Priority | Focus | Status | Deliverable |
+|----------|-------|--------|-------------|
+| ~~P0~~ | ~~Scoring fix~~ | **DONE 3/7** | Removed Class A/B, Class C cap increased to 30 |
+| ~~P0~~ | ~~Building class grouped filters~~ | **DONE 3/7** | 3 checkbox groups + D class excluded by default |
+| ~~P1~~ | ~~Tax lien dollar amounts~~ | **DONE 3/7** | Via `scjx-j6np` SAC charges (not DOF scraping) |
+| ~~P1~~ | ~~Outstanding tax bills~~ | **DONE 3/7** | Via `scjx-j6np` CHG charges. Validated: $8,530.35 |
+| **P1** | **Owner contact lookup (skip tracing)** | Not started | Phone numbers for cold calling. Brett is ready. Research batch providers. |
+| **P2** | **Manhattan expansion** | Not started | Add borough 1 with same criteria as BK/QN |
+| **P2** | **Servicer info (MTAG vs Tower)** | Not started | PDF tax bill parsing from `a836-edms.nyc.gov`. MTAG/Tower sites are dead ends. |
+| **P3** | **Property Shark integration** | Not started | Daniel sent login (dgabay@gmail.com). Research if API exists or web-only. |
+| **P3** | **Lis pendens alerts** | Not started | ACRIS integration + SMS/email push. Still high value. |
+| **P4** | **Property photos** | Not started | Street View API |
 
 ---
 
@@ -408,12 +407,25 @@ Based on SoW deliverables, meeting notes, and Daniel's spreadsheet feedback:
 
 _Reprioritized from lis pendens. Brett is ready to cold call — he needs lien amounts, tax bills, and phone numbers first._
 
-- [ ] **Tax lien dollar amounts** — Integrate NYC DOF account history for lien $$ per property. Shows servicer (MTAG or Tower), lien status (Sold vs Redeemed), and lien amount. DOF search: `a836-pts-access.nyc.gov`. Research scraping or API approach — site is dynamic. Also check servicer sites: [MTAG/Station 31](https://station31partners.com/mtag-services-2/), [Tower](https://www.tcmfc.com).
-- [ ] **Outstanding tax bills** — Pull current tax bill amounts from NYC DOF. PDF tax bills available at `a836-edms.nyc.gov/dctm-rest/repositories/dofedmspts/StatementSearch?bbl={bbl}&stmtDate={date}&stmtType=SOA`. Research batch approach.
+- [ ] **Tax lien dollar amounts + outstanding tax bills** — Use Socrata `scjx-j6np` (Property Charges Balance). **Research complete (3/7):** Dataset has 109M rows, updated quarterly (latest extract 2026-02-21). `SAC` (Special Assessment Charge) rows contain actual lien amounts. `CHG` rows contain property tax charges. Sum `sum_bal` per BBL to get outstanding balances. **Validated:** BBL 3004050058 returns $8,530.35, matching Daniel's stated ~$8,530. Batch queryable via SODA API (IN clause, ~250 BBLs per request). See `3_7_WEEKEND_PLAN.md` for implementation details.
 - [ ] **Owner contact lookup** — Skip tracing for phone numbers. Brett ready to start cold calling. Research batch providers (Spokeo, BeenVerified, BatchSkipTracing, REISkip).
 - [ ] **Scoring update** — Remove Class A/B violations. Only Class C matters. Redistribute weight.
 - [ ] **Building class grouped filters** — 3 checkbox categories replacing individual dropdown.
 - [ ] **Manhattan expansion** — Add borough 1 with same criteria.
+
+#### Research Findings: Data Source Feasibility (3/7/2026)
+
+| Source | Feasibility | What It Gives Us | What It Doesn't |
+|--------|-------------|------------------|-----------------|
+| **`scjx-j6np` Property Charges Balance (Socrata)** | **HIGH — primary source** | Outstanding tax bills (CHG), lien charge amounts (SAC), total balance owed. Free SODA API, batch queryable, validated against Daniel's example. | Servicer identity (MTAG vs Tower), lien sold/redeemed status. |
+| **PDF tax bills (`a836-edms.nyc.gov`)** | **HIGH — proven at scale** | Full financial picture including lien amounts, servicer, sold status. Deterministic URL: `StatementSearch?bbl={BBL}&stmtDate={YYYYMMDD}&stmtType=SOA`. No auth. Chris Whong downloaded 1.1M+ bills. | Requires PDF parsing (pdftotext + regex). ~50 min for 3K properties at 1/sec. |
+| **DOF web portal (`a836-pts-access.nyc.gov`)** | **LOW — avoid** | Account history with lien details. | ASP.NET WebForms, session-based, was down during research. Fragile. |
+| **MTAG / Station 31 Partners** | **DEAD END** | Nothing programmatic. | Search feature removed. Phone-only (800-750-9210). |
+| **Tower Capital (`tcmfc.com`)** | **DEAD END** | Nothing programmatic. | No search. References defunct `nycserv.nyc.gov` portal (returns 403). Phone-only (800-970-8454). |
+| **NYCTL quarterly status reports (Excel)** | **WORTH INVESTIGATING** | Downloadable .xlsx from DOF lien sales archive. May contain per-BBL lien amounts + servicer assignments. | Haven't inspected actual file contents yet. |
+| **DOF SOAP/REST APIs** | **NONE FOUND** | N/A | No public APIs beyond Socrata. Internal SOAP services exist but not exposed. |
+
+**Recommended approach:** Socrata `scjx-j6np` for outstanding balances (covers ~80% of value), then PDF tax bills for servicer info if needed later.
 
 ### Phase 3 — Lis Pendens Alerts
 
@@ -431,7 +443,7 @@ _Still high value but deprioritized behind cold calling data needs._
 
 - [ ] **Property valuations via comps** — Integrate Property Shark (Daniel's login: dgabay@gmail.com) or ATTOM API for actual market values and comparable sales. Research if Property Shark has an API or is web-only.
 - [ ] **Property photos** — Google Street View Static API (free tier: 28K/month) or Zillow API
-- [ ] **Property Charges Balance** — Ingest `scjx-j6np` for outstanding balance data (additional distress signal)
+- [ ] **Servicer info (MTAG vs Tower)** — Parse PDF tax bills from `a836-edms.nyc.gov` to extract lien servicer, sold/redeemed status, and exact lien amounts. Proven at scale. Deferred from Phase 2 since `scjx-j6np` covers the core need.
 
 ### Phase 5 — Multi-Jurisdiction
 
