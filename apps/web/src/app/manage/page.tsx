@@ -5,7 +5,11 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import { useApi } from "@/hooks/use-api";
 
-type BucketAction = "REPLY_TO_SELF" | "DRAFT_REPLY_TO_BROKER" | "MOVE_TO_FOLDER" | "NONE";
+type BucketAction =
+  | "REPLY_TO_SELF"
+  | "DRAFT_REPLY_TO_BROKER"
+  | "MOVE_TO_FOLDER"
+  | "NONE";
 
 interface Bucket {
   id: string;
@@ -171,7 +175,10 @@ export default function ManagePage() {
     const swapIndex = direction === "up" ? index - 1 : index + 1;
     if (swapIndex < 0 || swapIndex >= buckets.length) return;
     const newOrder = [...buckets];
-    [newOrder[index], newOrder[swapIndex]] = [newOrder[swapIndex], newOrder[index]];
+    [newOrder[index], newOrder[swapIndex]] = [
+      newOrder[swapIndex],
+      newOrder[index],
+    ];
     const bucketIds = newOrder.map((b) => b.id);
     // Optimistically update
     setBuckets(newOrder.map((b, i) => ({ ...b, rank: i + 1 })));
@@ -203,7 +210,7 @@ export default function ManagePage() {
           <h1 className="text-3xl font-bold">Screening Buckets</h1>
           <button
             onClick={startCreate}
-            className="px-4 py-2 bg-[#3ECFA0] hover:bg-[#35b88d] text-black font-medium rounded-lg text-sm transition-colors"
+            className="px-4 py-2 bg-[#C8A96E] hover:bg-[#b8952a] text-black font-medium rounded-lg text-sm transition-colors"
           >
             + Add Bucket
           </button>
@@ -224,49 +231,64 @@ export default function ManagePage() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm text-zinc-400 mb-1">Name</label>
+                  <label className="block text-sm text-zinc-400 mb-1">
+                    Name
+                  </label>
                   <input
                     type="text"
                     required
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-white text-sm focus:outline-none focus:border-[#3ECFA0]"
+                    className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-white text-sm focus:outline-none focus:border-[#C8A96E]"
                     placeholder="e.g. Hot Deal"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-zinc-400 mb-1">Color</label>
+                  <label className="block text-sm text-zinc-400 mb-1">
+                    Color
+                  </label>
                   <input
                     type="text"
                     value={form.color}
-                    onChange={(e) => setForm({ ...form, color: e.target.value })}
-                    className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-white text-sm focus:outline-none focus:border-[#3ECFA0]"
-                    placeholder="#3ECFA0"
+                    onChange={(e) =>
+                      setForm({ ...form, color: e.target.value })
+                    }
+                    className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-white text-sm focus:outline-none focus:border-[#C8A96E]"
+                    placeholder="#C8A96E"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm text-zinc-400 mb-1">Description</label>
+                <label className="block text-sm text-zinc-400 mb-1">
+                  Description
+                </label>
                 <textarea
                   required
                   rows={3}
                   value={form.description}
-                  onChange={(e) => setForm({ ...form, description: e.target.value })}
-                  className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-white text-sm focus:outline-none focus:border-[#3ECFA0] resize-y"
+                  onChange={(e) =>
+                    setForm({ ...form, description: e.target.value })
+                  }
+                  className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-white text-sm focus:outline-none focus:border-[#C8A96E] resize-y"
                   placeholder="Criteria for AI classification into this bucket..."
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm text-zinc-400 mb-1">Action</label>
+                  <label className="block text-sm text-zinc-400 mb-1">
+                    Action
+                  </label>
                   <select
                     value={form.action}
                     onChange={(e) =>
-                      setForm({ ...form, action: e.target.value as BucketAction })
+                      setForm({
+                        ...form,
+                        action: e.target.value as BucketAction,
+                      })
                     }
-                    className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-white text-sm focus:outline-none focus:border-[#3ECFA0]"
+                    className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-white text-sm focus:outline-none focus:border-[#C8A96E]"
                   >
                     {Object.entries(ACTION_LABELS).map(([value, label]) => (
                       <option key={value} value={value}>
@@ -287,7 +309,7 @@ export default function ManagePage() {
                       onChange={(e) =>
                         setForm({ ...form, folderName: e.target.value })
                       }
-                      className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-white text-sm focus:outline-none focus:border-[#3ECFA0]"
+                      className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-white text-sm focus:outline-none focus:border-[#C8A96E]"
                       placeholder="Passed Deals"
                     />
                   </div>
@@ -299,10 +321,14 @@ export default function ManagePage() {
                   <input
                     type="checkbox"
                     checked={form.isPass}
-                    onChange={(e) => setForm({ ...form, isPass: e.target.checked })}
-                    className="accent-[#3ECFA0]"
+                    onChange={(e) =>
+                      setForm({ ...form, isPass: e.target.checked })
+                    }
+                    className="accent-[#C8A96E]"
                   />
-                  <span className="text-zinc-300">Is Pass (Decision = YES)</span>
+                  <span className="text-zinc-300">
+                    Is Pass (Decision = YES)
+                  </span>
                 </label>
                 <label className="flex items-center gap-2 text-sm cursor-pointer">
                   <input
@@ -311,7 +337,7 @@ export default function ManagePage() {
                     onChange={(e) =>
                       setForm({ ...form, generateSummary: e.target.checked })
                     }
-                    className="accent-[#3ECFA0]"
+                    className="accent-[#C8A96E]"
                   />
                   <span className="text-zinc-300">Generate Summary</span>
                 </label>
@@ -321,9 +347,13 @@ export default function ManagePage() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-4 py-2 bg-[#3ECFA0] hover:bg-[#35b88d] text-black font-medium rounded-lg text-sm transition-colors disabled:opacity-50"
+                  className="px-4 py-2 bg-[#C8A96E] hover:bg-[#b8952a] text-black font-medium rounded-lg text-sm transition-colors disabled:opacity-50"
                 >
-                  {saving ? "Saving..." : editingId ? "Save Changes" : "Create Bucket"}
+                  {saving
+                    ? "Saving..."
+                    : editingId
+                      ? "Save Changes"
+                      : "Create Bucket"}
                 </button>
                 <button
                   type="button"
@@ -340,7 +370,9 @@ export default function ManagePage() {
         {/* Buckets Table */}
         <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden">
           {loading ? (
-            <div className="text-center py-12 text-zinc-400">Loading buckets...</div>
+            <div className="text-center py-12 text-zinc-400">
+              Loading buckets...
+            </div>
           ) : buckets.length === 0 ? (
             <div className="text-center py-12 text-zinc-400">
               No screening buckets found.
