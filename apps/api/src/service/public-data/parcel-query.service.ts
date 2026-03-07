@@ -7,13 +7,47 @@ import { PrismaService } from '../prisma/prisma.service';
  * Groups per Daniel's 3/4 feedback. D class excluded entirely.
  */
 const BUILDING_CLASS_GROUP_PREFIXES: Record<string, string[]> = {
-  residential: ['A', 'B', 'C'],  // C1-C7 excluded (they're in walkup)
-  commercial: ['E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
+  residential: ['A', 'B', 'C'], // C1-C7 excluded (they're in walkup)
+  commercial: [
+    'E',
+    'F',
+    'G',
+    'H',
+    'I',
+    'J',
+    'K',
+    'L',
+    'M',
+    'N',
+    'O',
+    'P',
+    'Q',
+    'R',
+    'S',
+    'T',
+    'U',
+    'V',
+    'W',
+    'X',
+    'Y',
+    'Z',
+  ],
   walkup: ['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7'],
 };
 
 // Walk-up codes that overlap with residential 'C' prefix
-const WALKUP_CODES = new Set(['C1', 'C2', 'C3', 'C4', 'C5', 'C6', 'C7', 'C8', 'C9', 'CC']);
+const WALKUP_CODES = new Set([
+  'C1',
+  'C2',
+  'C3',
+  'C4',
+  'C5',
+  'C6',
+  'C7',
+  'C8',
+  'C9',
+  'CC',
+]);
 
 export interface ParcelQueryFilters {
   boroughs?: string[];
@@ -24,6 +58,8 @@ export interface ParcelQueryFilters {
   maxDistressScore?: number;
   minUnits?: number;
   maxUnits?: number;
+  minOutstandingTaxBill?: number;
+  maxOutstandingTaxBill?: number;
   zipCode?: string;
   search?: string;
   buildingClasses?: string[];
@@ -56,13 +92,18 @@ export class ParcelQueryService {
       where.hasActiveLien = filters.hasActiveLien;
     }
 
-    if (filters.minDistressScore !== undefined || filters.maxDistressScore !== undefined) {
+    if (
+      filters.minDistressScore !== undefined ||
+      filters.maxDistressScore !== undefined
+    ) {
       where.distressScore = {};
       if (filters.minDistressScore !== undefined) {
-        (where.distressScore as Prisma.IntNullableFilter).gte = filters.minDistressScore;
+        (where.distressScore as Prisma.IntNullableFilter).gte =
+          filters.minDistressScore;
       }
       if (filters.maxDistressScore !== undefined) {
-        (where.distressScore as Prisma.IntNullableFilter).lte = filters.maxDistressScore;
+        (where.distressScore as Prisma.IntNullableFilter).lte =
+          filters.maxDistressScore;
       }
     }
 
@@ -73,6 +114,21 @@ export class ParcelQueryService {
       }
       if (filters.maxUnits !== undefined) {
         (where.unitsTotal as Prisma.IntNullableFilter).lte = filters.maxUnits;
+      }
+    }
+
+    if (
+      filters.minOutstandingTaxBill !== undefined ||
+      filters.maxOutstandingTaxBill !== undefined
+    ) {
+      where.outstandingTaxBill = {};
+      if (filters.minOutstandingTaxBill !== undefined) {
+        (where.outstandingTaxBill as Prisma.IntNullableFilter).gte =
+          filters.minOutstandingTaxBill;
+      }
+      if (filters.maxOutstandingTaxBill !== undefined) {
+        (where.outstandingTaxBill as Prisma.IntNullableFilter).lte =
+          filters.maxOutstandingTaxBill;
       }
     }
 
@@ -92,17 +148,15 @@ export class ParcelQueryService {
         // For walkup codes (C1-C7), use exact prefix match.
         // Handle the residential/walkup overlap: if residential is selected but
         // walkup is not, exclude C1-C7+ from the C prefix matches.
-        const hasResidential = filters.buildingClassGroups.includes('residential');
+        const hasResidential =
+          filters.buildingClassGroups.includes('residential');
         const hasWalkup = filters.buildingClassGroups.includes('walkup');
 
         const conditions: any[] = prefixes.map((p) => ({
           buildingClass: { startsWith: p },
         }));
 
-        where.AND = [
-          ...(where.AND as any[] || []),
-          { OR: conditions },
-        ];
+        where.AND = [...((where.AND as any[]) || []), { OR: conditions }];
 
         // If residential selected without walkup, exclude C1-C7 etc.
         if (hasResidential && !hasWalkup) {
@@ -120,7 +174,7 @@ export class ParcelQueryService {
     // Exclude D class by default (elevator apartments, mostly coops)
     if (filters.excludeDClass !== false) {
       where.AND = [
-        ...(where.AND as any[] || []),
+        ...((where.AND as any[]) || []),
         { NOT: { buildingClass: { startsWith: 'D' } } },
       ];
     }
@@ -139,16 +193,31 @@ export class ParcelQueryService {
   /**
    * Build Prisma orderBy from sort field + direction.
    */
-  private buildOrderBy(sort?: string, order?: 'asc' | 'desc'): Prisma.ParcelOrderByWithRelationInput {
+  private buildOrderBy(
+    sort?: string,
+    order?: 'asc' | 'desc',
+  ): Prisma.ParcelOrderByWithRelationInput {
     const dir = order || 'desc';
     const sortField = sort || 'distressScore';
 
     const validSortFields = [
-      'distressScore', 'address', 'borough', 'buildingClass', 'unitsTotal',
-      'buildingArea', 'estimatedMarketValue', 'yearBuilt', 'violationsOpen',
-      'violationsPerUnit', 'violationsClassC', 'hasActiveLien', 'ownerName',
-      'outstandingTaxBill', 'lienChargeAmount', 'totalOutstandingBalance',
-      'createdAt', 'updatedAt',
+      'distressScore',
+      'address',
+      'borough',
+      'buildingClass',
+      'unitsTotal',
+      'buildingArea',
+      'estimatedMarketValue',
+      'yearBuilt',
+      'violationsOpen',
+      'violationsPerUnit',
+      'violationsClassC',
+      'hasActiveLien',
+      'ownerName',
+      'outstandingTaxBill',
+      'totalOutstandingBalance',
+      'createdAt',
+      'updatedAt',
     ];
 
     if (validSortFields.includes(sortField)) {
@@ -221,7 +290,8 @@ export class ParcelQueryService {
     return {
       total,
       withActiveLiens: withLiens,
-      avgDistressScore: Math.round((avgScore._avg.distressScore || 0) * 10) / 10,
+      avgDistressScore:
+        Math.round((avgScore._avg.distressScore || 0) * 10) / 10,
       byBorough: byBorough.map((g) => ({
         borough: g.borough,
         count: g._count,

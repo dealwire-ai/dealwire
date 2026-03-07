@@ -11,14 +11,17 @@ Also ship the two quick P0 fixes from the 3/4 meeting (scoring fix + building cl
 ## What We're Adding
 
 ### 1. Outstanding tax bills per property
+
 Sum of `CHG` (property tax charge) rows where `sum_bal > 0` on the latest extract date. This is the exact amount the property currently owes NYC in property taxes.
 
 **Validated:** BBL 3004050058 (213 Butler St) returns $8,530.35 — matches Daniel's stated ~$8,530.
 
-### 2. Lien-related charge amounts per property
-Sum of `SAC` (special assessment charge) rows where `sum_bal > 0`. These are the actual tax lien sale amounts and related charges (water/sewer liens, ECB violations transferred to DOF).
+### 2. ~~Lien-related charge amounts per property~~ (INCORRECT — dropped 3/7)
+
+~~Sum of `SAC` (special assessment charge) rows.~~ **Correction:** SAC rows are small special assessments (water/sewer, ECB fines — typically $50-$250), NOT the lien sale amount (e.g. $58K sold to NYCTL). The `lienChargeAmount` field was dropped as misleading. SAC amounts are still included in `totalOutstandingBalance`.
 
 ### 3. Total outstanding balance per property
+
 Sum of all `sum_bal` across CHG + SAC + SAF + SAT. The full picture of what the property owes DOF.
 
 ---
@@ -33,21 +36,22 @@ Sum of all `sum_bal` across CHG + SAC + SAF + SAT. The full picture of what the 
 
 ### Key Fields
 
-| Field | Type | What It Means |
-|-------|------|---------------|
-| `parid` | Text | BBL in 10-digit BBLE format (matches our `bbl` field) |
-| `code` | Text | Charge type: `CHG` (property tax), `SAC` (lien/assessment), `SAF` (admin fee), `SAT` (assessment tax) |
-| `sum_liab` | Number | Original charge amount |
-| `sum_coll` | Number | Payments received |
-| `sum_int` | Number | Interest accrued |
-| `sum_bal` | Number | **Current balance due** (liability + interest - collections) |
-| `extractdt` | Date | When DOF extracted this snapshot |
-| `taxyear` | Text | Tax year |
-| `cycle` | Text | Billing cycle (1Q, 2Q, 3Q, 4Q, 1S, 3S) |
-| `type_acct` | Text | DOF account type (e.g., `026` = tax lien sale) |
-| `accode` | Text | Agency code for the charge |
+| Field       | Type   | What It Means                                                                                         |
+| ----------- | ------ | ----------------------------------------------------------------------------------------------------- |
+| `parid`     | Text   | BBL in 10-digit BBLE format (matches our `bbl` field)                                                 |
+| `code`      | Text   | Charge type: `CHG` (property tax), `SAC` (lien/assessment), `SAF` (admin fee), `SAT` (assessment tax) |
+| `sum_liab`  | Number | Original charge amount                                                                                |
+| `sum_coll`  | Number | Payments received                                                                                     |
+| `sum_int`   | Number | Interest accrued                                                                                      |
+| `sum_bal`   | Number | **Current balance due** (liability + interest - collections)                                          |
+| `extractdt` | Date   | When DOF extracted this snapshot                                                                      |
+| `taxyear`   | Text   | Tax year                                                                                              |
+| `cycle`     | Text   | Billing cycle (1Q, 2Q, 3Q, 4Q, 1S, 3S)                                                                |
+| `type_acct` | Text   | DOF account type (e.g., `026` = tax lien sale)                                                        |
+| `accode`    | Text   | Agency code for the charge                                                                            |
 
 ### What This Does NOT Give Us
+
 - Servicer identity (MTAG vs Tower) — would need PDF tax bill parsing for this
 - Lien sold/redeemed status — not explicitly flagged (but SAC rows with balances = active liens)
 - Lien sale year — partially inferrable from `dt_pd_begin` on SAC rows
@@ -76,9 +80,9 @@ In `nyc-ingestion.service.ts`, add a new source config alongside the existing on
 
 ```typescript
 const NYC_PROPERTY_CHARGES: SodaSourceConfig = {
-  name: 'NYC Property Charges Balance',
-  baseUrl: 'https://data.cityofnewyork.us',
-  datasetId: 'scjx-j6np',
+  name: "NYC Property Charges Balance",
+  baseUrl: "https://data.cityofnewyork.us",
+  datasetId: "scjx-j6np",
 };
 ```
 
@@ -114,6 +118,7 @@ ingestTaxLiens() → ingestPlutoData() → ingestHpdViolations() → ingestPrope
 ### Step 5: Update API query/response
 
 In `ParcelQueryService` (or wherever parcel queries are built):
+
 - Add new fields to the select/response: `outstandingTaxBill`, `lienChargeAmount`, `totalOutstandingBalance`
 - Add optional filter params: `minOutstandingBalance`, `maxOutstandingBalance`
 - Add sorting support for new fields
@@ -121,17 +126,20 @@ In `ParcelQueryService` (or wherever parcel queries are built):
 ### Step 6: Update frontend parcel table
 
 In `parcel-table.tsx`:
+
 - Add columns: "Tax Bill", "Lien Amt", "Total Owed"
 - Format as currency
 - Make sortable
 
 In expanded row detail view:
+
 - Show breakdown: tax charges vs lien charges vs fees
 - Show `chargesSyncedAt` timestamp
 
 ### Step 7: Update agent tools
 
 In `analyzer-agent.service.ts`:
+
 - Add new fields to `query_parcels` response
 - Add filter params to `query_parcels` tool definition
 - Update `get_parcel_stats` to include aggregate charge stats
@@ -151,6 +159,7 @@ Ensure new fields appear in CSV export with proper column headers.
 Current scoring includes Class B violations (+2 each, capped at 10). Remove this. Only Class C matters per Daniel's 3/4 feedback.
 
 Before:
+
 ```
 Active lien: +30
 Violations/unit: +10 per, cap 40
@@ -160,6 +169,7 @@ Max: 100
 ```
 
 After — redistribute the 10 freed points:
+
 ```
 Active lien: +30
 Violations/unit: +10 per, cap 40
@@ -172,7 +182,8 @@ Max: 100
 **File:** `apps/web/src/components/parcels/parcel-filters.tsx`
 
 Replace the current building class multi-select dropdown with 3 checkbox groups:
-- **Residential (A, B, C)** — single checkbox that toggles all A*, B*, C* classes
+
+- **Residential (A, B, C)** — single checkbox that toggles all A*, B*, C\* classes
 - **Commercial/Other (E–Z)** — single checkbox that toggles E* through Z*
 - **Walk-up Apartments (C1–C7)** — single checkbox that toggles C1-C7
 
@@ -200,6 +211,7 @@ Backend change: Add a `excludeBuildingClassPrefix` filter param (or handle the g
 ## Validation
 
 After implementation, verify against Daniel's known example:
+
 - **BBL 3004050058** (213 Butler St, Brooklyn) should show:
   - Outstanding tax bill: ~$8,530
   - Lien charges: should show SAC amounts (Lien 1 was $58K sold to Tower)
