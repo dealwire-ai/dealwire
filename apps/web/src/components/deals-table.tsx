@@ -84,11 +84,16 @@ export function DealsTable({
   if (deals.length === 0) {
     return (
       <div className="text-center py-12 text-zinc-400">
-        <p>{emptyMessage || (hasActiveFilters ? "No deals match your search." : "No deals found.")}</p>
+        <p>
+          {emptyMessage ||
+            (hasActiveFilters
+              ? "No deals match your search."
+              : "No deals found.")}
+        </p>
         {hasActiveFilters && onClearFilters && (
           <button
             onClick={onClearFilters}
-            className="mt-2 text-sm text-[#3ECFA0] hover:underline"
+            className="mt-2 text-sm text-[#C8A96E] hover:underline"
           >
             Clear filters
           </button>
@@ -175,9 +180,7 @@ export function DealsTable({
                     "-"
                   )}
                 </TableCell>
-                <TableCell>
-                  {formatRelativeDate(deal.createdAt)}
-                </TableCell>
+                <TableCell>{formatRelativeDate(deal.createdAt)}</TableCell>
               </TableRow>
               {isExpanded && (
                 <TableRow>
@@ -185,7 +188,7 @@ export function DealsTable({
                     colSpan={6}
                     className="bg-zinc-950/50 p-0 transition-all duration-200"
                   >
-                    <div className="border-l-2 border-[#3ECFA0] pl-4 py-4 pr-4">
+                    <div className="border-l-2 border-[#C8A96E] pl-4 py-4 pr-4">
                       <div className="grid grid-cols-2 gap-4 text-sm">
                         <div>
                           <div className="text-zinc-400 mb-2 font-medium">
@@ -263,7 +266,7 @@ export function DealsTable({
                                   e.stopPropagation();
                                   onNavigateToAsset(deal.assetId!);
                                 }}
-                                className="group w-full text-left p-3 rounded-lg border border-zinc-800 hover:border-[#3ECFA0]/50 bg-zinc-900/50 hover:bg-zinc-900 transition-all"
+                                className="group w-full text-left p-3 rounded-lg border border-zinc-800 hover:border-[#C8A96E]/50 bg-zinc-900/50 hover:bg-zinc-900 transition-all"
                               >
                                 <div className="flex items-center justify-between">
                                   <div>
@@ -274,7 +277,7 @@ export function DealsTable({
                                       {formatAddress(asset)}
                                     </div>
                                   </div>
-                                  <ArrowRight className="w-4 h-4 text-zinc-500 group-hover:text-[#3ECFA0] transition-colors" />
+                                  <ArrowRight className="w-4 h-4 text-zinc-500 group-hover:text-[#C8A96E] transition-colors" />
                                 </div>
                               </button>
                             )}
@@ -284,7 +287,7 @@ export function DealsTable({
                                   e.stopPropagation();
                                   onNavigateToContact(deal.contactId!);
                                 }}
-                                className="group w-full text-left p-3 rounded-lg border border-zinc-800 hover:border-[#3ECFA0]/50 bg-zinc-900/50 hover:bg-zinc-900 transition-all"
+                                className="group w-full text-left p-3 rounded-lg border border-zinc-800 hover:border-[#C8A96E]/50 bg-zinc-900/50 hover:bg-zinc-900 transition-all"
                               >
                                 <div className="flex items-center justify-between">
                                   <div>
@@ -295,7 +298,7 @@ export function DealsTable({
                                       {formatContactName(contact)}
                                     </div>
                                   </div>
-                                  <ArrowRight className="w-4 h-4 text-zinc-500 group-hover:text-[#3ECFA0] transition-colors" />
+                                  <ArrowRight className="w-4 h-4 text-zinc-500 group-hover:text-[#C8A96E] transition-colors" />
                                 </div>
                               </button>
                             )}
