@@ -7,8 +7,11 @@ import { PrismaService } from '../prisma/prisma.service';
  * Score components (max 100):
  *   - Active lien:          +30 pts
  *   - Violations per unit:  +10 per viol/unit (capped at 40)
- *   - Class C violations:   +5 each (capped at 20)
- *   - Class B violations:   +2 each (capped at 10)
+ *   - Class C violations:   +5 each (capped at 30)
+ *
+ * Updated 3/7: Removed Class B violations per Daniel's 3/4 feedback
+ * ("A and B violations are not meaningful"). Increased Class C cap
+ * from 20 to 30 to redistribute the freed weight.
  */
 @Injectable()
 export class DistressScoringService {
@@ -23,7 +26,6 @@ export class DistressScoringService {
     hasActiveLien: boolean;
     violationsPerUnit: number | null;
     violationsClassC: number;
-    violationsClassB: number;
   }): number {
     let score = 0;
 
@@ -37,14 +39,9 @@ export class DistressScoringService {
       score += Math.min(Math.round(parcel.violationsPerUnit * 10), 40);
     }
 
-    // Class C violations: +5 each, capped at 20
+    // Class C violations: +5 each, capped at 30
     if (parcel.violationsClassC > 0) {
-      score += Math.min(parcel.violationsClassC * 5, 20);
-    }
-
-    // Class B violations: +2 each, capped at 10
-    if (parcel.violationsClassB > 0) {
-      score += Math.min(parcel.violationsClassB * 2, 10);
+      score += Math.min(parcel.violationsClassC * 5, 30);
     }
 
     return Math.min(score, 100);
@@ -63,7 +60,6 @@ export class DistressScoringService {
         hasActiveLien: true,
         violationsPerUnit: true,
         violationsClassC: true,
-        violationsClassB: true,
       },
     });
 
