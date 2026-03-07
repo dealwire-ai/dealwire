@@ -21,8 +21,8 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 # Copy app package.json
 COPY apps/api/package.json apps/api/
 
-# Install dependencies
-RUN pnpm install --frozen-lockfile --filter @analyzer/api...
+# Install dependencies (LEFTHOOK=0 skips the prepare script — git not available in build layer)
+RUN LEFTHOOK=0 pnpm install --frozen-lockfile --filter @analyzer/api...
 
 # Copy application code
 COPY apps/api apps/api
