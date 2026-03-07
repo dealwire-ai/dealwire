@@ -72,7 +72,11 @@ const SORTABLE_COLUMNS: { label: string; field: string; align?: "right" }[] = [
   { label: "Class C", field: "violationsClassC", align: "right" },
   { label: "Lien", field: "hasActiveLien" },
   { label: "Tax Bill", field: "outstandingTaxBill", align: "right" },
-  { label: "Total Owed to DOF", field: "totalOutstandingBalance", align: "right" },
+  {
+    label: "Total Owed to DOF",
+    field: "totalOutstandingBalance",
+    align: "right",
+  },
 ];
 
 interface ParcelTableProps {
@@ -121,7 +125,7 @@ export function ParcelTable({
         {hasActiveFilters && onClearFilters && (
           <button
             onClick={onClearFilters}
-            className="mt-2 text-sm text-[#3ECFA0] hover:underline"
+            className="mt-2 text-sm text-[#C8A96E] hover:underline"
           >
             Clear filters
           </button>
@@ -205,7 +209,9 @@ export function ParcelTable({
                 </TableCell>
                 <TableCell className="text-right">
                   {parcel.violationsOpen > 0 ? (
-                    <span className="text-red-400">{parcel.violationsOpen}</span>
+                    <span className="text-red-400">
+                      {parcel.violationsOpen}
+                    </span>
                   ) : (
                     "0"
                   )}
@@ -246,7 +252,7 @@ export function ParcelTable({
                     colSpan={15}
                     className="bg-zinc-950/50 p-0 transition-all duration-200"
                   >
-                    <div className="border-l-2 border-[#3ECFA0] pl-4 py-4 pr-4">
+                    <div className="border-l-2 border-[#C8A96E] pl-4 py-4 pr-4">
                       <div className="grid grid-cols-3 gap-6 text-sm">
                         {/* Property Details */}
                         <div>
@@ -255,13 +261,13 @@ export function ParcelTable({
                           </div>
                           <div className="space-y-1">
                             <DetailRow label="BBL" value={parcel.bbl} />
-                            <DetailRow
-                              label="Address"
-                              value={parcel.address}
-                            />
+                            <DetailRow label="Address" value={parcel.address} />
                             <DetailRow label="Zip" value={parcel.zipCode} />
                             <DetailRow label="Owner" value={parcel.ownerName} />
-                            <DetailRow label="Zoning" value={parcel.zoneDist1} />
+                            <DetailRow
+                              label="Zoning"
+                              value={parcel.zoneDist1}
+                            />
                             <DetailRow
                               label="Tax Class"
                               value={parcel.taxClass}
@@ -340,10 +346,7 @@ export function ParcelTable({
                               value={parcel.hasActiveLien ? "Yes" : "No"}
                               highlight={parcel.hasActiveLien}
                             />
-                            <DetailRow
-                              label="Cycle"
-                              value={parcel.lienCycle}
-                            />
+                            <DetailRow label="Cycle" value={parcel.lienCycle} />
                             <DetailRow
                               label="Water Debt Only"
                               value={parcel.waterDebtOnly ? "Yes" : "No"}
@@ -355,8 +358,12 @@ export function ParcelTable({
                             />
                             <DetailRow
                               label="Total Owed to DOF"
-                              value={formatCurrency(parcel.totalOutstandingBalance)}
-                              highlight={(parcel.totalOutstandingBalance ?? 0) > 0}
+                              value={formatCurrency(
+                                parcel.totalOutstandingBalance,
+                              )}
+                              highlight={
+                                (parcel.totalOutstandingBalance ?? 0) > 0
+                              }
                             />
                             <DetailRow
                               label="Distress Score"

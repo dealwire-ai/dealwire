@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install -y \
     poppler-utils \
     binutils \
     openssl \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Enable corepack for pnpm
@@ -20,8 +21,9 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 # Copy app package.json
 COPY apps/api/package.json apps/api/
 
-# Install dependencies
-RUN pnpm install --frozen-lockfile --filter @analyzer/api...
+# Install dependencies (--ignore-scripts skips the prepare hook which runs lefthook install,
+# which requires git — not available in the build layer)
+RUN pnpm install --frozen-lockfile --ignore-scripts --filter @analyzer/api...
 
 # Copy application code
 COPY apps/api apps/api
@@ -34,6 +36,10 @@ RUN pnpm --filter @analyzer/api run build
 
 # Expose port
 EXPOSE 8080
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+  CMD sh -c 'curl -sf http://localhost:${PORT:-3001}/health || exit 1'
 
 # Start the application (runs prisma migrate deploy, then starts the server)
 CMD cd apps/api && pnpm start
