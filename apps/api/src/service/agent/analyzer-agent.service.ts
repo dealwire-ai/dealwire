@@ -681,6 +681,9 @@ export class AnalyzerAgentService {
               violationsOpen: p.violationsOpen,
               violationsClassC: p.violationsClassC,
               violationsPerUnit: p.violationsPerUnit,
+              outstandingTaxBill: p.outstandingTaxBill,
+              lienChargeAmount: p.lienChargeAmount,
+              totalOutstandingBalance: p.totalOutstandingBalance,
             })),
             total: result.pagination.total,
           };
