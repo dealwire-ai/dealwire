@@ -9,6 +9,7 @@ Read this before touching any subsystem. Each section answers: what it does, whe
 **What it does:** Monitors the user's Outlook inbox via Microsoft Graph webhooks. When a new email arrives, it determines if it's a real estate deal, extracts structured data, makes a yes/no decision against the user's buy box, sends an analysis reply, optionally moves rejected deals to a folder, and drafts a broker reply.
 
 **Key files:**
+
 ```
 src/service/microsoft/
   microsoft-graph.service.ts          # Graph API calls (fetch messages, attachments, send mail, folders)
@@ -31,6 +32,7 @@ src/service/ai/
 ```
 
 **Data flow:**
+
 ```
 Graph webhook → MicrosoftWebhookService
   → SQS enqueue (normalized-email queue)
@@ -47,6 +49,7 @@ Graph webhook → MicrosoftWebhookService
 **Env vars:** `MICROSOFT_CLIENT_ID`, `MICROSOFT_CLIENT_SECRET`, `MICROSOFT_WEBHOOK_SECRET`, `AWS_NORMALIZED_EMAIL_QUEUE_URL`, `OPENAI_API_KEY`, `OPENAI_SCREENING_MODEL`
 
 **Key behaviors:**
+
 - Infinite loop prevention: skip self-sent emails via `X-Analyzer-Sent` header
 - Dedup: in-memory cache of processed message IDs
 - Attachments stored in S3 before SQS enqueue (message carries metadata only)
@@ -58,6 +61,7 @@ Graph webhook → MicrosoftWebhookService
 **What it does:** Email-triggered autonomous underwriting. User forwards deal docs (OM, rent roll, T-12) to the underwriting inbound address with "underwrite this" in subject. System classifies, extracts, normalizes, fills the org's Excel pro forma template, and emails back the filled spreadsheet with a key-metrics summary.
 
 **Key files:**
+
 ```
 src/service/underwriting/
   underwriting-inbound.service.ts      # Resend inbound handler: download attachments → S3 → SQS
@@ -83,6 +87,7 @@ src/module/underwriting.module.ts
 ```
 
 **Pipeline steps:**
+
 ```
 Email → UnderwritingInboundService (Resend webhook)
   → S3 upload of attachments
@@ -100,6 +105,7 @@ Email → UnderwritingInboundService (Resend webhook)
 **Env vars:** `AWS_UNDERWRITING_QUEUE_URL`, `ANTHROPIC_API_KEY`, `UNDERWRITING_INBOUND_EMAIL`
 
 **Notes:**
+
 - No BullMQ — uses SQS directly (same pattern as email pipeline)
 - Rate limit retry in ProformaFillService: 65s → 90s backoff (Sonnet 10k TPM limit)
 - `EmailSenderService.sendEmail()` accepts optional `from` override — used here to send from `underwritingInboundEmail` with display name "AI Underwriting Analyst"
@@ -113,20 +119,23 @@ Email → UnderwritingInboundService (Resend webhook)
 **What it does:** Ingests NYC public property data (tax liens, PLUTO property records, HPD violations), computes distress scores per parcel (BBL), and exposes results via REST API and agent tools. Gated behind `parcels` feature flag.
 
 **Key files:**
+
 ```
 src/service/public-data/
   soda.adapter.ts              # Generic Socrata SODA API adapter (paginated fetch, field mapping)
   nyc-ingestion.service.ts     # Orchestrates: tax liens → PLUTO enrichment → HPD → score → upsert
   distress-scoring.service.ts  # Distress score (0-100): lien, violations, class C/B
   parcel-query.service.ts      # Query/filter Parcel table; used by controller + agent
+  skip-trace.service.ts        # Tracerfy skip tracing: submitBatch, pollAndStore, cap check
   nyc-utils.ts                 # Borough constants, BBL utilities
 
-src/controller/public-data.controller.ts  # /public-data/* — ingest, parcels, export, stats
+src/controller/public-data.controller.ts  # /public-data/* — ingest, parcels, export, stats, skip-trace
 src/module/public-data.module.ts
 src/module/ingestion.module.ts
 ```
 
 **Data flow:**
+
 ```
 POST /public-data/ingest
   → NycIngestionService.ingest()
@@ -135,9 +144,17 @@ POST /public-data/ingest
       → HPD violation aggregation          [wvxf-dwi5]
       → DistressScoringService.score()
       → Prisma upsert → Parcel table
+
+POST /public-data/parcels/skip-trace (or /:bbl/skip-trace)
+  → SkipTraceService.submitBatch(bbls)
+      → monthly cap check + idempotency filter
+      → mark pending → POST tracerfy.com/v1/api/trace/
+      → fire-and-forget: pollAndStore(queueId, bbls)
+          → poll GET /queue/:id every 15s (up to 5 min)
+          → write ownerPhones/ownerEmails → Parcel table
 ```
 
-**Env vars:** `NYC_OPEN_DATA_APP_TOKEN` (optional, avoids rate limits)
+**Env vars:** `NYC_OPEN_DATA_APP_TOKEN` (optional, avoids rate limits), `TRACERFY_API_KEY`, `TRACERFY_MONTHLY_CREDIT_CAP` (default 500)
 
 **Agent tools:** `query_parcels`, `get_parcel_stats` (in `AnalyzerAgentService`)
 
@@ -150,6 +167,7 @@ POST /public-data/ingest
 **What it does:** Unified AI agent that powers both web chat and email replies. Queries and writes deal/broker/preference data. Uses tool-calling via Vercel AI SDK.
 
 **Key files:**
+
 ```
 src/service/agent/analyzer-agent.service.ts  # All agent logic: system prompt, tool definitions, tool execution
 src/module/agent.module.ts
@@ -169,6 +187,7 @@ src/controller/agent.controller.ts           # POST /agent/chat (web), POST /age
 **What it does:** Clerk handles user auth and org management. All API routes are scoped to `organizationId`. Microsoft OAuth tokens are stored per user via Clerk.
 
 **Key files:**
+
 ```
 src/guard/clerk-auth.guard.ts           # JWT verification + organizationId lookup
 src/decorator/auth-user.decorator.ts    # @AuthUser('organizationId') param decorator
@@ -188,6 +207,7 @@ src/controller/webhook/clerk-webhook.controller.ts
 **What it does:** Shared plumbing used by multiple subsystems.
 
 **Key files:**
+
 ```
 src/service/s3/s3.service.ts              # Upload/download deal attachments + filled proformas
 src/service/sqs/sqs.service.ts            # Enqueue messages to normalized-email and underwriting queues
@@ -200,17 +220,19 @@ src/module/sqs-registration.module.ts    # Registers SQS queues with @ssut/nestj
 
 **SQS queues:**
 
-| Queue | Env var | Visibility timeout | Consumer |
-|-------|---------|-------------------|----------|
-| `normalized-email` | `AWS_NORMALIZED_EMAIL_QUEUE_URL` | 300s | `NormalizedEmailListenerService` |
-| `underwriting` | `AWS_UNDERWRITING_QUEUE_URL` | 600s | `UnderwritingListenerService` |
+| Queue              | Env var                          | Visibility timeout | Consumer                         |
+| ------------------ | -------------------------------- | ------------------ | -------------------------------- |
+| `normalized-email` | `AWS_NORMALIZED_EMAIL_QUEUE_URL` | 300s               | `NormalizedEmailListenerService` |
+| `underwriting`     | `AWS_UNDERWRITING_QUEUE_URL`     | 600s               | `UnderwritingListenerService`    |
 
 **S3 key conventions:**
+
 - Deal attachments: `deals/{dealId}/{timestamp}-{filename}`
 - Filled pro formas: `deals/{dealId}/proforma_filled.xlsx`
 - Pro forma templates: stored per org, key on `Proforma.s3Key`
 
 **Resend:**
+
 - Default `from`: `emailConfig().fromEmail` (env: `FROM_EMAIL`)
 - Underwriting delivery `from`: `AI Underwriting Analyst <{UNDERWRITING_INBOUND_EMAIL}>`
 - Inbound webhook at `/webhooks/resend` — routes to `UnderwritingInboundService` for underwriting emails

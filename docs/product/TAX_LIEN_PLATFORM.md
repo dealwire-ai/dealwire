@@ -13,40 +13,40 @@ A new platform capability for Analyzer: an AI-powered tax lien analysis and dist
 
 A secure web application that aggregates public tax lien data, property records, violations, zoning, and valuations into a single queryable interface with AI-powered scoring, natural language chat, and CSV export. The platform surfaces distressed property investment opportunities by combining signals that are currently scattered across dozens of disconnected government portals.
 
-**The core insight:** Daniel's value isn't "look at a table of 3,000 parcels." It's: *"The moment a property enters lis pendens, I get a text with owner name, phone, property type, photo, and lien amount — before my competitors even know it exists."* The dashboard is useful, but the **alert system** is the product.
+**The core insight:** Daniel's value isn't "look at a table of 3,000 parcels." It's: _"The moment a property enters lis pendens, I get a text with owner name, phone, property type, photo, and lien amount — before my competitors even know it exists."_ The dashboard is useful, but the **alert system** is the product.
 
 ### Implementation Status (as of Mar 7, 2026)
 
-| Component | Status | Notes |
-|-----------|--------|-------|
-| Tax lien list ingestion | ✅ Done | SODA adapter, latest cycle filtering |
-| PLUTO enrichment | ✅ Done | Building class, units, sqft, year built, owner, zoning |
-| HPD violations | ✅ Done | Aggregated counts by class, violations/unit |
-| Distress scoring | ✅ Done | 0-100 weighted score. **Updated 3/7:** Class C only (A/B removed), cap increased to 30. |
-| Parcel table UI | ✅ Done | Filterable, sortable, expandable rows |
-| CSV export | ✅ Done | All filters apply, includes financial columns |
-| Agent tools | ✅ Done | `query_parcels`, `get_parcel_stats` with financial fields |
-| Feature flag | ✅ Done | `parcels` org-level flag |
-| Building class grouped filters | ✅ Done 3/7 | 3 checkbox groups (Residential, Commercial, Walk-up). D class excluded by default. |
-| Property Charges Balance | ✅ Done 3/7 | `scjx-j6np` dataset. Outstanding tax bills (CHG), lien amounts (SAC), total balance. Validated against Daniel's test BBL. |
-| **Owner phone lookup** | ❌ Not started | Skip tracing — Brett ready to cold call |
-| **Manhattan expansion** | ❌ Not started | Same criteria as BK/QN |
-| **Servicer info (MTAG/Tower)** | ❌ Not started | PDF tax bill parsing. MTAG/Tower sites are dead ends (no search). |
-| **Accurate valuations** | ❌ Not started | Property Shark (login received) or ATTOM API |
-| **Lis pendens ingestion** | ❌ Not started | ACRIS integration needed |
-| **Push alerts (SMS/email)** | ❌ Not started | Time-sensitive advantage |
-| **Property photos** | ❌ Not started | Street View API |
+| Component                      | Status         | Notes                                                                                                                     |
+| ------------------------------ | -------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Tax lien list ingestion        | ✅ Done        | SODA adapter, latest cycle filtering                                                                                      |
+| PLUTO enrichment               | ✅ Done        | Building class, units, sqft, year built, owner, zoning                                                                    |
+| HPD violations                 | ✅ Done        | Aggregated counts by class, violations/unit                                                                               |
+| Distress scoring               | ✅ Done        | 0-100 weighted score. **Updated 3/7:** Class C only (A/B removed), cap increased to 30.                                   |
+| Parcel table UI                | ✅ Done        | Filterable, sortable, expandable rows                                                                                     |
+| CSV export                     | ✅ Done        | All filters apply, includes financial columns                                                                             |
+| Agent tools                    | ✅ Done        | `query_parcels`, `get_parcel_stats` with financial fields                                                                 |
+| Feature flag                   | ✅ Done        | `parcels` org-level flag                                                                                                  |
+| Building class grouped filters | ✅ Done 3/7    | 3 checkbox groups (Residential, Commercial, Walk-up). D class excluded by default.                                        |
+| Property Charges Balance       | ✅ Done 3/7    | `scjx-j6np` dataset. Outstanding tax bills (CHG), lien amounts (SAC), total balance. Validated against Daniel's test BBL. |
+| **Owner phone lookup**         | ✅ Done 3/7    | Tracerfy skip tracing — phone column, single + batch lookup, async polling                                                |
+| **Manhattan expansion**        | ❌ Not started | Same criteria as BK/QN                                                                                                    |
+| **Servicer info (MTAG/Tower)** | ❌ Not started | PDF tax bill parsing. MTAG/Tower sites are dead ends (no search).                                                         |
+| **Accurate valuations**        | ❌ Not started | Property Shark (login received) or ATTOM API                                                                              |
+| **Lis pendens ingestion**      | ❌ Not started | ACRIS integration needed                                                                                                  |
+| **Push alerts (SMS/email)**    | ❌ Not started | Time-sensitive advantage                                                                                                  |
+| **Property photos**            | ❌ Not started | Street View API                                                                                                           |
 
 ### Source Documents
 
-| Document | Location |
-|----------|----------|
-| Meeting notes (2/4, 2/12, 3/4) | [Google Drive](https://drive.google.com/drive/folders/1CzNH0jYqpdi4GtP5XPu1z_1dVAq8G0ty) |
-| Statement of Work | Google Drive (same folder) |
-| Broward County notes | Google Drive (same folder) |
-| Daniel's data feedback | `DG Comments.xlsx` in Google Drive + [email 3/4](https://mail.google.com/mail/u/0/#all/19cbb1ce331e71a2) |
-| Public Data Platform arch | [`docs/product/PUBLIC_DATA_PLATFORM.md`](PUBLIC_DATA_PLATFORM.md) |
-| Granola meeting transcripts | [2/4](https://notes.granola.ai/t/648f69bf-f9af-439c-9ff5-74ac5d8ff6fb), [2/12](https://notes.granola.ai/t/873b558a-84ce-4bd6-bd9f-5cb1fea9f91b), [3/4](https://notes.granola.ai/d/c7f8f518-3326-49ee-9ef0-ec825441e010) |
+| Document                       | Location                                                                                                                                                                                                                |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Meeting notes (2/4, 2/12, 3/4) | [Google Drive](https://drive.google.com/drive/folders/1CzNH0jYqpdi4GtP5XPu1z_1dVAq8G0ty)                                                                                                                                |
+| Statement of Work              | Google Drive (same folder)                                                                                                                                                                                              |
+| Broward County notes           | Google Drive (same folder)                                                                                                                                                                                              |
+| Daniel's data feedback         | `DG Comments.xlsx` in Google Drive + [email 3/4](https://mail.google.com/mail/u/0/#all/19cbb1ce331e71a2)                                                                                                                |
+| Public Data Platform arch      | [`docs/product/PUBLIC_DATA_PLATFORM.md`](PUBLIC_DATA_PLATFORM.md)                                                                                                                                                       |
+| Granola meeting transcripts    | [2/4](https://notes.granola.ai/t/648f69bf-f9af-439c-9ff5-74ac5d8ff6fb), [2/12](https://notes.granola.ai/t/873b558a-84ce-4bd6-bd9f-5cb1fea9f91b), [3/4](https://notes.granola.ai/d/c7f8f518-3326-49ee-9ef0-ec825441e010) |
 
 ---
 
@@ -62,18 +62,18 @@ Additionally, the dashboard is missing key data Daniel needs to act: **lien doll
 
 _Cold calling enablement is the primary driver. Scoring fix, building class filters, and financial data shipped 3/7._
 
-| Priority | Focus | Status | Deliverable |
-|----------|-------|--------|-------------|
-| ~~P0~~ | ~~Scoring fix~~ | **DONE 3/7** | Removed Class A/B, Class C cap increased to 30 |
-| ~~P0~~ | ~~Building class grouped filters~~ | **DONE 3/7** | 3 checkbox groups + D class excluded by default |
-| ~~P1~~ | ~~Tax lien dollar amounts~~ | **DONE 3/7** | Via `scjx-j6np` SAC charges (not DOF scraping) |
-| ~~P1~~ | ~~Outstanding tax bills~~ | **DONE 3/7** | Via `scjx-j6np` CHG charges. Validated: $8,530.35 |
-| **P1** | **Owner contact lookup (skip tracing)** | Not started | Phone numbers for cold calling. Brett is ready. Research batch providers. |
-| **P2** | **Manhattan expansion** | Not started | Add borough 1 with same criteria as BK/QN |
-| **P2** | **Servicer info (MTAG vs Tower)** | Not started | PDF tax bill parsing from `a836-edms.nyc.gov`. MTAG/Tower sites are dead ends. |
-| **P3** | **Property Shark integration** | Not started | Daniel sent login (dgabay@gmail.com). Research if API exists or web-only. |
-| **P3** | **Lis pendens alerts** | Not started | ACRIS integration + SMS/email push. Still high value. |
-| **P4** | **Property photos** | Not started | Street View API |
+| Priority | Focus                                   | Status       | Deliverable                                                                                  |
+| -------- | --------------------------------------- | ------------ | -------------------------------------------------------------------------------------------- |
+| ~~P0~~   | ~~Scoring fix~~                         | **DONE 3/7** | Removed Class A/B, Class C cap increased to 30                                               |
+| ~~P0~~   | ~~Building class grouped filters~~      | **DONE 3/7** | 3 checkbox groups + D class excluded by default                                              |
+| ~~P1~~   | ~~Tax lien dollar amounts~~             | **DONE 3/7** | Via `scjx-j6np` SAC charges (not DOF scraping)                                               |
+| ~~P1~~   | ~~Outstanding tax bills~~               | **DONE 3/7** | Via `scjx-j6np` CHG charges. Validated: $8,530.35                                            |
+| ~~P1~~   | ~~Owner contact lookup (skip tracing)~~ | **DONE 3/7** | Tracerfy ($0.02/record). Phone column, single + batch lookup, confirm dialog, async polling. |
+| **P2**   | **Manhattan expansion**                 | Not started  | Add borough 1 with same criteria as BK/QN                                                    |
+| **P2**   | **Servicer info (MTAG vs Tower)**       | Not started  | PDF tax bill parsing from `a836-edms.nyc.gov`. MTAG/Tower sites are dead ends.               |
+| **P3**   | **Property Shark integration**          | Not started  | Daniel sent login (dgabay@gmail.com). Research if API exists or web-only.                    |
+| **P3**   | **Lis pendens alerts**                  | Not started  | ACRIS integration + SMS/email push. Still high value.                                        |
+| **P4**   | **Property photos**                     | Not started  | Street View API                                                                              |
 
 ---
 
@@ -152,6 +152,7 @@ NYC sells tax liens on properties with outstanding tax, water, or sewer debt. Th
 4. **Individual investors participate indirectly** — The opportunity for investors like Daniel isn't buying the liens themselves (that's institutional). It's identifying distressed properties on the lien sale list that may be acquisition opportunities — properties where the owner can't pay taxes, might be willing to sell at a discount, or are heading toward foreclosure.
 
 **Eligibility thresholds (2025):**
+
 - Tax Class 1 (1-3 family): $3,000+ in water/sewer charges outstanding 1+ year
 - Tax Class 2 (multi-family, condos): $1,000+ outstanding 1+ year
 - Tax Class 4 (commercial): $1,000+ outstanding 1+ year
@@ -160,18 +161,19 @@ NYC sells tax liens on properties with outstanding tax, water, or sewer debt. Th
 
 **Recent timeline:**
 
-| Year | Event |
-|------|-------|
-| May 2020 | Lien sale postponed due to COVID |
-| 2020-2024 | Extended moratorium — no lien sales held |
-| July 2024 | Local Law 82 (Home Preservation & Debt Resolution Reform Act) signed |
-| Feb 2025 | 90-day notice list published (~30,000 liens) |
-| June 3, 2025 | 2025 lien sale held — first since COVID. 85% of the 30,000 liens removed before sale. |
-| Nov 2025 | City Council advances land bank legislation (4 bills) to replace private trust model |
-| Jan 2026 | Mayor Adams vetoes land bank bills |
-| Feb 2026 | The Real Deal reports on pending reform — land bank would create a NYC Land Trust to acquire liens, transfer distressed properties to partners for income-restricted housing |
+| Year         | Event                                                                                                                                                                        |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| May 2020     | Lien sale postponed due to COVID                                                                                                                                             |
+| 2020-2024    | Extended moratorium — no lien sales held                                                                                                                                     |
+| July 2024    | Local Law 82 (Home Preservation & Debt Resolution Reform Act) signed                                                                                                         |
+| Feb 2025     | 90-day notice list published (~30,000 liens)                                                                                                                                 |
+| June 3, 2025 | 2025 lien sale held — first since COVID. 85% of the 30,000 liens removed before sale.                                                                                        |
+| Nov 2025     | City Council advances land bank legislation (4 bills) to replace private trust model                                                                                         |
+| Jan 2026     | Mayor Adams vetoes land bank bills                                                                                                                                           |
+| Feb 2026     | The Real Deal reports on pending reform — land bank would create a NYC Land Trust to acquire liens, transfer distressed properties to partners for income-restricted housing |
 
 **2024 reform impacts (Local Law 82):**
+
 - Easy Exit Program: owner-occupied 1-3 unit homes can delay inclusion up to 1 year if income-qualified
 - Foreclosure protection: can't foreclose on owner-occupied 1-3 unit properties until lien value reaches 15% of property value OR $70K (whichever is less)
 - Enhanced notification requirements
@@ -205,6 +207,7 @@ Florida is both a tax lien AND tax deed state, with a different process than NYC
 4. **Tax Deed Sale** — If not redeemed after 2 years, the certificate holder can apply to force a public auction of the property (tax deed sale). The property sells to the highest bidder, and the certificate holder gets paid from the proceeds.
 
 **Broward County data access:**
+
 - SFTP server: `crpublic@BCFTP.Broward.org` — updated every weekday
 - Contains official records index data: document recordings (liens, deeds, mortgages, foreclosures)
 - Tells you: recording date/time, property, event type, ownership transfers, creditor claims, IRS involvement
@@ -218,17 +221,18 @@ Florida is both a tax lien AND tax deed state, with a different process than NYC
 
 NYC Housing Preservation & Development (HPD) issues violations in classes:
 
-| Class | Severity | Examples | Correction Window |
-|-------|----------|----------|-------------------|
-| **A** | Non-hazardous | Missing peephole, improper toilet seat | 90 days |
-| **B** | Hazardous | Broken smoke detector, damaged stairs | 30 days |
-| **C** | Immediately hazardous | No heat, rodents, lead paint, mold, no hot water | 24 hours |
+| Class | Severity              | Examples                                         | Correction Window |
+| ----- | --------------------- | ------------------------------------------------ | ----------------- |
+| **A** | Non-hazardous         | Missing peephole, improper toilet seat           | 90 days           |
+| **B** | Hazardous             | Broken smoke detector, damaged stairs            | 30 days           |
+| **C** | Immediately hazardous | No heat, rodents, lead paint, mold, no hot water | 24 hours          |
 
 **Why violations per unit matters:** A building with 50 violations and 200 units is probably fine. A building with 50 violations and 3 units is in severe distress. Daniel's key insight (from his spreadsheet comments) is that **violations per unit** is the real distress signal, not raw violation count.
 
 HPD uses open violations as a key input for identifying "distressed buildings" and enrolling them in the Alternative Enforcement Program (AEP). The platform should mirror this logic.
 
 **Data sources:**
+
 - **Open HPD Violations** (Socrata `csn4-vhvf`) — currently open violations, updated daily
 - **Housing Maintenance Code Violations** (Socrata `wvxf-dwi5`) — full history including resolved
 - **NYCDB** ([github.com/nycdb/nycdb](https://github.com/nycdb/nycdb)) — open-source aggregator of HPD violations, litigations, registrations, complaints, charges, repair/vacate orders, and AEP data
@@ -237,46 +241,47 @@ HPD uses open violations as a key input for identifying "distressed buildings" a
 
 NYC Department of Finance classifies every property. Key codes for tax lien analysis:
 
-| Code | Description | Relevance |
-|------|-------------|-----------|
-| **A0** | Cape Cod | Single family |
-| **A1** | Two stories, detached | Single family |
-| **A5** | Attached or semi-detached | Single family |
-| **A8** | Bungalow colony / coop | **EXCLUDE — Coop** |
-| **B1** | Two family, brick | Two family |
-| **B2** | Two family, frame (wood) | Two family — Daniel notes frame = less desirable |
-| **B3** | Two family, converted from one family | Two family |
-| **C0** | Three families | Walk-up apartment |
-| **C2** | Five-six family walk-up | Walk-up apartment |
-| **C5** | Converted dwelling or rooming house | Walk-up apartment |
-| **C6** | Walk-up cooperative | **EXCLUDE — Coop** |
-| **D4** | Elevator cooperative | **EXCLUDE — Coop** |
-| **H7** | Hotel (coop) | **EXCLUDE — Coop** |
-| **K4** | Store building (1 story, commercial) | Commercial |
-| **S1** | Primarily 1 family with store | Mixed use |
-| **S2** | Primarily 2 family with store | Mixed use |
-| **V1** | Vacant land (zoned residential) | Vacant lot |
-| **Z7** | Vacant land (zoned commercial) | Vacant lot |
+| Code   | Description                           | Relevance                                        |
+| ------ | ------------------------------------- | ------------------------------------------------ |
+| **A0** | Cape Cod                              | Single family                                    |
+| **A1** | Two stories, detached                 | Single family                                    |
+| **A5** | Attached or semi-detached             | Single family                                    |
+| **A8** | Bungalow colony / coop                | **EXCLUDE — Coop**                               |
+| **B1** | Two family, brick                     | Two family                                       |
+| **B2** | Two family, frame (wood)              | Two family — Daniel notes frame = less desirable |
+| **B3** | Two family, converted from one family | Two family                                       |
+| **C0** | Three families                        | Walk-up apartment                                |
+| **C2** | Five-six family walk-up               | Walk-up apartment                                |
+| **C5** | Converted dwelling or rooming house   | Walk-up apartment                                |
+| **C6** | Walk-up cooperative                   | **EXCLUDE — Coop**                               |
+| **D4** | Elevator cooperative                  | **EXCLUDE — Coop**                               |
+| **H7** | Hotel (coop)                          | **EXCLUDE — Coop**                               |
+| **K4** | Store building (1 story, commercial)  | Commercial                                       |
+| **S1** | Primarily 1 family with store         | Mixed use                                        |
+| **S2** | Primarily 2 family with store         | Mixed use                                        |
+| **V1** | Vacant land (zoned residential)       | Vacant lot                                       |
+| **Z7** | Vacant land (zoned commercial)        | Vacant lot                                       |
 
 **Official reference:** [NYC DOF Building Classification Codes](https://www.nyc.gov/assets/finance/jump/hlpbldgcode.html)
 
 **Complete coop building class codes (all should be excludable):**
 
-| Code | Description |
-|------|-------------|
-| A8 | Bungalow colony, cooperatively owned land |
-| C6 | Walk-up cooperative |
-| C8 | Walk-up co-op, conversion from loft/warehouse |
-| CC | Walk-up co-op apt, less than 11 units |
-| D0 | Elevator co-op, conversion from loft/warehouse |
-| D4 | Elevator cooperative |
-| DC | Elevator co-op apt, less than 11 units |
-| H7 | Apartment hotel, cooperatively owned |
-| R9 | Co-op within a condominium |
+| Code | Description                                    |
+| ---- | ---------------------------------------------- |
+| A8   | Bungalow colony, cooperatively owned land      |
+| C6   | Walk-up cooperative                            |
+| C8   | Walk-up co-op, conversion from loft/warehouse  |
+| CC   | Walk-up co-op apt, less than 11 units          |
+| D0   | Elevator co-op, conversion from loft/warehouse |
+| D4   | Elevator cooperative                           |
+| DC   | Elevator co-op apt, less than 11 units         |
+| H7   | Apartment hotel, cooperatively owned           |
+| R9   | Co-op within a condominium                     |
 
 Daniel's initial filter (A8, C6, D4, H7) covers the main ones, but the platform should exclude all 9 codes.
 
 **Daniel's filtering rules:**
+
 - Always exclude coops (all codes above)
 - Flag frame houses (B2 with frame construction) — less desirable than brick
 - Flag vacant lots (V-class, Z-class) — different investment thesis
@@ -286,38 +291,41 @@ Daniel's initial filter (A8, C6, D4, H7) covers the main ones, but the platform 
 
 NYC assessed values are NOT market values. The assessment ratios are:
 
-| Tax Class | Description | Assessment Ratio | Cap |
-|-----------|-------------|-----------------|-----|
-| 1 | 1-3 family residential | 6% of market value | 6%/year, 20%/5yr |
-| 2 | Multi-family, condos, coops | 45% of market value | 8%/year, 30%/5yr (10 units or fewer) |
-| 3 | Utility properties | 45% | N/A |
-| 4 | Commercial/industrial | 45% | Phase-in over 5 years |
+| Tax Class | Description                 | Assessment Ratio    | Cap                                  |
+| --------- | --------------------------- | ------------------- | ------------------------------------ |
+| 1         | 1-3 family residential      | 6% of market value  | 6%/year, 20%/5yr                     |
+| 2         | Multi-family, condos, coops | 45% of market value | 8%/year, 30%/5yr (10 units or fewer) |
+| 3         | Utility properties          | 45%                 | N/A                                  |
+| 4         | Commercial/industrial       | 45%                 | Phase-in over 5 years                |
 
 **To estimate market value from assessed value:**
+
 - Class 1: Assessed Value / 0.06 = rough market value
 - Class 2/3/4: Assessed Value / 0.45 = rough market value
 
 This is a rough approximation. For real comps, we need:
 
-| Source | What It Provides | Cost | Notes |
-|--------|-----------------|------|-------|
-| **Property Shark** | Comps, lis pendens, owner data, foreclosures | ~$500/month | Daniel has a login (2 simultaneous users). Best for NYC. |
-| **ATTOM API** | Nationwide AVM, tax, deed, foreclosure data | ~$500+/month | 158M+ properties, 9,000 attributes per property. AVM includes confidence score. |
-| **NYC PLUTO** | Assessed values, building characteristics | Free (Socrata) | 90+ fields per lot but no market comps |
-| **NYC Property Valuation dataset** | Assessed/market values, exemptions | Free (Socrata `8y4t-faws`) | Annual DOF valuations |
-| **ACRIS** | Deed transfers with sale prices | Free (Socrata) | Historical transactions — build your own comps |
+| Source                             | What It Provides                             | Cost                       | Notes                                                                           |
+| ---------------------------------- | -------------------------------------------- | -------------------------- | ------------------------------------------------------------------------------- |
+| **Property Shark**                 | Comps, lis pendens, owner data, foreclosures | ~$500/month                | Daniel has a login (2 simultaneous users). Best for NYC.                        |
+| **ATTOM API**                      | Nationwide AVM, tax, deed, foreclosure data  | ~$500+/month               | 158M+ properties, 9,000 attributes per property. AVM includes confidence score. |
+| **NYC PLUTO**                      | Assessed values, building characteristics    | Free (Socrata)             | 90+ fields per lot but no market comps                                          |
+| **NYC Property Valuation dataset** | Assessed/market values, exemptions           | Free (Socrata `8y4t-faws`) | Annual DOF valuations                                                           |
+| **ACRIS**                          | Deed transfers with sale prices              | Free (Socrata)             | Historical transactions — build your own comps                                  |
 
 ### Lis Pendens (Pre-Foreclosure Alerts)
 
 A lis pendens is a legal filing that signals the beginning of foreclosure proceedings. It's recorded at the county level (ACRIS in NYC) when a lender files a foreclosure action.
 
 **Why this matters for Daniel:**
+
 - A lis pendens is the earliest public signal that a property owner is in financial distress
 - There's a 5-minute competitive advantage in being the first to contact the owner
 - Daniel currently subscribes to PropertyShark for lis pendens alerts — gets notifications within 24-48 hours of filing
 - He wants **same-day alerts via text/email** with: owner name + phone, property type + photo, lien amount
 
 **Data sources in NYC:**
+
 - **ACRIS** (primary): Real Property Master (Socrata `bnx9-e6tj`) — document type codes for lis pendens include `LP` and related filings. Cross-reference with Real Property Legals (`8h5j-fqxa`) for BBL linkage and Real Property Parties (`636b-3b5g`) for owner names. Bulk download available via [github.com/fitnr/acris-download](https://github.com/fitnr/acris-download) (requires 10GB+ disk space).
 - **PropertyShark**: Pre-foreclosure listings updated within 24-48 hours of filing, includes lien amount, owner name/address, title history
 - **CourtAlert**: Real-time lis pendens filing alert service for investors/attorneys
@@ -325,12 +333,12 @@ A lis pendens is a legal filing that signals the beginning of foreclosure procee
 
 **NYC foreclosure timeline:** New York is a judicial foreclosure state — all foreclosures must go through court.
 
-| Scenario | Timeline |
-|----------|----------|
-| Uncontested (owner doesn't respond) | ~6 months minimum |
-| Typical contested foreclosure | 12-18 months |
+| Scenario                                  | Timeline              |
+| ----------------------------------------- | --------------------- |
+| Uncontested (owner doesn't respond)       | ~6 months minimum     |
+| Typical contested foreclosure             | 12-18 months          |
 | Average from first missed payment to sale | ~445 days (15 months) |
-| Complex cases with multiple defenses | 2-4+ years |
+| Complex cases with multiple defenses      | 2-4+ years            |
 
 This extended window (often 12-18+ months) creates opportunity for direct outreach — owners may sell at 20-40% below market to avoid the credit impact of foreclosure.
 
@@ -338,14 +346,14 @@ This extended window (often 12-18+ months) creates opportunity for direct outrea
 
 ## Competitive Landscape
 
-| Platform | Focus | Strengths | Gaps We Fill |
-|----------|-------|-----------|-------------|
-| **PropertyShark** | NYC property intelligence | Best NYC data, lis pendens, comps, 100% NYC coverage | Manual lookups only, no AI scoring, no aggregated lien analysis, expensive (~$500/mo) |
-| **Reonomy** (Altus Group) | CRE property intelligence | 50M+ commercial properties, LLC piercing, predictive scoring | Enterprise pricing, not focused on tax lien investing workflow |
-| **Tax Sale Resources** | Tax lien/deed auction research | Nationwide sale data, portfolio management, nationwide coverage | No property intelligence overlay, no AI, no violations/distress data |
-| **FastLien** | Tax lien sale list research | Clean UI for sale lists, county-by-county access | Limited data enrichment, no scoring, no alerts |
-| **GoliathData** | Real estate prospecting | AI-powered, property data with prospecting tools | General-purpose, not specialized for tax lien/distress analysis |
-| **ATTOM API** | Raw property data API | 158M properties, AVM, tax, deed data | Raw data only — no UI, no scoring, no workflow, requires engineering |
+| Platform                  | Focus                          | Strengths                                                       | Gaps We Fill                                                                          |
+| ------------------------- | ------------------------------ | --------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| **PropertyShark**         | NYC property intelligence      | Best NYC data, lis pendens, comps, 100% NYC coverage            | Manual lookups only, no AI scoring, no aggregated lien analysis, expensive (~$500/mo) |
+| **Reonomy** (Altus Group) | CRE property intelligence      | 50M+ commercial properties, LLC piercing, predictive scoring    | Enterprise pricing, not focused on tax lien investing workflow                        |
+| **Tax Sale Resources**    | Tax lien/deed auction research | Nationwide sale data, portfolio management, nationwide coverage | No property intelligence overlay, no AI, no violations/distress data                  |
+| **FastLien**              | Tax lien sale list research    | Clean UI for sale lists, county-by-county access                | Limited data enrichment, no scoring, no alerts                                        |
+| **GoliathData**           | Real estate prospecting        | AI-powered, property data with prospecting tools                | General-purpose, not specialized for tax lien/distress analysis                       |
+| **ATTOM API**             | Raw property data API          | 158M properties, AVM, tax, deed data                            | Raw data only — no UI, no scoring, no workflow, requires engineering                  |
 
 ### Where We Win
 
@@ -364,6 +372,7 @@ This extended window (often 12-18+ months) creates opportunity for direct outrea
 Based on SoW deliverables, meeting notes, and Daniel's spreadsheet feedback:
 
 #### Data Aggregation
+
 - [x] Ingest NYC Tax Lien Sale Lists (Socrata `9rz4-mjek`) — latest cycle only
 - [ ] Ingest Property Charges Balance — outstanding balances (Socrata `scjx-j6np`)
 - [x] Ingest PLUTO property data (Socrata `64uk-42ks`) — building class, units, sqft, lot size, zoning, year built
@@ -372,6 +381,7 @@ Based on SoW deliverables, meeting notes, and Daniel's spreadsheet feedback:
 - [x] Join datasets by BBL (borough-block-lot) key
 
 #### Building Intelligence
+
 - [x] Show building class with full description
 - [x] Auto-exclude coops (all 9 codes: A8, C6, C8, CC, D0, D4, DC, H7, R9) — filterable toggle
 - [ ] **Grouped building class filter** — 3 checkbox categories: (A,B,C), (E-Z), (C1-C7). Exclude all D class entirely. _3/4 feedback._
@@ -384,6 +394,7 @@ Based on SoW deliverables, meeting notes, and Daniel's spreadsheet feedback:
 - [x] Show number of units from PLUTO
 
 #### Scoring System
+
 - [x] Composite distress score (0-100) weighing:
   - Active lien (+30 points)
   - Violations per unit (+10 per viol/unit, capped at 40)
@@ -393,6 +404,7 @@ Based on SoW deliverables, meeting notes, and Daniel's spreadsheet feedback:
 - [ ] Score explanation for each property (why this score?)
 
 #### Interface
+
 - [x] Secure web app with login (Clerk auth + org-level `parcels` feature flag)
 - [x] Sortable/filterable data table with all fields
 - [x] Agent tools for natural language queries (`query_parcels`, `get_parcel_stats`)
@@ -400,6 +412,7 @@ Based on SoW deliverables, meeting notes, and Daniel's spreadsheet feedback:
 - [x] Expandable row detail view with all aggregated data
 
 #### Data Maintenance
+
 - [ ] Automated data refresh (at minimum weekly, ideally daily for violations)
 - [x] Last-updated timestamps per data source (`plutoSyncedAt`, `liensSyncedAt`, `violationsSyncedAt`)
 
@@ -415,15 +428,15 @@ _Reprioritized from lis pendens. Brett is ready to cold call — he needs lien a
 
 #### Research Findings: Data Source Feasibility (3/7/2026)
 
-| Source | Feasibility | What It Gives Us | What It Doesn't |
-|--------|-------------|------------------|-----------------|
-| **`scjx-j6np` Property Charges Balance (Socrata)** | **HIGH — primary source** | Outstanding tax bills (CHG), lien charge amounts (SAC), total balance owed. Free SODA API, batch queryable, validated against Daniel's example. | Servicer identity (MTAG vs Tower), lien sold/redeemed status. |
-| **PDF tax bills (`a836-edms.nyc.gov`)** | **HIGH — proven at scale** | Full financial picture including lien amounts, servicer, sold status. Deterministic URL: `StatementSearch?bbl={BBL}&stmtDate={YYYYMMDD}&stmtType=SOA`. No auth. Chris Whong downloaded 1.1M+ bills. | Requires PDF parsing (pdftotext + regex). ~50 min for 3K properties at 1/sec. |
-| **DOF web portal (`a836-pts-access.nyc.gov`)** | **LOW — avoid** | Account history with lien details. | ASP.NET WebForms, session-based, was down during research. Fragile. |
-| **MTAG / Station 31 Partners** | **DEAD END** | Nothing programmatic. | Search feature removed. Phone-only (800-750-9210). |
-| **Tower Capital (`tcmfc.com`)** | **DEAD END** | Nothing programmatic. | No search. References defunct `nycserv.nyc.gov` portal (returns 403). Phone-only (800-970-8454). |
-| **NYCTL quarterly status reports (Excel)** | **WORTH INVESTIGATING** | Downloadable .xlsx from DOF lien sales archive. May contain per-BBL lien amounts + servicer assignments. | Haven't inspected actual file contents yet. |
-| **DOF SOAP/REST APIs** | **NONE FOUND** | N/A | No public APIs beyond Socrata. Internal SOAP services exist but not exposed. |
+| Source                                             | Feasibility                | What It Gives Us                                                                                                                                                                                    | What It Doesn't                                                                                  |
+| -------------------------------------------------- | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| **`scjx-j6np` Property Charges Balance (Socrata)** | **HIGH — primary source**  | Outstanding tax bills (CHG), lien charge amounts (SAC), total balance owed. Free SODA API, batch queryable, validated against Daniel's example.                                                     | Servicer identity (MTAG vs Tower), lien sold/redeemed status.                                    |
+| **PDF tax bills (`a836-edms.nyc.gov`)**            | **HIGH — proven at scale** | Full financial picture including lien amounts, servicer, sold status. Deterministic URL: `StatementSearch?bbl={BBL}&stmtDate={YYYYMMDD}&stmtType=SOA`. No auth. Chris Whong downloaded 1.1M+ bills. | Requires PDF parsing (pdftotext + regex). ~50 min for 3K properties at 1/sec.                    |
+| **DOF web portal (`a836-pts-access.nyc.gov`)**     | **LOW — avoid**            | Account history with lien details.                                                                                                                                                                  | ASP.NET WebForms, session-based, was down during research. Fragile.                              |
+| **MTAG / Station 31 Partners**                     | **DEAD END**               | Nothing programmatic.                                                                                                                                                                               | Search feature removed. Phone-only (800-750-9210).                                               |
+| **Tower Capital (`tcmfc.com`)**                    | **DEAD END**               | Nothing programmatic.                                                                                                                                                                               | No search. References defunct `nycserv.nyc.gov` portal (returns 403). Phone-only (800-970-8454). |
+| **NYCTL quarterly status reports (Excel)**         | **WORTH INVESTIGATING**    | Downloadable .xlsx from DOF lien sales archive. May contain per-BBL lien amounts + servicer assignments.                                                                                            | Haven't inspected actual file contents yet.                                                      |
+| **DOF SOAP/REST APIs**                             | **NONE FOUND**             | N/A                                                                                                                                                                                                 | No public APIs beyond Socrata. Internal SOAP services exist but not exposed.                     |
 
 **Recommended approach:** Socrata `scjx-j6np` for outstanding balances (covers ~80% of value), then PDF tax bills for servicer info if needed later.
 
@@ -459,15 +472,15 @@ _Still high value but deprioritized behind cold calling data needs._
 
 This platform should be built within the Analyzer monorepo, leveraging existing infrastructure:
 
-| Existing | Reuse For Tax Lien Platform |
-|----------|---------------------------|
-| NestJS API (`apps/api`) | Add data ingestion endpoints, property query APIs, alert scheduling |
-| Next.js frontend (`apps/web`) | Property table, chat interface, detail views |
-| Prisma + PostgreSQL (Supabase) | Property data schema, raw ingestion tables |
-| OpenAI integration | Scoring engine, chat interface, natural language queries |
-| Clerk auth | User access control (Daniel's 3-person team) |
-| SQS pipeline | Async data ingestion jobs |
-| S3 | Cache downloaded datasets, store exported CSVs |
+| Existing                       | Reuse For Tax Lien Platform                                         |
+| ------------------------------ | ------------------------------------------------------------------- |
+| NestJS API (`apps/api`)        | Add data ingestion endpoints, property query APIs, alert scheduling |
+| Next.js frontend (`apps/web`)  | Property table, chat interface, detail views                        |
+| Prisma + PostgreSQL (Supabase) | Property data schema, raw ingestion tables                          |
+| OpenAI integration             | Scoring engine, chat interface, natural language queries            |
+| Clerk auth                     | User access control (Daniel's 3-person team)                        |
+| SQS pipeline                   | Async data ingestion jobs                                           |
+| S3                             | Cache downloaded datasets, store exported CSVs                      |
 
 ### Key Data Pipeline
 
@@ -517,6 +530,7 @@ NYC Open Data (SODA API)
 ### BBL (Borough-Block-Lot) as Primary Key
 
 All NYC property data joins on BBL — a 10-digit identifier:
+
 - Borough (1 digit): 1=Manhattan, 2=Bronx, 3=Brooklyn, 4=Queens, 5=Staten Island
 - Block (5 digits, zero-padded)
 - Lot (4 digits, zero-padded)
@@ -537,26 +551,47 @@ HPD violations are not fetched borough-wide (that would pull 5M+ records). Inste
 
 Full list of `PublicDataController` endpoints at `/public-data/*`:
 
-| Method | Path | Description |
-|--------|------|-------------|
-| `POST` | `/public-data/ingest` | Trigger ingestion (optional `boroughs`, `sources` in body) |
-| `GET` | `/public-data/parcels` | Query parcels with filters, sorting, pagination |
-| `GET` | `/public-data/parcels/export` | CSV export (same filters as query) |
-| `GET` | `/public-data/parcels/:bbl` | Single parcel detail by 10-digit BBL |
-| `GET` | `/public-data/stats` | Aggregate statistics (totals, borough breakdown, avg score) |
+| Method | Path                                   | Description                                                      |
+| ------ | -------------------------------------- | ---------------------------------------------------------------- |
+| `POST` | `/public-data/ingest`                  | Trigger ingestion (optional `boroughs`, `sources` in body)       |
+| `GET`  | `/public-data/parcels`                 | Query parcels with filters, sorting, pagination                  |
+| `GET`  | `/public-data/parcels/export`          | CSV export (same filters as query)                               |
+| `GET`  | `/public-data/parcels/:bbl`            | Single parcel detail by 10-digit BBL                             |
+| `GET`  | `/public-data/stats`                   | Aggregate statistics (totals, borough breakdown, avg score)      |
+| `POST` | `/public-data/parcels/skip-trace`      | Batch skip trace: `{ bbls: string[], force?: boolean }` → queued |
+| `POST` | `/public-data/parcels/:bbl/skip-trace` | Single parcel skip trace shortcut                                |
 
 All endpoints require Clerk auth + `parcels` feature flag (returns 403 if flag is off).
+
+### Skip Tracing (Owner Contact Lookup)
+
+Provider: **Tracerfy** (`tracerfy.com/v1/api`) — pay-as-you-go, $0.02/record.
+
+**Async flow:**
+
+1. `POST /trace/` → returns `queue_id` immediately
+2. Server polls `GET /queue/:id` every 15s for up to 5 minutes
+3. Results written to `Parcel.ownerPhones` (JSON array) + `Parcel.ownerEmails` (string[]) on completion
+
+**Cost controls:**
+
+- Max 500 BBLs per request (hard 400 error)
+- `TRACERFY_MONTHLY_CREDIT_CAP` env var (default 500 = $10/mo)
+- Idempotency: skips parcels traced in last 30 days with `status=found` unless `force=true`
+- Never auto-triggered — user-initiated only
+
+**UI:** Phone column in parcel table (tel: link for primary number), single lookup button in expanded row, batch lookup with confirm dialog showing estimated cost.
 
 ---
 
 ## Commercial Terms (from SoW)
 
-| Milestone | Description | Hours | Payment |
-|-----------|-------------|-------|---------|
-| Kickoff | Project initiation, API access setup, data pipeline architecture | 10 | $1,500 |
-| Data Validated | Tax lien, violations, property, valuation data aggregated/cleaned/validated | 20 | $1,500 |
-| Platform Live | Secure web app with AI query interface, scoring, full onboarding | 30 | $2,000 |
-| **Total** | | **60** | **$5,000** |
+| Milestone      | Description                                                                 | Hours  | Payment    |
+| -------------- | --------------------------------------------------------------------------- | ------ | ---------- |
+| Kickoff        | Project initiation, API access setup, data pipeline architecture            | 10     | $1,500     |
+| Data Validated | Tax lien, violations, property, valuation data aggregated/cleaned/validated | 20     | $1,500     |
+| Platform Live  | Secure web app with AI query interface, scoring, full onboarding            | 30     | $2,000     |
+| **Total**      |                                                                             | **60** | **$5,000** |
 
 **Ongoing:** $500/month for hosting, data maintenance, AI query functionality
 **Equity:** 0.5% gross ownership equity in any property purchased through platform data
@@ -588,16 +623,16 @@ All endpoints require Clerk auth + `parcels` feature flag (returns 403 if flag i
 
 All freely accessible datasets for the MVP:
 
-| Dataset | Socrata ID | Update Frequency | Key Fields |
-|---------|-----------|------------------|------------|
-| Tax Lien Sale Lists | `9rz4-mjek` | Annual (when sale occurs) | borough, block, lot, tax_class_code, building_class, zip_code |
-| Property Charges Balance | `scjx-j6np` | Varies | parid (BBL), sum_liab, sum_coll, sum_bal, due_date, taxyear |
-| PLUTO | `64uk-42ks` | Annual | ZoneDist, BldgClass, NumFloors, UnitsTotal, LotArea, BldgArea, AssessTot, YearBuilt, OwnerName |
-| Open HPD Violations | `csn4-vhvf` | Daily | BoroID, Block, Lot, Class, InspectionDate, ApprovedDate, CurrentStatus |
-| HPD Violations (full history) | `wvxf-dwi5` | Daily | Full violation history including resolved |
-| Property Valuation & Assessment | `8y4t-faws` | Annual | Assessed/market values, exemptions |
-| ACRIS Real Property Master | `bnx9-e6tj` | Daily | Document recordings: deeds, liens, lis pendens |
-| ACRIS Real Property Legals | `8h5j-fqxa` | Daily | BBL linkage for each ACRIS document |
-| ACRIS Real Property Parties | `636b-3b5g` | Daily | Grantor/grantee names |
-| ACRIS Document Control Codes | `7isb-wh4c` | Static | Decode document type codes (29 lien-related types) |
-| DOF Building Classification Codes | `nzvw-cjc2` | Static | Building class code → description mapping |
+| Dataset                           | Socrata ID  | Update Frequency          | Key Fields                                                                                     |
+| --------------------------------- | ----------- | ------------------------- | ---------------------------------------------------------------------------------------------- |
+| Tax Lien Sale Lists               | `9rz4-mjek` | Annual (when sale occurs) | borough, block, lot, tax_class_code, building_class, zip_code                                  |
+| Property Charges Balance          | `scjx-j6np` | Varies                    | parid (BBL), sum_liab, sum_coll, sum_bal, due_date, taxyear                                    |
+| PLUTO                             | `64uk-42ks` | Annual                    | ZoneDist, BldgClass, NumFloors, UnitsTotal, LotArea, BldgArea, AssessTot, YearBuilt, OwnerName |
+| Open HPD Violations               | `csn4-vhvf` | Daily                     | BoroID, Block, Lot, Class, InspectionDate, ApprovedDate, CurrentStatus                         |
+| HPD Violations (full history)     | `wvxf-dwi5` | Daily                     | Full violation history including resolved                                                      |
+| Property Valuation & Assessment   | `8y4t-faws` | Annual                    | Assessed/market values, exemptions                                                             |
+| ACRIS Real Property Master        | `bnx9-e6tj` | Daily                     | Document recordings: deeds, liens, lis pendens                                                 |
+| ACRIS Real Property Legals        | `8h5j-fqxa` | Daily                     | BBL linkage for each ACRIS document                                                            |
+| ACRIS Real Property Parties       | `636b-3b5g` | Daily                     | Grantor/grantee names                                                                          |
+| ACRIS Document Control Codes      | `7isb-wh4c` | Static                    | Decode document type codes (29 lien-related types)                                             |
+| DOF Building Classification Codes | `nzvw-cjc2` | Static                    | Building class code → description mapping                                                      |
