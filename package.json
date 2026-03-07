@@ -4,7 +4,15 @@
   "main": "index.js",
   "scripts": {
     "dev": "pnpm --filter @analyzer/api dev & pnpm --filter @analyzer/web dev",
-    "build": "pnpm --filter @analyzer/api build && pnpm --filter @analyzer/web build"
+    "build": "pnpm --filter @analyzer/api build && pnpm --filter @analyzer/web build",
+    "prepare": "lefthook install"
   },
-  "packageManager": "pnpm@10.25.0"
+  "packageManager": "pnpm@10.25.0",
+  "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
+    "lefthook": "^1.13.6",
+    "lint-staged": "^16.3.2",
+    "prettier": "^3.7.4"
+  }
 }

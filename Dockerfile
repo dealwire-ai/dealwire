@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install -y \
     poppler-utils \
     binutils \
     openssl \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Enable corepack for pnpm
@@ -34,6 +35,10 @@ RUN pnpm --filter @analyzer/api run build
 
 # Expose port
 EXPOSE 8080
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+  CMD sh -c 'curl -sf http://localhost:${PORT:-3001}/health || exit 1'
 
 # Start the application (runs prisma migrate deploy, then starts the server)
 CMD cd apps/api && pnpm start

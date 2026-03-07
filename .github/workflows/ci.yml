@@ -14,7 +14,7 @@ jobs:
   test:
     name: Run Tests
     runs-on: ubuntu-latest
-    
+
     defaults:
       run:
         working-directory: apps/api
@@ -31,8 +31,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'pnpm'
+          node-version: "20"
+          cache: "pnpm"
           cache-dependency-path: pnpm-lock.yaml
 
       - name: Install dependencies
@@ -53,12 +53,8 @@ jobs:
           CLERK_WEBHOOK_SECRET: ${{ secrets.CLERK_WEBHOOK_SECRET || 'dummy-webhook-secret' }}
 
   lint:
-    name: Lint
+    name: Lint & Typecheck
     runs-on: ubuntu-latest
-    
-    defaults:
-      run:
-        working-directory: apps/api
 
     steps:
       - name: Checkout code
@@ -72,8 +68,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'pnpm'
+          node-version: "20"
+          cache: "pnpm"
           cache-dependency-path: pnpm-lock.yaml
 
       - name: Install dependencies
@@ -84,9 +80,14 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://dummy:dummy@localhost:5432/dummy' }}
 
-      - name: Run linter
-        run: pnpm --filter @analyzer/api lint || true
-        continue-on-error: true
+      - name: Lint API
+        run: pnpm --filter @analyzer/api lint
+
+      - name: Lint Web
+        run: pnpm --filter @analyzer/web lint
+
+      - name: Typecheck API
+        run: pnpm --filter @analyzer/api exec tsc --noEmit
 
   secrets:
     name: Secret Scan
