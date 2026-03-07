@@ -73,7 +73,13 @@ _The data Analyzer produces must be best-in-class. This is the foundation everyt
 _Deep data is the moat. An analyst is only as good as their data access._
 
 - [x] **Tax lien platform (Phase 1)** — NYC public data ingestion from 3 sources (tax lien sale list, PLUTO property records, HPD violations). SODA adapter for Socrata API, lien-first ingestion (start from lien list, enrich with PLUTO + HPD), distress scoring (0-100), filterable parcel table UI at `/public-data/parcels` with CSV export, and agent tools (`query_parcels`, `get_parcel_stats`). See [`docs/product/TAX_LIEN_PLATFORM.md`](TAX_LIEN_PLATFORM.md).
-- [ ] **Tax lien platform (Phase 2 — cold calling enablement)** — Lien dollar amounts from NYC DOF, outstanding tax bills, owner contact lookup (skip tracing), scoring update (Class C violations only), grouped building class filters, Manhattan expansion. _3/4 meeting reprioritized this ahead of lis pendens — Brett is ready to cold call._ See [`docs/product/TAX_LIEN_PLATFORM.md`](TAX_LIEN_PLATFORM.md).
+- [~] **Tax lien platform (Phase 2 — cold calling enablement)** — _3/4 meeting reprioritized this ahead of lis pendens — Brett is ready to cold call._ See [`docs/product/TAX_LIEN_PLATFORM.md`](TAX_LIEN_PLATFORM.md).
+  - [x] Scoring update: Class C violations only (removed Class A/B from score, increased Class C cap to 30)
+  - [x] Grouped building class filters: 3 checkbox groups (Residential, Commercial, Walk-up). D class excluded by default.
+  - [x] Outstanding tax bills + lien charge amounts: Ingested from DOF Property Charges Balance (`scjx-j6np`). Validated against Daniel's test case.
+  - [ ] Owner contact lookup (skip tracing) — phone numbers for cold calling. Brett waiting on this.
+  - [ ] Manhattan expansion — add borough 1 with same criteria
+  - [ ] Servicer info (MTAG vs Tower) — requires PDF tax bill parsing, deferred
 - [ ] **Public data ingestion platform** — Adapter-based system for pulling tax liens, zoning, permits, assessments, and deed data from municipal/county sources. Starts with NYC (Socrata SODA API + ArcGIS), designed to expand city-by-city via configuration. See [`docs/product/PUBLIC_DATA_PLATFORM.md`](PUBLIC_DATA_PLATFORM.md) for full architecture.
 - [ ] **Property data enrichment** — Pull from public records, assessor databases, census/demographic data to auto-fill details the email didn't include (year built, lot size, zoning, ownership history, tax assessments).
 - [ ] **Market context** — Auto-attach market comps, submarket stats, rent trends to deal summaries. "This is priced 15% above recent comps in the submarket."
