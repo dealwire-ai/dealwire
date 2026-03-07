@@ -1,4 +1,5 @@
 import { LoggerService, LogLevel } from '@nestjs/common';
+import { correlationStorage } from './correlation-context';
 
 // ANSI color codes
 const colors = {
@@ -60,12 +61,19 @@ export class JsonLogger implements LoggerService {
     }
   }
 
-  private write(level: LogLevel, message: any, context?: string, extra?: Record<string, any>) {
+  private write(
+    level: LogLevel,
+    message: any,
+    context?: string,
+    extra?: Record<string, any>,
+  ) {
+    const store = correlationStorage.getStore();
     const logEntry = {
       timestamp: new Date().toISOString(),
       level,
       context: context || 'Application',
       message: typeof message === 'string' ? message : JSON.stringify(message),
+      ...(store?.correlationId ? { correlationId: store.correlationId } : {}),
       ...extra,
     };
 
@@ -78,9 +86,9 @@ export class JsonLogger implements LoggerService {
     // Colorize the output: [LEVEL] timestamp [Context] message
     console.log(
       `${color}${colors.bright}[${levelUpper}]${colors.reset} ` +
-      `${colors.dim}${logEntry.timestamp}${colors.reset} ` +
-      `${colors.cyan}[${logEntry.context}]${colors.reset} ` +
-      `${logEntry.message}${extra?.trace ? `\n${colors.red}${extra.trace}${colors.reset}` : ''}`,
+        `${colors.dim}${logEntry.timestamp}${colors.reset} ` +
+        `${colors.cyan}[${logEntry.context}]${colors.reset} ` +
+        `${logEntry.message}${extra?.trace ? `\n${colors.red}${extra.trace}${colors.reset}` : ''}`,
     );
   }
 }

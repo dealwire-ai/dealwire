@@ -41,11 +41,15 @@ export function AssetsTable({
   if (assets.length === 0) {
     return (
       <div className="text-center py-12 text-zinc-400">
-        <p>{hasActiveFilters ? "No properties match your search." : "No properties found."}</p>
+        <p>
+          {hasActiveFilters
+            ? "No properties match your search."
+            : "No properties found."}
+        </p>
         {hasActiveFilters && onClearFilters && (
           <button
             onClick={onClearFilters}
-            className="mt-2 text-sm text-[#3ECFA0] hover:underline"
+            className="mt-2 text-sm text-[#C8A96E] hover:underline"
           >
             Clear filters
           </button>
@@ -88,9 +92,7 @@ export function AssetsTable({
                 <TableCell>{asset.city || "-"}</TableCell>
                 <TableCell>{asset.state || "-"}</TableCell>
                 <TableCell>{asset.country || "-"}</TableCell>
-                <TableCell>
-                  {formatRelativeDate(asset.createdAt)}
-                </TableCell>
+                <TableCell>{formatRelativeDate(asset.createdAt)}</TableCell>
               </TableRow>
               {isExpanded && (
                 <TableRow>
@@ -98,7 +100,7 @@ export function AssetsTable({
                     colSpan={6}
                     className="bg-zinc-950/50 p-0 transition-all duration-200"
                   >
-                    <div className="border-l-2 border-[#3ECFA0] pl-4 py-4 pr-4">
+                    <div className="border-l-2 border-[#C8A96E] pl-4 py-4 pr-4">
                       <div className="grid grid-cols-2 gap-4 text-sm">
                         <div>
                           <div className="text-zinc-400 mb-2 font-medium">
