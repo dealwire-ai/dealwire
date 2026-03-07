@@ -15,8 +15,8 @@ Sum of `CHG` (property tax charge) rows where `sum_bal > 0` on the latest extrac
 
 **Validated:** BBL 3004050058 (213 Butler St) returns $8,530.35 — matches Daniel's stated ~$8,530.
 
-### 2. Lien-related charge amounts per property
-Sum of `SAC` (special assessment charge) rows where `sum_bal > 0`. These are the actual tax lien sale amounts and related charges (water/sewer liens, ECB violations transferred to DOF).
+### 2. ~~Lien-related charge amounts per property~~ (INCORRECT — dropped 3/7)
+~~Sum of `SAC` (special assessment charge) rows.~~ **Correction:** SAC rows are small special assessments (water/sewer, ECB fines — typically $50-$250), NOT the lien sale amount (e.g. $58K sold to NYCTL). The `lienChargeAmount` field was dropped as misleading. SAC amounts are still included in `totalOutstandingBalance`.
 
 ### 3. Total outstanding balance per property
 Sum of all `sum_bal` across CHG + SAC + SAF + SAT. The full picture of what the property owes DOF.

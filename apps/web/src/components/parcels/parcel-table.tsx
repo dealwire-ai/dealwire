@@ -55,7 +55,6 @@ export interface Parcel {
   violationsPerUnit: number | null;
   distressScore: number | null;
   outstandingTaxBill: number | null;
-  lienChargeAmount: number | null;
   totalOutstandingBalance: number | null;
 }
 
@@ -73,8 +72,7 @@ const SORTABLE_COLUMNS: { label: string; field: string; align?: "right" }[] = [
   { label: "Class C", field: "violationsClassC", align: "right" },
   { label: "Lien", field: "hasActiveLien" },
   { label: "Tax Bill", field: "outstandingTaxBill", align: "right" },
-  { label: "Lien Amt", field: "lienChargeAmount", align: "right" },
-  { label: "Total Owed", field: "totalOutstandingBalance", align: "right" },
+  { label: "Total Owed to DOF", field: "totalOutstandingBalance", align: "right" },
 ];
 
 interface ParcelTableProps {
@@ -238,9 +236,6 @@ export function ParcelTable({
                 <TableCell className="text-right">
                   {formatCurrency(parcel.outstandingTaxBill)}
                 </TableCell>
-                <TableCell className="text-right">
-                  {formatCurrency(parcel.lienChargeAmount)}
-                </TableCell>
                 <TableCell className="text-right font-medium">
                   {formatCurrency(parcel.totalOutstandingBalance)}
                 </TableCell>
@@ -248,7 +243,7 @@ export function ParcelTable({
               {isExpanded && (
                 <TableRow>
                   <TableCell
-                    colSpan={16}
+                    colSpan={15}
                     className="bg-zinc-950/50 p-0 transition-all duration-200"
                   >
                     <div className="border-l-2 border-[#3ECFA0] pl-4 py-4 pr-4">
@@ -359,12 +354,7 @@ export function ParcelTable({
                               highlight={(parcel.outstandingTaxBill ?? 0) > 0}
                             />
                             <DetailRow
-                              label="Lien Charge Amount"
-                              value={formatCurrency(parcel.lienChargeAmount)}
-                              highlight={(parcel.lienChargeAmount ?? 0) > 0}
-                            />
-                            <DetailRow
-                              label="Total Outstanding"
+                              label="Total Owed to DOF"
                               value={formatCurrency(parcel.totalOutstandingBalance)}
                               highlight={(parcel.totalOutstandingBalance ?? 0) > 0}
                             />
