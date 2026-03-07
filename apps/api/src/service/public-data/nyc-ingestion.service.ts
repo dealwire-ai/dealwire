@@ -58,7 +58,9 @@ export class NycIngestionService {
    * Run full ingestion pipeline: tax liens → PLUTO enrichment → HPD violations → scoring.
    */
   async ingestAll(boroughs: string[]): Promise<IngestionResult[]> {
-    this.logger.log(`Starting full ingestion for boroughs: ${boroughs.join(', ')}`);
+    this.logger.log(
+      `Starting full ingestion for boroughs: ${boroughs.join(', ')}`,
+    );
     const results: IngestionResult[] = [];
 
     // 1. Ingest tax lien list (creates Parcel rows)
@@ -80,7 +82,9 @@ export class NycIngestionService {
     // 5. Compute distress scores
     await this.scoring.scoreAll();
 
-    this.logger.log(`Full ingestion complete. Results: ${JSON.stringify(results.map((r) => `${r.source}: ${r.recordsProcessed}`))}`);
+    this.logger.log(
+      `Full ingestion complete. Results: ${JSON.stringify(results.map((r) => `${r.source}: ${r.recordsProcessed}`))}`,
+    );
     return results;
   }
 
@@ -97,15 +101,21 @@ export class NycIngestionService {
     let updated = 0;
 
     // First, find the most recent lien cycle date (the dataset has years of history)
-    const [latestRecord] = await this.soda.fetch(NYC_TAX_LIENS, {
+    const [latestRecord] = (await this.soda.fetch(NYC_TAX_LIENS, {
       $select: 'month',
       $order: 'month DESC',
       $limit: 1,
-    }) as Record<string, string>[];
+    })) as Record<string, string>[];
 
     if (!latestRecord?.month) {
       this.logger.warn('No tax lien records found');
-      return { source: 'tax_liens', recordsProcessed: 0, recordsCreated: 0, recordsUpdated: 0, durationMs: Date.now() - start };
+      return {
+        source: 'tax_liens',
+        recordsProcessed: 0,
+        recordsCreated: 0,
+        recordsUpdated: 0,
+        durationMs: Date.now() - start,
+      };
     }
 
     const latestMonth = latestRecord.month;
@@ -127,7 +137,9 @@ export class NycIngestionService {
 
         const bbl = normalizeBbl(borough, block, lot);
 
-        const address = [record.house_number, record.street_name].filter(Boolean).join(' ') || null;
+        const address =
+          [record.house_number, record.street_name].filter(Boolean).join(' ') ||
+          null;
 
         const result = await this.prisma.parcel.upsert({
           where: { bbl },
@@ -142,13 +154,15 @@ export class NycIngestionService {
             taxClass: record.tax_class_code || null,
             hasActiveLien: true,
             lienCycle: record.cycle || null,
-            waterDebtOnly: (record.water_debt_only || '').toLowerCase() === 'yes',
+            waterDebtOnly:
+              (record.water_debt_only || '').toLowerCase() === 'yes',
             liensSyncedAt: new Date(),
           },
           update: {
             hasActiveLien: true,
             lienCycle: record.cycle || null,
-            waterDebtOnly: (record.water_debt_only || '').toLowerCase() === 'yes',
+            waterDebtOnly:
+              (record.water_debt_only || '').toLowerCase() === 'yes',
             liensSyncedAt: new Date(),
           },
         });
@@ -163,7 +177,9 @@ export class NycIngestionService {
     }
 
     const duration = Date.now() - start;
-    this.logger.log(`Tax liens: ${processed} processed (${created} created, ${updated} updated) in ${duration}ms`);
+    this.logger.log(
+      `Tax liens: ${processed} processed (${created} created, ${updated} updated) in ${duration}ms`,
+    );
 
     return {
       source: 'tax_liens',
@@ -191,7 +207,13 @@ export class NycIngestionService {
     this.logger.log(`Enriching ${bbls.length} parcels with PLUTO data`);
 
     if (bbls.length === 0) {
-      return { source: 'pluto', recordsProcessed: 0, recordsCreated: 0, recordsUpdated: 0, durationMs: Date.now() - start };
+      return {
+        source: 'pluto',
+        recordsProcessed: 0,
+        recordsCreated: 0,
+        recordsUpdated: 0,
+        durationMs: Date.now() - start,
+      };
     }
 
     let processed = 0;
@@ -205,10 +227,10 @@ export class NycIngestionService {
       // Use numeric OR conditions: bbl=3001850041 OR bbl=3001970016 OR ...
       const bblFilter = batch.map((b) => `bbl=${b}`).join(' OR ');
 
-      const records = await this.soda.fetch(NYC_PLUTO, {
+      const records = (await this.soda.fetch(NYC_PLUTO, {
         $where: bblFilter,
         $limit: batchSize,
-      }) as Record<string, string>[];
+      })) as Record<string, string>[];
 
       for (const record of records) {
         // Reconstruct the clean 10-char BBL from PLUTO's borough+block+lot
@@ -217,8 +239,9 @@ export class NycIngestionService {
         const lot = record.lot?.trim();
         if (!boroughAbbr || !block || !lot) continue;
 
-        const boroughNumeric = Object.entries(BOROUGH_NUMERIC_TO_ABBR)
-          .find(([, abbr]) => abbr === boroughAbbr)?.[0];
+        const boroughNumeric = Object.entries(BOROUGH_NUMERIC_TO_ABBR).find(
+          ([, abbr]) => abbr === boroughAbbr,
+        )?.[0];
         if (!boroughNumeric) continue;
 
         const bbl = normalizeBbl(boroughNumeric, block, lot);
@@ -255,12 +278,16 @@ export class NycIngestionService {
       }
 
       if ((i / batchSize) % 5 === 0) {
-        this.logger.log(`PLUTO progress: ${i + batch.length}/${bbls.length} BBLs queried, ${updated} updated`);
+        this.logger.log(
+          `PLUTO progress: ${i + batch.length}/${bbls.length} BBLs queried, ${updated} updated`,
+        );
       }
     }
 
     const duration = Date.now() - start;
-    this.logger.log(`PLUTO enrichment: ${updated} parcels updated in ${duration}ms`);
+    this.logger.log(
+      `PLUTO enrichment: ${updated} parcels updated in ${duration}ms`,
+    );
 
     return {
       source: 'pluto',
@@ -278,38 +305,59 @@ export class NycIngestionService {
    */
   async ingestHpdViolations(boroughs: string[]): Promise<IngestionResult> {
     const start = Date.now();
-    this.logger.log(`Ingesting HPD violations for boroughs: ${boroughs.join(', ')}`);
+    this.logger.log(
+      `Ingesting HPD violations for boroughs: ${boroughs.join(', ')}`,
+    );
 
     // Get parcels we need to enrich — need borough, block, lot for HPD queries
     const existingParcels = await this.prisma.parcel.findMany({
       where: { borough: { in: boroughs } },
-      select: { bbl: true, borough: true, block: true, lot: true, unitsTotal: true },
+      select: {
+        bbl: true,
+        borough: true,
+        block: true,
+        lot: true,
+        unitsTotal: true,
+      },
     });
 
     if (existingParcels.length === 0) {
       this.logger.log('No parcels to enrich with HPD data');
-      return { source: 'hpd_violations', recordsProcessed: 0, recordsCreated: 0, recordsUpdated: 0, durationMs: Date.now() - start };
+      return {
+        source: 'hpd_violations',
+        recordsProcessed: 0,
+        recordsCreated: 0,
+        recordsUpdated: 0,
+        durationMs: Date.now() - start,
+      };
     }
 
-    this.logger.log(`Querying HPD violations for ${existingParcels.length} parcels`);
+    this.logger.log(
+      `Querying HPD violations for ${existingParcels.length} parcels`,
+    );
 
     // Build a lookup from BBL to unitsTotal
     const unitsMap = new Map(existingParcels.map((p) => [p.bbl, p.unitsTotal]));
 
     // Aggregate violation counts by BBL
-    const counts = new Map<string, {
-      total: number;
-      open: number;
-      classA: number;
-      classB: number;
-      classC: number;
-    }>();
+    const counts = new Map<
+      string,
+      {
+        total: number;
+        open: number;
+        classA: number;
+        classB: number;
+        classC: number;
+      }
+    >();
 
     let totalFetched = 0;
 
     // Group parcels by borough, then batch-query HPD by block+lot
     for (const borough of boroughs) {
-      const boroughParcels = existingParcels.filter((p) => p.borough === borough);
+      const boroughParcels = existingParcels.filter(
+        (p) => p.borough === borough,
+      );
       if (boroughParcels.length === 0) continue;
 
       // Batch into groups of 50 (HPD queries by block+lot pairs)
@@ -320,7 +368,10 @@ export class NycIngestionService {
         // Build HPD query: boroid='3' AND ((block='185' AND lot='41') OR (block='197' AND lot='16') OR ...)
         // HPD uses unpadded block/lot
         const pairFilter = batch
-          .map((p) => `(block='${parseInt(p.block)}' AND lot='${parseInt(p.lot)}')`)
+          .map(
+            (p) =>
+              `(block='${parseInt(p.block)}' AND lot='${parseInt(p.lot)}')`,
+          )
           .join(' OR ');
         const whereClause = `boroid='${borough}' AND (${pairFilter})`;
 
@@ -337,7 +388,13 @@ export class NycIngestionService {
             const bbl = normalizeBbl(boroid, block, lot);
 
             if (!counts.has(bbl)) {
-              counts.set(bbl, { total: 0, open: 0, classA: 0, classB: 0, classC: 0 });
+              counts.set(bbl, {
+                total: 0,
+                open: 0,
+                classA: 0,
+                classB: 0,
+                classC: 0,
+              });
             }
             const c = counts.get(bbl)!;
             c.total++;
@@ -354,7 +411,9 @@ export class NycIngestionService {
         }
 
         if ((i / batchSize) % 5 === 0) {
-          this.logger.log(`HPD progress: borough ${borough}, ${i + batch.length}/${boroughParcels.length} parcels queried, ${totalFetched} violations fetched`);
+          this.logger.log(
+            `HPD progress: borough ${borough}, ${i + batch.length}/${boroughParcels.length} parcels queried, ${totalFetched} violations fetched`,
+          );
         }
       }
     }
@@ -363,9 +422,10 @@ export class NycIngestionService {
     let updated = 0;
     for (const [bbl, c] of counts) {
       const unitsTotal = unitsMap.get(bbl);
-      const violationsPerUnit = unitsTotal && unitsTotal > 0
-        ? Math.round((c.open / unitsTotal) * 100) / 100
-        : null;
+      const violationsPerUnit =
+        unitsTotal && unitsTotal > 0
+          ? Math.round((c.open / unitsTotal) * 100) / 100
+          : null;
 
       await this.prisma.parcel.updateMany({
         where: { bbl },
@@ -383,7 +443,9 @@ export class NycIngestionService {
     }
 
     const duration = Date.now() - start;
-    this.logger.log(`HPD violations: ${totalFetched} fetched, ${counts.size} parcels aggregated, ${updated} updated in ${duration}ms`);
+    this.logger.log(
+      `HPD violations: ${totalFetched} fetched, ${counts.size} parcels aggregated, ${updated} updated in ${duration}ms`,
+    );
 
     return {
       source: 'hpd_violations',
@@ -403,7 +465,9 @@ export class NycIngestionService {
    */
   async ingestPropertyCharges(boroughs: string[]): Promise<IngestionResult> {
     const start = Date.now();
-    this.logger.log(`Ingesting property charges for boroughs: ${boroughs.join(', ')}`);
+    this.logger.log(
+      `Ingesting property charges for boroughs: ${boroughs.join(', ')}`,
+    );
 
     // Get BBLs we need to query
     const existingParcels = await this.prisma.parcel.findMany({
@@ -413,21 +477,33 @@ export class NycIngestionService {
     const bbls = existingParcels.map((p) => p.bbl);
 
     if (bbls.length === 0) {
-      return { source: 'property_charges', recordsProcessed: 0, recordsCreated: 0, recordsUpdated: 0, durationMs: Date.now() - start };
+      return {
+        source: 'property_charges',
+        recordsProcessed: 0,
+        recordsCreated: 0,
+        recordsUpdated: 0,
+        durationMs: Date.now() - start,
+      };
     }
 
     this.logger.log(`Querying property charges for ${bbls.length} parcels`);
 
     // Find the latest extract date in the dataset
-    const [latestExtract] = await this.soda.fetch(NYC_PROPERTY_CHARGES, {
+    const [latestExtract] = (await this.soda.fetch(NYC_PROPERTY_CHARGES, {
       $select: 'extractdt',
       $order: 'extractdt DESC',
       $limit: 1,
-    }) as Record<string, string>[];
+    })) as Record<string, string>[];
 
     if (!latestExtract?.extractdt) {
       this.logger.warn('No property charges records found');
-      return { source: 'property_charges', recordsProcessed: 0, recordsCreated: 0, recordsUpdated: 0, durationMs: Date.now() - start };
+      return {
+        source: 'property_charges',
+        recordsProcessed: 0,
+        recordsCreated: 0,
+        recordsUpdated: 0,
+        durationMs: Date.now() - start,
+      };
     }
 
     const latestExtractDt = latestExtract.extractdt;
@@ -446,11 +522,11 @@ export class NycIngestionService {
       const paridList = batch.map((b) => `'${b}'`).join(',');
       const whereClause = `parid IN (${paridList}) AND extractdt='${latestExtractDt}' AND sum_bal > 0`;
 
-      const records = await this.soda.fetch(NYC_PROPERTY_CHARGES, {
+      const records = (await this.soda.fetch(NYC_PROPERTY_CHARGES, {
         $where: whereClause,
         $select: 'parid,code,sum_bal',
         $limit: 50000,
-      }) as Record<string, string>[];
+      })) as Record<string, string>[];
 
       for (const record of records) {
         const parid = record.parid?.trim();
@@ -474,7 +550,9 @@ export class NycIngestionService {
       }
 
       if ((i / batchSize) % 3 === 0) {
-        this.logger.log(`Property charges progress: ${i + batch.length}/${bbls.length} BBLs queried, ${charges.size} with balances`);
+        this.logger.log(
+          `Property charges progress: ${i + batch.length}/${bbls.length} BBLs queried, ${charges.size} with balances`,
+        );
       }
     }
 
@@ -506,7 +584,9 @@ export class NycIngestionService {
     }
 
     const duration = Date.now() - start;
-    this.logger.log(`Property charges: ${totalRecords} records, ${charges.size} parcels with balances, ${updated} updated in ${duration}ms`);
+    this.logger.log(
+      `Property charges: ${totalRecords} records, ${charges.size} parcels with balances, ${updated} updated in ${duration}ms`,
+    );
 
     return {
       source: 'property_charges',

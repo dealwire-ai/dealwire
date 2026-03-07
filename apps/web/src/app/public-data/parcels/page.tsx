@@ -6,6 +6,7 @@ import { useAuth } from "@clerk/nextjs";
 import { ParcelTable, type Parcel } from "@/components/parcels/parcel-table";
 import { ParcelFilters } from "@/components/parcels/parcel-filters";
 import { ExportButton } from "@/components/parcels/export-button";
+import { BatchSkipTraceButton } from "@/components/parcels/batch-skip-trace-button";
 import { TableToolbar } from "@/components/table-toolbar";
 import { TablePagination } from "@/components/table-pagination";
 import { TableSkeleton } from "@/components/table-skeleton";
@@ -44,6 +45,7 @@ export default function ParcelsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+  const [selectedBbls, setSelectedBbls] = useState<Set<string>>(new Set());
 
   const table = useTableState({
     defaultLimit: 50,
@@ -58,7 +60,7 @@ export default function ParcelsPage() {
       setLoading(true);
       setError(null);
       const response = await apiCall(
-        `/public-data/parcels?${table.queryString}`
+        `/public-data/parcels?${table.queryString}`,
       );
       setParcels(response.data || []);
       if (response.pagination) table.setMeta(response.pagination);
@@ -78,9 +80,7 @@ export default function ParcelsPage() {
       const params = new URLSearchParams();
       if (borough) params.set("borough", borough);
       if (excludeCoops) params.set("excludeCoops", excludeCoops);
-      const response = await apiCall(
-        `/public-data/stats?${params.toString()}`
-      );
+      const response = await apiCall(`/public-data/stats?${params.toString()}`);
       setStats(response);
     } catch {
       // Stats are non-critical
@@ -111,6 +111,7 @@ export default function ParcelsPage() {
 
   useEffect(() => {
     setExpandedRows(new Set());
+    setSelectedBbls(new Set());
   }, [table.page, table.sort, table.order]);
 
   if (!isLoaded) {
@@ -146,7 +147,10 @@ export default function ParcelsPage() {
         {/* Stats bar */}
         {stats && (
           <div className="grid grid-cols-4 gap-4 mb-6">
-            <StatCard label="Total Parcels" value={stats.total.toLocaleString()} />
+            <StatCard
+              label="Total Parcels"
+              value={stats.total.toLocaleString()}
+            />
             <StatCard
               label="Active Liens"
               value={stats.withActiveLiens.toLocaleString()}
@@ -159,8 +163,7 @@ export default function ParcelsPage() {
               label="Proportions per Borough"
               value={stats.byBorough
                 .map(
-                  (b) =>
-                    `${BOROUGH_NAMES[b.borough] || b.borough}: ${b.count}`
+                  (b) => `${BOROUGH_NAMES[b.borough] || b.borough}: ${b.count}`,
                 )
                 .join(", ")}
               small
@@ -182,6 +185,24 @@ export default function ParcelsPage() {
                 filters={table.filters}
                 onSetFilter={table.setFilter}
               />
+            }
+            actionSlot={
+              selectedBbls.size > 0 ? (
+                <BatchSkipTraceButton
+                  selectedBbls={selectedBbls}
+                  onQueued={() => {
+                    // Mark selected parcels as pending locally
+                    setParcels((prev) =>
+                      prev.map((p) =>
+                        selectedBbls.has(p.bbl)
+                          ? { ...p, skipTraceStatus: "pending" }
+                          : p,
+                      ),
+                    );
+                    setSelectedBbls(new Set());
+                  }}
+                />
+              ) : null
             }
           />
 
@@ -206,11 +227,33 @@ export default function ParcelsPage() {
                 }
                 setExpandedRows(newExpanded);
               }}
+              selectedBbls={selectedBbls}
+              onToggleSelect={(bbl) => {
+                const next = new Set(selectedBbls);
+                if (next.has(bbl)) {
+                  next.delete(bbl);
+                } else {
+                  next.add(bbl);
+                }
+                setSelectedBbls(next);
+              }}
+              onSelectAll={(bbls) => {
+                if (bbls.length === 0) {
+                  setSelectedBbls(new Set());
+                } else {
+                  setSelectedBbls(new Set(bbls));
+                }
+              }}
               hasActiveFilters={table.hasActiveFilters}
               onClearFilters={table.clearFilters}
               sort={table.sort}
               order={table.order}
               onSortChange={table.setSort}
+              onParcelUpdated={(bbl, updates) => {
+                setParcels((prev) =>
+                  prev.map((p) => (p.bbl === bbl ? { ...p, ...updates } : p)),
+                );
+              }}
             />
           )}
 

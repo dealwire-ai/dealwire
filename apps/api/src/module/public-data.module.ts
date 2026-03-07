@@ -5,6 +5,7 @@ import { SodaAdapter } from '../service/public-data/soda.adapter';
 import { NycIngestionService } from '../service/public-data/nyc-ingestion.service';
 import { DistressScoringService } from '../service/public-data/distress-scoring.service';
 import { ParcelQueryService } from '../service/public-data/parcel-query.service';
+import { SkipTraceService } from '../service/public-data/skip-trace.service';
 import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
 
 @Module({
@@ -15,6 +16,7 @@ import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
     NycIngestionService,
     DistressScoringService,
     ParcelQueryService,
+    SkipTraceService,
     ClerkAuthGuard,
   ],
   exports: [ParcelQueryService],
