@@ -61,5 +61,5 @@ app.enableCors({
 
 Required env var in `apps/api/.env`:
 ```bash
-FRONTEND_URL=http://localhost:3000  # or https://yourapp.vercel.app in prod
+FRONTEND_URL=http://localhost:3000  # or https://deals.frontstep.ai in prod
 ```
