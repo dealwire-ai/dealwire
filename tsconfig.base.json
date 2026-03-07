@@ -5,11 +5,6 @@
     "moduleResolution": "Bundler",
     "strict": true,
     "noEmit": true,
-    "skipLibCheck": true,
-    "baseUrl": ".",
-    "paths": {
-      "@analyzer/*": ["packages/*/src"]
-    }
+    "skipLibCheck": true
   }
 }
-
