@@ -108,6 +108,8 @@ export class PublicDataController {
     @Query('buildingClass') buildingClass?: string,
     @Query('buildingClassGroups') buildingClassGroups?: string,
     @Query('excludeDClass') excludeDClass?: string,
+    @Query('minOutstandingTaxBill') minOutstandingTaxBill?: string,
+    @Query('maxOutstandingTaxBill') maxOutstandingTaxBill?: string,
     @Query('sort') sort?: string,
     @Query('order') order?: 'asc' | 'desc',
   ) {
@@ -127,6 +129,12 @@ export class PublicDataController {
         : undefined,
       minUnits: minUnits ? parseInt(minUnits) : undefined,
       maxUnits: maxUnits ? parseInt(maxUnits) : undefined,
+      minOutstandingTaxBill: minOutstandingTaxBill
+        ? parseFloat(minOutstandingTaxBill)
+        : undefined,
+      maxOutstandingTaxBill: maxOutstandingTaxBill
+        ? parseFloat(maxOutstandingTaxBill)
+        : undefined,
       zipCode,
       search,
       buildingClasses: buildingClass ? buildingClass.split(',') : undefined,
@@ -156,6 +164,8 @@ export class PublicDataController {
     @Query('buildingClass') buildingClass?: string,
     @Query('buildingClassGroups') buildingClassGroups?: string,
     @Query('excludeDClass') excludeDClass?: string,
+    @Query('minOutstandingTaxBill') minOutstandingTaxBill?: string,
+    @Query('maxOutstandingTaxBill') maxOutstandingTaxBill?: string,
     @Query('sort') sort?: string,
     @Query('order') order?: 'asc' | 'desc',
   ) {
@@ -175,6 +185,12 @@ export class PublicDataController {
         : undefined,
       minUnits: minUnits ? parseInt(minUnits) : undefined,
       maxUnits: maxUnits ? parseInt(maxUnits) : undefined,
+      minOutstandingTaxBill: minOutstandingTaxBill
+        ? parseFloat(minOutstandingTaxBill)
+        : undefined,
+      maxOutstandingTaxBill: maxOutstandingTaxBill
+        ? parseFloat(maxOutstandingTaxBill)
+        : undefined,
       zipCode,
       search,
       buildingClasses: buildingClass ? buildingClass.split(',') : undefined,
@@ -208,8 +224,7 @@ export class PublicDataController {
       'Lien Cycle',
       'Water Debt Only',
       'Outstanding Tax Bill',
-      'Lien Charge Amount',
-      'Total Outstanding Balance',
+      'Total Owed to DOF',
       'Violations Total',
       'Violations Open',
       'Class A',
@@ -241,7 +256,6 @@ export class PublicDataController {
       p.lienCycle || '',
       p.waterDebtOnly ? 'Yes' : 'No',
       p.outstandingTaxBill ?? '',
-      p.lienChargeAmount ?? '',
       p.totalOutstandingBalance ?? '',
       p.violationsTotal,
       p.violationsOpen,

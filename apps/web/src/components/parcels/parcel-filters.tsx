@@ -254,6 +254,26 @@ export function ParcelFilters({ filters, onSetFilter }: ParcelFiltersProps) {
         </SelectContent>
       </Select>
 
+      {/* Min outstanding tax bill */}
+      <Select
+        value={filters.minOutstandingTaxBill || "any"}
+        onValueChange={(value) =>
+          onSetFilter("minOutstandingTaxBill", value === "any" ? "" : value)
+        }
+      >
+        <SelectTrigger className="w-[160px] bg-zinc-950 border-zinc-800 text-white">
+          <SelectValue placeholder="Min Tax Bill" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="any">Any Tax Bill</SelectItem>
+          <SelectItem value="1">Has Tax Bill</SelectItem>
+          <SelectItem value="1000">$1,000+</SelectItem>
+          <SelectItem value="5000">$5,000+</SelectItem>
+          <SelectItem value="10000">$10,000+</SelectItem>
+          <SelectItem value="25000">$25,000+</SelectItem>
+        </SelectContent>
+      </Select>
+
       {/* Building class groups */}
       <BuildingClassGroupFilter
         value={filters.buildingClassGroups || ""}
