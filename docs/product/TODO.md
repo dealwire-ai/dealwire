@@ -12,7 +12,12 @@
    -       Jacob Palmer -- internal accountant AI for cashflow analysis (need some example input data from him)
 
 ## Deal Screener
-   - Plan and start building out the automated underwriting process (t-12/rent roll parsing, filling out excel proforma, etc.)
+   - **[HIGH PRIORITY — JK 3/3]** Criteria update button in deal emails — one-click button in every deal summary/digest email that pre-composes a criteria update email to send back
+   - **[JK 3/3]** Mute/pass deal from digest — "Pass" or "Neg" button on Deal Digest to suppress future broker follow-ups on a rejected deal without deleting it
+   - **[JK 3/3]** Underwriting pipeline improvements:
+      - Rent roll unit type classification (handle "renovated" vs "premium renovation" etc.)
+      - Template variations by deal type (value-add vs ground-up; JK to send blank templates)
+      - Traceability — show document source for each AI-filled cell (blue cells concept)
 
 ## Tax Lien Analyzer
    - see roadmap
