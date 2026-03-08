@@ -1,11 +1,16 @@
-import { Injectable, NotFoundException, ForbiddenException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+  Logger,
+} from '@nestjs/common';
 import { Proforma, Prisma } from '@prisma/client';
 import { generateObject } from 'ai';
 import { anthropic } from '@ai-sdk/anthropic';
 import { z } from 'zod';
 import { PrismaService } from '../prisma/prisma.service';
 import { S3Service } from '../s3/s3.service';
-import { excelToText } from './extractors/extraction-types';
+import { excelToTextWithCellRefs } from './extractors/extraction-types';
 
 export interface FieldMapEntry {
   name: string;
@@ -50,40 +55,50 @@ export class ProformaService {
 
   private async scanProformaFields(buffer: Buffer): Promise<FieldMapEntry[]> {
     try {
-      const rawText = excelToText(buffer);
-      // Haiku limit is 200k tokens (~4 chars/token). 
+      const rawText = excelToTextWithCellRefs(buffer);
+      // Haiku limit is 200k tokens (~4 chars/token).
       // Input cells are almost always in the first few sheets, so truncation is safe.
       const MAX_CHARS = 190_000;
-      const text = rawText.length > MAX_CHARS
-        ? rawText.slice(0, MAX_CHARS) + '\n\n[... truncated for length ...]'
-        : rawText;
+      const text =
+        rawText.length > MAX_CHARS
+          ? rawText.slice(0, MAX_CHARS) + '\n\n[... truncated for length ...]'
+          : rawText;
 
       const { object } = await generateObject({
         model: anthropic('claude-haiku-4-5-20251001'),
         schema: ScannedFieldsSchema,
         system: `You are analyzing a real estate pro forma Excel template to identify input cells.
 
-Your task: find all cells that are INPUTS (hard-coded values users enter), NOT formulas or outputs.
+The spreadsheet is serialized as: CELLREF:"value" per cell, with (formula) marking computed cells.
+Example: B6:"Name"  C6:"Northway at Fern Forest"  means C6 contains the property name input.
+
+Your task: find all cells that are INPUTS (hard-coded values a user would change per deal), NOT formulas or outputs.
+Cells marked (formula) are computed — never return them as inputs.
 
 For each input cell, return:
 - name: short plain-English label (e.g. "Purchase Price", "Cap Rate", "Total Units")
 - description: one sentence describing what this value represents
 - sheet: the Excel sheet name exactly as it appears
-- cell: the cell address (e.g. "B5", "C12")
+- cell: the cell address exactly as shown (e.g. "C6", "G9") — copy it verbatim from the serialized data
 
 Focus on purchase terms, income assumptions, expense assumptions, financing parameters, and unit/property characteristics. Target 10-30 fields. Skip formula cells, headers, and labels.`,
         messages: [
           {
             role: 'user',
-            content: `Here is the pro forma spreadsheet content:\n\n${text}\n\nIdentify all input cells (not formulas) and return them with plain-English names and descriptions.`,
+            content: `Here is the pro forma spreadsheet content:\n\n${text}\n\nIdentify all input cells (not formulas) and return them with plain-English names and descriptions. Copy cell addresses verbatim from the data above.`,
           },
         ],
       });
 
-      this.logger.log(`[proforma] Scanned ${object.fields.length} input fields from template`);
+      this.logger.log(
+        `[proforma] Scanned ${object.fields.length} input fields from template`,
+      );
       return object.fields as FieldMapEntry[];
     } catch (err) {
-      this.logger.error('[proforma] Field scan failed, using empty fieldMap', err);
+      this.logger.error(
+        '[proforma] Field scan failed, using empty fieldMap',
+        err,
+      );
       return [];
     }
   }
@@ -97,7 +112,9 @@ Focus on purchase terms, income assumptions, expense assumptions, financing para
     const s3Key = await this.s3.uploadProformaTemplate(buffer, filename, orgId);
 
     // Auto-set isDefault for the org's first proforma
-    const existing = await this.prisma.proforma.count({ where: { organizationId: orgId } });
+    const existing = await this.prisma.proforma.count({
+      where: { organizationId: orgId },
+    });
     const isDefault = existing === 0;
 
     // AI-scan the template to discover input cells
@@ -115,7 +132,11 @@ Focus on purchase terms, income assumptions, expense assumptions, financing para
     });
   }
 
-  async update(orgId: string, id: string, patch: ProformaPatch): Promise<Proforma> {
+  async update(
+    orgId: string,
+    id: string,
+    patch: ProformaPatch,
+  ): Promise<Proforma> {
     const existing = await this.prisma.proforma.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException('Proforma not found');
     if (existing.organizationId !== orgId) throw new ForbiddenException();
@@ -139,7 +160,9 @@ Focus on purchase terms, income assumptions, expense assumptions, financing para
           },
         }),
       ]);
-      return this.prisma.proforma.findUnique({ where: { id } }) as Promise<Proforma>;
+      return this.prisma.proforma.findUnique({
+        where: { id },
+      }) as Promise<Proforma>;
     }
 
     return this.prisma.proforma.update({
