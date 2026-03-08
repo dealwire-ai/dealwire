@@ -84,11 +84,11 @@ _Deep data is the moat. An analyst is only as good as their data access._
 - [~] **Tax lien platform (Phase 2 — cold calling enablement)** — _3/4 meeting reprioritized this ahead of lis pendens — Brett is ready to cold call._ See [`docs/product/TAX_LIEN_PLATFORM.md`](TAX_LIEN_PLATFORM.md).
   - [x] Scoring update: Class C violations only (removed Class A/B from score, increased Class C cap to 30)
   - [x] Grouped building class filters: 3 checkbox groups (Residential, Commercial, Walk-up). D class excluded by default.
-  - [x] Outstanding tax bills: Ingested from DOF Property Charges Balance (`scjx-j6np`). CHG = property tax, total = all DOF charges. Note: actual lien sale amounts (e.g. $58K sold to NYCTL) are NOT in this dataset — requires DOF web portal scraping or PDF parsing.
-  - [ ] Actual lien sale amounts — not available via Socrata. Requires scraping DOF CARE portal or parsing PDF tax bills. Research in progress.
-  - [ ] Owner contact lookup (skip tracing) — phone numbers for cold calling. Brett waiting on this.
+  - [x] Outstanding tax bills: Ingested from DOF Property Charges Balance (`scjx-j6np`). CHG = property tax, total = all DOF charges.
+  - [x] Actual lien sale amounts — NYCTL quarterly XLSX reports from DOF, crosswalk matched on (zip, buildingClass, taxClass). ~24% exact match shown in UI, rest stored with group/estimated confidence. Includes sale amount, redemptive value, servicer, trust vintage, foreclosure status.
+  - [x] Owner contact lookup (skip tracing) — Tracerfy integration, phone column, single + batch lookup, async polling.
   - [ ] Manhattan expansion — add borough 1 with same criteria
-  - [ ] Servicer info (MTAG vs Tower) — requires PDF tax bill parsing, deferred
+  - [~] Servicer info (MTAG vs Tower) — partially available via NYCTL quarterly reports. CARE portal scraping would improve coverage.
 - [ ] **Public data ingestion platform** — Adapter-based system for pulling tax liens, zoning, permits, assessments, and deed data from municipal/county sources. Starts with NYC (Socrata SODA API + ArcGIS), designed to expand city-by-city via configuration. See [`docs/product/PUBLIC_DATA_PLATFORM.md`](PUBLIC_DATA_PLATFORM.md) for full architecture.
 - [ ] **Property data enrichment** — Pull from public records, assessor databases, census/demographic data to auto-fill details the email didn't include (year built, lot size, zoning, ownership history, tax assessments).
 - [ ] **Market context** — Auto-attach market comps, submarket stats, rent trends to deal summaries. "This is priced 15% above recent comps in the submarket."

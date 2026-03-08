@@ -380,6 +380,18 @@ model Parcel {
   skipTraceStatus  String?   // 'pending' | 'found' | 'not_found' | 'error'
   skipTraceQueueId String?   // Tracerfy async queue_id, cleared after completion
 
+  // NYCTL lien sale data (from quarterly status reports, crosswalk matched)
+  lienSaleAmount        Float?    // "Balance Sold" — $$ sold to NYCTL Trust
+  lienRedemptiveValue   Float?    // Current payoff amount (principal + interest + fees)
+  lienServicer          String?   // "MTAG" or "Tower"
+  lienRedeemed          Boolean?  // Has owner paid off the lien?
+  lienForeclosureStatus String?   // e.g., "Referred", "Active", null
+  lienSaleDate          String?   // When lien was sold
+  lienTrustVintage      String?   // e.g., "2025-A", "1998-2"
+  lienMatchConfidence   String?   // "exact", "group_small", "group_large", "estimated"
+  lienMatchGroupSize    Int?      // How many records shared the match key (1 = exact)
+  nyctlSyncedAt         DateTime?
+
   // Sync tracking
   plutoSyncedAt       DateTime?
   liensSyncedAt       DateTime?

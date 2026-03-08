@@ -18,6 +18,7 @@ import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
 import { AuthUser } from '../decorator/auth-user.decorator';
 import { PrismaService } from '../service/prisma/prisma.service';
 import { NycIngestionService } from '../service/public-data/nyc-ingestion.service';
+import { NyctlQuarterlyService } from '../service/public-data/nyctl-quarterly.service';
 import { ParcelQueryService } from '../service/public-data/parcel-query.service';
 import { SkipTraceService } from '../service/public-data/skip-trace.service';
 import { BOROUGH_NAMES } from '../service/public-data/nyc-utils';
@@ -31,6 +32,7 @@ export class PublicDataController {
   constructor(
     private readonly prisma: PrismaService,
     private readonly ingestion: NycIngestionService,
+    private readonly nyctl: NyctlQuarterlyService,
     private readonly parcelQuery: ParcelQueryService,
     private readonly skipTrace: SkipTraceService,
   ) {}
@@ -91,6 +93,40 @@ export class PublicDataController {
     };
   }
 
+  @Post('ingest/nyctl')
+  async triggerNyctlIngestion(
+    @AuthUser('organizationId') organizationId: string | null,
+    @Body() body: { reportDate: string },
+  ) {
+    await this.assertParcelsEnabled(organizationId);
+
+    if (!body.reportDate) {
+      throw new HttpException(
+        'reportDate is required (e.g., "9-30-2025")',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    this.logger.log(
+      `Triggering NYCTL quarterly ingestion for report date: ${body.reportDate}`,
+    );
+
+    // Fire-and-forget
+    this.nyctl
+      .ingestNyctlQuarterly(body.reportDate)
+      .then((result) => {
+        this.logger.log(`NYCTL ingestion complete: ${JSON.stringify(result)}`);
+      })
+      .catch((err) => {
+        this.logger.error(`NYCTL ingestion failed: ${err.message}`, err.stack);
+      });
+
+    return {
+      message: 'NYCTL quarterly ingestion started',
+      reportDate: body.reportDate,
+    };
+  }
+
   @Get('parcels')
   async getParcels(
     @AuthUser('organizationId') organizationId: string | null,
@@ -110,6 +146,8 @@ export class PublicDataController {
     @Query('excludeDClass') excludeDClass?: string,
     @Query('minOutstandingTaxBill') minOutstandingTaxBill?: string,
     @Query('maxOutstandingTaxBill') maxOutstandingTaxBill?: string,
+    @Query('minLienSaleAmount') minLienSaleAmount?: string,
+    @Query('maxLienSaleAmount') maxLienSaleAmount?: string,
     @Query('sort') sort?: string,
     @Query('order') order?: 'asc' | 'desc',
   ) {
@@ -134,6 +172,12 @@ export class PublicDataController {
         : undefined,
       maxOutstandingTaxBill: maxOutstandingTaxBill
         ? parseFloat(maxOutstandingTaxBill)
+        : undefined,
+      minLienSaleAmount: minLienSaleAmount
+        ? parseFloat(minLienSaleAmount)
+        : undefined,
+      maxLienSaleAmount: maxLienSaleAmount
+        ? parseFloat(maxLienSaleAmount)
         : undefined,
       zipCode,
       search,
@@ -166,6 +210,8 @@ export class PublicDataController {
     @Query('excludeDClass') excludeDClass?: string,
     @Query('minOutstandingTaxBill') minOutstandingTaxBill?: string,
     @Query('maxOutstandingTaxBill') maxOutstandingTaxBill?: string,
+    @Query('minLienSaleAmount') minLienSaleAmount?: string,
+    @Query('maxLienSaleAmount') maxLienSaleAmount?: string,
     @Query('sort') sort?: string,
     @Query('order') order?: 'asc' | 'desc',
   ) {
@@ -190,6 +236,12 @@ export class PublicDataController {
         : undefined,
       maxOutstandingTaxBill: maxOutstandingTaxBill
         ? parseFloat(maxOutstandingTaxBill)
+        : undefined,
+      minLienSaleAmount: minLienSaleAmount
+        ? parseFloat(minLienSaleAmount)
+        : undefined,
+      maxLienSaleAmount: maxLienSaleAmount
+        ? parseFloat(maxLienSaleAmount)
         : undefined,
       zipCode,
       search,
@@ -232,6 +284,13 @@ export class PublicDataController {
       'Class C',
       'Violations/Unit',
       'Distress Score',
+      'Lien Sale Amount',
+      'Redemptive Value',
+      'Lien Servicer',
+      'Lien Redeemed',
+      'Foreclosure Status',
+      'Trust Vintage',
+      'Match Confidence',
     ];
 
     const rows = parcels.map((p) => [
@@ -264,6 +323,13 @@ export class PublicDataController {
       p.violationsClassC,
       p.violationsPerUnit ?? '',
       p.distressScore ?? '',
+      p.lienSaleAmount ?? '',
+      p.lienRedemptiveValue ?? '',
+      p.lienServicer || '',
+      p.lienRedeemed === null ? '' : p.lienRedeemed ? 'Yes' : 'No',
+      p.lienForeclosureStatus || '',
+      p.lienTrustVintage || '',
+      p.lienMatchConfidence || '',
     ]);
 
     const csvContent = [
