@@ -4,6 +4,15 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useClerk, useUser, OrganizationSwitcher } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
+import {
+  Inbox,
+  Users,
+  Building2,
+  SlidersHorizontal,
+  LayoutTemplate,
+  Map,
+  LogOut,
+} from "lucide-react";
 import { useFeatureFlags } from "@/hooks/use-feature-flags";
 import { isFrontstepUser } from "@/lib/utils";
 import posthog from "posthog-js";
@@ -12,6 +21,7 @@ interface NavItem {
   label: string;
   href: string;
   tab?: string;
+  icon: React.ComponentType<{ className?: string }>;
 }
 
 interface NavSection {
@@ -28,8 +38,6 @@ function NavLink({ item }: { item: NavItem }) {
 
   let isActive: boolean;
   if (item.tab) {
-    // Tab link: must be on /dashboard with exact tab match
-    // /dashboard?tab=deals is also active when tab is null (default)
     isActive =
       pathname === "/dashboard" &&
       (tab === item.tab || (item.tab === "deals" && tab === null));
@@ -37,15 +45,24 @@ function NavLink({ item }: { item: NavItem }) {
     isActive = pathname.startsWith(item.href);
   }
 
+  const Icon = item.icon;
+
   return (
     <Link
       href={item.href}
-      className={`flex items-center px-3 py-1.5 rounded-md text-sm transition-colors ${
+      className={`group flex items-center gap-2.5 px-3 py-1.5 rounded-md text-sm transition-all ${
         isActive
-          ? "text-[#C8A96E] bg-zinc-900"
-          : "text-zinc-400 hover:text-white hover:bg-zinc-900"
+          ? "bg-zinc-800 text-white font-medium"
+          : "text-zinc-500 hover:text-zinc-100 hover:bg-zinc-900"
       }`}
     >
+      <Icon
+        className={`w-4 h-4 shrink-0 transition-colors ${
+          isActive
+            ? "text-[#C8A96E]"
+            : "text-zinc-600 group-hover:text-zinc-400"
+        }`}
+      />
       {item.label}
     </Link>
   );
@@ -72,31 +89,45 @@ export function Sidebar() {
 
   const sections: NavSection[] = [
     {
-      title: "Deal Flow",
+      title: "Deal Screening",
       items: [
-        { label: "Deals", href: "/dashboard?tab=deals", tab: "deals" },
-        { label: "Contacts", href: "/dashboard?tab=contacts", tab: "contacts" },
+        {
+          label: "Deals",
+          href: "/dashboard?tab=deals",
+          tab: "deals",
+          icon: Inbox,
+        },
+        {
+          label: "Contacts",
+          href: "/dashboard?tab=contacts",
+          tab: "contacts",
+          icon: Users,
+        },
         {
           label: "Properties",
           href: "/dashboard?tab=properties",
           tab: "properties",
+          icon: Building2,
+        },
+        {
+          label: "Screening Buckets",
+          href: "/manage",
+          icon: SlidersHorizontal,
         },
       ],
     },
     {
       title: "Underwriting",
-      items: [{ label: "Templates", href: "/underwriting" }],
+      items: [
+        { label: "Templates", href: "/underwriting", icon: LayoutTemplate },
+      ],
       flag: flags.underwriting,
     },
     {
       title: "Market Data",
-      items: [{ label: "Parcels", href: "/public-data/parcels" }],
+      items: [{ label: "Parcels", href: "/public-data/parcels", icon: Map }],
       flag: flags.parcels,
       frontstepOnly: true,
-    },
-    {
-      title: "Settings",
-      items: [{ label: "Buckets", href: "/manage" }],
     },
   ];
 
@@ -107,18 +138,20 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="w-[220px] flex flex-col bg-zinc-950 border-r border-zinc-800 h-screen shrink-0">
+    <aside className="w-[220px] flex flex-col bg-zinc-950 border-r border-zinc-800/60 h-screen shrink-0">
       {/* Logo */}
-      <div className="px-4 py-5 border-b border-zinc-800">
-        <span className="text-white font-semibold tracking-tight">
-          ◈ Analyzer
-        </span>
+      <div className="px-4 py-4 border-b border-zinc-800/60">
+        <div className="flex items-center gap-2">
+          <span className="text-[#C8A96E]">◈</span>
+          <span className="text-white font-semibold tracking-tight text-sm">
+            Analyzer
+          </span>
+        </div>
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 overflow-y-auto px-2 py-4 space-y-5">
+      <nav className="flex-1 overflow-y-auto px-2 py-3 space-y-4">
         {sections.map((section) => {
-          // Hide flagged sections until flags are loaded (no flash)
           if (section.flag !== undefined && !flagsLoading && !section.flag)
             return null;
           if (section.frontstepOnly && !isFrontstep) return null;
@@ -126,7 +159,7 @@ export function Sidebar() {
 
           return (
             <div key={section.title}>
-              <p className="px-3 mb-1 text-[10px] uppercase tracking-widest text-zinc-600">
+              <p className="px-3 mb-1 text-[10px] font-medium uppercase tracking-widest text-zinc-600">
                 {section.title}
               </p>
               <div className="space-y-0.5">
@@ -140,22 +173,23 @@ export function Sidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="border-t border-zinc-800 px-3 py-3 space-y-2">
+      <div className="border-t border-zinc-800/60 px-3 py-3 space-y-2.5">
         {isFrontstep && (
           <OrganizationSwitcher hidePersonal appearance={{ baseTheme: dark }} />
         )}
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-full bg-zinc-700 flex items-center justify-center text-xs font-medium text-white shrink-0">
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="w-6 h-6 rounded-full bg-zinc-700 flex items-center justify-center text-[10px] font-semibold text-zinc-200 shrink-0">
             {initials}
           </div>
-          <span className="text-sm text-zinc-300 truncate flex-1">
+          <span className="text-xs text-zinc-400 truncate flex-1 min-w-0">
             {displayName}
           </span>
           <button
             onClick={handleSignOut}
-            className="text-xs text-zinc-500 hover:text-white transition-colors shrink-0"
+            title="Sign out"
+            className="text-zinc-600 hover:text-zinc-300 transition-colors shrink-0"
           >
-            Sign out
+            <LogOut className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
