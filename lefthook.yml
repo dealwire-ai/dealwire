@@ -11,6 +11,17 @@ commit-msg:
 
 pre-push:
   commands:
+    check-pr-not-merged:
+      run: |
+        BRANCH=$(git rev-parse --abbrev-ref HEAD)
+        if [ "$BRANCH" = "main" ] || [ "$BRANCH" = "master" ]; then
+          exit 0
+        fi
+        PR_STATE=$(gh pr view "$BRANCH" --json state -q '.state' 2>/dev/null || echo "NONE")
+        if [ "$PR_STATE" = "MERGED" ]; then
+          echo "❌ The PR for branch '$BRANCH' is already merged. Create a new branch for new changes."
+          exit 1
+        fi
     typecheck-api:
       glob: "apps/api/**/*.ts"
       run: pnpm --filter @analyzer/api exec tsc --noEmit
