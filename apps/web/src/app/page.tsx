@@ -944,7 +944,7 @@ export default function Home() {
                 <div className="lg:border-l lg:border-white/[0.06] lg:pl-12">
                   <p className="text-white/38 leading-relaxed text-sm mb-4">
                     Built in 3 months. Won a cash prize at Northeastern&apos;s
-                    startup competition. Acquired within weeks of launch. The
+                    startup competition. Acquired within months of launch. The
                     platform automatically qualified thousands of renters,
                     underwriting applicants the same way we now underwrite
                     deals.
