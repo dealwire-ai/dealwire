@@ -87,7 +87,9 @@ export class UnderwritingInboundService {
         this.logger.debug(`Uploaded ${att.filename} → ${s3Key}`);
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
-        this.logger.warn(`Failed to process attachment ${att.filename}: ${msg}`);
+        this.logger.warn(
+          `Failed to process attachment ${att.filename}: ${msg}`,
+        );
       }
     }
 
@@ -98,13 +100,24 @@ export class UnderwritingInboundService {
       return;
     }
 
+    // Resend delivers headers as an array of {name, value} objects
+    const headersArray: Array<{ name: string; value: string }> = Array.isArray(
+      emailData.headers,
+    )
+      ? emailData.headers
+      : [];
+    const messageIdHeader = headersArray.find(
+      (h) => h.name?.toLowerCase() === 'message-id',
+    );
+    const inReplyToMessageId = messageIdHeader?.value || undefined;
+
     await this.sqsService.enqueueUnderwritingJob({
       type: 'underwriting-job',
       dealId: jobId,
       orgId,
       senderEmail: fromEmail,
       documents,
-      inReplyToMessageId: emailData.headers?.['message-id'] || undefined,
+      inReplyToMessageId,
     });
 
     this.logger.log(
