@@ -15,6 +15,38 @@ export function excelToText(buffer: Buffer): string {
   }).join('\n\n');
 }
 
+/**
+ * Convert an Excel buffer to a cell-reference-aware text representation.
+ * Each non-empty cell is output as `REF: "value"` (formula cells marked).
+ * Use this for template field scanning — CSV loses row numbers, causing
+ * Claude to misidentify cell addresses.
+ */
+export function excelToTextWithCellRefs(buffer: Buffer): string {
+  const workbook = XLSX.read(buffer, { type: 'buffer' });
+  return workbook.SheetNames.map((sheetName) => {
+    const ws = workbook.Sheets[sheetName];
+    if (!ws['!ref']) return `=== Sheet: ${sheetName} ===\n(empty)`;
+
+    const range = XLSX.utils.decode_range(ws['!ref']);
+    const lines: string[] = [];
+
+    for (let R = range.s.r; R <= range.e.r; R++) {
+      const rowCells: string[] = [];
+      for (let C = range.s.c; C <= range.e.c; C++) {
+        const ref = XLSX.utils.encode_cell({ r: R, c: C });
+        const cell = ws[ref];
+        if (cell && cell.v !== undefined && cell.v !== '') {
+          const tag = cell.f ? '(formula)' : '';
+          rowCells.push(`${ref}${tag}:"${cell.v}"`);
+        }
+      }
+      if (rowCells.length > 0) lines.push(rowCells.join('  '));
+    }
+
+    return `=== Sheet: ${sheetName} ===\n${lines.join('\n')}`;
+  }).join('\n\n');
+}
+
 // ─── OM ───────────────────────────────────────────────────────────────────────
 
 /**
@@ -25,16 +57,16 @@ export const OMExtractionSchema = z.object({
   propertyAddress: z.string().nullable(),
   city: z.string().nullable(),
   state: z.string().nullable(),
-  propertyType: z.string().nullable(),   // "multifamily", "office", "retail", etc.
+  propertyType: z.string().nullable(), // "multifamily", "office", "retail", etc.
   yearBuilt: z.number().int().nullable(),
   totalUnits: z.number().int().nullable(),
   totalSqFt: z.number().nullable(),
-  askingPrice: z.number().nullable(),    // dollars
-  capRate: z.number().nullable(),        // decimal (0.065 = 6.5%)
-  noi: z.number().nullable(),            // annual, dollars
-  occupancyRate: z.number().nullable(),  // decimal (0.95 = 95%)
+  askingPrice: z.number().nullable(), // dollars
+  capRate: z.number().nullable(), // decimal (0.065 = 6.5%)
+  noi: z.number().nullable(), // annual, dollars
+  occupancyRate: z.number().nullable(), // decimal (0.95 = 95%)
   confidence: z.number().min(0).max(1),
-  flags: z.array(z.string()),            // e.g. ["NOI not stated — derived from price × cap rate"]
+  flags: z.array(z.string()), // e.g. ["NOI not stated — derived from price × cap rate"]
 });
 
 export type OMExtraction = z.infer<typeof OMExtractionSchema>;
@@ -46,11 +78,11 @@ export type OMExtraction = z.infer<typeof OMExtractionSchema>;
  */
 export const RentRollUnitSchema = z.object({
   unit: z.string(),
-  type: z.string().nullable(),           // "1BR", "2BR/1BA", "Studio", etc.
+  type: z.string().nullable(), // "1BR", "2BR/1BA", "Studio", etc.
   tenant: z.string().nullable(),
   sqFt: z.number().nullable(),
-  monthlyRent: z.number().nullable(),    // dollars
-  leaseStart: z.string().nullable(),     // ISO date string or raw
+  monthlyRent: z.number().nullable(), // dollars
+  leaseStart: z.string().nullable(), // ISO date string or raw
   leaseEnd: z.string().nullable(),
   isVacant: z.boolean(),
 });
@@ -59,10 +91,10 @@ export const RentRollExtractionSchema = z.object({
   totalUnits: z.number().int().nullable(),
   occupiedUnits: z.number().int().nullable(),
   vacantUnits: z.number().int().nullable(),
-  grossPotentialRent: z.number().nullable(),  // monthly, dollars (all units at market)
-  effectiveGrossRent: z.number().nullable(),  // monthly, dollars (occupied only)
-  vacancyRate: z.number().nullable(),         // decimal
-  averageRentPerUnit: z.number().nullable(),  // monthly, dollars
+  grossPotentialRent: z.number().nullable(), // monthly, dollars (all units at market)
+  effectiveGrossRent: z.number().nullable(), // monthly, dollars (occupied only)
+  vacancyRate: z.number().nullable(), // decimal
+  averageRentPerUnit: z.number().nullable(), // monthly, dollars
   units: z.array(RentRollUnitSchema),
   confidence: z.number().min(0).max(1),
   flags: z.array(z.string()),
@@ -82,7 +114,7 @@ export const T12ExtractionSchema = z.object({
   effectiveGrossIncome: z.number().nullable(),
 
   // Expenses (annual)
-  operatingExpenses: z.number().nullable(),   // total
+  operatingExpenses: z.number().nullable(), // total
   taxes: z.number().nullable(),
   insurance: z.number().nullable(),
   utilities: z.number().nullable(),
@@ -92,7 +124,7 @@ export const T12ExtractionSchema = z.object({
 
   // Bottom line (annual)
   noi: z.number().nullable(),
-  expenseRatio: z.number().nullable(),  // operatingExpenses / effectiveGrossIncome
+  expenseRatio: z.number().nullable(), // operatingExpenses / effectiveGrossIncome
 
   confidence: z.number().min(0).max(1),
   flags: z.array(z.string()),
