@@ -71,10 +71,10 @@ export default function BookPage() {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight mb-6">
-              Join the waitlist
+              Book an intro call
             </h1>
             <p className="text-white/40 text-lg max-w-xl mx-auto">
-              We&apos;ll be in touch soon.
+              30 minutes. No pitch deck. We&apos;ll show you what we can build.
             </p>
           </div>
 
