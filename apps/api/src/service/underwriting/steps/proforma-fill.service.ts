@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { S3Service } from '../../s3/s3.service';
 import { ExtractionResults } from '../extractors/extraction-types';
 import { FieldMapEntry } from '../proforma.service';
-import { NormalizedResult } from './normalizer.service';
+import { ResolvedMetrics } from './extraction-reconciler.service';
 
 // xlsx-populate ships no TypeScript types — use require with any
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -30,14 +30,18 @@ export class ProformaFillService {
     proformaS3Key: string,
     fieldMap: FieldMapEntry[],
     extraction: ExtractionResults,
-    normalized: NormalizedResult,
+    normalized: ResolvedMetrics,
     dealId: string,
   ): Promise<string> {
     // Download template
     const templateBuffer = await this.s3.downloadDealAttachment(proformaS3Key);
 
     // Ask Haiku to map field names → best values from extraction data
-    const fieldValues = await this.mapFieldsWithAI(fieldMap, extraction, normalized);
+    const fieldValues = await this.mapFieldsWithAI(
+      fieldMap,
+      extraction,
+      normalized,
+    );
 
     // Write values into the workbook
     const workbook = await XlsxPopulate.fromDataAsync(templateBuffer);
@@ -50,16 +54,23 @@ export class ProformaFillService {
           filled++;
         } catch (err) {
           const msg = err instanceof Error ? err.message : String(err);
-          this.logger.warn(`[${dealId}] Could not write ${entry.name} to ${entry.sheet}!${entry.cell}: ${msg}`);
+          this.logger.warn(
+            `[${dealId}] Could not write ${entry.name} to ${entry.sheet}!${entry.cell}: ${msg}`,
+          );
         }
       }
     }
 
-    this.logger.log(`[${dealId}] Filled ${filled}/${fieldMap.length} proforma cells`);
+    this.logger.log(
+      `[${dealId}] Filled ${filled}/${fieldMap.length} proforma cells`,
+    );
 
     // Serialize and upload
     const outputBuffer = await workbook.outputAsync();
-    const s3Key = await this.s3.uploadFilledProforma(Buffer.from(outputBuffer), dealId);
+    const s3Key = await this.s3.uploadFilledProforma(
+      Buffer.from(outputBuffer),
+      dealId,
+    );
     this.logger.log(`[${dealId}] Filled proforma uploaded to S3: ${s3Key}`);
     return s3Key;
   }
@@ -67,9 +78,11 @@ export class ProformaFillService {
   private async mapFieldsWithAI(
     fieldMap: FieldMapEntry[],
     extraction: ExtractionResults,
-    normalized: NormalizedResult,
+    normalized: ResolvedMetrics,
   ): Promise<Array<{ name: string; value: number | string | null }>> {
-    const fieldList = fieldMap.map((f) => `- ${f.name}: ${f.description}`).join('\n');
+    const fieldList = fieldMap
+      .map((f) => `- ${f.name}: ${f.description}`)
+      .join('\n');
     const extractionJson = JSON.stringify({ extraction, normalized }, null, 2);
 
     const MAX_ATTEMPTS = 3;
@@ -93,10 +106,14 @@ Do not invent values — only use what's present in the extraction data.`,
           ],
         });
 
-        return object.mappings as Array<{ name: string; value: number | string | null }>;
+        return object.mappings as Array<{
+          name: string;
+          value: number | string | null;
+        }>;
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
-        const isRateLimit = msg.toLowerCase().includes('rate limit') || msg.includes('429');
+        const isRateLimit =
+          msg.toLowerCase().includes('rate limit') || msg.includes('429');
 
         if (isRateLimit && attempt < MAX_ATTEMPTS) {
           const waitMs = RATE_LIMIT_WAITS_MS[attempt - 1] ?? 90_000;
@@ -107,7 +124,9 @@ Do not invent values — only use what's present in the extraction data.`,
           continue;
         }
 
-        this.logger.error(`[proforma-fill] AI mapping failed after ${attempt} attempt(s): ${msg}`);
+        this.logger.error(
+          `[proforma-fill] AI mapping failed after ${attempt} attempt(s): ${msg}`,
+        );
         return fieldMap.map((f) => ({ name: f.name, value: null }));
       }
     }
