@@ -95,7 +95,8 @@ export class InitialScreeningService {
             country: parsedContent.address.country || undefined,
           });
         } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : String(error);
+          const errorMessage =
+            error instanceof Error ? error.message : String(error);
           this.logger.warn(
             `Failed to process address for deal ${dealId}: ${errorMessage}. Continuing without asset association.`,
           );
@@ -106,12 +107,14 @@ export class InitialScreeningService {
       let contactId: string | null = null;
       if (senderEmail) {
         try {
-          contactId = await this.contactNormalizationService.findOrCreateContact(
-            senderEmail,
-            senderName,
-          );
+          contactId =
+            await this.contactNormalizationService.findOrCreateContact(
+              senderEmail,
+              senderName,
+            );
         } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : String(error);
+          const errorMessage =
+            error instanceof Error ? error.message : String(error);
           this.logger.warn(
             `Failed to process contact for deal ${dealId}: ${errorMessage}. Continuing without contact association.`,
           );
@@ -150,7 +153,12 @@ export class InitialScreeningService {
       });
 
       const duration = (Date.now() - start) / 1000;
-      this.metricsService.recordAICall('initial-screening', this.aiConfig.openaiScreeningModel, duration, 'success');
+      this.metricsService.recordAICall(
+        'initial-screening',
+        this.aiConfig.openaiScreeningModel,
+        duration,
+        'success',
+      );
 
       this.logger.log(
         `Initial screening completed: ${decision} bucket="${matchedBucket.name}" (model: ${this.aiConfig.openaiScreeningModel}) for deal ${dealId}${assetId ? ` with asset ${assetId}` : ' (no asset)'}${contactId ? ` with contact ${contactId}` : ' (no contact)'}`,
@@ -159,9 +167,16 @@ export class InitialScreeningService {
       return result;
     } catch (error) {
       const duration = (Date.now() - start) / 1000;
-      this.metricsService.recordAICall('initial-screening', this.aiConfig.openaiScreeningModel, duration, 'error');
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      const errorType = error instanceof Error ? error.constructor.name : 'Unknown';
+      this.metricsService.recordAICall(
+        'initial-screening',
+        this.aiConfig.openaiScreeningModel,
+        duration,
+        'error',
+      );
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      const errorType =
+        error instanceof Error ? error.constructor.name : 'Unknown';
       this.logger.error(
         `Initial screening failed for deal ${dealId}: ${errorMessage} (type: ${errorType})`,
       );
@@ -169,12 +184,12 @@ export class InitialScreeningService {
     }
   }
 
-  private buildPrompt(buckets: ScreeningBucket[], hasStructuredData: boolean = false): string {
+  private buildPrompt(
+    buckets: ScreeningBucket[],
+    hasStructuredData: boolean = false,
+  ): string {
     const bucketDescriptions = buckets
-      .map(
-        (b, i) =>
-          `Bucket ${i + 1}: "${b.name}"\nCriteria: ${b.description}`,
-      )
+      .map((b, i) => `Bucket ${i + 1}: "${b.name}"\nCriteria: ${b.description}`)
       .join('\n\n');
 
     return (
@@ -220,8 +235,8 @@ export class InitialScreeningService {
       '- "Contact us" or sender contact information\n' +
       '- Footer/disclaimer sections\n\n' +
       'These are SENDER addresses, not property addresses. The property address is typically found in the deal description, subject line, or property highlights section.\n\n' +
-      'If the deal mentions a city/state or neighborhood but no specific street address (common for teasers), return the city and state with street set to null. ' +
-      'For example: {"street": null, "city": "Gretna", "state": "LA", "country": "USA"}\n\n' +
+      'If no specific street address is available (e.g. the deal only mentions a city, neighborhood, or market area), set address to null. ' +
+      'A city/state alone does not constitute a property address.\n\n' +
       'If no property location can be determined at all, set address to null.\n' +
       'Use 2-letter state abbreviations when possible. Default country to "USA" if not specified.'
     );
@@ -231,10 +246,15 @@ export class InitialScreeningService {
    * Match AI's returned bucket name to a ScreeningBucket record.
    * Case-insensitive match, falls back to last-ranked bucket if unrecognized.
    */
-  private matchBucket(bucketName: string | undefined, buckets: ScreeningBucket[]): ScreeningBucket {
+  private matchBucket(
+    bucketName: string | undefined,
+    buckets: ScreeningBucket[],
+  ): ScreeningBucket {
     if (bucketName) {
       const normalized = bucketName.toLowerCase().trim();
-      const match = buckets.find((b) => b.name.toLowerCase().trim() === normalized);
+      const match = buckets.find(
+        (b) => b.name.toLowerCase().trim() === normalized,
+      );
       if (match) return match;
 
       this.logger.warn(

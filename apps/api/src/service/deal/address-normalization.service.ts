@@ -103,7 +103,8 @@ export class AddressNormalizationService {
    * Normalize address components to create a consistent matching key
    */
   normalizeAddress(components: AddressComponents): string | null {
-    if (!components.street && !components.city && !components.state) {
+    // Require a street address — city/state alone is not specific enough to represent a property
+    if (!components.street) {
       return null;
     }
 
@@ -242,10 +243,9 @@ export class AddressNormalizationService {
 
       return newAsset.id;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      this.logger.error(
-        `Failed to find or create asset: ${errorMessage}`,
-      );
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      this.logger.error(`Failed to find or create asset: ${errorMessage}`);
       // Don't throw - return null so deal processing can continue
       return null;
     }
