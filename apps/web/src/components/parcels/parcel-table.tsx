@@ -294,9 +294,24 @@ export function ParcelTable({
                   )}
                 </TableCell>
                 <TableCell className="text-right">
-                  {parcel.lienMatchConfidence === "exact"
-                    ? formatCurrency(parcel.lienSaleAmount)
-                    : "-"}
+                  {parcel.lienSaleAmount != null ? (
+                    <span className="inline-flex items-center gap-1 justify-end">
+                      {formatCurrency(parcel.lienSaleAmount)}
+                      {parcel.lienMatchConfidence === "group_small" && (
+                        <Badge className="bg-yellow-900/30 text-yellow-400 border-yellow-900/50 text-[10px] px-1 py-0 leading-tight">
+                          ~Est
+                        </Badge>
+                      )}
+                      {(parcel.lienMatchConfidence === "group_large" ||
+                        parcel.lienMatchConfidence === "estimated") && (
+                        <Badge className="bg-orange-900/30 text-orange-400 border-orange-900/50 text-[10px] px-1 py-0 leading-tight">
+                          ~Est
+                        </Badge>
+                      )}
+                    </span>
+                  ) : (
+                    "-"
+                  )}
                 </TableCell>
                 <TableCell className="text-right">
                   {formatCurrency(parcel.outstandingTaxBill)}
@@ -439,10 +454,24 @@ export function ParcelTable({
                               label="Distress Score"
                               value={parcel.distressScore?.toString()}
                             />
-                            {parcel.lienMatchConfidence === "exact" && (
+                            {parcel.lienSaleAmount != null && (
                               <>
-                                <div className="mt-3 mb-1 text-zinc-400 font-medium text-xs">
+                                <div className="mt-3 mb-1 text-zinc-400 font-medium text-xs inline-flex items-center gap-2">
                                   NYCTL Lien Sale
+                                  {parcel.lienMatchConfidence ===
+                                    "group_small" && (
+                                    <Badge className="bg-yellow-900/30 text-yellow-400 border-yellow-900/50 text-[10px] px-1 py-0 leading-tight">
+                                      ~Est (group)
+                                    </Badge>
+                                  )}
+                                  {(parcel.lienMatchConfidence ===
+                                    "group_large" ||
+                                    parcel.lienMatchConfidence ===
+                                      "estimated") && (
+                                    <Badge className="bg-orange-900/30 text-orange-400 border-orange-900/50 text-[10px] px-1 py-0 leading-tight">
+                                      ~Est (group)
+                                    </Badge>
+                                  )}
                                 </div>
                                 <DetailRow
                                   label="Sale Amount"
@@ -481,6 +510,13 @@ export function ParcelTable({
                                   label="Sale Date"
                                   value={parcel.lienSaleDate}
                                 />
+                                {parcel.lienMatchGroupSize != null &&
+                                  parcel.lienMatchGroupSize > 1 && (
+                                    <DetailRow
+                                      label="Group Size"
+                                      value={`${parcel.lienMatchGroupSize} BBLs`}
+                                    />
+                                  )}
                               </>
                             )}
                           </div>
