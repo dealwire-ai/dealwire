@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { SodaAdapter, SodaSourceConfig } from './soda.adapter';
 import { DistressScoringService } from './distress-scoring.service';
 import { NyctlQuarterlyService } from './nyctl-quarterly.service';
+import { NotificationService } from '../notifications/notification.service';
 import {
   normalizeBbl,
   BOROUGH_NUMERIC_TO_ABBR,
@@ -49,60 +50,160 @@ export interface IngestionResult {
 @Injectable()
 export class NycIngestionService {
   private readonly logger = new Logger(NycIngestionService.name);
+  private running = false;
 
   constructor(
     private readonly prisma: PrismaService,
     private readonly soda: SodaAdapter,
     private readonly scoring: DistressScoringService,
     private readonly nyctl: NyctlQuarterlyService,
+    private readonly notifications: NotificationService,
   ) {}
+
+  get isRunning(): boolean {
+    return this.running;
+  }
 
   /**
    * Run full ingestion pipeline: tax liens → PLUTO enrichment → HPD violations → scoring.
+   * Only one ingestion can run at a time. Throws if already running.
    */
   async ingestAll(boroughs: string[]): Promise<IngestionResult[]> {
-    this.logger.log(
-      `Starting full ingestion for boroughs: ${boroughs.join(', ')}`,
-    );
-    const results: IngestionResult[] = [];
-
-    // 1. Ingest tax lien list (creates Parcel rows)
-    const lienResult = await this.ingestTaxLiens(boroughs);
-    results.push(lienResult);
-
-    // 2. Enrich with PLUTO data (query by borough abbreviation)
-    const plutoResult = await this.ingestPlutoData(boroughs);
-    results.push(plutoResult);
-
-    // 3. Ingest HPD violations
-    const hpdResult = await this.ingestHpdViolations(boroughs);
-    results.push(hpdResult);
-
-    // 4. Ingest property charges (outstanding tax bills)
-    const chargesResult = await this.ingestPropertyCharges(boroughs);
-    results.push(chargesResult);
-
-    // 5. Compute distress scores
-    await this.scoring.scoreAll();
-
-    // 6. NYCTL quarterly report (if report date is configured)
-    const nyctlReportDate = process.env.NYCTL_REPORT_DATE;
-    if (nyctlReportDate) {
-      try {
-        const nyctlResult =
-          await this.nyctl.ingestNyctlQuarterly(nyctlReportDate);
-        results.push(nyctlResult);
-      } catch (err) {
-        this.logger.error(
-          `NYCTL ingestion failed (non-fatal): ${(err as Error).message}`,
-        );
-      }
+    if (this.running) {
+      throw new Error('Ingestion is already running');
     }
 
-    this.logger.log(
-      `Full ingestion complete. Results: ${JSON.stringify(results.map((r) => `${r.source}: ${r.recordsProcessed}`))}`,
-    );
-    return results;
+    this.running = true;
+    const start = Date.now();
+    const boroughNames = boroughs.map((b) => BOROUGH_NAMES[b] || b);
+
+    try {
+      this.logger.log(
+        `Starting full ingestion for boroughs: ${boroughs.join(', ')}`,
+      );
+      const results: IngestionResult[] = [];
+
+      // 1. Ingest tax lien list (creates Parcel rows)
+      const lienResult = await this.ingestTaxLiens(boroughs);
+      results.push(lienResult);
+
+      // 2. Enrich with PLUTO data (query by borough abbreviation)
+      const plutoResult = await this.ingestPlutoData(boroughs);
+      results.push(plutoResult);
+
+      // 3. Ingest HPD violations
+      const hpdResult = await this.ingestHpdViolations(boroughs);
+      results.push(hpdResult);
+
+      // 4. Ingest property charges (outstanding tax bills)
+      const chargesResult = await this.ingestPropertyCharges(boroughs);
+      results.push(chargesResult);
+
+      // 5. Compute distress scores
+      await this.scoring.scoreAll();
+
+      // 6. NYCTL quarterly report (if report date is configured)
+      const nyctlReportDate = process.env.NYCTL_REPORT_DATE;
+      if (nyctlReportDate) {
+        try {
+          const nyctlResult =
+            await this.nyctl.ingestNyctlQuarterly(nyctlReportDate);
+          results.push(nyctlResult);
+        } catch (err) {
+          this.logger.error(
+            `NYCTL ingestion failed (non-fatal): ${(err as Error).message}`,
+          );
+        }
+      }
+
+      const durationMin = Math.round((Date.now() - start) / 1000 / 60);
+      this.logger.log(
+        `Full ingestion complete. Results: ${JSON.stringify(results.map((r) => `${r.source}: ${r.recordsProcessed}`))}`,
+      );
+
+      // Notify admins
+      await this.notifyIngestionComplete(boroughNames, results, durationMin);
+
+      return results;
+    } catch (err) {
+      const durationMin = Math.round((Date.now() - start) / 1000 / 60);
+      await this.notifyIngestionFailed(
+        boroughNames,
+        (err as Error).message,
+        durationMin,
+      );
+      throw err;
+    } finally {
+      this.running = false;
+    }
+  }
+
+  private async notifyIngestionComplete(
+    boroughs: string[],
+    results: IngestionResult[],
+    durationMin: number,
+  ): Promise<void> {
+    const rows = results
+      .map(
+        (r) =>
+          `<tr><td style="padding:6px 12px;border-bottom:1px solid #333;">${r.source}</td>` +
+          `<td style="padding:6px 12px;border-bottom:1px solid #333;text-align:right;">${r.recordsProcessed.toLocaleString()}</td>` +
+          `<td style="padding:6px 12px;border-bottom:1px solid #333;text-align:right;">${r.recordsUpdated.toLocaleString()}</td>` +
+          `<td style="padding:6px 12px;border-bottom:1px solid #333;text-align:right;">${(r.durationMs / 1000).toFixed(1)}s</td></tr>`,
+      )
+      .join('');
+
+    const html = `
+      <div style="font-family:sans-serif;max-width:600px;margin:0 auto;">
+        <h2 style="color:#22c55e;">Parcel Ingestion Complete</h2>
+        <p>Boroughs: <strong>${boroughs.join(', ')}</strong> | Duration: <strong>${durationMin} min</strong></p>
+        <table style="width:100%;border-collapse:collapse;font-size:14px;">
+          <tr style="background:#222;color:#aaa;">
+            <th style="padding:6px 12px;text-align:left;">Source</th>
+            <th style="padding:6px 12px;text-align:right;">Processed</th>
+            <th style="padding:6px 12px;text-align:right;">Updated</th>
+            <th style="padding:6px 12px;text-align:right;">Duration</th>
+          </tr>
+          ${rows}
+        </table>
+        <p style="color:#666;font-size:12px;margin-top:16px;">${new Date().toLocaleString()}</p>
+      </div>`;
+
+    try {
+      await this.notifications.sendCustom(
+        `Ingestion complete — ${boroughs.join(', ')}`,
+        html,
+      );
+    } catch (err) {
+      this.logger.warn(
+        `Failed to send ingestion email: ${(err as Error).message}`,
+      );
+    }
+  }
+
+  private async notifyIngestionFailed(
+    boroughs: string[],
+    error: string,
+    durationMin: number,
+  ): Promise<void> {
+    const html = `
+      <div style="font-family:sans-serif;max-width:600px;margin:0 auto;">
+        <h2 style="color:#ef4444;">Parcel Ingestion Failed</h2>
+        <p>Boroughs: <strong>${boroughs.join(', ')}</strong> | Failed after: <strong>${durationMin} min</strong></p>
+        <pre style="background:#1a1a1a;color:#f87171;padding:12px;border-radius:6px;overflow-x:auto;">${error.substring(0, 2000)}</pre>
+        <p style="color:#666;font-size:12px;margin-top:16px;">${new Date().toLocaleString()}</p>
+      </div>`;
+
+    try {
+      await this.notifications.sendCustom(
+        `Ingestion FAILED — ${boroughs.join(', ')}`,
+        html,
+      );
+    } catch (err) {
+      this.logger.warn(
+        `Failed to send failure email: ${(err as Error).message}`,
+      );
+    }
   }
 
   /**
