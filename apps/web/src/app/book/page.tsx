@@ -74,7 +74,7 @@ export default function BookPage() {
               Join the waitlist
             </h1>
             <p className="text-white/40 text-lg max-w-xl mx-auto">
-              We'll be in touch soon.
+              We&apos;ll be in touch soon.
             </p>
           </div>
 
