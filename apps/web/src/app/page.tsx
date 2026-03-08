@@ -349,7 +349,7 @@ export default function Home() {
       <section className="relative z-10 px-6 lg:px-16 py-14 border-t border-white/[0.04]">
         <div className="max-w-7xl mx-auto">
           <p className="text-xs font-mono text-white/20 tracking-widest uppercase text-center mb-10">
-            Backed by operators who&apos;ve moved $2B+ across private markets
+            Trusted by operators who&apos;ve moved $2B+ across private markets
           </p>
           <div className="flex flex-wrap items-center justify-center gap-x-14 gap-y-8">
             {[
@@ -770,10 +770,10 @@ export default function Home() {
             </h2>
             <p className="text-white/40 max-w-2xl text-lg leading-relaxed mb-16">
               Two Northeastern students who built, scaled, and sold a proptech
-              company before most classmates had their first internship. We
-              don&apos;t have decades of experience. We have something rarer:
-              the depth to build what the industry needs, backed by operators
-              who&apos;ve seen every type of deal.
+              company in between classes. We don&apos;t have decades of
+              experience. We have something rarer: the depth to build what the
+              industry needs, backed by operators who&apos;ve seen every type of
+              deal.
             </p>
           </FadeInSection>
 
@@ -790,7 +790,7 @@ export default function Home() {
               {
                 name: "Noah Weinstein",
                 role: "Co-Founder",
-                bio: "Former Software Engineer at Flexcar and Technical Product Manager at Siphox, a venture-backed health tech startup, where he worked on consumer-facing AI systems. Computer Science at Northeastern. Co-founded and sold frontstep.ai.",
+                bio: "Former Software Engineer at Flexcar and Technical Product Manager at Siphox, a venture-backed health tech startup. Computer Science at Northeastern. Co-founded and sold frontstep.ai.",
                 linkedin: "https://www.linkedin.com/in/noahweinstein/",
                 email: "noah@frontstep.ai",
                 headshot: "/headshots/noah.webp",
