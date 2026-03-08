@@ -934,6 +934,10 @@ export class AnalyzerAgentService {
                 violationsPerUnit: p.violationsPerUnit,
                 outstandingTaxBill: p.outstandingTaxBill,
                 totalOutstandingBalance: p.totalOutstandingBalance,
+                lienSaleAmount: p.lienSaleAmount,
+                lienRedemptiveValue: p.lienRedemptiveValue,
+                lienServicer: p.lienServicer,
+                lienMatchConfidence: p.lienMatchConfidence,
               })),
               total: result.pagination.total,
             };
