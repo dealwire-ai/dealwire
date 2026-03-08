@@ -37,18 +37,22 @@ See `docs/product/PUBLIC_DATA_PLATFORM.md` for the public data ingestion archite
 ## Architecture
 
 ### Monorepo Structure
+
 - `apps/web` - Next.js 16 frontend (React 19, Tailwind 4)
 - `apps/api` - NestJS 11 backend
 
 ### Commands (from root)
+
 - `pnpm dev` - Run both frontend and backend
 - `pnpm build` - Build both apps
 
 ### Ports
+
 - Frontend: http://localhost:3000
 - Backend: http://localhost:3001
 
 ### Deployment
+
 - Frontend: Railway (service: analyzer-web, root dir: apps/web)
 - Backend: Railway (service: analyzer-api, root dir: apps/api, uses Dockerfile)
 
@@ -76,6 +80,7 @@ Railway MCP tools (`mcp__railway__*`) are available for deployments, logs, and s
 - Prod DB uses port 5432 (direct Supabase URL), never 6543 (pooler) for migrations
 
 ### Package naming
+
 - Frontend: `@analyzer/web`
 - Backend: `@analyzer/api`
 
@@ -87,42 +92,42 @@ All project instructions live in `CLAUDE.md` (this file). `.cursorrules` points 
 
 #### `docs/technical/` — Engineering & Infrastructure
 
-| Document | Purpose |
-|----------|---------|
-| `SUBSYSTEMS.md` | **Codebase map** — what each subsystem does, key service files, data flow, env vars. Read this before touching any subsystem. |
-| `ARCHITECTURE.md` | ASCII system architecture diagram |
-| `BACKEND.md` | Services, email flow, auth, patterns, env vars |
-| `FRONTEND.md` | API clients, CORS, env vars |
-| `TESTING.md` | Unit test philosophy, format, guidelines |
-| `DEVELOPMENT.md` | Troubleshooting, migrations, local dev tips |
-| `GRAFANA_SETUP.md` | Monitoring/observability setup guide |
-| `CLERK_AUTH_SETUP.md` | Clerk authentication implementation details |
-| `DESKTOP_DEEP_LINK.md` | MAPI entry ID fetch + `outlook:` protocol for desktop Outlook deep links in digest |
+| Document               | Purpose                                                                                                                       |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `SUBSYSTEMS.md`        | **Codebase map** — what each subsystem does, key service files, data flow, env vars. Read this before touching any subsystem. |
+| `ARCHITECTURE.md`      | ASCII system architecture diagram                                                                                             |
+| `BACKEND.md`           | Services, email flow, auth, patterns, env vars                                                                                |
+| `FRONTEND.md`          | API clients, CORS, env vars                                                                                                   |
+| `TESTING.md`           | Unit test philosophy, format, guidelines                                                                                      |
+| `DEVELOPMENT.md`       | Troubleshooting, migrations, local dev tips                                                                                   |
+| `GRAFANA_SETUP.md`     | Monitoring/observability setup guide                                                                                          |
+| `CLERK_AUTH_SETUP.md`  | Clerk authentication implementation details                                                                                   |
+| `DESKTOP_DEEP_LINK.md` | MAPI entry ID fetch + `outlook:` protocol for desktop Outlook deep links in digest                                            |
 
 #### `docs/product/` — Product & Features
 
-| Document | Purpose |
-|----------|---------|
-| `ROADMAP.md` | Current product priorities and feature roadmap |
-| `TODO.md` | Active task list across workstreams |
-| `UNDERWRITING.md` | Acquisition underwriting — implementation status (top) + full plan. Email trigger → extract → pro forma fill + Excel delivery. |
-| `PUBLIC_DATA_PLATFORM.md` | Architecture for public property data ingestion |
-| `TAX_LIEN_PLATFORM.md` | Tax lien data platform — domain knowledge, features, architecture, commercial terms |
+| Document                  | Purpose                                                                                                                        |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `ROADMAP.md`              | Current product priorities and feature roadmap                                                                                 |
+| `TODO.md`                 | Active task list across workstreams                                                                                            |
+| `UNDERWRITING.md`         | Acquisition underwriting — implementation status (top) + full plan. Email trigger → extract → pro forma fill + Excel delivery. |
+| `PUBLIC_DATA_PLATFORM.md` | Architecture for public property data ingestion                                                                                |
+| `TAX_LIEN_PLATFORM.md`    | Tax lien data platform — domain knowledge, features, architecture, commercial terms                                            |
 
 #### `docs/clients/` — Client-Specific Notes
 
-| Document | Client | Purpose |
-|----------|--------|---------|
-| `JK_NOTES.md` | Jordan Karlik | Meeting notes, Google Drive folder, Granola transcripts |
-| `TAX_LIEN_NOTES.md` | Daniel Gabay | Tax lien research, proposals, Google Drive folder |
-| `BOUTIQUE_HOTEL_OPPORTUNITY.md` | Minas Terlidis | Bohopo lead — hotel acquisition sourcing vertical |
+| Document                        | Client         | Purpose                                                 |
+| ------------------------------- | -------------- | ------------------------------------------------------- |
+| `JK_NOTES.md`                   | Jordan Karlik  | Meeting notes, Google Drive folder, Granola transcripts |
+| `TAX_LIEN_NOTES.md`             | Daniel Gabay   | Tax lien research, proposals, Google Drive folder       |
+| `BOUTIQUE_HOTEL_OPPORTUNITY.md` | Minas Terlidis | Bohopo lead — hotel acquisition sourcing vertical       |
 
 #### Reference (not in docs/)
 
-| Document | Purpose |
-|----------|---------|
+| Document                         | Purpose                                          |
+| -------------------------------- | ------------------------------------------------ |
 | `/apps/api/prisma/schema.prisma` | Database schema (source of truth for data model) |
-| `/apps/api/.env.example` | Required environment variables for backend |
+| `/apps/api/.env.example`         | Required environment variables for backend       |
 
 ---
 
@@ -136,15 +141,15 @@ Any time make changes to the Prisma schema, generate a dev migration using cd ap
 
 After implementing any feature, API change, or architectural change — update the relevant doc(s) in `/docs/` to reflect the new reality. Don't leave docs describing a state that no longer exists.
 
-| Change type | Update |
-|-------------|--------|
-| New or modified API endpoints | `docs/product/TAX_LIEN_PLATFORM.md` (public data) or `docs/technical/BACKEND.md` |
-| New services, adapters, or architectural patterns | Relevant domain doc |
-| New or changed env vars | `apps/api/.env.example` + `docs/technical/BACKEND.md` |
-| Prisma schema changes | Note in `docs/technical/BACKEND.md` if it affects documented data model |
-| Roadmap item completed | Mark `[x]` in `docs/product/ROADMAP.md` |
-| New feature added | Add to "What's Built" section in `docs/product/ROADMAP.md` |
-| New subsystem or major service refactor | Update `docs/technical/SUBSYSTEMS.md` |
+| Change type                                       | Update                                                                           |
+| ------------------------------------------------- | -------------------------------------------------------------------------------- |
+| New or modified API endpoints                     | `docs/product/TAX_LIEN_PLATFORM.md` (public data) or `docs/technical/BACKEND.md` |
+| New services, adapters, or architectural patterns | Relevant domain doc                                                              |
+| New or changed env vars                           | `apps/api/.env.example` + `docs/technical/BACKEND.md`                            |
+| Prisma schema changes                             | Note in `docs/technical/BACKEND.md` if it affects documented data model          |
+| Roadmap item completed                            | Mark `[x]` in `docs/product/ROADMAP.md`                                          |
+| New feature added                                 | Add to "What's Built" section in `docs/product/ROADMAP.md`                       |
+| New subsystem or major service refactor           | Update `docs/technical/SUBSYSTEMS.md`                                            |
 
 ---
 
@@ -165,3 +170,15 @@ Same `type: description` format as commits. Keep under 70 chars — use the desc
 ### PR Structure
 
 Break changes into separate, logical commits — each group of related changes should be its own commit rather than one big commit for the whole PR.
+
+---
+
+## Code Quality
+
+This is a TypeScript codebase. When making code changes, always verify the changes compile (`npx tsc --noEmit`) before considering the task complete. If tests exist, run them. If test configuration is broken, note it clearly rather than spending excessive time debugging the test runner.
+
+---
+
+## Deployment Reminders
+
+After deploying code changes that affect data ingestion or processing pipelines, remind the user that ingestion may need to be re-triggered for existing records to reflect the changes.
