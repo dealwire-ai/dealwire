@@ -453,7 +453,9 @@ export class PublicDataController {
 
     let result: { queueId: string; queued: string[]; skipped: number };
     try {
-      result = await this.skipTrace.submitBatch([bbl], body.force ?? false);
+      // Use enqueue to buffer single-BBL requests and flush as one batch,
+      // avoiding Tracerfy's rate limit on multiple 1-row uploads
+      result = await this.skipTrace.enqueue(bbl, body.force ?? false);
     } catch (err) {
       const message = (err as Error).message;
       if (
@@ -474,9 +476,6 @@ export class PublicDataController {
       );
       throw new HttpException(message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
-    // Fire-and-forget polling
-    this.skipTrace.pollAndStore(result.queueId, result.queued);
 
     return {
       queued: result.queued.length,
