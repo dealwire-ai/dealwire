@@ -10,13 +10,24 @@ export class NotificationService {
   private readonly notificationLevel: NotificationLevel;
 
   constructor(private readonly emailSender: EmailSenderService) {
-    this.notificationLevel = (process.env.NOTIFICATION_LEVEL as NotificationLevel) || 'all';
+    this.notificationLevel =
+      (process.env.NOTIFICATION_LEVEL as NotificationLevel) || 'all';
+  }
+
+  /**
+   * Send a custom notification email to admins. Public wrapper for use by other services.
+   */
+  async sendCustom(subject: string, html: string): Promise<void> {
+    await this.sendEmailNotification(subject, html);
   }
 
   /**
    * Send email notification to admins
    */
-  private async sendEmailNotification(subject: string, html: string): Promise<void> {
+  private async sendEmailNotification(
+    subject: string,
+    html: string,
+  ): Promise<void> {
     try {
       await this.emailSender.sendEmail({
         to: ADMIN_EMAILS,
@@ -29,7 +40,6 @@ export class NotificationService {
     }
   }
 
-  
   /**
    * Notify about a new deal processed
    * @deprecated No longer used - admins now receive the original email via forward and analysis via reply
@@ -57,9 +67,10 @@ export class NotificationService {
     const color = decision === 'yes' ? '#00ff00' : '#ff0000';
 
     // Truncate email body if too long (show first 2000 chars)
-    const truncatedBody = emailBodyText.length > 2000 
-      ? emailBodyText.substring(0, 2000) + '... (truncated)'
-      : emailBodyText;
+    const truncatedBody =
+      emailBodyText.length > 2000
+        ? emailBodyText.substring(0, 2000) + '... (truncated)'
+        : emailBodyText;
 
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -76,27 +87,38 @@ export class NotificationService {
           <p><strong>Decision:</strong> ${decisionText}</p>
           <p><strong>Reason:</strong> ${reason}</p>
         </div>
-        ${emailBodyText ? `
+        ${
+          emailBodyText
+            ? `
         <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;">
           <h3 style="margin-top: 0;">Email Body:</h3>
           <pre style="white-space: pre-wrap; word-wrap: break-word; font-family: monospace; font-size: 12px; max-height: 400px; overflow-y: auto;">${this.escapeHtml(truncatedBody)}</pre>
         </div>
-        ` : ''}
-        ${attachmentS3Keys.length > 0 ? `
+        `
+            : ''
+        }
+        ${
+          attachmentS3Keys.length > 0
+            ? `
         <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;">
           <h3 style="margin-top: 0;">Attachments (S3 Keys):</h3>
           <ul style="margin: 0; padding-left: 20px;">
-            ${attachmentS3Keys.map(key => `<li style="font-family: monospace; font-size: 12px; word-break: break-all;">${this.escapeHtml(key)}</li>`).join('')}
+            ${attachmentS3Keys.map((key) => `<li style="font-family: monospace; font-size: 12px; word-break: break-all;">${this.escapeHtml(key)}</li>`).join('')}
           </ul>
         </div>
-        ` : ''}
+        `
+            : ''
+        }
         <p style="color: #666; font-size: 12px;">
           ${new Date().toLocaleString()}
         </p>
       </div>
     `;
 
-    await this.sendEmailNotification(`Deal Processed: ${decisionText} - ${subject}`, html);
+    await this.sendEmailNotification(
+      `Deal Processed: ${decisionText} - ${subject}`,
+      html,
+    );
   }
 
   /**
@@ -205,23 +227,27 @@ export class NotificationService {
       </div>
     `;
 
-    await this.sendEmailNotification(`Email Moved to ${folderName}: ${subject}`, html);
+    await this.sendEmailNotification(
+      `Email Moved to ${folderName}: ${subject}`,
+      html,
+    );
   }
 
   /**
    * Send daily digest summary
    */
-  async sendDailyDigest(
-    stats: {
-      totalProcessed: number;
-      deals: number;
-      skipped: number;
-      yesDecisions: number;
-      noDecisions: number;
-      errors: number;
-    },
-  ): Promise<void> {
-    if (this.notificationLevel !== 'all' && this.notificationLevel !== 'digest-only') {
+  async sendDailyDigest(stats: {
+    totalProcessed: number;
+    deals: number;
+    skipped: number;
+    yesDecisions: number;
+    noDecisions: number;
+    errors: number;
+  }): Promise<void> {
+    if (
+      this.notificationLevel !== 'all' &&
+      this.notificationLevel !== 'digest-only'
+    ) {
       return;
     }
 
