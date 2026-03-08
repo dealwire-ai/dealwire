@@ -52,7 +52,8 @@ export class ScreeningInboundService {
     }
 
     // Fetch the email body text from Resend
-    const { text: bodyText } = await this.emailProcessing.extractEmailBody(emailId);
+    const { text: bodyText } =
+      await this.emailProcessing.extractEmailBody(emailId);
     const userMessage = (bodyText || '').trim();
 
     if (!userMessage) {
@@ -84,12 +85,25 @@ export class ScreeningInboundService {
         (this.config.screeningInboundEmail || '').toLowerCase(),
     );
 
+    // Resend delivers headers as an array of {name, value} objects
+    const headersArray: Array<{ name: string; value: string }> = Array.isArray(
+      emailData.headers,
+    )
+      ? emailData.headers
+      : [];
+    const messageIdHeader = headersArray.find(
+      (h) => h.name?.toLowerCase() === 'message-id',
+    );
+    const replyToMessageId = messageIdHeader?.value || emailId;
+
     await this.emailSender.sendEmail({
       to: [fromEmail],
       from: screeningAddr || this.config.screeningInboundEmail || undefined,
-      subject: subject.toLowerCase().startsWith('re:') ? subject : `Re: ${subject}`,
+      subject: subject.toLowerCase().startsWith('re:')
+        ? subject
+        : `Re: ${subject}`,
       html: htmlBody,
-      replyToMessageId: emailData.headers?.['message-id'] || emailId,
+      replyToMessageId,
     });
 
     this.logger.log(`Replied to screening command from ${fromEmail}`);
