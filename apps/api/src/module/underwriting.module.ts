@@ -11,6 +11,7 @@ import { NormalizerService } from '../service/underwriting/steps/normalizer.serv
 import { ProformaFillService } from '../service/underwriting/steps/proforma-fill.service';
 import { DeliveryService } from '../service/underwriting/steps/delivery.service';
 import { ProformaController } from '../controller/underwriting/proforma.controller';
+import { UnderwritingDevController } from '../controller/underwriting/underwriting-dev.controller';
 import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
 import { PrismaModule } from './prisma.module';
 import { S3Module } from './s3.module';
@@ -18,7 +19,7 @@ import { EmailServicesModule } from './email.module';
 
 @Module({
   imports: [PrismaModule, S3Module, EmailServicesModule],
-  controllers: [ProformaController],
+  controllers: [ProformaController, UnderwritingDevController],
   providers: [
     ClerkAuthGuard,
     UnderwritingListenerService,
