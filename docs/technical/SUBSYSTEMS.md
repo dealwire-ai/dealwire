@@ -123,27 +123,37 @@ Email → UnderwritingInboundService (Resend webhook)
 ```
 src/service/public-data/
   soda.adapter.ts              # Generic Socrata SODA API adapter (paginated fetch, field mapping)
-  nyc-ingestion.service.ts     # Orchestrates: tax liens → PLUTO enrichment → HPD → score → upsert
-  distress-scoring.service.ts  # Distress score (0-100): lien, violations, class C/B
+  nyc-ingestion.service.ts     # Orchestrates: tax liens → PLUTO → HPD → charges → NYCTL → score → upsert
+  nyctl-quarterly.service.ts   # NYCTL quarterly XLSX download, parsing, crosswalk matching
+  distress-scoring.service.ts  # Distress score (0-100): lien, violations, class C
   parcel-query.service.ts      # Query/filter Parcel table; used by controller + agent
   skip-trace.service.ts        # Tracerfy skip tracing: submitBatch, pollAndStore, cap check
   nyc-utils.ts                 # Borough constants, BBL utilities
 
 src/controller/public-data.controller.ts  # /public-data/* — ingest, parcels, export, stats, skip-trace
 src/module/public-data.module.ts
-src/module/ingestion.module.ts
 ```
 
 **Data flow:**
 
 ```
 POST /public-data/ingest
-  → NycIngestionService.ingest()
-      → SodaAdapter.fetch(taxLienDataset)  [9rz4-mjek]
-      → batch PLUTO enrichment             [64uk-42ks]
-      → HPD violation aggregation          [wvxf-dwi5]
+  → NycIngestionService.ingestAll() [guarded by in-memory lock, 409 if running]
+      → SodaAdapter.fetch(taxLienDataset)       [9rz4-mjek]
+      → batch PLUTO enrichment                  [64uk-42ks]
+      → HPD violation aggregation               [wvxf-dwi5]
+      → Property Charges Balance                [scjx-j6np]
       → DistressScoringService.score()
+      → (optional) NyctlQuarterlyService        [if NYCTL_REPORT_DATE set]
       → Prisma upsert → Parcel table
+      → Email notification on completion/failure
+
+POST /public-data/ingest/nyctl  { reportDate: "9-30-2025" }
+  → NyctlQuarterlyService.ingestNyctlQuarterly()
+      → download XLSX from nyc.gov DOF quarterly reports
+      → crosswalk match on (zip, buildingClass, taxClass) → 4-tier confidence
+      → multi-trust merging (sum across trust vintages)
+      → Prisma update → Parcel NYCTL fields
 
 POST /public-data/parcels/skip-trace (or /:bbl/skip-trace)
   → SkipTraceService.submitBatch(bbls)
@@ -154,7 +164,7 @@ POST /public-data/parcels/skip-trace (or /:bbl/skip-trace)
           → write ownerPhones/ownerEmails → Parcel table
 ```
 
-**Env vars:** `NYC_OPEN_DATA_APP_TOKEN` (optional, avoids rate limits), `TRACERFY_API_KEY`, `TRACERFY_MONTHLY_CREDIT_CAP` (default 500)
+**Env vars:** `NYC_OPEN_DATA_APP_TOKEN` (optional, avoids rate limits), `TRACERFY_API_KEY`, `TRACERFY_MONTHLY_CREDIT_CAP` (default 500), `NYCTL_REPORT_DATE` (optional, e.g. `9-30-2025` — triggers NYCTL ingestion as part of full ingest)
 
 **Agent tools:** `query_parcels`, `get_parcel_stats` (in `AnalyzerAgentService`)
 
