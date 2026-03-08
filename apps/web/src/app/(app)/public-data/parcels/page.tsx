@@ -7,6 +7,7 @@ import { ParcelTable, type Parcel } from "@/components/parcels/parcel-table";
 import { ParcelFilters } from "@/components/parcels/parcel-filters";
 import { ExportButton } from "@/components/parcels/export-button";
 import { BatchSkipTraceButton } from "@/components/parcels/batch-skip-trace-button";
+import { DataCoverageBar } from "@/components/parcels/data-coverage-bar";
 import { TableToolbar } from "@/components/table-toolbar";
 import { TablePagination } from "@/components/table-pagination";
 import { TableSkeleton } from "@/components/table-skeleton";
@@ -24,6 +25,13 @@ interface Stats {
     count: number;
     avgScore: number;
   }>;
+  totalOutstandingDebt: number;
+  withPlutoData: number;
+  withViolations: number;
+  withTaxBills: number;
+  withNyctlData: number;
+  withSkipTrace: number;
+  withCompleteData: number;
 }
 
 const BOROUGH_NAMES: Record<string, string> = {
@@ -32,6 +40,14 @@ const BOROUGH_NAMES: Record<string, string> = {
   "3": "Brooklyn",
   "4": "Queens",
   "5": "Staten Island",
+};
+
+const BOROUGH_ABBREV: Record<string, string> = {
+  "1": "MN",
+  "2": "BX",
+  "3": "BK",
+  "4": "QN",
+  "5": "SI",
 };
 
 export default function ParcelsPage() {
@@ -46,6 +62,10 @@ export default function ParcelsPage() {
   const [error, setError] = useState<string | null>(null);
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const [selectedBbls, setSelectedBbls] = useState<Set<string>>(new Set());
+  const [showCoverage, setShowCoverage] = useState(() => {
+    if (typeof window === "undefined") return true;
+    return localStorage.getItem("parcels-show-coverage") !== "false";
+  });
 
   const table = useTableState({
     defaultLimit: 50,
@@ -130,30 +150,85 @@ export default function ParcelsPage() {
           <ExportButton queryString={table.queryString} />
         </div>
 
-        {/* Stats bar */}
+        {/* Data Coverage Dashboard */}
         {stats && (
-          <div className="grid grid-cols-4 gap-4 mb-6">
-            <StatCard
-              label="Total Parcels"
-              value={stats.total.toLocaleString()}
-            />
-            <StatCard
-              label="Active Liens"
-              value={stats.withActiveLiens.toLocaleString()}
-            />
-            <StatCard
-              label="Avg Distress Score"
-              value={stats.avgDistressScore.toString()}
-            />
-            <StatCard
-              label="Proportions per Borough"
-              value={stats.byBorough
-                .map(
-                  (b) => `${BOROUGH_NAMES[b.borough] || b.borough}: ${b.count}`,
-                )
-                .join(", ")}
-              small
-            />
+          <div className="mb-6 space-y-4">
+            {/* Row 1: Key metrics */}
+            <div className="grid grid-cols-4 gap-4">
+              <StatCard
+                label="Total Parcels"
+                value={stats.total.toLocaleString()}
+                subtitle={stats.byBorough
+                  .map(
+                    (b) =>
+                      `${b.count.toLocaleString()} ${BOROUGH_ABBREV[b.borough] || b.borough}`,
+                  )
+                  .join(" / ")}
+              />
+              <StatCard
+                label="With Active Liens"
+                value={stats.withActiveLiens.toLocaleString()}
+                subtitle={
+                  stats.total > 0
+                    ? `${((stats.withActiveLiens / stats.total) * 100).toFixed(1)}%`
+                    : "0%"
+                }
+              />
+              <StatCard
+                label="Complete Data"
+                value={stats.withCompleteData.toLocaleString()}
+                subtitle="Phone + violations + NYCTL"
+              />
+              <StatCard
+                label="Total Outstanding Debt"
+                value={`$${Math.round(stats.totalOutstandingDebt).toLocaleString()}`}
+                subtitle="Sum of all outstanding balances"
+              />
+            </div>
+
+            {/* Row 2: Coverage bars (collapsible) */}
+            <div className="bg-zinc-900 border border-zinc-800 rounded-lg">
+              <button
+                onClick={() => {
+                  const next = !showCoverage;
+                  setShowCoverage(next);
+                  localStorage.setItem("parcels-show-coverage", String(next));
+                }}
+                className="w-full flex items-center justify-between px-4 py-2.5 text-xs text-zinc-400 hover:text-zinc-300 transition-colors"
+              >
+                <span>Data Coverage</span>
+                <span>{showCoverage ? "Hide" : "Show"}</span>
+              </button>
+              {showCoverage && (
+                <div className="px-4 pb-4 space-y-2.5">
+                  <DataCoverageBar
+                    label="PLUTO Property Data"
+                    count={stats.withPlutoData}
+                    total={stats.total}
+                  />
+                  <DataCoverageBar
+                    label="HPD Violations"
+                    count={stats.withViolations}
+                    total={stats.total}
+                  />
+                  <DataCoverageBar
+                    label="Outstanding Tax Bills"
+                    count={stats.withTaxBills}
+                    total={stats.total}
+                  />
+                  <DataCoverageBar
+                    label="NYCTL Lien Sale Data"
+                    count={stats.withNyctlData}
+                    total={stats.total}
+                  />
+                  <DataCoverageBar
+                    label="Skip Traced (Phones)"
+                    count={stats.withSkipTrace}
+                    total={stats.total}
+                  />
+                </div>
+              )}
+            </div>
           </div>
         )}
 
@@ -261,20 +336,17 @@ export default function ParcelsPage() {
 function StatCard({
   label,
   value,
-  small,
+  subtitle,
 }: {
   label: string;
   value: string;
-  small?: boolean;
+  subtitle?: string;
 }) {
   return (
     <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
       <div className="text-xs text-zinc-400 mb-1">{label}</div>
-      <div
-        className={`font-semibold ${small ? "text-sm text-zinc-300" : "text-xl text-white"}`}
-      >
-        {value}
-      </div>
+      <div className="text-xl font-semibold text-white">{value}</div>
+      {subtitle && <div className="text-xs text-zinc-500 mt-1">{subtitle}</div>}
     </div>
   );
 }
