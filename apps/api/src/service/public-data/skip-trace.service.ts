@@ -37,6 +37,18 @@ interface TracerfyQueueItem {
   [key: string]: unknown;
 }
 
+/** Pending item in the single-BBL queue */
+interface QueuedRequest {
+  bbl: string;
+  force: boolean;
+  resolve: (result: {
+    queueId: string;
+    queued: string[];
+    skipped: number;
+  }) => void;
+  reject: (err: Error) => void;
+}
+
 @Injectable()
 export class SkipTraceService {
   private readonly logger = new Logger(SkipTraceService.name);
@@ -46,7 +58,65 @@ export class SkipTraceService {
     process.env.TRACERFY_MONTHLY_CREDIT_CAP ?? '500',
   );
 
+  /** Buffer for single-BBL requests — flushed as one batch after FLUSH_DELAY_MS */
+  private pendingQueue: QueuedRequest[] = [];
+  private flushTimer: ReturnType<typeof setTimeout> | null = null;
+  private readonly FLUSH_DELAY_MS = 5_000;
+
   constructor(private readonly prisma: PrismaService) {}
+
+  /**
+   * Queue a single BBL for skip tracing. Buffers requests for 5 seconds,
+   * then flushes all queued BBLs as one Tracerfy batch to avoid rate limits.
+   * Returns a promise that resolves when the batch is submitted.
+   */
+  enqueue(
+    bbl: string,
+    force = false,
+  ): Promise<{ queueId: string; queued: string[]; skipped: number }> {
+    return new Promise((resolve, reject) => {
+      this.pendingQueue.push({ bbl, force, resolve, reject });
+
+      this.logger.log(
+        `Enqueued BBL ${bbl} for batched skip trace (${this.pendingQueue.length} pending)`,
+      );
+
+      // Reset the flush timer on each new request (debounce)
+      if (this.flushTimer) clearTimeout(this.flushTimer);
+      this.flushTimer = setTimeout(
+        () => this.flushQueue(),
+        this.FLUSH_DELAY_MS,
+      );
+    });
+  }
+
+  /** Flush all pending single-BBL requests as one submitBatch call */
+  private async flushQueue(): Promise<void> {
+    this.flushTimer = null;
+    const items = this.pendingQueue.splice(0);
+    if (items.length === 0) return;
+
+    const bbls = items.map((i) => i.bbl);
+    const force = items.some((i) => i.force);
+
+    this.logger.log(
+      `Flushing ${items.length} queued skip trace requests as one batch: [${bbls.join(', ')}]`,
+    );
+
+    try {
+      const result = await this.submitBatch(bbls, force);
+      // Start polling for results
+      this.pollAndStore(result.queueId, result.queued);
+      // Resolve all waiting callers with the shared result
+      for (const item of items) {
+        item.resolve(result);
+      }
+    } catch (err) {
+      for (const item of items) {
+        item.reject(err as Error);
+      }
+    }
+  }
 
   async submitBatch(
     bbls: string[],
