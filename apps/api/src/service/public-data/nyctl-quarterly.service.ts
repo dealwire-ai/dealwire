@@ -72,6 +72,7 @@ function detectServicer(row: Record<string, unknown>): string {
     (row['Servicer'] as string) ||
     (row['servicer'] as string) ||
     (row['SERVICER'] as string) ||
+    (row['SVC'] as string) ||
     '';
   if (servicerField) return servicerField.trim();
 
@@ -357,7 +358,22 @@ export class NyctlQuarterlyService {
       if (!sheet) continue;
 
       const trustVintage = parseTrustVintage(sheetName);
-      const jsonData = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet);
+      const rawJsonData =
+        XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet);
+
+      // Normalize column headers: collapse \r\n and extra whitespace
+      const jsonData = rawJsonData.map((row) => {
+        const normalized: Record<string, unknown> = {};
+        for (const [key, val] of Object.entries(row)) {
+          normalized[
+            key
+              .replace(/[\r\n]+/g, ' ')
+              .replace(/\s+/g, ' ')
+              .trim()
+          ] = val;
+        }
+        return normalized;
+      });
 
       for (const row of jsonData) {
         // Try various column name patterns
@@ -428,10 +444,26 @@ export class NyctlQuarterlyService {
               '',
           ).trim() || null;
 
-        const saleDate =
+        const saleDateRaw =
+          row['Sale Date'] ?? row['sale_date'] ?? row['SALE DATE'] ?? '';
+        let saleDate: string | null = null;
+        if (typeof saleDateRaw === 'number') {
+          // Excel serial date → JS date
+          const d = new Date((saleDateRaw - 25569) * 86400000);
+          saleDate = d.toISOString().split('T')[0];
+        } else {
+          const s = String(saleDateRaw).trim();
+          saleDate = s || null;
+        }
+
+        // Trust vintage: prefer per-row "Original Purchaser" column (e.g. "2012-A")
+        const rowVintage =
           String(
-            row['Sale Date'] ?? row['sale_date'] ?? row['SALE DATE'] ?? '',
-          ).trim() || null;
+            row['Original Purchaser'] ??
+              row['original_purchaser'] ??
+              row['ORIGINAL PURCHASER'] ??
+              '',
+          ).trim() || trustVintage;
 
         allRows.push({
           zip,
@@ -443,7 +475,7 @@ export class NyctlQuarterlyService {
           redeemed,
           foreclosureStatus,
           saleDate,
-          trustVintage,
+          trustVintage: rowVintage,
           currentOwner,
         });
       }
