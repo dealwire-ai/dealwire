@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { PrismaModule } from './prisma.module';
 import { NotificationsModule } from './notifications.module';
 import { PublicDataController } from '../controller/public-data.controller';
+import { SkipTraceWebhookController } from '../controller/skip-trace-webhook.controller';
 import { SodaAdapter } from '../service/public-data/soda.adapter';
 import { NycIngestionService } from '../service/public-data/nyc-ingestion.service';
 import { DistressScoringService } from '../service/public-data/distress-scoring.service';
@@ -12,7 +13,7 @@ import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
 
 @Module({
   imports: [PrismaModule, NotificationsModule],
-  controllers: [PublicDataController],
+  controllers: [PublicDataController, SkipTraceWebhookController],
   providers: [
     SodaAdapter,
     NycIngestionService,
