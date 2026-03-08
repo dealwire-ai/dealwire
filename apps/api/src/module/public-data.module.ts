@@ -6,6 +6,7 @@ import { NycIngestionService } from '../service/public-data/nyc-ingestion.servic
 import { DistressScoringService } from '../service/public-data/distress-scoring.service';
 import { ParcelQueryService } from '../service/public-data/parcel-query.service';
 import { SkipTraceService } from '../service/public-data/skip-trace.service';
+import { NyctlQuarterlyService } from '../service/public-data/nyctl-quarterly.service';
 import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
 
 @Module({
@@ -17,6 +18,7 @@ import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
     DistressScoringService,
     ParcelQueryService,
     SkipTraceService,
+    NyctlQuarterlyService,
     ClerkAuthGuard,
   ],
   exports: [ParcelQueryService],

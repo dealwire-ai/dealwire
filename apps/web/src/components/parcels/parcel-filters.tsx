@@ -274,6 +274,26 @@ export function ParcelFilters({ filters, onSetFilter }: ParcelFiltersProps) {
         </SelectContent>
       </Select>
 
+      {/* Min lien sale amount */}
+      <Select
+        value={filters.minLienSaleAmount || "any"}
+        onValueChange={(value) =>
+          onSetFilter("minLienSaleAmount", value === "any" ? "" : value)
+        }
+      >
+        <SelectTrigger className="w-[170px] bg-zinc-950 border-zinc-800 text-white">
+          <SelectValue placeholder="Min Lien Sale" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="any">Any Lien Sale</SelectItem>
+          <SelectItem value="1">Has Lien Sale</SelectItem>
+          <SelectItem value="10000">$10K+</SelectItem>
+          <SelectItem value="25000">$25K+</SelectItem>
+          <SelectItem value="50000">$50K+</SelectItem>
+          <SelectItem value="100000">$100K+</SelectItem>
+        </SelectContent>
+      </Select>
+
       {/* Building class groups */}
       <BuildingClassGroupFilter
         value={filters.buildingClassGroups || ""}
