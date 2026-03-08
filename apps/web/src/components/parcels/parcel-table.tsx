@@ -64,6 +64,16 @@ export interface Parcel {
   distressScore: number | null;
   outstandingTaxBill: number | null;
   totalOutstandingBalance: number | null;
+  // NYCTL lien sale data
+  lienSaleAmount: number | null;
+  lienRedemptiveValue: number | null;
+  lienServicer: string | null;
+  lienRedeemed: boolean | null;
+  lienForeclosureStatus: string | null;
+  lienSaleDate: string | null;
+  lienTrustVintage: string | null;
+  lienMatchConfidence: string | null;
+  lienMatchGroupSize: number | null;
   // Skip tracing
   ownerPhones: OwnerPhone[] | null;
   ownerEmails: string[] | null;
@@ -84,6 +94,7 @@ const SORTABLE_COLUMNS: { label: string; field: string; align?: "right" }[] = [
   { label: "V/Unit", field: "violationsPerUnit", align: "right" },
   { label: "Class C", field: "violationsClassC", align: "right" },
   { label: "Lien", field: "hasActiveLien" },
+  { label: "Lien Sale Amt", field: "lienSaleAmount", align: "right" },
   { label: "Tax Bill", field: "outstandingTaxBill", align: "right" },
   {
     label: "Total Owed to DOF",
@@ -283,6 +294,11 @@ export function ParcelTable({
                   )}
                 </TableCell>
                 <TableCell className="text-right">
+                  {parcel.lienMatchConfidence === "exact"
+                    ? formatCurrency(parcel.lienSaleAmount)
+                    : "-"}
+                </TableCell>
+                <TableCell className="text-right">
                   {formatCurrency(parcel.outstandingTaxBill)}
                 </TableCell>
                 <TableCell className="text-right font-medium">
@@ -295,7 +311,7 @@ export function ParcelTable({
               {isExpanded && (
                 <TableRow>
                   <TableCell
-                    colSpan={17}
+                    colSpan={18}
                     className="bg-zinc-950/50 p-0 transition-all duration-200"
                   >
                     <div className="border-l-2 border-[#C8A96E] pl-4 py-4 pr-4">
@@ -423,6 +439,50 @@ export function ParcelTable({
                               label="Distress Score"
                               value={parcel.distressScore?.toString()}
                             />
+                            {parcel.lienMatchConfidence === "exact" && (
+                              <>
+                                <div className="mt-3 mb-1 text-zinc-400 font-medium text-xs">
+                                  NYCTL Lien Sale
+                                </div>
+                                <DetailRow
+                                  label="Sale Amount"
+                                  value={formatCurrency(parcel.lienSaleAmount)}
+                                  highlight={(parcel.lienSaleAmount ?? 0) > 0}
+                                />
+                                <DetailRow
+                                  label="Redemptive Value"
+                                  value={formatCurrency(
+                                    parcel.lienRedemptiveValue,
+                                  )}
+                                />
+                                <DetailRow
+                                  label="Servicer"
+                                  value={parcel.lienServicer}
+                                />
+                                <DetailRow
+                                  label="Redeemed"
+                                  value={
+                                    parcel.lienRedeemed === null
+                                      ? "Unknown"
+                                      : parcel.lienRedeemed
+                                        ? "Yes"
+                                        : "No"
+                                  }
+                                />
+                                <DetailRow
+                                  label="Foreclosure"
+                                  value={parcel.lienForeclosureStatus}
+                                />
+                                <DetailRow
+                                  label="Trust Vintage"
+                                  value={parcel.lienTrustVintage}
+                                />
+                                <DetailRow
+                                  label="Sale Date"
+                                  value={parcel.lienSaleDate}
+                                />
+                              </>
+                            )}
                           </div>
                         </div>
                       </div>
