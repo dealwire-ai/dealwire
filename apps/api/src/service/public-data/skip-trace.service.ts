@@ -30,10 +30,12 @@ interface TracerfyResultRecord {
   [key: string]: string | undefined;
 }
 
-/** An item from the GET /queues/ list endpoint */
-interface TracerfyQueueItem {
-  id: number | string;
-  status: string;
+/** Response from GET /queue/:id — pending:false means complete */
+interface TracerfyQueueResponse {
+  id?: number | string;
+  queue_id?: number | string;
+  pending?: boolean;
+  results?: unknown[];
   [key: string]: unknown;
 }
 
@@ -149,8 +151,6 @@ export class SkipTraceService {
         address: true,
         zipCode: true,
         borough: true,
-        city: true,
-        state: true,
         skipTracedAt: true,
         skipTraceStatus: true,
       },
@@ -192,8 +192,8 @@ export class SkipTraceService {
       const nameParts = (parcel.ownerName || '').trim().split(/\s+/);
       const firstName = nameParts[0] || '';
       const lastName = nameParts.slice(1).join(' ') || '';
-      const city = parcel.city || BOROUGH_NAMES[parcel.borough] || '';
-      const state = parcel.state || 'NY';
+      const city = BOROUGH_NAMES[parcel.borough] || 'New York';
+      const state = 'NY';
       const address = parcel.address || '';
       const zip = parcel.zipCode || '';
 
@@ -268,40 +268,8 @@ export class SkipTraceService {
   }
 
   /**
-   * Check queue status via GET /queues/ list endpoint.
-   * Returns 'complete', 'pending', or 'failed'.
-   */
-  private async isQueueComplete(
-    queueId: string,
-  ): Promise<'complete' | 'pending' | 'failed'> {
-    const response = await fetch(`${this.baseUrl}/queues/`, {
-      headers: { Authorization: `Bearer ${this.apiKey}` },
-    });
-
-    if (!response.ok) {
-      this.logger.warn(
-        `GET /queues/ failed: ${response.status} ${response.statusText}`,
-      );
-      return 'pending'; // Treat as pending on fetch failure
-    }
-
-    const queues = (await response.json()) as TracerfyQueueItem[];
-    const queue = queues.find((q) => String(q.id) === String(queueId));
-
-    if (!queue) {
-      this.logger.warn(`Queue ${queueId} not found in /queues/ list`);
-      return 'pending';
-    }
-
-    const status = (queue.status || '').toLowerCase();
-    if (status === 'complete' || status === 'completed') return 'complete';
-    if (status === 'failed' || status === 'error') return 'failed';
-    return 'pending';
-  }
-
-  /**
-   * Fire-and-forget polling loop. Checks queue status via /queues/,
-   * then fetches results from /queue/:id when complete.
+   * Fire-and-forget polling loop. Polls GET /queue/:id directly and checks
+   * pending:false to detect completion (per Tracerfy API docs).
    * Polls every 15s up to 20 attempts (~5 min).
    */
   pollAndStore(queueId: string, bbls: string[]): void {
@@ -310,36 +278,41 @@ export class SkipTraceService {
 
     const poll = async (attempt: number): Promise<void> => {
       try {
-        const status = await this.isQueueComplete(queueId);
+        const response = await fetch(`${this.baseUrl}/queue/${queueId}`, {
+          headers: { Authorization: `Bearer ${this.apiKey}` },
+        });
 
-        if (status === 'complete') {
-          // Fetch actual results from GET /queue/:id
-          const response = await fetch(`${this.baseUrl}/queue/${queueId}`, {
-            headers: { Authorization: `Bearer ${this.apiKey}` },
-          });
-
-          if (!response.ok) {
-            this.logger.error(
-              `GET /queue/${queueId} failed: ${response.status}`,
-            );
+        if (!response.ok) {
+          this.logger.warn(
+            `GET /queue/${queueId} failed: ${response.status} ${response.statusText} (attempt ${attempt}/${maxAttempts})`,
+          );
+          if (attempt < maxAttempts) {
+            setTimeout(() => poll(attempt + 1), intervalMs);
+          } else {
             await this.prisma.parcel.updateMany({
               where: { bbl: { in: bbls } },
               data: { skipTraceStatus: 'error', skipTraceQueueId: null },
             });
-            return;
           }
-
-          const results = (await response.json()) as TracerfyResultRecord[];
-          await this.writeResults(queueId, bbls, results);
           return;
         }
 
-        if (status === 'failed') {
-          this.logger.error(`Tracerfy queue ${queueId} failed`);
-          await this.prisma.parcel.updateMany({
-            where: { bbl: { in: bbls } },
-            data: { skipTraceStatus: 'error', skipTraceQueueId: null },
-          });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const raw = (await response.json()) as any;
+
+        // Tracerfy returns results array when complete, or { pending: false }
+        if (Array.isArray(raw) && raw.length >= 0) {
+          await this.writeResults(queueId, bbls, raw as TracerfyResultRecord[]);
+          return;
+        }
+
+        const data = raw as TracerfyQueueResponse;
+        if (data.pending === false) {
+          // Results may be embedded in a field or the object itself
+          const results: TracerfyResultRecord[] = Array.isArray(data.results)
+            ? (data.results as TracerfyResultRecord[])
+            : [];
+          await this.writeResults(queueId, bbls, results);
           return;
         }
 
@@ -369,6 +342,45 @@ export class SkipTraceService {
     };
 
     setTimeout(() => poll(1), intervalMs);
+  }
+
+  /**
+   * Handle a Tracerfy webhook callback (POST from Tracerfy when a trace completes).
+   * The webhook delivers the same payload as GET /queue/:id but pushed to us.
+   * Configure the webhook URL in your Tracerfy account settings.
+   */
+  async handleWebhook(payload: TracerfyQueueResponse): Promise<void> {
+    const queueId = String(payload.id ?? payload.queue_id ?? '');
+    if (!queueId) {
+      this.logger.warn('Tracerfy webhook received with no queue ID');
+      return;
+    }
+
+    // Find BBLs that were queued under this queueId
+    const parcels = await this.prisma.parcel.findMany({
+      where: { skipTraceQueueId: queueId },
+      select: { bbl: true },
+    });
+
+    if (parcels.length === 0) {
+      this.logger.warn(
+        `Tracerfy webhook for queue ${queueId}: no matching parcels found`,
+      );
+      return;
+    }
+
+    const bbls = parcels.map((p) => p.bbl);
+    this.logger.log(
+      `Tracerfy webhook received for queue ${queueId}: processing ${bbls.length} parcels`,
+    );
+
+    // Webhook delivers either results array directly, or object with results field
+    const results: TracerfyResultRecord[] = Array.isArray(payload)
+      ? (payload as unknown as TracerfyResultRecord[])
+      : Array.isArray(payload.results)
+        ? (payload.results as TracerfyResultRecord[])
+        : [];
+    await this.writeResults(queueId, bbls, results);
   }
 
   /**
