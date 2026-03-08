@@ -25,7 +25,9 @@ jest.mock('../../config/ai.config', () => ({
   }),
 }));
 
-const makeBucket = (overrides: Partial<ScreeningBucket> = {}): ScreeningBucket => ({
+const makeBucket = (
+  overrides: Partial<ScreeningBucket> = {},
+): ScreeningBucket => ({
   id: 'bucket-1',
   name: 'Interested',
   description: 'Meets all criteria',
@@ -43,8 +45,23 @@ const makeBucket = (overrides: Partial<ScreeningBucket> = {}): ScreeningBucket =
 
 const buckets: ScreeningBucket[] = [
   makeBucket({ id: 'bucket-yes', name: 'Interested', rank: 1, isPass: true }),
-  makeBucket({ id: 'bucket-maybe', name: 'Maybe', rank: 2, isPass: true, description: 'Possibly meets criteria' }),
-  makeBucket({ id: 'bucket-no', name: 'Pass', rank: 3, isPass: false, action: 'MOVE_TO_FOLDER', folderName: 'Passed Deals', generateSummary: false, description: 'Does not meet criteria' }),
+  makeBucket({
+    id: 'bucket-maybe',
+    name: 'Maybe',
+    rank: 2,
+    isPass: true,
+    description: 'Possibly meets criteria',
+  }),
+  makeBucket({
+    id: 'bucket-no',
+    name: 'Pass',
+    rank: 3,
+    isPass: false,
+    action: 'MOVE_TO_FOLDER',
+    folderName: 'Passed Deals',
+    generateSummary: false,
+    description: 'Does not meet criteria',
+  }),
 ];
 
 describe('InitialScreeningService', () => {
@@ -112,7 +129,12 @@ describe('InitialScreeningService', () => {
     mockOpenAIResponse({
       bucket: 'Interested',
       reason: 'Meets all geographic and size criteria',
-      address: { street: '123 Main St', city: 'New York', state: 'NY', country: 'USA' },
+      address: {
+        street: '123 Main St',
+        city: 'New York',
+        state: 'NY',
+        country: 'USA',
+      },
     });
 
     // Act
@@ -173,7 +195,12 @@ describe('InitialScreeningService', () => {
     mockOpenAIResponse({
       bucket: 'Interested',
       reason: 'Good deal',
-      address: { street: '123 Main St', city: 'New York', state: 'NY', country: 'USA' },
+      address: {
+        street: '123 Main St',
+        city: 'New York',
+        state: 'NY',
+        country: 'USA',
+      },
     });
     addressNormalizationService.findOrCreateAsset.mockRejectedValue(
       new Error('Database connection error'),
@@ -213,10 +240,9 @@ describe('InitialScreeningService', () => {
     // Assert
     expect(result.decision).toBe('yes');
     expect(result.contactId).toBeNull();
-    expect(contactNormalizationService.findOrCreateContact).toHaveBeenCalledWith(
-      'broker@example.com',
-      'Jane Broker',
-    );
+    expect(
+      contactNormalizationService.findOrCreateContact,
+    ).toHaveBeenCalledWith('broker@example.com', 'Jane Broker');
     expect(prismaService.initialScreening.upsert).toHaveBeenCalled();
   });
 
@@ -261,7 +287,9 @@ describe('InitialScreeningService', () => {
     // Act & Assert
     await expect(
       service.screen('deal-7', 'some text', buckets),
-    ).rejects.toThrow('Failed to perform initial screening: Empty response from OpenAI');
+    ).rejects.toThrow(
+      'Failed to perform initial screening: Empty response from OpenAI',
+    );
 
     expect(metricsService.recordAICall).toHaveBeenCalledWith(
       'initial-screening',
@@ -278,7 +306,9 @@ describe('InitialScreeningService', () => {
     // Act & Assert
     await expect(
       service.screen('deal-8', 'some text', buckets),
-    ).rejects.toThrow('Failed to perform initial screening: Rate limit exceeded');
+    ).rejects.toThrow(
+      'Failed to perform initial screening: Rate limit exceeded',
+    );
 
     expect(metricsService.recordAICall).toHaveBeenCalledWith(
       'initial-screening',
@@ -296,10 +326,21 @@ describe('InitialScreeningService', () => {
       address: null,
     });
 
-    const structuredData = { askingPrice: 5000000, propertyType: 'multifamily', units: 50 };
+    const structuredData = {
+      askingPrice: 5000000,
+      propertyType: 'multifamily',
+      units: 50,
+    };
 
     // Act
-    await service.screen('deal-9', 'some text', buckets, undefined, undefined, structuredData);
+    await service.screen(
+      'deal-9',
+      'some text',
+      buckets,
+      undefined,
+      undefined,
+      structuredData,
+    );
 
     // Assert - check the system prompt includes structured data instructions
     const callArgs = mockCreate.mock.calls[0][0];
@@ -362,7 +403,9 @@ describe('InitialScreeningService', () => {
 
     // Assert
     expect(result.contactId).toBeNull();
-    expect(contactNormalizationService.findOrCreateContact).not.toHaveBeenCalled();
+    expect(
+      contactNormalizationService.findOrCreateContact,
+    ).not.toHaveBeenCalled();
   });
 
   it('should include address disambiguation instructions to reject brokerage/signature addresses', async () => {
@@ -383,7 +426,7 @@ describe('InitialScreeningService', () => {
     expect(systemPrompt).toContain('Email signatures');
     expect(systemPrompt).toContain('Brokerage/company office addresses');
     expect(systemPrompt).toContain('SENDER addresses, not property addresses');
-    expect(systemPrompt).toContain('"street": null');
+    expect(systemPrompt).toContain('set address to null');
   });
 
   it('should not call address normalization when AI returns null address', async () => {
@@ -399,6 +442,8 @@ describe('InitialScreeningService', () => {
 
     // Assert
     expect(result.assetId).toBeNull();
-    expect(addressNormalizationService.findOrCreateAsset).not.toHaveBeenCalled();
+    expect(
+      addressNormalizationService.findOrCreateAsset,
+    ).not.toHaveBeenCalled();
   });
 });
