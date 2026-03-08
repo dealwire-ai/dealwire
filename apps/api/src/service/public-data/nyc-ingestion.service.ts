@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { SodaAdapter, SodaSourceConfig } from './soda.adapter';
 import { DistressScoringService } from './distress-scoring.service';
+import { NyctlQuarterlyService } from './nyctl-quarterly.service';
 import {
   normalizeBbl,
   BOROUGH_NUMERIC_TO_ABBR,
@@ -53,6 +54,7 @@ export class NycIngestionService {
     private readonly prisma: PrismaService,
     private readonly soda: SodaAdapter,
     private readonly scoring: DistressScoringService,
+    private readonly nyctl: NyctlQuarterlyService,
   ) {}
 
   /**
@@ -82,6 +84,20 @@ export class NycIngestionService {
 
     // 5. Compute distress scores
     await this.scoring.scoreAll();
+
+    // 6. NYCTL quarterly report (if report date is configured)
+    const nyctlReportDate = process.env.NYCTL_REPORT_DATE;
+    if (nyctlReportDate) {
+      try {
+        const nyctlResult =
+          await this.nyctl.ingestNyctlQuarterly(nyctlReportDate);
+        results.push(nyctlResult);
+      } catch (err) {
+        this.logger.error(
+          `NYCTL ingestion failed (non-fatal): ${(err as Error).message}`,
+        );
+      }
+    }
 
     this.logger.log(
       `Full ingestion complete. Results: ${JSON.stringify(results.map((r) => `${r.source}: ${r.recordsProcessed}`))}`,
