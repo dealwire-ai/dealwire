@@ -73,6 +73,13 @@ export class PublicDataController {
       }
     }
 
+    if (this.ingestion.isRunning) {
+      throw new HttpException(
+        'Ingestion is already running. Wait for it to complete before starting another.',
+        HttpStatus.CONFLICT,
+      );
+    }
+
     this.logger.log(
       `Triggering ingestion for boroughs: ${boroughs.map((b) => BOROUGH_NAMES[b]).join(', ')}`,
     );

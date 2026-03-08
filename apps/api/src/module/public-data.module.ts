@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { PrismaModule } from './prisma.module';
+import { NotificationsModule } from './notifications.module';
 import { PublicDataController } from '../controller/public-data.controller';
 import { SodaAdapter } from '../service/public-data/soda.adapter';
 import { NycIngestionService } from '../service/public-data/nyc-ingestion.service';
@@ -10,7 +11,7 @@ import { NyctlQuarterlyService } from '../service/public-data/nyctl-quarterly.se
 import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, NotificationsModule],
   controllers: [PublicDataController],
   providers: [
     SodaAdapter,
