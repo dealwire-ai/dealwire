@@ -265,7 +265,7 @@ export function ParcelFilters({ filters, onSetFilter }: ParcelFiltersProps) {
           <SelectValue placeholder="Min Tax Bill" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="any">Any Tax Bill</SelectItem>
+          <SelectItem value="any">No Filter</SelectItem>
           <SelectItem value="1">Has Tax Bill</SelectItem>
           <SelectItem value="1000">$1,000+</SelectItem>
           <SelectItem value="5000">$5,000+</SelectItem>
@@ -285,7 +285,7 @@ export function ParcelFilters({ filters, onSetFilter }: ParcelFiltersProps) {
           <SelectValue placeholder="Min Lien Sale" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="any">Any Lien Sale</SelectItem>
+          <SelectItem value="any">No Filter</SelectItem>
           <SelectItem value="1">Has Lien Sale</SelectItem>
           <SelectItem value="10000">$10K+</SelectItem>
           <SelectItem value="25000">$25K+</SelectItem>

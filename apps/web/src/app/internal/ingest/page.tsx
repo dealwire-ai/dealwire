@@ -23,6 +23,15 @@ export default function IngestPage() {
   const [result, setResult] = useState<IngestResult | null>(null);
   const [error, setError] = useState<string>("");
 
+  // NYCTL state
+  const [nyctlState, setNyctlState] = useState<IngestState>("idle");
+  const [nyctlResult, setNyctlResult] = useState<Record<
+    string,
+    unknown
+  > | null>(null);
+  const [nyctlError, setNyctlError] = useState<string>("");
+  const [nyctlReportDate, setNyctlReportDate] = useState("9-30-2025");
+
   useEffect(() => {
     if (isLoaded && !user) {
       router.push("/sign-in");
@@ -48,6 +57,25 @@ export default function IngestPage() {
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
       setState("error");
+    }
+  }
+
+  async function handleNyctlIngest() {
+    if (nyctlState === "loading" || !nyctlReportDate.trim()) return;
+    setNyctlState("loading");
+    setNyctlResult(null);
+    setNyctlError("");
+
+    try {
+      const data = await apiCall("/public-data/ingest/nyctl", {
+        method: "POST",
+        body: JSON.stringify({ reportDate: nyctlReportDate.trim() }),
+      });
+      setNyctlResult(data);
+      setNyctlState("success");
+    } catch (err) {
+      setNyctlError(err instanceof Error ? err.message : "Unknown error");
+      setNyctlState("error");
     }
   }
 
@@ -222,6 +250,80 @@ export default function IngestPage() {
         take several minutes. Frontstep, Inc. is not responsible for any
         consequences of pressing this button.
       </p>
+
+      {/* NYCTL Lien Sale Ingestion */}
+      <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6 max-w-md w-full space-y-4 mt-8">
+        <div className="text-zinc-300 font-bold text-sm tracking-wide uppercase">
+          NYCTL Lien Sale Ingestion
+        </div>
+        <p className="text-zinc-500 text-xs">
+          Ingest NYCTL quarterly XLSX data and match to parcels. Enter the
+          report date from the XLSX filename (e.g. 9-30-2025).
+        </p>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={nyctlReportDate}
+            onChange={(e) => setNyctlReportDate(e.target.value)}
+            placeholder="9-30-2025"
+            className="flex-1 bg-zinc-950 border border-zinc-700 rounded px-3 py-2 text-sm text-white font-mono placeholder:text-zinc-600 focus:outline-none focus:border-zinc-500"
+          />
+          <button
+            onClick={handleNyctlIngest}
+            disabled={nyctlState === "loading" || !nyctlReportDate.trim()}
+            className={`px-4 py-2 rounded text-sm font-medium transition-colors cursor-pointer ${
+              nyctlState === "loading"
+                ? "bg-yellow-900 text-yellow-300 animate-pulse"
+                : "bg-yellow-600 text-white hover:bg-yellow-500"
+            } disabled:opacity-50 disabled:cursor-not-allowed`}
+          >
+            {nyctlState === "loading" ? "Ingesting..." : "Ingest NYCTL"}
+          </button>
+        </div>
+
+        {nyctlState === "success" && nyctlResult && (
+          <div className="bg-zinc-950 border border-green-800 rounded p-3 text-xs font-mono space-y-1">
+            <div className="text-green-400 font-bold">
+              NYCTL INGESTION COMPLETE
+            </div>
+            {Object.entries(nyctlResult).map(([key, val]) => (
+              <div key={key}>
+                <span className="text-zinc-500">{key}: </span>
+                <span className="text-zinc-200">
+                  {typeof val === "number"
+                    ? val.toLocaleString()
+                    : String(val ?? "-")}
+                </span>
+              </div>
+            ))}
+            <button
+              onClick={() => {
+                setNyctlState("idle");
+                setNyctlResult(null);
+              }}
+              className="mt-2 text-zinc-500 hover:text-zinc-300 underline cursor-pointer"
+            >
+              Reset
+            </button>
+          </div>
+        )}
+
+        {nyctlState === "error" && (
+          <div className="bg-zinc-950 border border-red-800 rounded p-3 text-xs font-mono">
+            <div className="text-red-400 font-bold">NYCTL INGESTION FAILED</div>
+            <div className="text-red-300 break-all mt-1">{nyctlError}</div>
+            <button
+              onClick={() => {
+                setNyctlState("idle");
+                setNyctlError("");
+              }}
+              className="mt-2 text-zinc-500 hover:text-zinc-300 underline cursor-pointer"
+            >
+              Try Again
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
