@@ -78,6 +78,8 @@ Railway MCP tools (`mcp__railway__*`) are available for deployments, logs, and s
 - Both services deploy automatically on push to `main`
 - Start script runs `prisma migrate deploy && node dist/src/main.js`
 - Prod DB uses port 5432 (direct Supabase URL), never 6543 (pooler) for migrations
+- Before deploying: verify `rootDirectory` is set correctly per service, peer deps are resolved, and all tsconfig base files are present
+- After merging, always check deployment logs to confirm a successful deploy
 
 ### Package naming
 
@@ -153,6 +155,15 @@ After implementing any feature, API change, or architectural change — update t
 
 ---
 
+## General Guidelines
+
+- When asked to research or explore a specific directory/project, confirm the exact path before starting. Do not default to the current project directory.
+- Before diagnosing a bug or proposing a fix, read the relevant service/guard/middleware/module code first. Do not assume the root cause — wrong initial diagnoses (auth guard resolving wrong org, hardcoded dark backgrounds misread as dark mode bugs) have been a recurring source of wasted cycles.
+- When the user specifies a preferred approach or solution, implement that. Do not substitute an alternative unless explicitly asked. If you think a different approach is better, flag it briefly — but default to what the user asked for.
+- Before starting any multi-step task or feature that touches multiple systems, confirm the scope and boundaries. If the request is ambiguous (e.g. "add Clerk" — globally or project-scoped?), ask before writing any code.
+
+---
+
 ## Git & PRs
 
 ### Commit Messages
@@ -171,11 +182,39 @@ Same `type: description` format as commits. Keep under 70 chars — use the desc
 
 Break changes into separate, logical commits — each group of related changes should be its own commit rather than one big commit for the whole PR.
 
+### Before Creating a PR
+
+Before pushing commits or opening a PR:
+
+1. Check that the branch is not already merged (`gh pr view --json state` or `git branch -r`). Never push fix commits to a branch whose PR has already been merged.
+2. Run CI checks locally: `npx tsc --noEmit`, `pnpm lint`, and `pnpm test`. Fix all failures before pushing — pre-existing type/lint errors and hardcoded test defaults have repeatedly blocked CI.
+
+---
+
+## Tech Stack
+
+This project uses **TypeScript** throughout — **NestJS 11** on the backend, **Next.js 16 / React 19** on the frontend, **Prisma ORM** with **Supabase Postgres**. Always verify field names against the actual Prisma schema (`apps/api/prisma/schema.prisma`) before writing queries or any code that references DB columns. Do not assume a field exists — read the schema first.
+
+### NestJS Module Checklist
+
+When adding or modifying a NestJS module, verify:
+
+- Every service used inside the module is listed in `providers: []`
+- Every service needed by other modules is listed in `exports: []`
+- `PrismaService` is in `providers` for any module that touches the DB (missing this causes startup crashes)
+- Any external module (e.g. `SqsModule`, `BullModule`) is only exported if other modules actually import it — unconditional exports cause crashes if the dep isn't configured
+
 ---
 
 ## Code Quality
 
 This is a TypeScript codebase. When making code changes, always verify the changes compile (`npx tsc --noEmit`) before considering the task complete. If tests exist, run them. If test configuration is broken, note it clearly rather than spending excessive time debugging the test runner.
+
+---
+
+## Frontend / CSS
+
+When making theme or styling changes, **search the entire codebase exhaustively** (grep/glob across all files) for every occurrence of the affected value(s) before making any edits. List all files that need updating, then change them all in one pass. Partial replacements across the frontend have caused multiple revision cycles — do not stop after finding a few matches.
 
 ---
 
