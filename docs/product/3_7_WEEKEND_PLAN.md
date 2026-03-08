@@ -1,5 +1,7 @@
 # 3/7 Weekend Plan — Tax Lien Platform Phase 2
 
+> **Status: COMPLETED 3/8.** All items shipped. The lien sale amounts approach changed — SAC rows in `scjx-j6np` turned out to be small special assessments, NOT lien sale amounts. Actual lien sale amounts were implemented via NYCTL quarterly XLSX reports with crosswalk matching (see PR #109). Skip tracing (originally "not in this plan") was also shipped on 3/7 via Tracerfy integration.
+
 ## Goal
 
 Ship **tax lien dollar amounts** and **outstanding tax bills** on the parcel dashboard using the Property Charges Balance dataset (`scjx-j6np`). This is the core cold-calling enablement data that Brett is waiting on.
@@ -219,10 +221,10 @@ After implementation, verify against Daniel's known example:
 
 ---
 
-## What's NOT in This Plan
+## What's NOT in This Plan (updated 3/8)
 
-- **Servicer info (MTAG vs Tower)** — requires PDF tax bill parsing. Deferring to a follow-up.
-- **Lien sold/redeemed status** — not available in Socrata. Same PDF approach needed.
-- **Skip tracing / owner phone lookup** — separate vendor decision needed.
-- **Manhattan expansion** — trivial once P0/P1 are done (add borough 1 to ingestion).
-- **Lis pendens alerts** — Phase 3, deprioritized behind cold calling data.
+- **Servicer info (MTAG vs Tower)** — partially available via NYCTL quarterly reports (shipped 3/8). CARE portal scraping would improve coverage.
+- ~~**Lien sold/redeemed status** — not available in Socrata.~~ → Available via NYCTL quarterly reports (shipped 3/8).
+- ~~**Skip tracing / owner phone lookup**~~ → Shipped 3/7 via Tracerfy integration.
+- **Manhattan expansion** — trivial once ingestion is stable (add borough 1).
+- **Lis pendens alerts** — deprioritized behind cold calling data.
