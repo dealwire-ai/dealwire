@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import { useApi } from "@/hooks/use-api";
 
@@ -52,7 +51,6 @@ const ACTION_LABELS: Record<BucketAction, string> = {
 
 export default function ManagePage() {
   const { userId, isLoaded } = useAuth();
-  const router = useRouter();
   const { apiCall } = useApi();
 
   const [buckets, setBuckets] = useState<Bucket[]>([]);
@@ -64,12 +62,6 @@ export default function ManagePage() {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<BucketForm>(emptyForm);
-
-  useEffect(() => {
-    if (isLoaded && !userId) {
-      router.push("/sign-in");
-    }
-  }, [isLoaded, userId, router]);
 
   useEffect(() => {
     if (isLoaded && userId) {
@@ -195,16 +187,14 @@ export default function ManagePage() {
 
   if (!isLoaded) {
     return (
-      <div className="min-h-screen bg-black text-white p-8">
-        <div className="max-w-4xl mx-auto text-center py-12 text-zinc-400">
-          Loading...
-        </div>
+      <div className="p-8">
+        <div className="text-center py-12 text-zinc-400">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black text-white p-8">
+    <div className="p-8">
       <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold">Screening Buckets</h1>

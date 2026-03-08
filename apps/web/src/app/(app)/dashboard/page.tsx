@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth, useUser, OrganizationSwitcher } from "@clerk/nextjs";
-import { dark } from "@clerk/themes";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useAuth, useUser } from "@clerk/nextjs";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
@@ -20,9 +19,7 @@ import { TablePagination } from "@/components/table-pagination";
 import { TableSkeleton } from "@/components/table-skeleton";
 import { useApi } from "@/hooks/use-api";
 import { useTableState } from "@/hooks/use-table-state";
-import { useFeatureFlags } from "@/hooks/use-feature-flags";
 import { Chatbot } from "@/components/chat/chatbot";
-import { isFrontstepUser } from "@/lib/utils";
 import posthog from "posthog-js";
 
 interface Deal {
@@ -85,8 +82,8 @@ export default function DashboardPage() {
   const { userId, isLoaded } = useAuth();
   const { user } = useUser();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { apiCall } = useApi();
-  const { flags } = useFeatureFlags();
 
   const [deals, setDeals] = useState<Deal[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
@@ -108,19 +105,37 @@ export default function DashboardPage() {
   const assetsTable = useTableState();
 
   // Tab and expansion state management
-  const [activeTab, setActiveTab] = useState("deals");
+  const [activeTab, setActiveTab] = useState(
+    () => searchParams.get("tab") ?? "deals",
+  );
   const [expandedDeals, setExpandedDeals] = useState<Set<string>>(new Set());
   const [expandedContacts, setExpandedContacts] = useState<Set<string>>(
-    new Set()
+    new Set(),
   );
   const [expandedAssets, setExpandedAssets] = useState<Set<string>>(new Set());
+
+  // Normalize URL on mount — ensure tab param is always set
+  useEffect(() => {
+    if (!searchParams.get("tab")) {
+      router.replace("/dashboard?tab=deals", { scroll: false });
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Sync active tab from URL (e.g. sidebar navigation)
+  useEffect(() => {
+    const tab = searchParams.get("tab");
+    if (tab && tab !== activeTab) {
+      setActiveTab(tab);
+    }
+  }, [searchParams]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Function to navigate to a tab and expand a specific row
   const navigateToTabAndExpand = (
     tab: "deals" | "contacts" | "properties",
-    id: string
+    id: string,
   ) => {
     setActiveTab(tab);
+    router.replace(`/dashboard?tab=${tab}`, { scroll: false });
     if (tab === "deals") {
       posthog.capture("deal_navigate_to_contact", { deal_id: id });
       setExpandedDeals(new Set([id]));
@@ -140,6 +155,7 @@ export default function DashboardPage() {
       to_tab: tab,
     });
     setActiveTab(tab);
+    router.replace(`/dashboard?tab=${tab}`, { scroll: false });
   };
 
   // Identify user in PostHog when they access the dashboard
@@ -214,13 +230,6 @@ export default function DashboardPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoaded, userId, assetsTable.queryString]);
 
-  // Redirect if not authenticated
-  useEffect(() => {
-    if (isLoaded && !userId) {
-      router.push("/sign-in");
-    }
-  }, [isLoaded, userId, router]);
-
   // Fetch data when query strings change
   useEffect(() => {
     fetchDeals();
@@ -249,57 +258,21 @@ export default function DashboardPage() {
 
   if (!isLoaded) {
     return (
-      <div className="min-h-screen bg-black text-white p-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center py-12 text-zinc-400">Loading...</div>
-        </div>
+      <div className="p-8">
+        <div className="text-center py-12 text-zinc-400">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black text-white p-8">
+    <div className="p-8">
       <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold">Dashboard</h1>
-          <div className="flex items-center gap-3">
-            {isFrontstepUser(user?.primaryEmailAddress?.emailAddress) && (
-              <OrganizationSwitcher
-                hidePersonal
-                appearance={{ baseTheme: dark }}
-              />
-            )}
-            {flags.underwriting && (
-              <a
-                href="/underwriting"
-                className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-sm transition-colors"
-              >
-                Underwriting
-              </a>
-            )}
-            {flags.parcels && isFrontstepUser(user?.primaryEmailAddress?.emailAddress) && (
-              <a
-                href="/public-data/parcels"
-                className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-sm transition-colors"
-              >
-                NYC Parcels
-              </a>
-            )}
-            <a
-              href="/api/auth/signout"
-              onClick={() => {
-                posthog.capture("sign_out_clicked");
-                posthog.reset();
-              }}
-              className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-sm transition-colors"
-            >
-              Sign Out
-            </a>
-          </div>
-        </div>
-
         <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6">
-          <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+          <Tabs
+            value={activeTab}
+            onValueChange={handleTabChange}
+            className="w-full"
+          >
             <TabsList>
               <TabsTrigger value="deals">Deals</TabsTrigger>
               <TabsTrigger value="contacts">Contacts</TabsTrigger>
@@ -318,7 +291,10 @@ export default function DashboardPage() {
                   <Select
                     value={dealsTable.filters.decision || "all"}
                     onValueChange={(value) =>
-                      dealsTable.setFilter("decision", value === "all" ? "" : value)
+                      dealsTable.setFilter(
+                        "decision",
+                        value === "all" ? "" : value,
+                      )
                     }
                   >
                     <SelectTrigger className="w-[130px] bg-zinc-950 border-zinc-800 text-white">

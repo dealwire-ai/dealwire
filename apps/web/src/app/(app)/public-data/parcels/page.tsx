@@ -88,12 +88,6 @@ export default function ParcelsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoaded, userId, table.filters.borough, table.filters.excludeCoops]);
 
-  useEffect(() => {
-    if (isLoaded && !userId) {
-      router.push("/sign-in");
-    }
-  }, [isLoaded, userId, router]);
-
   // Redirect if feature flag is off
   useEffect(() => {
     if (!flagsLoading && !flags.parcels) {
@@ -116,14 +110,14 @@ export default function ParcelsPage() {
 
   if (!isLoaded) {
     return (
-      <div className="min-h-screen bg-black text-white p-8">
+      <div className="p-6">
         <div className="text-center py-12 text-zinc-400">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black text-white p-6">
+    <div className="p-6">
       <div className="max-w-[1600px] mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
@@ -133,15 +127,7 @@ export default function ParcelsPage() {
               Distressed property analysis from public data
             </p>
           </div>
-          <div className="flex items-center gap-3">
-            <ExportButton queryString={table.queryString} />
-            <a
-              href="/dashboard"
-              className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-sm transition-colors"
-            >
-              Dashboard
-            </a>
-          </div>
+          <ExportButton queryString={table.queryString} />
         </div>
 
         {/* Stats bar */}

@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useAuth } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
 import { useApi } from "@/hooks/use-api";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
@@ -33,15 +32,12 @@ function FieldMapEditor({
   onChange: (updated: FieldMapEntry[]) => void;
 }) {
   const addRow = () => {
-    onChange([
-      ...fieldMap,
-      { name: "", description: "", sheet: "", cell: "" },
-    ]);
+    onChange([...fieldMap, { name: "", description: "", sheet: "", cell: "" }]);
   };
 
   const updateRow = (i: number, patch: Partial<FieldMapEntry>) => {
     const updated = fieldMap.map((row, idx) =>
-      idx === i ? { ...row, ...patch } : row
+      idx === i ? { ...row, ...patch } : row,
     );
     onChange(updated);
   };
@@ -54,7 +50,9 @@ function FieldMapEditor({
     <div className="mt-4">
       <p className="text-xs text-zinc-400 mb-2">Fields</p>
       {fieldMap.length === 0 && (
-        <p className="text-xs text-zinc-600 mb-2">No fields yet. Add a field or upload a template to auto-discover them.</p>
+        <p className="text-xs text-zinc-600 mb-2">
+          No fields yet. Add a field or upload a template to auto-discover them.
+        </p>
       )}
       {fieldMap.length > 0 && (
         <div className="space-y-1 mb-3">
@@ -70,7 +68,9 @@ function FieldMapEditor({
                   />
                   <input
                     value={row.description}
-                    onChange={(e) => updateRow(i, { description: e.target.value })}
+                    onChange={(e) =>
+                      updateRow(i, { description: e.target.value })
+                    }
                     placeholder="Description"
                     className="bg-zinc-900 border border-zinc-700 rounded px-2 py-1 text-white text-xs flex-1 min-w-0"
                   />
@@ -129,31 +129,36 @@ function ProformaCard({
   const [editIsDefault, setEditIsDefault] = useState(proforma.isDefault);
   const [editIsReady, setEditIsReady] = useState(proforma.isReady);
   const [editFieldMap, setEditFieldMap] = useState<FieldMapEntry[]>(
-    Array.isArray(proforma.fieldMap) ? proforma.fieldMap : []
+    Array.isArray(proforma.fieldMap) ? proforma.fieldMap : [],
   );
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fieldCount = Array.isArray(proforma.fieldMap) ? proforma.fieldMap.length : 0;
+  const fieldCount = Array.isArray(proforma.fieldMap)
+    ? proforma.fieldMap.length
+    : 0;
 
   const handleSave = async () => {
     setSaving(true);
     setError(null);
     try {
-      const res = await fetch(`${API_URL}/underwriting/proforma/${proforma.id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
+      const res = await fetch(
+        `${API_URL}/underwriting/proforma/${proforma.id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
+          body: JSON.stringify({
+            name: editName,
+            isDefault: editIsDefault,
+            isReady: editIsReady,
+            fieldMap: editFieldMap,
+          }),
         },
-        body: JSON.stringify({
-          name: editName,
-          isDefault: editIsDefault,
-          isReady: editIsReady,
-          fieldMap: editFieldMap,
-        }),
-      });
+      );
       if (!res.ok) throw new Error(await res.text());
       const updated = await res.json();
       onUpdate(updated);
@@ -169,10 +174,13 @@ function ProformaCard({
     if (!confirm(`Delete "${proforma.name}"?`)) return;
     setDeleting(true);
     try {
-      const res = await fetch(`${API_URL}/underwriting/proforma/${proforma.id}`, {
-        method: "DELETE",
-        headers: { ...(token && { Authorization: `Bearer ${token}` }) },
-      });
+      const res = await fetch(
+        `${API_URL}/underwriting/proforma/${proforma.id}`,
+        {
+          method: "DELETE",
+          headers: { ...(token && { Authorization: `Bearer ${token}` }) },
+        },
+      );
       if (!res.ok) throw new Error(await res.text());
       onDelete(proforma.id);
     } catch (e) {
@@ -255,9 +263,7 @@ function ProformaCard({
             </label>
           </div>
           <FieldMapEditor fieldMap={editFieldMap} onChange={setEditFieldMap} />
-          {error && (
-            <p className="text-xs text-red-400">{error}</p>
-          )}
+          {error && <p className="text-xs text-red-400">{error}</p>}
           <button
             onClick={handleSave}
             disabled={saving}
@@ -273,7 +279,6 @@ function ProformaCard({
 
 export default function UnderwritingPage() {
   const { userId, isLoaded, getToken } = useAuth();
-  const router = useRouter();
   const { apiCall } = useApi();
 
   const [proformas, setProformas] = useState<Proforma[]>([]);
@@ -287,10 +292,6 @@ export default function UnderwritingPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [token, setToken] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (isLoaded && !userId) router.push("/sign-in");
-  }, [isLoaded, userId, router]);
 
   useEffect(() => {
     if (!isLoaded || !userId) return;
@@ -342,23 +343,17 @@ export default function UnderwritingPage() {
 
   if (!isLoaded) {
     return (
-      <div className="min-h-screen bg-black text-white p-8">
+      <div className="p-8">
         <div className="text-center py-12 text-zinc-400">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black text-white p-8">
+    <div className="p-8">
       <div className="max-w-4xl mx-auto">
-        <div className="flex items-center justify-between mb-8">
+        <div className="mb-8">
           <h1 className="text-3xl font-bold">Underwriting Templates</h1>
-          <a
-            href="/dashboard"
-            className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-sm transition-colors"
-          >
-            ← Dashboard
-          </a>
         </div>
 
         {/* Create form */}
@@ -396,11 +391,17 @@ export default function UnderwritingPage() {
 
         {/* Template list */}
         {loading ? (
-          <div className="text-zinc-400 py-8 text-center">Loading templates...</div>
+          <div className="text-zinc-400 py-8 text-center">
+            Loading templates...
+          </div>
         ) : error ? (
-          <div className="p-4 bg-red-900/20 border border-red-900/50 rounded-lg text-red-400">{error}</div>
+          <div className="p-4 bg-red-900/20 border border-red-900/50 rounded-lg text-red-400">
+            {error}
+          </div>
         ) : proformas.length === 0 ? (
-          <div className="text-zinc-500 py-8 text-center">No templates yet. Upload a .xlsx proforma above.</div>
+          <div className="text-zinc-500 py-8 text-center">
+            No templates yet. Upload a .xlsx proforma above.
+          </div>
         ) : (
           <div className="space-y-3">
             {proformas.map((p) => (
@@ -410,7 +411,7 @@ export default function UnderwritingPage() {
                 token={token}
                 onUpdate={(updated) =>
                   setProformas((prev) =>
-                    prev.map((x) => (x.id === updated.id ? updated : x))
+                    prev.map((x) => (x.id === updated.id ? updated : x)),
                   )
                 }
                 onDelete={(id) =>
