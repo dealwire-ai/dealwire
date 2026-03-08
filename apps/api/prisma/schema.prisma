@@ -331,6 +331,8 @@ model Parcel {
   // Address
   address   String?
   zipCode   String?
+  city      String?   // Derived from borough for NYC (e.g. "Brooklyn")
+  state     String?   // "NY" for all NYC parcels
 
   // PLUTO data (property characteristics from NYC Dept of City Planning)
   buildingClass     String?

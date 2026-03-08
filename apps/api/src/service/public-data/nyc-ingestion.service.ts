@@ -5,6 +5,7 @@ import { DistressScoringService } from './distress-scoring.service';
 import {
   normalizeBbl,
   BOROUGH_NUMERIC_TO_ABBR,
+  BOROUGH_NAMES,
   estimateMarketValue,
   isCoopBuildingClass,
 } from './nyc-utils';
@@ -150,6 +151,8 @@ export class NycIngestionService {
             lot: lot.padStart(4, '0'),
             address,
             zipCode: record.zip_code || null,
+            city: BOROUGH_NAMES[borough] || null,
+            state: 'NY',
             buildingClass: record.building_class || null,
             taxClass: record.tax_class_code || null,
             hasActiveLien: true,
@@ -257,6 +260,8 @@ export class NycIngestionService {
           data: {
             address: record.address || null,
             zipCode: record.zipcode || null,
+            city: BOROUGH_NAMES[boroughNumeric] || null,
+            state: 'NY',
             buildingClass,
             unitsTotal,
             unitsRes: parseInt(record.unitsres) || null,

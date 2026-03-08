@@ -1,22 +1,40 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { BOROUGH_NAMES } from './nyc-utils';
 
-interface TracerfyPhone {
+interface OwnerPhone {
   number: string;
   type: string;
   rank: number;
 }
 
-interface TracerfyResult {
+/** A single result record from GET /queue/:id (flat phone/email fields) */
+interface TracerfyResultRecord {
   first_name?: string;
   last_name?: string;
-  phones?: { phone_number: string; phone_type?: string; rank?: number }[];
-  emails?: string[];
+  address?: string;
+  primary_phone?: string;
+  mobile_1?: string;
+  mobile_2?: string;
+  mobile_3?: string;
+  mobile_4?: string;
+  mobile_5?: string;
+  landline_1?: string;
+  landline_2?: string;
+  landline_3?: string;
+  email_1?: string;
+  email_2?: string;
+  email_3?: string;
+  email_4?: string;
+  email_5?: string;
+  [key: string]: string | undefined;
 }
 
-interface TracerfyQueueResponse {
-  status: 'pending' | 'complete' | 'failed';
-  results?: TracerfyResult[];
+/** An item from the GET /queues/ list endpoint */
+interface TracerfyQueueItem {
+  id: number | string;
+  status: string;
+  [key: string]: unknown;
 }
 
 @Injectable()
@@ -60,6 +78,9 @@ export class SkipTraceService {
         ownerName: true,
         address: true,
         zipCode: true,
+        borough: true,
+        city: true,
+        state: true,
         skipTracedAt: true,
         skipTraceStatus: true,
       },
@@ -96,31 +117,55 @@ export class SkipTraceService {
       data: { skipTraceStatus: 'pending' },
     });
 
-    // Build Tracerfy payload
-    const payload = toQueue.map((parcel) => {
+    // Build Tracerfy json_data payload with all required fields
+    const jsonData = toQueue.map((parcel) => {
       const nameParts = (parcel.ownerName || '').trim().split(/\s+/);
       const firstName = nameParts[0] || '';
       const lastName = nameParts.slice(1).join(' ') || '';
+      const city = parcel.city || BOROUGH_NAMES[parcel.borough] || '';
+      const state = parcel.state || 'NY';
+      const address = parcel.address || '';
+      const zip = parcel.zipCode || '';
 
       return {
         first_name: firstName,
         last_name: lastName,
-        address: parcel.address || '',
-        zip: parcel.zipCode || '',
+        address,
+        city,
+        state,
+        zip,
+        // Mirror property address for mailing (no separate mailing data available)
+        mail_address: address,
+        mail_city: city,
+        mail_state: state,
+        mailing_zip: zip,
       };
     });
 
-    // Submit to Tracerfy
+    // Submit to Tracerfy using multipart/form-data (required by their API)
     this.logger.log(
-      `Submitting ${payload.length} records to Tracerfy POST /trace/`,
+      `Submitting ${jsonData.length} records to Tracerfy POST /trace/`,
     );
+
+    const formData = new FormData();
+    formData.append('json_data', JSON.stringify(jsonData));
+    formData.append('address_column', 'address');
+    formData.append('city_column', 'city');
+    formData.append('state_column', 'state');
+    formData.append('zip_column', 'zip');
+    formData.append('first_name_column', 'first_name');
+    formData.append('last_name_column', 'last_name');
+    formData.append('mail_address_column', 'mail_address');
+    formData.append('mail_city_column', 'mail_city');
+    formData.append('mail_state_column', 'mail_state');
+    formData.append('mailing_zip_column', 'mailing_zip');
+    formData.append('trace_type', 'normal');
+
     const response = await fetch(`${this.baseUrl}/trace/`, {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${this.apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ records: payload, trace_type: 'normal' }),
+      headers: { Authorization: `Bearer ${this.apiKey}` },
+      // Do NOT set Content-Type — fetch sets multipart boundary automatically
+      body: formData,
     });
 
     if (!response.ok) {
@@ -153,8 +198,41 @@ export class SkipTraceService {
   }
 
   /**
-   * Fire-and-forget polling loop. Polls Tracerfy every 15s up to 20 attempts (~5 min).
-   * Updates Parcel records with contact data when complete.
+   * Check queue status via GET /queues/ list endpoint.
+   * Returns 'complete', 'pending', or 'failed'.
+   */
+  private async isQueueComplete(
+    queueId: string,
+  ): Promise<'complete' | 'pending' | 'failed'> {
+    const response = await fetch(`${this.baseUrl}/queues/`, {
+      headers: { Authorization: `Bearer ${this.apiKey}` },
+    });
+
+    if (!response.ok) {
+      this.logger.warn(
+        `GET /queues/ failed: ${response.status} ${response.statusText}`,
+      );
+      return 'pending'; // Treat as pending on fetch failure
+    }
+
+    const queues = (await response.json()) as TracerfyQueueItem[];
+    const queue = queues.find((q) => String(q.id) === String(queueId));
+
+    if (!queue) {
+      this.logger.warn(`Queue ${queueId} not found in /queues/ list`);
+      return 'pending';
+    }
+
+    const status = (queue.status || '').toLowerCase();
+    if (status === 'complete' || status === 'completed') return 'complete';
+    if (status === 'failed' || status === 'error') return 'failed';
+    return 'pending';
+  }
+
+  /**
+   * Fire-and-forget polling loop. Checks queue status via /queues/,
+   * then fetches results from /queue/:id when complete.
+   * Polls every 15s up to 20 attempts (~5 min).
    */
   pollAndStore(queueId: string, bbls: string[]): void {
     const maxAttempts = 20;
@@ -162,24 +240,18 @@ export class SkipTraceService {
 
     const poll = async (attempt: number): Promise<void> => {
       try {
-        const response = await fetch(`${this.baseUrl}/queue/${queueId}`, {
-          headers: { Authorization: `Bearer ${this.apiKey}` },
-        });
+        const status = await this.isQueueComplete(queueId);
 
-        if (!response.ok) {
-          this.logger.warn(
-            `Poll attempt ${attempt}/${maxAttempts} failed: ${response.status}`,
-          );
-        } else {
-          const data = (await response.json()) as TracerfyQueueResponse;
+        if (status === 'complete') {
+          // Fetch actual results from GET /queue/:id
+          const response = await fetch(`${this.baseUrl}/queue/${queueId}`, {
+            headers: { Authorization: `Bearer ${this.apiKey}` },
+          });
 
-          if (data.status === 'complete' && data.results) {
-            await this.writeResults(queueId, bbls, data.results);
-            return;
-          }
-
-          if (data.status === 'failed') {
-            this.logger.error(`Tracerfy queue ${queueId} failed`);
+          if (!response.ok) {
+            this.logger.error(
+              `GET /queue/${queueId} failed: ${response.status}`,
+            );
             await this.prisma.parcel.updateMany({
               where: { bbl: { in: bbls } },
               data: { skipTraceStatus: 'error', skipTraceQueueId: null },
@@ -187,10 +259,23 @@ export class SkipTraceService {
             return;
           }
 
-          this.logger.debug(
-            `Queue ${queueId} still pending (attempt ${attempt}/${maxAttempts})`,
-          );
+          const results = (await response.json()) as TracerfyResultRecord[];
+          await this.writeResults(queueId, bbls, results);
+          return;
         }
+
+        if (status === 'failed') {
+          this.logger.error(`Tracerfy queue ${queueId} failed`);
+          await this.prisma.parcel.updateMany({
+            where: { bbl: { in: bbls } },
+            data: { skipTraceStatus: 'error', skipTraceQueueId: null },
+          });
+          return;
+        }
+
+        this.logger.debug(
+          `Queue ${queueId} still pending (attempt ${attempt}/${maxAttempts})`,
+        );
 
         if (attempt < maxAttempts) {
           setTimeout(() => poll(attempt + 1), intervalMs);
@@ -216,10 +301,14 @@ export class SkipTraceService {
     setTimeout(() => poll(1), intervalMs);
   }
 
+  /**
+   * Parse flat Tracerfy result records into OwnerPhone[] and string[] emails,
+   * then update Parcel records.
+   */
   private async writeResults(
     queueId: string,
     bbls: string[],
-    results: TracerfyResult[],
+    results: TracerfyResultRecord[],
   ): Promise<void> {
     const now = new Date();
 
@@ -239,19 +328,13 @@ export class SkipTraceService {
         continue;
       }
 
-      const phones: TracerfyPhone[] = (result.phones || []).map((p, idx) => ({
-        number: p.phone_number,
-        type: p.phone_type || 'unknown',
-        rank: p.rank ?? idx + 1,
-      }));
-
-      const emails: string[] = result.emails || [];
+      const phones = this.parsePhones(result);
+      const emails = this.parseEmails(result);
       const hasContact = phones.length > 0 || emails.length > 0;
 
       await this.prisma.parcel.updateMany({
         where: { bbl },
         data: {
-          // Cast to Prisma's InputJsonValue — phones/emails are plain JSON-serializable objects
           ...(phones.length > 0 && {
             ownerPhones: phones as unknown as object[],
           }),
@@ -263,13 +346,57 @@ export class SkipTraceService {
       });
     }
 
-    const foundCount = results.filter(
-      (r) => (r?.phones?.length ?? 0) > 0 || (r?.emails?.length ?? 0) > 0,
-    ).length;
+    const foundCount = bbls.filter((_, i) => {
+      const r = results[i];
+      if (!r) return false;
+      return this.parsePhones(r).length > 0 || this.parseEmails(r).length > 0;
+    }).length;
 
     this.logger.log(
       `Queue ${queueId} complete: ${foundCount}/${bbls.length} records with contact data`,
     );
+  }
+
+  /**
+   * Extract phones from flat Tracerfy result fields into OwnerPhone[].
+   * Deduplicates by phone number (primary_phone may duplicate a mobile/landline).
+   */
+  private parsePhones(result: TracerfyResultRecord): OwnerPhone[] {
+    const seen = new Set<string>();
+    const phones: OwnerPhone[] = [];
+
+    const addPhone = (raw: string | undefined, type: string, rank: number) => {
+      if (!raw || !raw.trim()) return;
+      const number = raw.trim();
+      if (seen.has(number)) return;
+      seen.add(number);
+      phones.push({ number, type, rank });
+    };
+
+    // Primary phone gets rank 1
+    addPhone(result.primary_phone, 'primary', 1);
+
+    // Mobile phones
+    for (let n = 1; n <= 5; n++) {
+      addPhone(result[`mobile_${n}`], 'mobile', phones.length + 1);
+    }
+
+    // Landline phones
+    for (let n = 1; n <= 3; n++) {
+      addPhone(result[`landline_${n}`], 'landline', phones.length + 1);
+    }
+
+    return phones;
+  }
+
+  /** Extract emails from flat Tracerfy result fields. */
+  private parseEmails(result: TracerfyResultRecord): string[] {
+    const emails: string[] = [];
+    for (let n = 1; n <= 5; n++) {
+      const email = result[`email_${n}`]?.trim();
+      if (email) emails.push(email);
+    }
+    return emails;
   }
 
   async checkMonthlyUsage(): Promise<number> {
