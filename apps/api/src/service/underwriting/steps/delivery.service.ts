@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { S3Service } from '../../s3/s3.service';
 import { EmailSenderService } from '../../email/email-sender.service';
 import { emailConfig } from '../../../config/email.config';
-import { NormalizedResult } from './normalizer.service';
+import { ResolvedMetrics } from './extraction-reconciler.service';
 import { ExtractionResults } from '../extractors/extraction-types';
 
 @Injectable()
@@ -19,11 +19,18 @@ export class DeliveryService {
     senderEmail: string;
     dealId: string;
     proformaS3Key: string;
-    normalized: NormalizedResult;
+    normalized: ResolvedMetrics;
     extraction: ExtractionResults;
     inReplyToMessageId?: string;
   }): Promise<void> {
-    const { senderEmail, dealId, proformaS3Key, normalized, extraction, inReplyToMessageId } = params;
+    const {
+      senderEmail,
+      dealId,
+      proformaS3Key,
+      normalized,
+      extraction,
+      inReplyToMessageId,
+    } = params;
 
     // Download filled proforma
     const buffer = await this.s3.downloadDealAttachment(proformaS3Key);
@@ -54,11 +61,13 @@ export class DeliveryService {
       ],
     });
 
-    this.logger.log(`[${dealId}] Underwriting results delivered to ${senderEmail}`);
+    this.logger.log(
+      `[${dealId}] Underwriting results delivered to ${senderEmail}`,
+    );
   }
 
   private buildResultHtml(
-    normalized: NormalizedResult,
+    normalized: ResolvedMetrics,
     extraction: ExtractionResults,
     dealId: string,
   ): string {
@@ -70,7 +79,9 @@ export class DeliveryService {
       annualGrossRent,
       effectiveGrossIncome,
       expenseRatio,
+      capRate,
       flags,
+      missingDocs,
     } = normalized;
 
     const fmt = (n: number | null | undefined, prefix = '', suffix = '') =>
@@ -81,10 +92,15 @@ export class DeliveryService {
     const fmtPct = (n: number | null | undefined) =>
       n !== null && n !== undefined ? `${(n * 100).toFixed(1)}%` : '<em>—</em>';
 
+    const missingDocsHtml =
+      missingDocs.length > 0
+        ? `<p style="color:#b45309;"><strong>Missing documents:</strong> ${missingDocs.join(', ')} — re-send to fill remaining fields.</p>`
+        : '';
+
     const flagsHtml =
       flags.length > 0
-        ? `<h3 style="color:#b45309;">⚠ Reconciliation Flags</h3><ul>${flags.map((f) => `<li>${f}</li>`).join('')}</ul>`
-        : '<p style="color:#15803d;">✓ No reconciliation flags</p>';
+        ? `<h3 style="color:#b45309;">⚠ Notes &amp; Flags</h3><ul>${flags.map((f) => `<li>${f}</li>`).join('')}</ul>`
+        : '<p style="color:#15803d;">✓ No flags</p>';
 
     return `
 <!DOCTYPE html>
@@ -106,7 +122,7 @@ export class DeliveryService {
     </tr>
     <tr style="background:#f3f4f6;">
       <td style="padding:8px;border:1px solid #e5e7eb;"><strong>Cap Rate</strong></td>
-      <td style="padding:8px;border:1px solid #e5e7eb;">${fmtPct(om?.capRate)}</td>
+      <td style="padding:8px;border:1px solid #e5e7eb;">${fmtPct(capRate)}</td>
     </tr>
     <tr>
       <td style="padding:8px;border:1px solid #e5e7eb;"><strong>Total Units</strong></td>
@@ -128,13 +144,18 @@ export class DeliveryService {
       <td style="padding:8px;border:1px solid #e5e7eb;"><strong>Expense Ratio</strong></td>
       <td style="padding:8px;border:1px solid #e5e7eb;">${fmtPct(expenseRatio)}</td>
     </tr>
-    ${t12?.operatingExpenses !== null && t12?.operatingExpenses !== undefined ? `
+    ${
+      t12?.operatingExpenses !== null && t12?.operatingExpenses !== undefined
+        ? `
     <tr style="background:#f3f4f6;">
       <td style="padding:8px;border:1px solid #e5e7eb;"><strong>Operating Expenses (T-12)</strong></td>
       <td style="padding:8px;border:1px solid #e5e7eb;">${fmt(t12.operatingExpenses, '$')}</td>
-    </tr>` : ''}
+    </tr>`
+        : ''
+    }
   </table>
 
+  ${missingDocsHtml}
   ${flagsHtml}
 
   <p style="margin-top:24px;color:#6b7280;font-size:13px;">
