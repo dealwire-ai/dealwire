@@ -251,8 +251,8 @@ export class SkipTraceService {
       throw new Error(`Tracerfy API error ${response.status}: ${text}`);
     }
 
-    const data = (await response.json()) as { queue_id: string };
-    const queueId = data.queue_id;
+    const data = (await response.json()) as { queue_id: string | number };
+    const queueId = String(data.queue_id);
 
     // Store queue_id on each parcel so we can correlate results
     await this.prisma.parcel.updateMany({
