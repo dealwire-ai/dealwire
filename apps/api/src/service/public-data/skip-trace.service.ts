@@ -34,6 +34,10 @@ export class SkipTraceService {
     bbls: string[],
     force = false,
   ): Promise<{ queueId: string; queued: string[]; skipped: number }> {
+    this.logger.log(
+      `submitBatch called: ${bbls.length} BBLs [${bbls.join(', ')}], force=${force}`,
+    );
+
     if (!this.apiKey) {
       throw new Error('TRACERFY_API_KEY is not configured');
     }
@@ -107,6 +111,9 @@ export class SkipTraceService {
     });
 
     // Submit to Tracerfy
+    this.logger.log(
+      `Submitting ${payload.length} records to Tracerfy POST /trace/`,
+    );
     const response = await fetch(`${this.baseUrl}/trace/`, {
       method: 'POST',
       headers: {
@@ -118,6 +125,9 @@ export class SkipTraceService {
 
     if (!response.ok) {
       const text = await response.text().catch(() => response.statusText);
+      this.logger.error(
+        `Tracerfy POST /trace/ failed: status=${response.status}, body=${text}`,
+      );
       // Unmark pending since we failed to submit
       await this.prisma.parcel.updateMany({
         where: { bbl: { in: toQueue.map((p) => p.bbl) } },
