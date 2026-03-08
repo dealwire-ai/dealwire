@@ -7,7 +7,7 @@ import { RentRollExtractorService } from '../service/underwriting/extractors/ren
 import { T12ExtractorService } from '../service/underwriting/extractors/t12-extractor.service';
 import { GenericExtractorService } from '../service/underwriting/extractors/generic-extractor.service';
 import { ProformaService } from '../service/underwriting/proforma.service';
-import { NormalizerService } from '../service/underwriting/steps/normalizer.service';
+import { ExtractionReconcilerService } from '../service/underwriting/steps/extraction-reconciler.service';
 import { ProformaFillService } from '../service/underwriting/steps/proforma-fill.service';
 import { DeliveryService } from '../service/underwriting/steps/delivery.service';
 import { ProformaController } from '../controller/underwriting/proforma.controller';
@@ -30,7 +30,7 @@ import { EmailServicesModule } from './email.module';
     T12ExtractorService,
     GenericExtractorService,
     ProformaService,
-    NormalizerService,
+    ExtractionReconcilerService,
     ProformaFillService,
     DeliveryService,
   ],
