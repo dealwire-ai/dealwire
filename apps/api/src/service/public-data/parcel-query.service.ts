@@ -60,6 +60,8 @@ export interface ParcelQueryFilters {
   maxUnits?: number;
   minOutstandingTaxBill?: number;
   maxOutstandingTaxBill?: number;
+  minLienSaleAmount?: number;
+  maxLienSaleAmount?: number;
   zipCode?: string;
   search?: string;
   buildingClasses?: string[];
@@ -129,6 +131,21 @@ export class ParcelQueryService {
       if (filters.maxOutstandingTaxBill !== undefined) {
         (where.outstandingTaxBill as Prisma.IntNullableFilter).lte =
           filters.maxOutstandingTaxBill;
+      }
+    }
+
+    if (
+      filters.minLienSaleAmount !== undefined ||
+      filters.maxLienSaleAmount !== undefined
+    ) {
+      where.lienSaleAmount = {};
+      if (filters.minLienSaleAmount !== undefined) {
+        (where.lienSaleAmount as Prisma.IntNullableFilter).gte =
+          filters.minLienSaleAmount;
+      }
+      if (filters.maxLienSaleAmount !== undefined) {
+        (where.lienSaleAmount as Prisma.IntNullableFilter).lte =
+          filters.maxLienSaleAmount;
       }
     }
 
@@ -216,6 +233,8 @@ export class ParcelQueryService {
       'ownerName',
       'outstandingTaxBill',
       'totalOutstandingBalance',
+      'lienSaleAmount',
+      'lienRedemptiveValue',
       'createdAt',
       'updatedAt',
     ];
