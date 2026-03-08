@@ -352,6 +352,10 @@ export class PublicDataController {
           HttpStatus.SERVICE_UNAVAILABLE,
         );
       }
+      this.logger.error(
+        `Batch skip trace failed for ${body.bbls.length} BBLs: ${message}`,
+        (err as Error).stack,
+      );
       throw new HttpException(message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -391,6 +395,10 @@ export class PublicDataController {
           HttpStatus.SERVICE_UNAVAILABLE,
         );
       }
+      this.logger.error(
+        `Single skip trace failed for BBL ${bbl}: ${message}`,
+        (err as Error).stack,
+      );
       throw new HttpException(message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
