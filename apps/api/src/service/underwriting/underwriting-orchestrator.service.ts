@@ -7,7 +7,7 @@ import { T12ExtractorService } from './extractors/t12-extractor.service';
 import { ExtractionResults } from './extractors/extraction-types';
 import { FieldMapEntry } from './proforma.service';
 import { GenericExtractorService } from './extractors/generic-extractor.service';
-import { NormalizerService } from './steps/normalizer.service';
+import { ExtractionReconcilerService } from './steps/extraction-reconciler.service';
 import { ProformaFillService } from './steps/proforma-fill.service';
 import { DeliveryService } from './steps/delivery.service';
 
@@ -44,7 +44,7 @@ export class UnderwritingOrchestratorService {
     private readonly rentRollExtractor: RentRollExtractorService,
     private readonly t12Extractor: T12ExtractorService,
     private readonly genericExtractor: GenericExtractorService,
-    private readonly normalizer: NormalizerService,
+    private readonly reconciler: ExtractionReconcilerService,
     private readonly proformaFill: ProformaFillService,
     private readonly delivery: DeliveryService,
   ) {}
@@ -89,18 +89,33 @@ export class UnderwritingOrchestratorService {
     this.logger.log(`[${dealId}] Step 2: Extract documents in parallel`);
 
     const omDocs = classified.filter((d) => d.documentType === 'om');
-    const rentRollDocs = classified.filter((d) => d.documentType === 'rent-roll');
+    const rentRollDocs = classified.filter(
+      (d) => d.documentType === 'rent-roll',
+    );
     const t12Docs = classified.filter((d) => d.documentType === 't12');
     const otherDocs = classified.filter((d) => d.documentType === 'other');
 
-    const [omResults, rentRollResults, t12Results, genericResults] = await Promise.all([
-      Promise.all(omDocs.map((d) => this.omExtractor.extract(d, neededFields))),
-      Promise.all(rentRollDocs.map((d) => this.rentRollExtractor.extract(d, neededFields))),
-      Promise.all(t12Docs.map((d) => this.t12Extractor.extract(d, neededFields))),
-      neededFields?.length
-        ? Promise.all(otherDocs.map((d) => this.genericExtractor.extract(d, neededFields)))
-        : Promise.resolve([]),
-    ]);
+    const [omResults, rentRollResults, t12Results, genericResults] =
+      await Promise.all([
+        Promise.all(
+          omDocs.map((d) => this.omExtractor.extract(d, neededFields)),
+        ),
+        Promise.all(
+          rentRollDocs.map((d) =>
+            this.rentRollExtractor.extract(d, neededFields),
+          ),
+        ),
+        Promise.all(
+          t12Docs.map((d) => this.t12Extractor.extract(d, neededFields)),
+        ),
+        neededFields?.length
+          ? Promise.all(
+              otherDocs.map((d) =>
+                this.genericExtractor.extract(d, neededFields),
+              ),
+            )
+          : Promise.resolve([]),
+      ]);
 
     if (otherDocs.length > 0) {
       this.logger.log(
@@ -121,8 +136,8 @@ export class UnderwritingOrchestratorService {
     );
 
     // ── Steps 3+4: Normalize + Reconcile ──────────────────────────────────────
-    this.logger.log(`[${dealId}] Steps 3+4: Normalize and reconcile`);
-    const normalized = this.normalizer.normalize(extraction);
+    this.logger.log(`[${dealId}] Steps 3+4: Snapshot — derive and reconcile`);
+    const normalized = this.reconciler.resolve(extraction);
     if (normalized.flags.length > 0) {
       this.logger.warn(
         `[${dealId}] Reconciliation flags (${normalized.flags.length}): ${normalized.flags.join(' | ')}`,
@@ -136,15 +151,23 @@ export class UnderwritingOrchestratorService {
     this.logger.log(`[${dealId}] Step 5: Confidence gate`);
     const confidenceFlags: string[] = [];
     if (extraction.om && extraction.om.confidence < 0.6) {
-      confidenceFlags.push(`Low OM confidence (${extraction.om.confidence.toFixed(2)}) — values may be unreliable`);
+      confidenceFlags.push(
+        `Low OM confidence (${extraction.om.confidence.toFixed(2)}) — values may be unreliable`,
+      );
     } else if (extraction.om && extraction.om.confidence < 0.85) {
-      confidenceFlags.push(`Moderate OM confidence (${extraction.om.confidence.toFixed(2)}) — review key figures`);
+      confidenceFlags.push(
+        `Moderate OM confidence (${extraction.om.confidence.toFixed(2)}) — review key figures`,
+      );
     }
     if (extraction.rentRoll && extraction.rentRoll.confidence < 0.6) {
-      confidenceFlags.push(`Low rent roll confidence (${extraction.rentRoll.confidence.toFixed(2)}) — review unit data`);
+      confidenceFlags.push(
+        `Low rent roll confidence (${extraction.rentRoll.confidence.toFixed(2)}) — review unit data`,
+      );
     }
     if (extraction.t12 && extraction.t12.confidence < 0.6) {
-      confidenceFlags.push(`Low T-12 confidence (${extraction.t12.confidence.toFixed(2)}) — review expense data`);
+      confidenceFlags.push(
+        `Low T-12 confidence (${extraction.t12.confidence.toFixed(2)}) — review expense data`,
+      );
     }
 
     const allFlags = [...normalized.flags, ...confidenceFlags];
@@ -168,7 +191,9 @@ export class UnderwritingOrchestratorService {
         allFlags.push('Pro forma fill failed — see logs');
       }
     } else {
-      this.logger.log(`[${dealId}] Step 6: Skipped (no ready proforma for org)`);
+      this.logger.log(
+        `[${dealId}] Step 6: Skipped (no ready proforma for org)`,
+      );
     }
 
     // ── Step 7: Deliver ────────────────────────────────────────────────────────
