@@ -88,7 +88,7 @@ export class JsonLogger implements LoggerService {
       `${color}${colors.bright}[${levelUpper}]${colors.reset} ` +
         `${colors.dim}${logEntry.timestamp}${colors.reset} ` +
         `${colors.cyan}[${logEntry.context}]${colors.reset} ` +
-        `${logEntry.message}${extra?.trace ? `\n${colors.red}${extra.trace}${colors.reset}` : ''}`,
+        `${logEntry.message}${extra?.trace ? ` ${colors.red}${extra.trace.replace(/\n/g, ' → ')}${colors.reset}` : ''}`,
     );
   }
 }
