@@ -162,7 +162,7 @@ export class PublicDataController {
 
     return this.parcelQuery.queryParcels({
       boroughs: borough ? borough.split(',') : undefined,
-      excludeCoops: excludeCoops === 'true',
+      excludeCoops: excludeCoops !== 'false',
       excludeDClass: excludeDClass === 'false' ? false : true,
       hasActiveLien:
         hasActiveLien !== undefined ? hasActiveLien === 'true' : undefined,
@@ -226,7 +226,7 @@ export class PublicDataController {
 
     const parcels = await this.parcelQuery.getAllForExport({
       boroughs: borough ? borough.split(',') : undefined,
-      excludeCoops: excludeCoops === 'true',
+      excludeCoops: excludeCoops !== 'false',
       excludeDClass: excludeDClass === 'false' ? false : true,
       hasActiveLien:
         hasActiveLien !== undefined ? hasActiveLien === 'true' : undefined,
@@ -373,7 +373,7 @@ export class PublicDataController {
 
     return this.parcelQuery.getStats({
       boroughs: borough ? borough.split(',') : undefined,
-      excludeCoops: excludeCoops === 'true',
+      excludeCoops: excludeCoops !== 'false',
     });
   }
 
