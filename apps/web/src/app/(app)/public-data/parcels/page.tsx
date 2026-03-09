@@ -84,7 +84,7 @@ export default function ParcelsPage() {
 
   const table = useTableState({
     defaultLimit: 50,
-    defaultFilters: { excludeCoops: "true", borough: "3,4" },
+    defaultFilters: { borough: "3,4" },
     defaultSort: "distressScore",
     defaultOrder: "desc",
   });
@@ -111,17 +111,15 @@ export default function ParcelsPage() {
     if (!isLoaded || !userId) return;
     try {
       const borough = table.filters.borough;
-      const excludeCoops = table.filters.excludeCoops;
       const params = new URLSearchParams();
       if (borough) params.set("borough", borough);
-      if (excludeCoops) params.set("excludeCoops", excludeCoops);
       const response = await apiCall(`/public-data/stats?${params.toString()}`);
       setStats(response);
     } catch {
       // Stats are non-critical
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoaded, userId, table.filters.borough, table.filters.excludeCoops]);
+  }, [isLoaded, userId, table.filters.borough]);
 
   // Redirect if feature flag is off
   useEffect(() => {

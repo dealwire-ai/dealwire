@@ -421,8 +421,11 @@ export function ParcelTable({
             return (
               <Fragment key={col.key}>
                 {showDataDotBefore && (
-                  <TableHead className="w-8 px-1">
-                    <Circle className="h-3 w-3 text-zinc-500 mx-auto" />
+                  <TableHead
+                    className="w-16 px-1 text-center"
+                    title="Data quality based on three signals: skip trace (phone numbers), HPD violation sync, and NYCTL lien sale match. Green = all three present. Yellow = 1-2 present. Gray = none."
+                  >
+                    Data Quality
                   </TableHead>
                 )}
                 <TableHead
@@ -449,8 +452,11 @@ export function ParcelTable({
           {/* If Score is not first column or not visible, still show data dot header at start */}
           {(activeColumns.length === 0 ||
             activeColumns[0]?.key !== "distressScore") && (
-            <TableHead className="w-8 px-1">
-              <Circle className="h-3 w-3 text-zinc-500 mx-auto" />
+            <TableHead
+              className="w-16 px-1 text-center"
+              title="Data quality based on three signals: skip trace (phone numbers), HPD violation sync, and NYCTL lien sale match. Green = all three present. Yellow = 1-2 present. Gray = none."
+            >
+              Data Quality
             </TableHead>
           )}
         </TableRow>
