@@ -89,7 +89,7 @@ _Deep data is the moat. An analyst is only as good as their data access._
   - [x] Owner contact lookup (skip tracing) — Tracerfy integration, phone column, single + batch lookup, async polling.
   - [x] Data coverage dashboard — Replaced vanity stats bar with coverage-focused metrics (total parcels w/ borough split, active liens w/ %, complete data count, total outstanding debt) and collapsible per-source coverage bars (PLUTO, HPD, tax bills, NYCTL, skip trace).
   - [ ] Manhattan expansion — add borough 1 with same criteria
-  - [~] Servicer info (MTAG vs Tower) — partially available via NYCTL quarterly reports. CARE portal scraping would improve coverage.
+  - [~] Servicer info (MTAG vs Tower) — partially available via NYCTL quarterly reports. DOF tax bill PDF parsing (`a836-edms.nyc.gov`) would improve coverage to ~90%+ of active-lien parcels. CARE portal is phone-only (dead end for automation).
 - [ ] **Public data ingestion platform** — Adapter-based system for pulling tax liens, zoning, permits, assessments, and deed data from municipal/county sources. Starts with NYC (Socrata SODA API + ArcGIS), designed to expand city-by-city via configuration. See [`docs/product/PUBLIC_DATA_PLATFORM.md`](PUBLIC_DATA_PLATFORM.md) for full architecture.
 - [ ] **Property data enrichment** — Pull from public records, assessor databases, census/demographic data to auto-fill details the email didn't include (year built, lot size, zoning, ownership history, tax assessments).
 - [ ] **Market context** — Auto-attach market comps, submarket stats, rent trends to deal summaries. "This is priced 15% above recent comps in the submarket."
