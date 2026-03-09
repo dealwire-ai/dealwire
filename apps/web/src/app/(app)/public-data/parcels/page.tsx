@@ -19,7 +19,7 @@ import { TableSkeleton } from "@/components/table-skeleton";
 import { useApi } from "@/hooks/use-api";
 import { useTableState } from "@/hooks/use-table-state";
 import { useFeatureFlags } from "@/hooks/use-feature-flags";
-import { Chatbot } from "@/components/chat/chatbot";
+// import { Chatbot } from "@/components/chat/chatbot";
 
 interface Stats {
   total: number;
@@ -303,7 +303,7 @@ export default function ParcelsPage() {
         </div>
       </div>
 
-      <Chatbot />
+      {/* <Chatbot /> */}
     </div>
   );
 }
