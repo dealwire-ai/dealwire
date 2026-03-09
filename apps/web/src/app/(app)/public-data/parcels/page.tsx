@@ -3,9 +3,14 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
-import { ParcelTable, type Parcel } from "@/components/parcels/parcel-table";
+import {
+  ParcelTable,
+  type Parcel,
+  DEFAULT_VISIBLE_COLUMNS,
+} from "@/components/parcels/parcel-table";
 import { ParcelFilters } from "@/components/parcels/parcel-filters";
 import { ExportButton } from "@/components/parcels/export-button";
+import { ColumnToggle } from "@/components/parcels/column-toggle";
 import { BatchSkipTraceButton } from "@/components/parcels/batch-skip-trace-button";
 import { DataCoverageBar } from "@/components/parcels/data-coverage-bar";
 import { TableToolbar } from "@/components/table-toolbar";
@@ -65,6 +70,16 @@ export default function ParcelsPage() {
   const [showCoverage, setShowCoverage] = useState(() => {
     if (typeof window === "undefined") return true;
     return localStorage.getItem("parcels-show-coverage") !== "false";
+  });
+  const [visibleColumns, setVisibleColumns] = useState<Set<string>>(() => {
+    if (typeof window === "undefined") return DEFAULT_VISIBLE_COLUMNS;
+    try {
+      const stored = localStorage.getItem("parcels-visible-columns");
+      if (stored) return new Set(JSON.parse(stored) as string[]);
+    } catch {
+      // ignore
+    }
+    return DEFAULT_VISIBLE_COLUMNS;
   });
 
   const table = useTableState({
@@ -147,7 +162,27 @@ export default function ParcelsPage() {
               Distressed property analysis from public data
             </p>
           </div>
-          <ExportButton queryString={table.queryString} />
+          <div className="flex items-center gap-2">
+            <ColumnToggle
+              visibleColumns={visibleColumns}
+              onToggle={(key) => {
+                setVisibleColumns((prev) => {
+                  const next = new Set(prev);
+                  if (next.has(key)) {
+                    next.delete(key);
+                  } else {
+                    next.add(key);
+                  }
+                  localStorage.setItem(
+                    "parcels-visible-columns",
+                    JSON.stringify([...next]),
+                  );
+                  return next;
+                });
+              }}
+            />
+            <ExportButton queryString={table.queryString} />
+          </div>
         </div>
 
         {/* Data Coverage Dashboard */}
@@ -274,11 +309,12 @@ export default function ParcelsPage() {
           )}
 
           {loading ? (
-            <TableSkeleton columns={13} />
+            <TableSkeleton columns={visibleColumns.size + 3} />
           ) : (
             <ParcelTable
               parcels={parcels}
               expandedRows={expandedRows}
+              visibleColumns={visibleColumns}
               onToggleRow={(id) => {
                 const newExpanded = new Set(expandedRows);
                 if (newExpanded.has(id)) {
