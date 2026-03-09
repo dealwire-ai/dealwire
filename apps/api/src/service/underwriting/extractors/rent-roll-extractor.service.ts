@@ -3,7 +3,11 @@ import { generateObject } from 'ai';
 import { anthropic } from '@ai-sdk/anthropic';
 import { S3Service } from '../../s3/s3.service';
 import { ClassifiedDocument } from './document-classifier.service';
-import { RentRollExtractionSchema, RentRollExtraction, excelToText } from './extraction-types';
+import {
+  RentRollExtractionSchema,
+  RentRollExtraction,
+  excelToText,
+} from './extraction-types';
 
 const SYSTEM_PROMPT = `You are an expert real estate underwriter extracting data from a Rent Roll (Schedule of Rent).
 
@@ -35,7 +39,10 @@ export class RentRollExtractorService {
 
   constructor(private readonly s3Service: S3Service) {}
 
-  async extract(doc: ClassifiedDocument, neededFields?: string[]): Promise<RentRollExtraction> {
+  async extract(
+    doc: ClassifiedDocument,
+    neededFields?: string[],
+  ): Promise<RentRollExtraction> {
     this.logger.log(`[rent-roll-extractor] Extracting from "${doc.filename}"`);
 
     const isPdf =
@@ -64,6 +71,7 @@ export class RentRollExtractorService {
         schema: RentRollExtractionSchema,
         system: SYSTEM_PROMPT,
         messages: [{ role: 'user', content: content as any }],
+        maxTokens: 16000,
       });
 
       this.logger.log(
@@ -83,6 +91,7 @@ export class RentRollExtractorService {
       schema: RentRollExtractionSchema,
       system: SYSTEM_PROMPT,
       messages: [{ role: 'user', content: userText }],
+      maxTokens: 16000,
     });
 
     this.logger.log(
