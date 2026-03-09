@@ -218,7 +218,7 @@ export const COLUMNS: ColumnDef[] = [
     label: "Tax Bill",
     field: "outstandingTaxBill",
     align: "right",
-    defaultVisible: false,
+    defaultVisible: true,
     sortable: true,
   },
 ];
@@ -241,6 +241,13 @@ const DATA_DOT_COLORS = {
   green: "text-emerald-400",
   yellow: "text-yellow-400",
   gray: "text-zinc-600",
+} as const;
+
+const DATA_DOT_LABELS = {
+  green:
+    "High data quality — all 3 signals present (skip trace, HPD violations, lien sale)",
+  yellow: "Partial data quality — 1-2 of 3 signals present",
+  gray: "Low data quality — no signals present",
 } as const;
 
 interface ParcelTableProps {
@@ -492,7 +499,10 @@ export function ParcelTable({
                   return (
                     <Fragment key={col.key}>
                       {showDataDotBefore && (
-                        <TableCell className="w-8 px-1 text-center">
+                        <TableCell
+                          className="w-8 px-1 text-center"
+                          title={DATA_DOT_LABELS[quality]}
+                        >
                           <Circle
                             className={`h-2.5 w-2.5 fill-current mx-auto ${DATA_DOT_COLORS[quality]}`}
                           />
@@ -515,7 +525,10 @@ export function ParcelTable({
                 })}
                 {(activeColumns.length === 0 ||
                   activeColumns[0]?.key !== "distressScore") && (
-                  <TableCell className="w-8 px-1 text-center">
+                  <TableCell
+                    className="w-8 px-1 text-center"
+                    title={DATA_DOT_LABELS[quality]}
+                  >
                     <Circle
                       className={`h-2.5 w-2.5 fill-current mx-auto ${DATA_DOT_COLORS[quality]}`}
                     />
