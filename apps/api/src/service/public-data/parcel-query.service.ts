@@ -291,7 +291,19 @@ export class ParcelQueryService {
   async getStats(filters: ParcelQueryFilters = {}) {
     const where = this.buildWhere(filters);
 
-    const [total, withLiens, avgScore, byBorough] = await Promise.all([
+    const [
+      total,
+      withLiens,
+      avgScore,
+      byBorough,
+      debtSum,
+      withPlutoData,
+      withViolations,
+      withTaxBills,
+      withNyctlData,
+      withSkipTrace,
+      withCompleteData,
+    ] = await Promise.all([
       this.prisma.parcel.count({ where }),
       this.prisma.parcel.count({ where: { ...where, hasActiveLien: true } }),
       this.prisma.parcel.aggregate({
@@ -303,6 +315,33 @@ export class ParcelQueryService {
         where,
         _count: true,
         _avg: { distressScore: true },
+      }),
+      this.prisma.parcel.aggregate({
+        where,
+        _sum: { totalOutstandingBalance: true },
+      }),
+      this.prisma.parcel.count({
+        where: { ...where, buildingClass: { not: null } },
+      }),
+      this.prisma.parcel.count({
+        where: { ...where, violationsSyncedAt: { not: null } },
+      }),
+      this.prisma.parcel.count({
+        where: { ...where, outstandingTaxBill: { not: null } },
+      }),
+      this.prisma.parcel.count({
+        where: { ...where, lienSaleAmount: { not: null } },
+      }),
+      this.prisma.parcel.count({
+        where: { ...where, skipTraceStatus: 'found' },
+      }),
+      this.prisma.parcel.count({
+        where: {
+          ...where,
+          skipTraceStatus: 'found',
+          lienSaleAmount: { not: null },
+          violationsSyncedAt: { not: null },
+        },
       }),
     ]);
 
@@ -316,6 +355,13 @@ export class ParcelQueryService {
         count: g._count,
         avgScore: Math.round((g._avg.distressScore || 0) * 10) / 10,
       })),
+      totalOutstandingDebt: debtSum._sum.totalOutstandingBalance || 0,
+      withPlutoData,
+      withViolations,
+      withTaxBills,
+      withNyctlData,
+      withSkipTrace,
+      withCompleteData,
     };
   }
 
