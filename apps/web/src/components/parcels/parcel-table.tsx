@@ -1,7 +1,13 @@
 "use client";
 
 import { Fragment } from "react";
-import { ArrowDown, ArrowUp, ChevronDown, ChevronUp } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowUp,
+  ChevronDown,
+  ChevronUp,
+  Circle,
+} from "lucide-react";
 import {
   Table,
   TableBody,
@@ -61,6 +67,7 @@ export interface Parcel {
   violationsClassB: number;
   violationsClassC: number;
   violationsPerUnit: number | null;
+  violationsSyncedAt: string | null;
   distressScore: number | null;
   outstandingTaxBill: number | null;
   totalOutstandingBalance: number | null;
@@ -81,28 +88,160 @@ export interface Parcel {
   skipTraceStatus: "pending" | "found" | "not_found" | "error" | null;
 }
 
-const SORTABLE_COLUMNS: { label: string; field: string; align?: "right" }[] = [
-  { label: "Score", field: "distressScore" },
-  { label: "Address", field: "address" },
-  { label: "Borough", field: "borough" },
-  { label: "Class", field: "buildingClass" },
-  { label: "Units", field: "unitsTotal", align: "right" },
-  { label: "Sqft", field: "buildingArea", align: "right" },
-  { label: "Est. Value", field: "estimatedMarketValue", align: "right" },
-  { label: "Year", field: "yearBuilt", align: "right" },
-  { label: "Open Viol.", field: "violationsOpen", align: "right" },
-  { label: "V/Unit", field: "violationsPerUnit", align: "right" },
-  { label: "Class C", field: "violationsClassC", align: "right" },
-  { label: "Lien", field: "hasActiveLien" },
-  { label: "Lien Sale Amt", field: "lienSaleAmount", align: "right" },
-  { label: "Tax Bill", field: "outstandingTaxBill", align: "right" },
+export interface ColumnDef {
+  key: string;
+  label: string;
+  field: string;
+  align?: "right";
+  defaultVisible: boolean;
+  sortable: boolean;
+}
+
+export const COLUMNS: ColumnDef[] = [
   {
-    label: "Total Owed to DOF",
+    key: "distressScore",
+    label: "Score",
+    field: "distressScore",
+    defaultVisible: true,
+    sortable: true,
+  },
+  {
+    key: "address",
+    label: "Address",
+    field: "address",
+    defaultVisible: true,
+    sortable: true,
+  },
+  {
+    key: "buildingClass",
+    label: "Class",
+    field: "buildingClass",
+    defaultVisible: true,
+    sortable: true,
+  },
+  {
+    key: "unitsTotal",
+    label: "Units",
+    field: "unitsTotal",
+    align: "right",
+    defaultVisible: true,
+    sortable: true,
+  },
+  {
+    key: "violationsPerUnit",
+    label: "V/Unit",
+    field: "violationsPerUnit",
+    align: "right",
+    defaultVisible: true,
+    sortable: true,
+  },
+  {
+    key: "lienSaleAmount",
+    label: "Lien Sale Amt",
+    field: "lienSaleAmount",
+    align: "right",
+    defaultVisible: true,
+    sortable: true,
+  },
+  {
+    key: "totalOutstandingBalance",
+    label: "Total Owed",
     field: "totalOutstandingBalance",
     align: "right",
+    defaultVisible: true,
+    sortable: true,
   },
-  { label: "Phone", field: "ownerPhones" },
+  {
+    key: "ownerPhones",
+    label: "Phone",
+    field: "ownerPhones",
+    defaultVisible: true,
+    sortable: true,
+  },
+  // Hidden by default
+  {
+    key: "borough",
+    label: "Borough",
+    field: "borough",
+    defaultVisible: false,
+    sortable: true,
+  },
+  {
+    key: "buildingArea",
+    label: "Sqft",
+    field: "buildingArea",
+    align: "right",
+    defaultVisible: false,
+    sortable: true,
+  },
+  {
+    key: "estimatedMarketValue",
+    label: "Est. Value",
+    field: "estimatedMarketValue",
+    align: "right",
+    defaultVisible: false,
+    sortable: true,
+  },
+  {
+    key: "yearBuilt",
+    label: "Year",
+    field: "yearBuilt",
+    align: "right",
+    defaultVisible: false,
+    sortable: true,
+  },
+  {
+    key: "violationsOpen",
+    label: "Open Viol.",
+    field: "violationsOpen",
+    align: "right",
+    defaultVisible: false,
+    sortable: true,
+  },
+  {
+    key: "violationsClassC",
+    label: "Class C",
+    field: "violationsClassC",
+    align: "right",
+    defaultVisible: false,
+    sortable: true,
+  },
+  {
+    key: "hasActiveLien",
+    label: "Lien",
+    field: "hasActiveLien",
+    defaultVisible: false,
+    sortable: true,
+  },
+  {
+    key: "outstandingTaxBill",
+    label: "Tax Bill",
+    field: "outstandingTaxBill",
+    align: "right",
+    defaultVisible: false,
+    sortable: true,
+  },
 ];
+
+export const DEFAULT_VISIBLE_COLUMNS = new Set(
+  COLUMNS.filter((c) => c.defaultVisible).map((c) => c.key),
+);
+
+function getDataQuality(parcel: Parcel): "green" | "yellow" | "gray" {
+  let signals = 0;
+  if (parcel.skipTraceStatus === "found") signals++;
+  if (parcel.lienSaleAmount != null) signals++;
+  if (parcel.violationsSyncedAt != null) signals++;
+  if (signals === 3) return "green";
+  if (signals >= 1) return "yellow";
+  return "gray";
+}
+
+const DATA_DOT_COLORS = {
+  green: "text-emerald-400",
+  yellow: "text-yellow-400",
+  gray: "text-zinc-600",
+} as const;
 
 interface ParcelTableProps {
   parcels: Parcel[];
@@ -117,6 +256,7 @@ interface ParcelTableProps {
   order?: "asc" | "desc";
   onSortChange?: (field: string) => void;
   onParcelUpdated?: (bbl: string, updates: Partial<Parcel>) => void;
+  visibleColumns: Set<string>;
 }
 
 function formatCurrency(value: number | null | undefined): string {
@@ -133,6 +273,86 @@ function formatNumber(value: number | null | undefined): string {
   return new Intl.NumberFormat("en-US").format(value);
 }
 
+function renderCell(key: string, parcel: Parcel) {
+  switch (key) {
+    case "distressScore":
+      return <ScoreBadge score={parcel.distressScore} />;
+    case "address":
+      return (
+        <span className="font-medium max-w-[200px] truncate block">
+          {parcel.address || parcel.bbl}
+        </span>
+      );
+    case "borough":
+      return BOROUGH_NAMES[parcel.borough] || parcel.borough;
+    case "buildingClass":
+      return formatBuildingClass(parcel.buildingClass);
+    case "unitsTotal":
+      return parcel.unitsTotal ?? "-";
+    case "buildingArea":
+      return parcel.buildingArea ? formatNumber(parcel.buildingArea) : "-";
+    case "estimatedMarketValue":
+      return formatCurrency(parcel.estimatedMarketValue);
+    case "yearBuilt":
+      return parcel.yearBuilt ?? "-";
+    case "violationsOpen":
+      return parcel.violationsOpen > 0 ? (
+        <span className="text-red-400">{parcel.violationsOpen}</span>
+      ) : (
+        "0"
+      );
+    case "violationsPerUnit":
+      return parcel.violationsPerUnit !== null
+        ? parcel.violationsPerUnit.toFixed(1)
+        : "-";
+    case "violationsClassC":
+      return parcel.violationsClassC > 0 ? (
+        <span className="text-red-400">{parcel.violationsClassC}</span>
+      ) : (
+        "0"
+      );
+    case "hasActiveLien":
+      return parcel.hasActiveLien ? (
+        <Badge className="bg-orange-900/30 text-orange-400 border-orange-900/50 hover:bg-orange-900/40">
+          Lien
+        </Badge>
+      ) : (
+        "-"
+      );
+    case "lienSaleAmount":
+      return parcel.lienSaleAmount != null ? (
+        <span className="inline-flex items-center gap-1 justify-end">
+          {formatCurrency(parcel.lienSaleAmount)}
+          {parcel.lienMatchConfidence === "group_small" && (
+            <Badge className="bg-yellow-900/30 text-yellow-400 border-yellow-900/50 text-[10px] px-1 py-0 leading-tight">
+              ~Est
+            </Badge>
+          )}
+          {(parcel.lienMatchConfidence === "group_large" ||
+            parcel.lienMatchConfidence === "estimated") && (
+            <Badge className="bg-orange-900/30 text-orange-400 border-orange-900/50 text-[10px] px-1 py-0 leading-tight">
+              ~Est
+            </Badge>
+          )}
+        </span>
+      ) : (
+        "-"
+      );
+    case "outstandingTaxBill":
+      return formatCurrency(parcel.outstandingTaxBill);
+    case "totalOutstandingBalance":
+      return (
+        <span className="font-medium">
+          {formatCurrency(parcel.totalOutstandingBalance)}
+        </span>
+      );
+    case "ownerPhones":
+      return <PhoneCell parcel={parcel} />;
+    default:
+      return "-";
+  }
+}
+
 export function ParcelTable({
   parcels,
   expandedRows,
@@ -146,9 +366,15 @@ export function ParcelTable({
   order,
   onSortChange,
   onParcelUpdated,
+  visibleColumns,
 }: ParcelTableProps) {
   const allSelected =
     parcels.length > 0 && parcels.every((p) => selectedBbls?.has(p.bbl));
+
+  const activeColumns = COLUMNS.filter((c) => visibleColumns.has(c.key));
+  // +2 for checkbox, +1 for expand chevron, +1 for data quality dot
+  const totalColSpan = activeColumns.length + 3;
+
   if (parcels.length === 0) {
     return (
       <div className="text-center py-12 text-zinc-400">
@@ -187,35 +413,52 @@ export function ParcelTable({
             />
           </TableHead>
           <TableHead className="w-10"></TableHead>
-          {SORTABLE_COLUMNS.map(({ label, field, align }) => {
-            const isActive = sort === field;
+          {activeColumns.map((col, i) => {
+            const isActive = sort === col.field;
+            // Insert data quality dot header after Score column (index 0)
+            const showDataDotBefore =
+              i === 1 && activeColumns[0]?.key === "distressScore";
             return (
-              <TableHead
-                key={field}
-                className={
-                  align === "right"
-                    ? "text-right cursor-pointer hover:text-white select-none"
-                    : "cursor-pointer hover:text-white select-none"
-                }
-                onClick={() => onSortChange?.(field)}
-              >
-                <span className="inline-flex items-center gap-1">
-                  {label}
-                  {isActive &&
-                    (order === "desc" ? (
-                      <ArrowDown className="h-3.5 w-3.5" />
-                    ) : (
-                      <ArrowUp className="h-3.5 w-3.5" />
-                    ))}
-                </span>
-              </TableHead>
+              <Fragment key={col.key}>
+                {showDataDotBefore && (
+                  <TableHead className="w-8 px-1">
+                    <Circle className="h-3 w-3 text-zinc-500 mx-auto" />
+                  </TableHead>
+                )}
+                <TableHead
+                  className={
+                    col.align === "right"
+                      ? "text-right cursor-pointer hover:text-white select-none"
+                      : "cursor-pointer hover:text-white select-none"
+                  }
+                  onClick={() => col.sortable && onSortChange?.(col.field)}
+                >
+                  <span className="inline-flex items-center gap-1">
+                    {col.label}
+                    {isActive &&
+                      (order === "desc" ? (
+                        <ArrowDown className="h-3.5 w-3.5" />
+                      ) : (
+                        <ArrowUp className="h-3.5 w-3.5" />
+                      ))}
+                  </span>
+                </TableHead>
+              </Fragment>
             );
           })}
+          {/* If Score is not first column or not visible, still show data dot header at start */}
+          {(activeColumns.length === 0 ||
+            activeColumns[0]?.key !== "distressScore") && (
+            <TableHead className="w-8 px-1">
+              <Circle className="h-3 w-3 text-zinc-500 mx-auto" />
+            </TableHead>
+          )}
         </TableRow>
       </TableHeader>
       <TableBody>
         {parcels.map((parcel) => {
           const isExpanded = expandedRows.has(parcel.id);
+          const quality = getDataQuality(parcel);
           return (
             <Fragment key={parcel.id}>
               <TableRow
@@ -235,98 +478,48 @@ export function ParcelTable({
                     <ChevronDown className="w-4 h-4 text-zinc-400" />
                   )}
                 </TableCell>
-                <TableCell>
-                  <ScoreBadge score={parcel.distressScore} />
-                </TableCell>
-                <TableCell className="font-medium max-w-[200px] truncate">
-                  {parcel.address || parcel.bbl}
-                </TableCell>
-                <TableCell>
-                  {BOROUGH_NAMES[parcel.borough] || parcel.borough}
-                </TableCell>
-                <TableCell>
-                  {formatBuildingClass(parcel.buildingClass)}
-                </TableCell>
-                <TableCell className="text-right">
-                  {parcel.unitsTotal ?? "-"}
-                </TableCell>
-                <TableCell className="text-right">
-                  {parcel.buildingArea
-                    ? formatNumber(parcel.buildingArea)
-                    : "-"}
-                </TableCell>
-                <TableCell className="text-right">
-                  {formatCurrency(parcel.estimatedMarketValue)}
-                </TableCell>
-                <TableCell className="text-right">
-                  {parcel.yearBuilt ?? "-"}
-                </TableCell>
-                <TableCell className="text-right">
-                  {parcel.violationsOpen > 0 ? (
-                    <span className="text-red-400">
-                      {parcel.violationsOpen}
-                    </span>
-                  ) : (
-                    "0"
-                  )}
-                </TableCell>
-                <TableCell className="text-right">
-                  {parcel.violationsPerUnit !== null
-                    ? parcel.violationsPerUnit.toFixed(1)
-                    : "-"}
-                </TableCell>
-                <TableCell className="text-right">
-                  {parcel.violationsClassC > 0 ? (
-                    <span className="text-red-400">
-                      {parcel.violationsClassC}
-                    </span>
-                  ) : (
-                    "0"
-                  )}
-                </TableCell>
-                <TableCell>
-                  {parcel.hasActiveLien ? (
-                    <Badge className="bg-orange-900/30 text-orange-400 border-orange-900/50 hover:bg-orange-900/40">
-                      Lien
-                    </Badge>
-                  ) : (
-                    "-"
-                  )}
-                </TableCell>
-                <TableCell className="text-right">
-                  {parcel.lienSaleAmount != null ? (
-                    <span className="inline-flex items-center gap-1 justify-end">
-                      {formatCurrency(parcel.lienSaleAmount)}
-                      {parcel.lienMatchConfidence === "group_small" && (
-                        <Badge className="bg-yellow-900/30 text-yellow-400 border-yellow-900/50 text-[10px] px-1 py-0 leading-tight">
-                          ~Est
-                        </Badge>
+                {activeColumns.map((col, i) => {
+                  const showDataDotBefore =
+                    i === 1 && activeColumns[0]?.key === "distressScore";
+                  const cellContent = renderCell(col.key, parcel);
+                  const needsStopPropagation = col.key === "ownerPhones";
+                  return (
+                    <Fragment key={col.key}>
+                      {showDataDotBefore && (
+                        <TableCell className="w-8 px-1 text-center">
+                          <Circle
+                            className={`h-2.5 w-2.5 fill-current mx-auto ${DATA_DOT_COLORS[quality]}`}
+                          />
+                        </TableCell>
                       )}
-                      {(parcel.lienMatchConfidence === "group_large" ||
-                        parcel.lienMatchConfidence === "estimated") && (
-                        <Badge className="bg-orange-900/30 text-orange-400 border-orange-900/50 text-[10px] px-1 py-0 leading-tight">
-                          ~Est
-                        </Badge>
-                      )}
-                    </span>
-                  ) : (
-                    "-"
-                  )}
-                </TableCell>
-                <TableCell className="text-right">
-                  {formatCurrency(parcel.outstandingTaxBill)}
-                </TableCell>
-                <TableCell className="text-right font-medium">
-                  {formatCurrency(parcel.totalOutstandingBalance)}
-                </TableCell>
-                <TableCell onClick={(e) => e.stopPropagation()}>
-                  <PhoneCell parcel={parcel} />
-                </TableCell>
+                      <TableCell
+                        className={
+                          col.align === "right" ? "text-right" : undefined
+                        }
+                        onClick={
+                          needsStopPropagation
+                            ? (e) => e.stopPropagation()
+                            : undefined
+                        }
+                      >
+                        {cellContent}
+                      </TableCell>
+                    </Fragment>
+                  );
+                })}
+                {(activeColumns.length === 0 ||
+                  activeColumns[0]?.key !== "distressScore") && (
+                  <TableCell className="w-8 px-1 text-center">
+                    <Circle
+                      className={`h-2.5 w-2.5 fill-current mx-auto ${DATA_DOT_COLORS[quality]}`}
+                    />
+                  </TableCell>
+                )}
               </TableRow>
               {isExpanded && (
                 <TableRow>
                   <TableCell
-                    colSpan={18}
+                    colSpan={totalColSpan + 1}
                     className="bg-zinc-950/50 p-0 transition-all duration-200"
                   >
                     <div className="border-l-2 border-[#C8A96E] pl-4 py-4 pr-4">
@@ -563,7 +756,7 @@ function PhoneCell({ parcel }: { parcel: Parcel }) {
     );
   }
 
-  return <span className="text-zinc-600 text-xs">—</span>;
+  return <span className="text-zinc-600 text-xs">&mdash;</span>;
 }
 
 function DetailRow({
