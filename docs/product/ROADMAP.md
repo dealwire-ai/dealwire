@@ -87,6 +87,7 @@ _Deep data is the moat. An analyst is only as good as their data access._
   - [x] Outstanding tax bills: Ingested from DOF Property Charges Balance (`scjx-j6np`). CHG = property tax, total = all DOF charges.
   - [x] Actual lien sale amounts — NYCTL quarterly XLSX reports from DOF, crosswalk matched on (zip, buildingClass, taxClass). ~24% exact match shown in UI, rest stored with group/estimated confidence. Includes sale amount, redemptive value, servicer, trust vintage, foreclosure status.
   - [x] Owner contact lookup (skip tracing) — Tracerfy integration, phone column, single + batch lookup, async polling.
+  - [x] Data coverage dashboard — Replaced vanity stats bar with coverage-focused metrics (total parcels w/ borough split, active liens w/ %, complete data count, total outstanding debt) and collapsible per-source coverage bars (PLUTO, HPD, tax bills, NYCTL, skip trace).
   - [ ] Manhattan expansion — add borough 1 with same criteria
   - [~] Servicer info (MTAG vs Tower) — partially available via NYCTL quarterly reports. CARE portal scraping would improve coverage.
 - [ ] **Public data ingestion platform** — Adapter-based system for pulling tax liens, zoning, permits, assessments, and deed data from municipal/county sources. Starts with NYC (Socrata SODA API + ArcGIS), designed to expand city-by-city via configuration. See [`docs/product/PUBLIC_DATA_PLATFORM.md`](PUBLIC_DATA_PLATFORM.md) for full architecture.
