@@ -47,7 +47,7 @@ describe('ParcelQueryService', () => {
         expect.objectContaining({
           skip: 0,
           take: 50,
-          orderBy: { distressScore: 'desc' },
+          orderBy: { distressScore: { sort: 'desc', nulls: 'last' } },
         }),
       );
     });
