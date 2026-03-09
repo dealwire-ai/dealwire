@@ -204,21 +204,6 @@ export function ParcelFilters({ filters, onSetFilter }: ParcelFiltersProps) {
         </SelectContent>
       </Select>
 
-      {/* Has Active Lien toggle */}
-      <Button
-        variant={filters.hasActiveLien === "true" ? "default" : "outline"}
-        size="sm"
-        onClick={() =>
-          onSetFilter(
-            "hasActiveLien",
-            filters.hasActiveLien === "true" ? "" : "true",
-          )
-        }
-        className="text-xs"
-      >
-        Active Liens Only
-      </Button>
-
       {/* Min distress score */}
       <Select
         value={filters.minDistressScore || "any"}

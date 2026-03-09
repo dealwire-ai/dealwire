@@ -240,10 +240,10 @@ export class ParcelQueryService {
     ];
 
     if (validSortFields.includes(sortField)) {
-      return { [sortField]: dir };
+      return { [sortField]: { sort: dir, nulls: 'last' } };
     }
 
-    return { distressScore: 'desc' };
+    return { distressScore: { sort: 'desc', nulls: 'last' } };
   }
 
   /**
