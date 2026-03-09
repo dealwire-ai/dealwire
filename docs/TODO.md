@@ -1,9 +1,10 @@
 # TODO
 
 ## General Ops
+   - scope project for Thomas Dolan
    - decide on new name / domain
-   - (isaac) eng migration
-   - (noah) gsuite + related accounts
+      - (isaac) eng migration
+      - (noah) gsuite + related accounts
    - make a really strong, energetic e2e demo (deal screening, underwriting, (and optionally) IC report generation)
 
 ## Biz Dev
