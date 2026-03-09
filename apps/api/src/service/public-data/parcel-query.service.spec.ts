@@ -184,10 +184,20 @@ describe('ParcelQueryService', () => {
       // Arrange
       prisma.parcel.count
         .mockResolvedValueOnce(100) // total
-        .mockResolvedValueOnce(30); // withLiens
-      prisma.parcel.aggregate.mockResolvedValue({
-        _avg: { distressScore: 45.67 },
-      });
+        .mockResolvedValueOnce(30) // withLiens
+        .mockResolvedValueOnce(80) // withPlutoData
+        .mockResolvedValueOnce(60) // withViolations
+        .mockResolvedValueOnce(50) // withTaxBills
+        .mockResolvedValueOnce(20) // withNyctlData
+        .mockResolvedValueOnce(40) // withSkipTrace
+        .mockResolvedValueOnce(15); // withCompleteData
+      prisma.parcel.aggregate
+        .mockResolvedValueOnce({
+          _avg: { distressScore: 45.67 },
+        })
+        .mockResolvedValueOnce({
+          _sum: { totalOutstandingBalance: 1234567.89 },
+        });
       prisma.parcel.groupBy.mockResolvedValue([
         { borough: '3', _count: 60, _avg: { distressScore: 50 } },
         { borough: '4', _count: 40, _avg: { distressScore: 40 } },
@@ -206,6 +216,13 @@ describe('ParcelQueryService', () => {
         count: 60,
         avgScore: 50,
       });
+      expect(result.totalOutstandingDebt).toBe(1234567.89);
+      expect(result.withPlutoData).toBe(80);
+      expect(result.withViolations).toBe(60);
+      expect(result.withTaxBills).toBe(50);
+      expect(result.withNyctlData).toBe(20);
+      expect(result.withSkipTrace).toBe(40);
+      expect(result.withCompleteData).toBe(15);
     });
   });
 });
