@@ -6,7 +6,10 @@ import { EmailSenderService } from '../email/email-sender.service';
 import { ScreeningPreferencesService } from '../preferences/screening-preferences.service';
 import { MicrosoftGraphService } from '../microsoft/microsoft-graph.service';
 import { S3Service } from '../s3/s3.service';
-import { BrokerIntelligenceService, DigestBrokerContext } from './broker-intelligence.service';
+import {
+  BrokerIntelligenceService,
+  DigestBrokerContext,
+} from './broker-intelligence.service';
 import { ADMIN_EMAILS } from '../../config/email.config';
 import CronExpressionParser from 'cron-parser';
 import { formatFileSize, escapeHtml, getErrorMessage } from '../../util/format';
@@ -76,7 +79,8 @@ export class DealDigestService implements OnModuleInit {
 
       for (const org of organizations) {
         const schedule = org.screeningPreferences?.digestSchedule;
-        const timeZone = org.screeningPreferences?.digestTimeZone || 'America/New_York';
+        const timeZone =
+          org.screeningPreferences?.digestTimeZone || 'America/New_York';
 
         if (!schedule) {
           continue;
@@ -91,7 +95,10 @@ export class DealDigestService implements OnModuleInit {
       }
     } catch (error) {
       const errorStack = error instanceof Error ? error.stack : undefined;
-      this.logger.error(`Failed to check and send digests: ${getErrorMessage(error)}`, errorStack);
+      this.logger.error(
+        `Failed to check and send digests: ${getErrorMessage(error)}`,
+        errorStack,
+      );
     }
   }
 
@@ -149,7 +156,9 @@ export class DealDigestService implements OnModuleInit {
       });
 
       if (!org || org.users.length === 0) {
-        this.logger.warn(`Organization ${organizationId} not found or has no users`);
+        this.logger.warn(
+          `Organization ${organizationId} not found or has no users`,
+        );
         return;
       }
 
@@ -166,28 +175,33 @@ export class DealDigestService implements OnModuleInit {
 
       // Calculate sinceDate - default to 7 days ago if no previous digest
       const sinceDate =
-        lastDigest?.digestSentAt || new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+        lastDigest?.digestSentAt ||
+        new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
       // Atomically mark unsent screenings as sent to prevent race conditions
       // This ensures only one process can claim the screenings
       const now = new Date();
-      const updateResult = await this.prismaService.initialScreening.updateMany({
-        where: {
-          deal: { organizationId },
-          digestSent: false,
-          screenedAt: {
-            gte: sinceDate,
+      const updateResult = await this.prismaService.initialScreening.updateMany(
+        {
+          where: {
+            deal: { organizationId },
+            digestSent: false,
+            screenedAt: {
+              gte: sinceDate,
+            },
+          },
+          data: {
+            digestSent: true,
+            digestSentAt: now,
           },
         },
-        data: {
-          digestSent: true,
-          digestSentAt: now,
-        },
-      });
+      );
 
       // Skip if no screenings were updated (either none exist or another process claimed them)
       if (updateResult.count === 0) {
-        this.logger.log(`No new screenings for organization ${organizationId} since last digest`);
+        this.logger.log(
+          `No new screenings for organization ${organizationId} since last digest`,
+        );
         return;
       }
 
@@ -243,28 +257,41 @@ export class DealDigestService implements OnModuleInit {
       const contactIds = screenings
         .map((s) => s.deal.contact?.id)
         .filter((id): id is string => !!id);
-      const brokerContext = await this.brokerIntelligence.getBrokerContextForDigest(
-        contactIds,
-        organizationId,
-      );
+      const brokerContext =
+        await this.brokerIntelligence.getBrokerContextForDigest(
+          contactIds,
+          organizationId,
+        );
 
       // Get org-level summary stats
-      const orgSummary = await this.brokerIntelligence.getOrgDealSummary(organizationId);
+      const orgSummary =
+        await this.brokerIntelligence.getOrgDealSummary(organizationId);
 
       // Get top brokers for leaderboard section
-      const leaderboard = await this.brokerIntelligence.getLeaderboard(organizationId, {
-        limit: 5,
-        since: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-      });
+      const leaderboard = await this.brokerIntelligence.getLeaderboard(
+        organizationId,
+        {
+          limit: 5,
+          since: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+        },
+      );
 
       // Build action links for each deal (pre-signed S3 URLs, extracted links, webLinks)
       const actionLinksMap = await this.buildActionLinksForDigest(screenings);
 
       // Get organization preferences for email branding
-      const preferences = await this.screeningPreferencesService.getPreferences(organizationId);
+      const preferences =
+        await this.screeningPreferencesService.getPreferences(organizationId);
 
       // Format email with enhanced data
-      const emailHtml = this.formatDigestEmail(screenings, preferences, brokerContext, orgSummary, leaderboard, actionLinksMap);
+      const emailHtml = this.formatDigestEmail(
+        screenings,
+        preferences,
+        brokerContext,
+        orgSummary,
+        leaderboard,
+        actionLinksMap,
+      );
 
       // Get user emails
       const userEmails = org.users
@@ -277,10 +304,10 @@ export class DealDigestService implements OnModuleInit {
       }
 
       // Find a user with Microsoft subscription (prefer first user by createdAt)
-      type UserType = typeof org.users[0];
-      const userWithMicrosoft = org.users.find(
-        (u: UserType) => u.microsoftSubscription !== null,
-      ) || org.users[0]; // Fallback to first user if none have Microsoft
+      type UserType = (typeof org.users)[0];
+      const userWithMicrosoft =
+        org.users.find((u: UserType) => u.microsoftSubscription !== null) ||
+        org.users[0]; // Fallback to first user if none have Microsoft
 
       // Get Microsoft access token for the selected user
       const accessToken = userWithMicrosoft
@@ -291,9 +318,13 @@ export class DealDigestService implements OnModuleInit {
         : null;
 
       // Send email
-      type ScreeningType = typeof screenings[0];
-      const yesCount = screenings.filter((s: ScreeningType) => s.decision === 'YES').length;
-      const noCount = screenings.filter((s: ScreeningType) => s.decision === 'NO').length;
+      type ScreeningType = (typeof screenings)[0];
+      const yesCount = screenings.filter(
+        (s: ScreeningType) => s.decision === 'YES',
+      ).length;
+      const noCount = screenings.filter(
+        (s: ScreeningType) => s.decision === 'NO',
+      ).length;
       const subject = `Deal Digest: ${screenings.length} Deal${screenings.length > 1 ? 's' : ''} Screened (${yesCount} Yes, ${noCount} No)`;
 
       if (accessToken && userWithMicrosoft.email) {
@@ -380,7 +411,17 @@ export class DealDigestService implements OnModuleInit {
     const map = new Map<string, DigestActionLinks>();
 
     for (const screening of screenings) {
-      const deal = screening.deal as { id: string; sourceWebLink?: string | null; sourceEntryId?: string | null; extractedLinks?: unknown; documents?: Array<{ filename: string; s3Key: string | null; sizeBytes: number | null }> };
+      const deal = screening.deal as {
+        id: string;
+        sourceWebLink?: string | null;
+        sourceEntryId?: string | null;
+        extractedLinks?: unknown;
+        documents?: Array<{
+          filename: string;
+          s3Key: string | null;
+          sizeBytes: number | null;
+        }>;
+      };
       if (!deal.id) continue;
 
       const links: DigestActionLinks = {};
@@ -397,7 +438,11 @@ export class DealDigestService implements OnModuleInit {
 
       // Pre-signed S3 URLs for documents
       if (deal.documents && deal.documents.length > 0) {
-        const docLinks: Array<{ filename: string; url: string; sizeBytes?: number }> = [];
+        const docLinks: Array<{
+          filename: string;
+          url: string;
+          sizeBytes?: number;
+        }> = [];
         for (const doc of deal.documents) {
           if (doc.s3Key) {
             try {
@@ -419,7 +464,10 @@ export class DealDigestService implements OnModuleInit {
 
       // Extracted links from email HTML (stored at processing time)
       if (deal.extractedLinks && typeof deal.extractedLinks === 'object') {
-        const extracted = deal.extractedLinks as { dealRoomLinks?: string[]; caLinks?: string[] };
+        const extracted = deal.extractedLinks as {
+          dealRoomLinks?: string[];
+          caLinks?: string[];
+        };
         if (extracted.dealRoomLinks?.length) {
           links.dealRoomLinks = extracted.dealRoomLinks;
         }
@@ -429,7 +477,13 @@ export class DealDigestService implements OnModuleInit {
       }
 
       // Only store if there's something
-      if (links.webLink || links.desktopLink || links.documentLinks || links.dealRoomLinks || links.caLinks) {
+      if (
+        links.webLink ||
+        links.desktopLink ||
+        links.documentLinks ||
+        links.dealRoomLinks ||
+        links.caLinks
+      ) {
         map.set(deal.id, links);
       }
     }
@@ -498,13 +552,21 @@ export class DealDigestService implements OnModuleInit {
     const inboundEmail = process.env.SCREENING_INBOUND_EMAIL || '';
 
     // Separate YES and NO deals
-    type ScreeningType = typeof screenings[0];
-    const yesDeals = screenings.filter((s: ScreeningType) => s.decision === 'YES');
-    const noDeals = screenings.filter((s: ScreeningType) => s.decision === 'NO');
+    type ScreeningType = (typeof screenings)[0];
+    const yesDeals = screenings.filter(
+      (s: ScreeningType) => s.decision === 'YES',
+    );
+    const noDeals = screenings.filter(
+      (s: ScreeningType) => s.decision === 'NO',
+    );
 
-    const formatDeal = (screening: typeof screenings[0], isYes: boolean) => {
+    const formatDeal = (screening: (typeof screenings)[0], isYes: boolean) => {
       const location = screening.deal.asset
-        ? [screening.deal.asset.address, screening.deal.asset.city, screening.deal.asset.state]
+        ? [
+            screening.deal.asset.address,
+            screening.deal.asset.city,
+            screening.deal.asset.state,
+          ]
             .filter(Boolean)
             .join(', ')
         : 'Location not specified';
@@ -533,7 +595,9 @@ export class DealDigestService implements OnModuleInit {
         const ctx = brokerContext.get(contactId)!;
         const brokerName = ctx.name || ctx.email;
         const parts: string[] = [];
-        parts.push(`${ctx.totalDeals} deal${ctx.totalDeals !== 1 ? 's' : ''} total`);
+        parts.push(
+          `${ctx.totalDeals} deal${ctx.totalDeals !== 1 ? 's' : ''} total`,
+        );
         parts.push(`${ctx.passRate}% pass rate`);
         if (ctx.recentDeals > 1) {
           parts.push(`${ctx.recentDeals} in last 30 days`);
@@ -569,7 +633,7 @@ export class DealDigestService implements OnModuleInit {
                 </tr>${brokerLine}
                 <tr>
                   <td style="padding: 2px 0; font-size: 14px; font-weight: 500; color: #6b7280;">Location</td>
-                  <td style="padding: 2px 0 2px 12px; font-size: 14px; font-weight: 500; color: #1f2937;">${escapeHtml(location)}</td>
+                  <td style="padding: 2px 0 2px 12px; font-size: 14px; font-weight: 500; color: #1f2937;">${screening.deal.asset && location !== 'Location not specified' ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}" style="color: #2563eb; text-decoration: none;" target="_blank">${escapeHtml(location)}</a>` : escapeHtml(location)}</td>
                 </tr>
                 <tr>
                   <td style="padding: 2px 0; font-size: 14px; font-weight: 500; color: #6b7280;">Screened</td>
@@ -629,17 +693,22 @@ export class DealDigestService implements OnModuleInit {
             </td>
           </tr>
         </table>
-        ${orgSummary.topMarkets.length > 0 ? `
+        ${
+          orgSummary.topMarkets.length > 0
+            ? `
         <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #e5e7eb;">
           <span style="font-size: 13px; color: #6b7280;">Top markets:</span>
           ${orgSummary.topMarkets.map((m) => `<span style="font-size: 13px; color: #1f2937; margin-left: 6px;">${escapeHtml(m.location)} <span style="color: #6b7280;">(${m.count})</span></span>`).join(' &middot;')}
-        </div>` : ''}
+        </div>`
+            : ''
+        }
       </div>`
       : '';
 
     // Top brokers section (last 30 days)
-    const brokersHtml = leaderboard && leaderboard.brokers.length > 0
-      ? `
+    const brokersHtml =
+      leaderboard && leaderboard.brokers.length > 0
+        ? `
       <div style="margin: 0 0 32px 0;">
         <h2 style="margin: 0 0 16px 0; font-size: 20px; font-weight: 700; color: #111827; letter-spacing: -0.3px;">
           Top Brokers <span style="color: #6b7280; font-weight: 500; font-size: 16px;">Last 30 Days</span>
@@ -651,21 +720,27 @@ export class DealDigestService implements OnModuleInit {
             <td style="padding: 10px 16px; font-weight: 700; color: #6b7280; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; background-color: #f9fafb; border-bottom: 1px solid #e5e7eb;">Approved</td>
             <td style="padding: 10px 16px; font-weight: 700; color: #6b7280; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; background-color: #f9fafb; border-bottom: 1px solid #e5e7eb;">Pass Rate</td>
           </tr>
-          ${leaderboard.brokers.map((b, i) => {
-            const name = [b.firstName, b.lastName].filter(Boolean).join(' ') || b.email;
-            const rowBg = i % 2 === 0 ? '#ffffff' : '#f9fafb';
-            const borderBottom = i < leaderboard.brokers.length - 1 ? 'border-bottom: 1px solid #f3f4f6;' : '';
-            return `
+          ${leaderboard.brokers
+            .map((b, i) => {
+              const name =
+                [b.firstName, b.lastName].filter(Boolean).join(' ') || b.email;
+              const rowBg = i % 2 === 0 ? '#ffffff' : '#f9fafb';
+              const borderBottom =
+                i < leaderboard.brokers.length - 1
+                  ? 'border-bottom: 1px solid #f3f4f6;'
+                  : '';
+              return `
           <tr>
             <td style="padding: 10px 16px; color: #111827; font-weight: 600; background-color: ${rowBg}; ${borderBottom}">${escapeHtml(name)}</td>
             <td style="padding: 10px 16px; color: #1f2937; font-weight: 500; text-align: center; background-color: ${rowBg}; ${borderBottom}">${b.totalDeals}</td>
             <td style="padding: 10px 16px; color: #16a34a; font-weight: 600; text-align: center; background-color: ${rowBg}; ${borderBottom}">${b.yesCount}</td>
             <td style="padding: 10px 16px; color: #1f2937; font-weight: 500; text-align: center; background-color: ${rowBg}; ${borderBottom}">${b.passRate}%</td>
           </tr>`;
-          }).join('')}
+            })
+            .join('')}
         </table>
       </div>`
-      : '';
+        : '';
 
     return `<!DOCTYPE html>
 <html>
@@ -730,31 +805,42 @@ export class DealDigestService implements OnModuleInit {
     const links = actionLinksMap.get(dealId);
     if (!links) return '';
 
-    const linkStyle = 'color: #2563eb; text-decoration: none; font-size: 13px; font-weight: 600;';
+    const linkStyle =
+      'color: #2563eb; text-decoration: none; font-size: 13px; font-weight: 600;';
     const separatorStyle = 'color: #d1d5db; margin: 0 6px; font-size: 13px;';
     const items: string[] = [];
 
     if (links.webLink) {
-      items.push(`<a href="${links.webLink}" style="${linkStyle}" target="_blank">View Email</a>`);
+      items.push(
+        `<a href="${links.webLink}" style="${linkStyle}" target="_blank">View Email</a>`,
+      );
     }
 
     if (links.desktopLink) {
-      items.push(`<a href="${links.desktopLink}" style="${linkStyle}" target="_blank">Open in Desktop</a>`);
+      items.push(
+        `<a href="${links.desktopLink}" style="${linkStyle}" target="_blank">Open in Desktop</a>`,
+      );
     }
 
     if (links.documentLinks && links.documentLinks.length > 0) {
       for (const doc of links.documentLinks) {
         const size = doc.sizeBytes ? ` (${formatFileSize(doc.sizeBytes)})` : '';
-        items.push(`<a href="${doc.url}" style="${linkStyle}" target="_blank">${escapeHtml(doc.filename)}${size}</a>`);
+        items.push(
+          `<a href="${doc.url}" style="${linkStyle}" target="_blank">${escapeHtml(doc.filename)}${size}</a>`,
+        );
       }
     }
 
     if (links.dealRoomLinks && links.dealRoomLinks.length > 0) {
-      items.push(`<a href="${links.dealRoomLinks[0]}" style="${linkStyle}" target="_blank">Deal Room</a>`);
+      items.push(
+        `<a href="${links.dealRoomLinks[0]}" style="${linkStyle}" target="_blank">Deal Room</a>`,
+      );
     }
 
     if (links.caLinks && links.caLinks.length > 0) {
-      items.push(`<a href="${links.caLinks[0]}" style="${linkStyle}" target="_blank">Sign CA</a>`);
+      items.push(
+        `<a href="${links.caLinks[0]}" style="${linkStyle}" target="_blank">Sign CA</a>`,
+      );
     }
 
     if (items.length === 0) return '';
@@ -773,7 +859,8 @@ export class DealDigestService implements OnModuleInit {
     location: string,
     inboundEmail: string,
   ): string {
-    const truncatedSubject = subject.length > 60 ? subject.slice(0, 57) + '...' : subject;
+    const truncatedSubject =
+      subject.length > 60 ? subject.slice(0, 57) + '...' : subject;
     const decisionLabel = isYes ? 'YES' : 'NO';
     const sharedContext = `Deal: ${subject}\nLocation: ${location}\nAI Decision: ${decisionLabel}\nAI Reason: ${reason}`;
 
@@ -792,12 +879,14 @@ export class DealDigestService implements OnModuleInit {
     }
 
     const href = `mailto:${inboundEmail}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(body)}`;
-    const linkStyle = 'color: #6b7280; text-decoration: none; font-size: 12px; font-weight: 600;';
+    const linkStyle =
+      'color: #6b7280; text-decoration: none; font-size: 12px; font-weight: 600;';
 
     const muteSubject = `Mute this deal: ${truncatedSubject}`;
     const muteBody = `Deal: ${subject}\nLocation: ${location}\n\nPlease mute this specific deal. I've already made my decision and don't want future emails about this property to ever surface as YES.`;
     const muteHref = `mailto:${inboundEmail}?subject=${encodeURIComponent(muteSubject)}&body=${encodeURIComponent(muteBody)}`;
-    const muteLinkStyle = 'color: #9ca3af; text-decoration: none; font-size: 12px; font-weight: 600;';
+    const muteLinkStyle =
+      'color: #9ca3af; text-decoration: none; font-size: 12px; font-weight: 600;';
 
     return `
               <div style="padding-top: 8px; margin-top: 6px;">
@@ -807,5 +896,4 @@ export class DealDigestService implements OnModuleInit {
                 <a href="${muteHref}" style="${muteLinkStyle}">Mute this deal</a>
               </div>`;
   }
-
 }
