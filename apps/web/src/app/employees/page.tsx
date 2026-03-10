@@ -643,13 +643,6 @@ export default function Custom() {
               <br />
               <span className="text-white/30">Backed by top operators.</span>
             </h2>
-            <p className="text-white/40 max-w-2xl text-lg leading-relaxed mb-16">
-              Two Northeastern students who built, scaled, and sold a proptech
-              company in between classes. We don&apos;t have decades of
-              experience. We have something rarer: the depth to build what the
-              industry needs, backed by operators who&apos;ve seen every type of
-              deal.
-            </p>
           </FadeInSection>
 
           <div className="grid md:grid-cols-2 gap-4">
@@ -823,9 +816,7 @@ export default function Custom() {
                   <p className="text-white/38 leading-relaxed text-sm mb-4">
                     Built in 3 months. Won a cash prize at Northeastern&apos;s
                     startup competition. Acquired within months of launch. The
-                    platform automatically qualified thousands of renters,
-                    underwriting applicants the same way we now underwrite
-                    deals.
+                    platform automatically qualified thousands of renters.
                   </p>
                   <div className="flex flex-wrap gap-x-6 gap-y-1">
                     {[
