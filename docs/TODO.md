@@ -29,4 +29,4 @@
    - lead scoring + auto-scheduling feature (proposal sent)
     
 ## Survey Platform
-   - test M3 b4 demo on Fri
+   - get M3 payment (65 hrs + $60 for cursor)
