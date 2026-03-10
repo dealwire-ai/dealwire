@@ -7,11 +7,19 @@ export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 export default async function Image() {
-  const spaceGrotesk = await fetch(
-    new URL(
-      "https://fonts.gstatic.com/s/spacegrotesk/v16/V8mDoQDjQSkFtoMM3T6r8E7mPbF4Cw.woff",
-    ),
-  ).then((res) => res.arrayBuffer());
+  let spaceGrotesk: ArrayBuffer | null = null;
+  try {
+    const res = await fetch(
+      new URL(
+        "https://fonts.gstatic.com/s/spacegrotesk/v22/V8mQoQDjQSkFtoMM3T6r8E7mF71Q-gOoraIAEj7aUUsj.ttf",
+      ),
+    );
+    if (res.ok) {
+      spaceGrotesk = await res.arrayBuffer();
+    }
+  } catch {
+    // Fall back to system font if fetch fails
+  }
 
   return new ImageResponse(
     <div
@@ -23,7 +31,7 @@ export default async function Image() {
         justifyContent: "center",
         alignItems: "center",
         background: "#080808",
-        fontFamily: "Space Grotesk",
+        fontFamily: spaceGrotesk ? "Space Grotesk" : "sans-serif",
         position: "relative",
         overflow: "hidden",
       }}
@@ -114,14 +122,18 @@ export default async function Image() {
     </div>,
     {
       ...size,
-      fonts: [
-        {
-          name: "Space Grotesk",
-          data: spaceGrotesk,
-          style: "normal",
-          weight: 500,
-        },
-      ],
+      ...(spaceGrotesk
+        ? {
+            fonts: [
+              {
+                name: "Space Grotesk",
+                data: spaceGrotesk,
+                style: "normal" as const,
+                weight: 500 as const,
+              },
+            ],
+          }
+        : {}),
     },
   );
 }
