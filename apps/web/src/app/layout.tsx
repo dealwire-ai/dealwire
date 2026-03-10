@@ -17,18 +17,16 @@ const ibmPlexMono = IBM_Plex_Mono({
 
 export const metadata: Metadata = {
   title: "Levine & Weinstein",
-  description: "AI Employees for Real Estate",
+  description: "Deal intelligence. From inbox to IC memo.",
   metadataBase: new URL("https://deals.frontstep.ai"),
   openGraph: {
     title: "Levine & Weinstein",
-    description: "AI Employees for Real Estate",
-    images: ["/og-image.jpg"],
+    description: "Deal intelligence. From inbox to IC memo.",
   },
   twitter: {
     card: "summary_large_image",
     title: "Levine & Weinstein",
-    description: "AI Employees for Real Estate",
-    images: ["/og-image.jpg"],
+    description: "Deal intelligence. From inbox to IC memo.",
   },
 };
 
