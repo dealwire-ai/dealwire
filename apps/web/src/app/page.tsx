@@ -454,7 +454,7 @@ export default function Home() {
           <div className="grid md:grid-cols-3 gap-3 mt-8">
             {[
               {
-                value: "< 4 min",
+                value: "< 20 min",
                 label: "OM to decision",
                 desc: "Inbox to screened decision, pro forma populated, broker reply sent.",
               },
@@ -768,13 +768,6 @@ export default function Home() {
               <br />
               <span className="text-white/30">Backed by top operators.</span>
             </h2>
-            <p className="text-white/40 max-w-2xl text-lg leading-relaxed mb-16">
-              Two Northeastern students who built, scaled, and sold a proptech
-              company in between classes. We don&apos;t have decades of
-              experience. We have something rarer: the depth to build what the
-              industry needs, backed by operators who&apos;ve seen every type of
-              deal.
-            </p>
           </FadeInSection>
 
           <div className="grid md:grid-cols-2 gap-4">
@@ -945,9 +938,7 @@ export default function Home() {
                   <p className="text-white/38 leading-relaxed text-sm mb-4">
                     Built in 3 months. Won a cash prize at Northeastern&apos;s
                     startup competition. Acquired within months of launch. The
-                    platform automatically qualified thousands of renters,
-                    underwriting applicants the same way we now underwrite
-                    deals.
+                    platform automatically qualified thousands of renters.
                   </p>
                   <div className="flex flex-wrap gap-x-6 gap-y-1">
                     {[
@@ -998,7 +989,7 @@ export default function Home() {
                   <h2 className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight mb-6">
                     See what a fully underwritten
                     <br />
-                    deal looks like in 4 minutes.
+                    deal looks like in 20 minutes.
                   </h2>
                   <p className="text-white/40 text-lg mb-10 leading-relaxed">
                     30 minutes. No pitch deck. Show us a deal. We&apos;ll show
