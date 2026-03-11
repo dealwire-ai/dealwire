@@ -65,8 +65,8 @@ Railway MCP tools (`mcp__railway__*`) are available for deployments, logs, and s
 **Important:** The Railway CLI must be linked to a service before you can list deployments or get logs. Use the workspace path for the relevant service:
 
 ```bash
-# API service — workspacePath=/Users/isaac/projects/analyzer/apps/api, serviceName=dealwire-api
-# Web service — workspacePath=/Users/isaac/projects/analyzer/apps/web, serviceName=dealwire-web
+# API service — workspacePath=/Users/isaac/projects/dealwire/apps/api, serviceName=dealwire-api
+# Web service — workspacePath=/Users/isaac/projects/dealwire/apps/web, serviceName=dealwire-web
 
 # Then use MCP tools:
 # mcp__railway__list-deployments — check deployment status
