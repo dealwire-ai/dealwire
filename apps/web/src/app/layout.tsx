@@ -18,7 +18,7 @@ const ibmPlexMono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   title: "Levine & Weinstein",
   description: "Deal intelligence. From inbox to IC memo.",
-  metadataBase: new URL("https://deals.frontstep.ai"),
+  metadataBase: new URL("https://dealwire.ai"),
   openGraph: {
     title: "Levine & Weinstein",
     description: "Deal intelligence. From inbox to IC memo.",

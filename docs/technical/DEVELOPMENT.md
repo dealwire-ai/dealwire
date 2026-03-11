@@ -75,7 +75,7 @@ curl -X POST http://localhost:3001/public-data/ingest \
 
 **Production (requires Clerk JWT):**
 
-1. Sign in at `deals.frontstep.ai`
+1. Sign in at `dealwire.ai`
 2. Open browser console, run: `await window.Clerk.session.getToken()`
 3. Copy the token (expires in 60 seconds) and immediately run:
 
@@ -119,7 +119,7 @@ DELETE FROM "Parcel";
    ```bash
    cd apps/api && pnpm send-test-email imlevine@outlook.com
    ```
-   This sends a realistic deal email via Resend → arrives in Outlook → Graph webhook fires → deal detection → screening → reply. Watch Railway logs or local server output. The verified Resend sending domain is `mail.deals.frontstep.ai`.
+   This sends a realistic deal email via Resend → arrives in Outlook → Graph webhook fires → deal detection → screening → reply. Watch Railway logs or local server output. The verified Resend sending domain is `mail.dealwire.ai`.
 2. **Preferences not loading?**: Check snake_case vs camelCase mapping
 3. **Subscription not working?**: Verify `API_BASE_URL` is HTTPS
 4. **Replies not threaded?**: Must use Graph API's `createReply` endpoint

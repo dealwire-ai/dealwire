@@ -92,7 +92,7 @@ HTML=$(cat <<ENDOFHTML
             <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;margin-bottom:14px;">
               <tr>
                 <td style="padding:2px 0;font-size:14px;font-weight:500;color:#6b7280;width:70px;">From</td>
-                <td style="padding:2px 0 2px 12px;font-size:14px;font-weight:500;color:#1f2937;">jennifer@mail.deals.frontstep.ai</td>
+                <td style="padding:2px 0 2px 12px;font-size:14px;font-weight:500;color:#1f2937;">jennifer@mail.dealwire.ai</td>
               </tr>
               <tr>
                 <td style="padding:2px 0;font-size:14px;font-weight:500;color:#6b7280;">Broker</td>
@@ -131,7 +131,7 @@ HTML=$(cat <<ENDOFHTML
             <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;margin-bottom:14px;">
               <tr>
                 <td style="padding:2px 0;font-size:14px;font-weight:500;color:#6b7280;width:70px;">From</td>
-                <td style="padding:2px 0 2px 12px;font-size:14px;font-weight:500;color:#1f2937;">brian@mail.deals.frontstep.ai</td>
+                <td style="padding:2px 0 2px 12px;font-size:14px;font-weight:500;color:#1f2937;">brian@mail.dealwire.ai</td>
               </tr>
               <tr>
                 <td style="padding:2px 0;font-size:14px;font-weight:500;color:#6b7280;">Broker</td>
@@ -171,7 +171,7 @@ HTML=$(cat <<ENDOFHTML
               </tr>
             </table>
             <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;margin-bottom:14px;">
-              <tr><td style="padding:2px 0;font-size:14px;font-weight:500;color:#6b7280;width:70px;">From</td><td style="padding:2px 0 2px 12px;font-size:14px;font-weight:500;color:#1f2937;">sarah@mail.deals.frontstep.ai</td></tr>
+              <tr><td style="padding:2px 0;font-size:14px;font-weight:500;color:#6b7280;width:70px;">From</td><td style="padding:2px 0 2px 12px;font-size:14px;font-weight:500;color:#1f2937;">sarah@mail.dealwire.ai</td></tr>
               <tr><td style="padding:2px 0;font-size:14px;font-weight:500;color:#6b7280;">Location</td><td style="padding:2px 0 2px 12px;font-size:14px;font-weight:500;color:#1f2937;">1 Vanderbilt Ave, New York, NY</td></tr>
               <tr><td style="padding:2px 0;font-size:14px;font-weight:500;color:#6b7280;">Screened</td><td style="padding:2px 0 2px 12px;font-size:14px;font-weight:500;color:#1f2937;">Feb 27, 2026, 9:06 AM</td></tr>
             </table>
@@ -192,7 +192,7 @@ HTML=$(cat <<ENDOFHTML
               </tr>
             </table>
             <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;margin-bottom:14px;">
-              <tr><td style="padding:2px 0;font-size:14px;font-weight:500;color:#6b7280;width:70px;">From</td><td style="padding:2px 0 2px 12px;font-size:14px;font-weight:500;color:#1f2937;">roberto@mail.deals.frontstep.ai</td></tr>
+              <tr><td style="padding:2px 0;font-size:14px;font-weight:500;color:#6b7280;width:70px;">From</td><td style="padding:2px 0 2px 12px;font-size:14px;font-weight:500;color:#1f2937;">roberto@mail.dealwire.ai</td></tr>
               <tr><td style="padding:2px 0;font-size:14px;font-weight:500;color:#6b7280;">Location</td><td style="padding:2px 0 2px 12px;font-size:14px;font-weight:500;color:#1f2937;">4525 Collins Ave, Miami Beach, FL</td></tr>
             </table>
             <div style="border-top:1px solid #f3f4f6;padding-top:14px;"><p style="margin:0;font-size:15px;font-weight:500;color:${RED_REASON};line-height:1.5;">Hospitality outside target asset class. \$115M exceeds deal size limit. Operational hotel requires active management. Pass.</p><div style="border-top:1px solid #f3f4f6;padding-top:10px;margin-top:10px;"><a href="https://outlook.office.com/mail/inbox/id/AAMkZmVhNjM4LTZmYWItNDdkNi05NzllLTY4NjZjY2Y5YTk5" style="color:#2563eb;text-decoration:none;font-size:13px;font-weight:600;" target="_blank">View Email</a></div></div>
@@ -212,7 +212,7 @@ HTML=$(cat <<ENDOFHTML
               </tr>
             </table>
             <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;margin-bottom:14px;">
-              <tr><td style="padding:2px 0;font-size:14px;font-weight:500;color:#6b7280;width:70px;">From</td><td style="padding:2px 0 2px 12px;font-size:14px;font-weight:500;color:#1f2937;">michael@mail.deals.frontstep.ai</td></tr>
+              <tr><td style="padding:2px 0;font-size:14px;font-weight:500;color:#6b7280;width:70px;">From</td><td style="padding:2px 0 2px 12px;font-size:14px;font-weight:500;color:#1f2937;">michael@mail.dealwire.ai</td></tr>
               <tr><td style="padding:2px 0;font-size:14px;font-weight:500;color:#6b7280;">Location</td><td style="padding:2px 0 2px 12px;font-size:14px;font-weight:500;color:#1f2937;">7 Kent Ave, Brooklyn, NY</td></tr>
             </table>
             <div style="border-top:1px solid #f3f4f6;padding-top:14px;"><p style="margin:0;font-size:15px;font-weight:500;color:${RED_REASON};line-height:1.5;">Development site — no in-place income. Northeast market, not Sun Belt. \$55M exceeds deal size limit. Pass.</p><div style="border-top:1px solid #f3f4f6;padding-top:10px;margin-top:10px;"><a href="https://outlook.office.com/mail/inbox/id/AAMkZmVhNjM4LTZmYWItNDdkNi05NzllLTY4NjZjY2Y5YTEwMA" style="color:#2563eb;text-decoration:none;font-size:13px;font-weight:600;" target="_blank">View Email</a></div></div>
@@ -285,7 +285,7 @@ HTTP_CODE=$(curl -s -o /tmp/resend-digest-response.json -w "%{http_code}" \
   -H "Authorization: Bearer $RESEND_API_KEY" \
   -H "Content-Type: application/json" \
   -d "{
-  \"from\": \"Lambert Capital <noreply@mail.deals.frontstep.ai>\",
+  \"from\": \"Lambert Capital <noreply@mail.dealwire.ai>\",
   \"to\": [\"$TO\"],
   \"subject\": \"Deal Digest: 5 Deals Screened (2 Yes, 3 No)\",
   \"html\": $(echo "$HTML" | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read()))')
