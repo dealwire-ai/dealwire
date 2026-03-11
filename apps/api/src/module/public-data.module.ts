@@ -9,6 +9,7 @@ import { DistressScoringService } from '../service/public-data/distress-scoring.
 import { ParcelQueryService } from '../service/public-data/parcel-query.service';
 import { SkipTraceService } from '../service/public-data/skip-trace.service';
 import { NyctlQuarterlyService } from '../service/public-data/nyctl-quarterly.service';
+import { CareScraperService } from '../service/public-data/care-scraper.service';
 import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
 
 @Module({
@@ -21,6 +22,7 @@ import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
     ParcelQueryService,
     SkipTraceService,
     NyctlQuarterlyService,
+    CareScraperService,
     ClerkAuthGuard,
   ],
   exports: [ParcelQueryService],

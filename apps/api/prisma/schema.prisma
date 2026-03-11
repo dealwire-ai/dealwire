@@ -380,6 +380,11 @@ model Parcel {
   skipTraceStatus  String?   // 'pending' | 'found' | 'not_found' | 'error'
   skipTraceQueueId String?   // Tracerfy async queue_id, cleared after completion
 
+  // CARE portal scraper (exact per-BBL lien data)
+  lienStatus            String?   // Raw CARE status: "S Sold", "R Post Sale Redeemed"
+  lienRedemptionDate    String?   // Date redeemed (if applicable)
+  careSyncedAt          DateTime? // When CARE scraper last updated this parcel
+
   // NYCTL lien sale data (from quarterly status reports, crosswalk matched)
   lienSaleAmount        Float?    // "Balance Sold" — $$ sold to NYCTL Trust
   lienRedemptiveValue   Float?    // Current payoff amount (principal + interest + fees)

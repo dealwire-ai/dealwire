@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { SodaAdapter, SodaSourceConfig } from './soda.adapter';
 import { DistressScoringService } from './distress-scoring.service';
 import { NyctlQuarterlyService } from './nyctl-quarterly.service';
+import { CareScraperService } from './care-scraper.service';
 import { NotificationService } from '../notifications/notification.service';
 import {
   normalizeBbl,
@@ -57,6 +58,7 @@ export class NycIngestionService {
     private readonly soda: SodaAdapter,
     private readonly scoring: DistressScoringService,
     private readonly nyctl: NyctlQuarterlyService,
+    private readonly careScraper: CareScraperService,
     private readonly notifications: NotificationService,
   ) {}
 
@@ -114,6 +116,16 @@ export class NycIngestionService {
             `NYCTL ingestion failed (non-fatal): ${(err as Error).message}`,
           );
         }
+      }
+
+      // 7. CARE portal scraper (exact per-BBL lien data, overwrites NYCTL estimates)
+      try {
+        const careResult = await this.careScraper.scrapeAll();
+        results.push(careResult);
+      } catch (err) {
+        this.logger.error(
+          `CARE scraper failed (non-fatal): ${(err as Error).message}`,
+        );
       }
 
       const durationMin = Math.round((Date.now() - start) / 1000 / 60);
