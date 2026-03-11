@@ -62,8 +62,8 @@ export interface AgentContext {
 }
 
 @Injectable()
-export class AnalyzerAgentService {
-  private readonly logger = new Logger(AnalyzerAgentService.name);
+export class DealwireAgentService {
+  private readonly logger = new Logger(DealwireAgentService.name);
 
   constructor(
     private readonly prisma: PrismaService,

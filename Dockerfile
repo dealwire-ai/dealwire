@@ -23,7 +23,7 @@ COPY apps/api/package.json apps/api/
 
 # Install dependencies (--ignore-scripts skips the prepare hook which runs lefthook install,
 # which requires git — not available in the build layer)
-RUN pnpm install --frozen-lockfile --ignore-scripts --filter @analyzer/api...
+RUN pnpm install --frozen-lockfile --ignore-scripts --filter @dealwire/api...
 
 # Copy application code
 COPY apps/api apps/api
@@ -32,7 +32,7 @@ COPY apps/api apps/api
 RUN cd apps/api && pnpm exec prisma generate
 
 # Build the application
-RUN pnpm --filter @analyzer/api run build
+RUN pnpm --filter @dealwire/api run build
 
 # Expose port
 EXPOSE 8080

@@ -1,10 +1,10 @@
 {
-  "name": "analyzer",
+  "name": "dealwire",
   "private": "true",
   "main": "index.js",
   "scripts": {
-    "dev": "pnpm --filter @analyzer/api dev & pnpm --filter @analyzer/web dev",
-    "build": "pnpm --filter @analyzer/api build && pnpm --filter @analyzer/web build",
+    "dev": "pnpm --filter @dealwire/api dev & pnpm --filter @dealwire/web dev",
+    "build": "pnpm --filter @dealwire/api build && pnpm --filter @dealwire/web build",
     "prepare": "lefthook install"
   },
   "packageManager": "pnpm@10.25.0",

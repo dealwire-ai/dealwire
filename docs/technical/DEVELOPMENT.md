@@ -2,14 +2,16 @@
 
 ## Local Database
 
-The local PostgreSQL database runs at `postgresql://isaac@localhost:5432/analyzer`. No password.
+The local PostgreSQL database runs at `postgresql://isaac@localhost:5432/dealwire`. No password.
 
 ### Connecting
+
 ```bash
-psql "postgresql://isaac@localhost:5432/analyzer"
+psql "postgresql://isaac@localhost:5432/dealwire"
 ```
 
 ### Common Queries
+
 ```sql
 -- List organizations and their feature flags
 SELECT id, name, "featureFlags" FROM "Organization";
@@ -54,6 +56,7 @@ Org-level feature flags are stored as JSON on `Organization.featureFlags`. The a
 ```bash
 cd apps/api && npx prisma studio
 ```
+
 Opens a browser UI at `http://localhost:5555` for browsing/editing data.
 
 ## Tax Lien / Parcel Data
@@ -63,6 +66,7 @@ Opens a browser UI at `http://localhost:5555` for browsing/editing data.
 Ingestion is triggered via `POST /public-data/ingest`. The endpoint is async — it returns immediately and runs the pipeline in the background (~5 minutes for BK+QN).
 
 **Local (dev mode, no auth required):**
+
 ```bash
 curl -X POST http://localhost:3001/public-data/ingest \
   -H 'Content-Type: application/json' \
@@ -70,11 +74,13 @@ curl -X POST http://localhost:3001/public-data/ingest \
 ```
 
 **Production (requires Clerk JWT):**
+
 1. Sign in at `deals.frontstep.ai`
 2. Open browser console, run: `await window.Clerk.session.getToken()`
 3. Copy the token (expires in 60 seconds) and immediately run:
+
 ```bash
-curl -X POST https://analyzer-api-production.up.railway.app/public-data/ingest \
+curl -X POST https://dealwire-api-production.up.railway.app/public-data/ingest \
   -H 'Content-Type: application/json' \
   -H 'Authorization: Bearer <TOKEN>' \
   -d '{"boroughs": ["3", "4"]}'
@@ -90,6 +96,7 @@ The org must have the `parcels` feature flag enabled. Borough codes: 1=Manhattan
 4. **Distress scoring** (~3K records, ~60s) — Computes 0-100 score based on lien status, violations per unit, class C violations
 
 ### Parcel Queries
+
 ```sql
 -- Count parcels by borough
 SELECT borough, COUNT(*) FROM "Parcel" GROUP BY borough;

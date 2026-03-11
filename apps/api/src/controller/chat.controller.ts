@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import { Readable } from 'stream';
-import { AnalyzerAgentService } from '../service/agent/analyzer-agent.service';
+import { DealwireAgentService } from '../service/agent/dealwire-agent.service';
 import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
 import { AuthUser } from '../decorator/auth-user.decorator';
 import type { CoreMessage } from 'ai';
@@ -17,7 +17,7 @@ import type { CoreMessage } from 'ai';
 @Controller('chat')
 @UseGuards(ClerkAuthGuard)
 export class ChatController {
-  constructor(private readonly agent: AnalyzerAgentService) {}
+  constructor(private readonly agent: DealwireAgentService) {}
 
   @Post()
   async chat(
@@ -31,7 +31,10 @@ export class ChatController {
     }
     const { messages } = body || {};
     if (!Array.isArray(messages) || messages.length === 0) {
-      throw new HttpException('messages array is required', HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        'messages array is required',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     const streamResult = await this.agent.stream(

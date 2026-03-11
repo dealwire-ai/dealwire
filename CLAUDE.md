@@ -1,12 +1,12 @@
-# Analyzer - AI-Powered Real Estate Deal Analysis Platform
+# Dealwire - AI-Powered Real Estate Deal Analysis Platform
 
 ## Overview
 
-Analyzer is an **agentic platform for private market asset analysis** — starting with commercial real estate but designed to extend to businesses, funds, and other private market assets.
+Dealwire is an **agentic platform for private market asset analysis** — starting with commercial real estate but designed to extend to businesses, funds, and other private market assets.
 
 ### What This Is
 
-This is NOT a traditional SaaS application. Analyzer is an **agentic layer** — software that works autonomously through integrations (email, APIs, data sources) rather than through a web dashboard. The frontend exists for configuration and visibility, but the core value is delivered through:
+This is NOT a traditional SaaS application. Dealwire is an **agentic layer** — software that works autonomously through integrations (email, APIs, data sources) rather than through a web dashboard. The frontend exists for configuration and visibility, but the core value is delivered through:
 
 - **Email integration**: Monitoring inboxes, analyzing incoming deals, replying with structured analysis
 - **Data enrichment**: Pulling property data from APIs, public records, government sites, and other sources to build deep asset intelligence
@@ -53,20 +53,20 @@ See `docs/product/PUBLIC_DATA_PLATFORM.md` for the public data ingestion archite
 
 ### Deployment
 
-- Frontend: Railway (service: analyzer-web, root dir: apps/web)
-- Backend: Railway (service: analyzer-api, root dir: apps/api, uses Dockerfile)
+- Frontend: Railway (service: dealwire-web, root dir: apps/web)
+- Backend: Railway (service: dealwire-api, root dir: apps/api, uses Dockerfile)
 
 ### Railway
 
 Railway MCP tools (`mcp__railway__*`) are available for deployments, logs, and service management.
 
-**Project:** `analyzer` (contains two services: `analyzer-api` and `analyzer-web`)
+**Project:** `dealwire` (contains two services: `dealwire-api` and `dealwire-web`)
 
 **Important:** The Railway CLI must be linked to a service before you can list deployments or get logs. Use the workspace path for the relevant service:
 
 ```bash
-# API service — workspacePath=/Users/isaac/projects/analyzer/apps/api, serviceName=analyzer-api
-# Web service — workspacePath=/Users/isaac/projects/analyzer/apps/web, serviceName=analyzer-web
+# API service — workspacePath=/Users/isaac/projects/analyzer/apps/api, serviceName=dealwire-api
+# Web service — workspacePath=/Users/isaac/projects/analyzer/apps/web, serviceName=dealwire-web
 
 # Then use MCP tools:
 # mcp__railway__list-deployments — check deployment status
@@ -83,8 +83,8 @@ Railway MCP tools (`mcp__railway__*`) are available for deployments, logs, and s
 
 ### Package naming
 
-- Frontend: `@analyzer/web`
-- Backend: `@analyzer/api`
+- Frontend: `@dealwire/web`
+- Backend: `@dealwire/api`
 
 ---
 
