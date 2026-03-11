@@ -123,14 +123,15 @@ Email → UnderwritingInboundService (Resend webhook)
 ```
 src/service/public-data/
   soda.adapter.ts              # Generic Socrata SODA API adapter (paginated fetch, field mapping)
-  nyc-ingestion.service.ts     # Orchestrates: tax liens → PLUTO → HPD → charges → NYCTL → score → upsert
+  nyc-ingestion.service.ts     # Orchestrates: tax liens → PLUTO → HPD → charges → NYCTL → CARE → score → upsert
   nyctl-quarterly.service.ts   # NYCTL quarterly XLSX download, parsing, crosswalk matching
+  care-scraper.service.ts      # CARE portal scraper: exact per-BBL lien sale amounts, servicer, status
   distress-scoring.service.ts  # Distress score (0-100): lien, violations, class C
   parcel-query.service.ts      # Query/filter Parcel table; used by controller + agent
   skip-trace.service.ts        # Tracerfy skip tracing: submitBatch, pollAndStore, cap check
   nyc-utils.ts                 # Borough constants, BBL utilities
 
-src/controller/public-data.controller.ts  # /public-data/* — ingest, parcels, export, stats, skip-trace
+src/controller/public-data.controller.ts  # /public-data/* — ingest, parcels, export, stats, skip-trace, care
 src/module/public-data.module.ts
 ```
 
@@ -154,6 +155,17 @@ POST /public-data/ingest/nyctl  { reportDate: "9-30-2025" }
       → crosswalk match on (zip, buildingClass, taxClass) → 4-tier confidence
       → multi-trust merging (sum across trust vintages)
       → Prisma update → Parcel NYCTL fields
+
+POST /public-data/ingest/care
+  → CareScraperService.scrapeAll() [guarded by in-memory lock, 409 if running]
+      → load all active-lien BBLs from Parcel table
+      → split across 3 parallel workers (each with independent session/cookie jar)
+      → per worker: initSession() (3-step ASP.NET handshake) → searchProperty() → scrapeAccountHistory()
+      → cheerio HTML parsing for lien sale amounts, servicer, status, dates
+      → Prisma update → Parcel lien fields (lienMatchConfidence = 'care_exact')
+      → overwrites NYCTL crosswalk data (more accurate)
+      → email notification on completion/failure
+      → ~20-25 min for ~3,000 parcels
 
 POST /public-data/parcels/skip-trace (or /:bbl/skip-trace)
   → SkipTraceService.submitBatch(bbls)
