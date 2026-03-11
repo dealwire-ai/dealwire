@@ -308,11 +308,11 @@ This allows the API to start successfully locally without configuring AWS.
 ### Preventing Infinite Loops
 
 - `MicrosoftWebhookService` checks if email sender = inbox owner
-- If so: fetch message, check `X-Analyzer-Sent` header (we add this to our analysis replies). If present → skip (our reply). If absent → user reply, enqueue to SQS as `user-reply-command` for the Email Command Agent pipeline (never the deal pipeline)
+- If so: fetch message, check `X-Dealwire-Sent` header (we add this to our analysis replies). If present → skip (our reply). If absent → user reply, enqueue to SQS as `user-reply-command` for the Email Command Agent pipeline (never the deal pipeline)
 
 ### Unified Agent (Web + Email)
 
-- Same agent powers web chat and email replies. Extract from chat route into shared `AnalyzerAgentService`.
+- Same agent powers web chat and email replies. Extract from chat route into shared `DealwireAgentService`.
 - Write tools: update_always_skip, update_deal_criteria, update_buy_box. No forward_deal_to.
 - **Agent must understand:** alwaysSkip = skip entirely (not a deal, no analysis, no move); dealCriteria = yes/no evaluation (no = moved to Passed Deals).
 

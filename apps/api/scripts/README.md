@@ -5,7 +5,7 @@ Scripts for running live demos and testing the full agentic pipeline.
 ## Prerequisites
 
 - `RESEND_API_KEY` set in `apps/api/.env`
-- `railway` CLI installed and linked to `analyzer-api` (for log monitoring mode)
+- `railway` CLI installed and linked to `dealwire-api` (for log monitoring mode)
 - A monitored Outlook inbox connected via Microsoft Graph webhook
 
 ## Scripts
@@ -13,6 +13,7 @@ Scripts for running live demos and testing the full agentic pipeline.
 ### `demo.sh` — Full demo orchestrator
 
 Runs the complete agentic loop end-to-end:
+
 1. Sends 10 diverse deal emails to the monitored inbox (burst, 1s apart)
 2. Watches Railway logs until all 10 deals are screened by the agent
 3. Sends a hardcoded deal digest email to the same address
@@ -27,13 +28,14 @@ pnpm demo jordan@jkequities.com
 
 **Flags:**
 
-| Flag | Description |
-|------|-------------|
+| Flag               | Description                                                       |
+| ------------------ | ----------------------------------------------------------------- |
 | `--wait <seconds>` | Skip log monitoring, use a fixed sleep instead (e.g. `--wait 90`) |
 
 **Log monitoring** (default): tails `railway logs --filter "Initial screening completed"` in the background and polls every 5s. Advances to the digest as soon as all 10 deals are confirmed screened. Hard timeout at 180s.
 
 **Environment overrides:**
+
 ```bash
 # Already handled by --wait flag, no separate env var needed
 pnpm demo jordan@jkequities.com --wait 60
@@ -59,6 +61,7 @@ The 10 burst deals cover: multifamily, office, industrial, retail, hotel, self-s
 Sends a pixel-perfect deal digest email directly via Resend — bypasses the database and service entirely. Useful for demoing the digest format without waiting for the full pipeline.
 
 The hardcoded digest matches the Lambert Capital demo org:
+
 - **3 YES** (approved): Galleria Commons retail, SecureSpace self-storage, MedPark Tower medical office
 - **7 NO** (passed): multifamily, office, industrial, hotel, student housing, dev site, NNN
 - Broker leaderboard: Brian Kessler (100%), Amanda Torres (50%), Jennifer Walsh (33%)
@@ -81,7 +84,7 @@ Suggested flow for a live recording:
 2. **Narrate step 1**: "I'm sending 10 deal emails to the inbox right now — multifamily, office, industrial, retail..."
 3. **While waiting (step 2)**: Switch to Outlook and show the inbox filling up with deal emails and screening replies arriving in real time. Show deals being moved into `Commercial Income` and `Healthcare` folders vs `Passed Deals`.
 4. **Digest arrives (step 3)**: Open the digest email. Show the summary bar, the 3 approved deals with reasoning, the 7 passes, and the broker leaderboard.
-5. **Ask the AI assistant**: *"Which brokers sent me deals that match my criteria, and which ones should I bother responding to?"*
+5. **Ask the AI assistant**: _"Which brokers sent me deals that match my criteria, and which ones should I bother responding to?"_
 
 ---
 
@@ -92,6 +95,7 @@ Configured in Screening Preferences for `org_3AEGDJh3sL8Q11Hlw1i7i70AqVI`:
 > High-yield commercial income properties in Sun Belt markets. Target assets: grocery-anchored retail centers, self-storage portfolios, and medical office buildings with strong tenancy. Minimum 6% cap rate. Deal size under $50M. Pass on: office, multifamily, industrial, hospitality, student housing, and development sites.
 
 **Buckets:**
+
 - `Commercial Income` — retail + self-storage (MOVE_TO_FOLDER)
 - `Healthcare` — medical office (MOVE_TO_FOLDER)
 - `Passed Deals` — everything else

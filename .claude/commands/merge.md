@@ -39,7 +39,7 @@ Report the merged PR URL.
 
 After merge, monitor the Railway deployment triggered by the push to main.
 
-1. **Find the service**: Use `mcp__railway__list-projects` and `mcp__railway__list-services` to locate the `analyzer-api` service.
+1. **Find the service**: Use `mcp__railway__list-projects` and `mcp__railway__list-services` to locate the `dealwire-api` service.
 
 2. **Poll for the new deployment**: Use `mcp__railway__list-deployments` to find the latest deployment. Wait up to 30 seconds after merge for it to appear if needed.
 
@@ -51,5 +51,6 @@ After merge, monitor the Railway deployment triggered by the push to main.
 ### Output
 
 Report both:
+
 - The merged PR (number, title, URL)
 - The Railway deployment result (success, failure with logs, or timeout)

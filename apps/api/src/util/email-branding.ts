@@ -3,7 +3,7 @@
  */
 
 export const EMAIL_DEFAULTS = {
-  companyName: 'Deal Analyzer',
+  companyName: 'Dealwire',
   brandColor: '#2A4A7C',
 } as const;
 

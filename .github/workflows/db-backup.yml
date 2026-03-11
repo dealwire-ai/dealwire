@@ -2,7 +2,7 @@ name: DB Backup
 
 on:
   schedule:
-    - cron: '0 3 * * *' # 3am UTC nightly
+    - cron: "0 3 * * *" # 3am UTC nightly
   workflow_dispatch: # allow manual trigger
 
 jobs:
@@ -38,7 +38,7 @@ jobs:
         run: |
           git config --global user.email "actions@github.com"
           git config --global user.name "github-actions"
-          git clone "https://x-access-token:${BACKUP_REPO_PAT}@github.com/isaac-levine/analyzer-db-backups.git" backup-repo
+          git clone "https://x-access-token:${BACKUP_REPO_PAT}@github.com/isaac-levine/dealwire-db-backups.git" backup-repo
           mv "$FILENAME" backup-repo/
           cd backup-repo
           git add "$FILENAME"
