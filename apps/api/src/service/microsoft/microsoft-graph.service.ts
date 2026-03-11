@@ -63,9 +63,13 @@ export class MicrosoftGraphService {
 
         if (!tokens.data || tokens.data.length === 0) {
           if (logLevel === 'debug') {
-            this.logger.debug(`No Microsoft OAuth token found for user ${userId}`);
+            this.logger.debug(
+              `No Microsoft OAuth token found for user ${userId}`,
+            );
           } else {
-            this.logger.warn(`No Microsoft OAuth token found for user ${userId}`);
+            this.logger.warn(
+              `No Microsoft OAuth token found for user ${userId}`,
+            );
           }
           return null;
         }
@@ -94,12 +98,14 @@ export class MicrosoftGraphService {
   }
 
   /**
-   * Check if a message has the X-Analyzer-Sent header (our bot fingerprint)
+   * Check if a message has the X-Dealwire-Sent header (our bot fingerprint)
    */
-  hasAnalyzerSentHeader(message: { internetMessageHeaders?: InternetMessageHeader[] }): boolean {
+  hasDealwireSentHeader(message: {
+    internetMessageHeaders?: InternetMessageHeader[];
+  }): boolean {
     const headers = message.internetMessageHeaders || [];
     return headers.some(
-      (h) => h.name?.toLowerCase() === 'x-analyzer-sent' && h.value === '1',
+      (h) => h.name?.toLowerCase() === 'x-dealwire-sent' && h.value === '1',
     );
   }
 
@@ -146,15 +152,12 @@ export class MicrosoftGraphService {
       if (includeEntryId) {
         url += `&$expand=singleValueExtendedProperties($filter=id eq 'Binary 0x0FFF')`;
       }
-      const response = await fetch(
-        url,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-          },
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
         },
-      );
+      });
 
       if (!response.ok) {
         this.logger.error(
@@ -266,9 +269,7 @@ export class MicrosoftGraphService {
             contentType: 'html',
             content: htmlBody,
           },
-          internetMessageHeaders: [
-            { name: 'X-Analyzer-Sent', value: '1' },
-          ],
+          internetMessageHeaders: [{ name: 'X-Dealwire-Sent', value: '1' }],
         },
       };
 
@@ -306,7 +307,9 @@ export class MicrosoftGraphService {
 
       if (!sendResponse.ok) {
         const errorText = await sendResponse.text();
-        this.logger.error(`Failed to send reply: ${sendResponse.status} - ${errorText}`);
+        this.logger.error(
+          `Failed to send reply: ${sendResponse.status} - ${errorText}`,
+        );
         return false;
       }
 
@@ -360,15 +363,15 @@ export class MicrosoftGraphService {
             contentType: 'html',
             content: htmlBody,
           },
-          internetMessageHeaders: [
-            { name: 'X-Analyzer-Sent', value: '1' },
-          ],
+          internetMessageHeaders: [{ name: 'X-Dealwire-Sent', value: '1' }],
         }),
       });
 
       if (!createResponse.ok) {
         const errorText = await createResponse.text();
-        this.logger.error(`Failed to create draft: ${createResponse.status} - ${errorText}`);
+        this.logger.error(
+          `Failed to create draft: ${createResponse.status} - ${errorText}`,
+        );
         return false;
       }
 
@@ -376,16 +379,21 @@ export class MicrosoftGraphService {
       const draftId = draft.id;
 
       // Step 2: Send the draft
-      const sendResponse = await fetch(`${GRAPH_BASE_URL}/me/messages/${draftId}/send`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
+      const sendResponse = await fetch(
+        `${GRAPH_BASE_URL}/me/messages/${draftId}/send`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
         },
-      });
+      );
 
       if (!sendResponse.ok) {
         const errorText = await sendResponse.text();
-        this.logger.error(`Failed to send email: ${sendResponse.status} - ${errorText}`);
+        this.logger.error(
+          `Failed to send email: ${sendResponse.status} - ${errorText}`,
+        );
         return false;
       }
 
@@ -413,16 +421,22 @@ export class MicrosoftGraphService {
       // Get the original message to include its content
       const originalMessage = await this.getMessage(accessToken, messageId);
       if (!originalMessage) {
-        this.logger.error(`Failed to fetch original message ${messageId} for forward`);
+        this.logger.error(
+          `Failed to fetch original message ${messageId} for forward`,
+        );
         return false;
       }
 
       // Extract original message content
       const originalBody = originalMessage.body?.content || '';
       const originalSubject = originalMessage.subject || 'No subject';
-      const originalFrom = originalMessage.from?.emailAddress?.address || 'Unknown';
-      const originalFromName = originalMessage.from?.emailAddress?.name || originalFrom;
-      const receivedDate = new Date(originalMessage.receivedDateTime).toLocaleString();
+      const originalFrom =
+        originalMessage.from?.emailAddress?.address || 'Unknown';
+      const originalFromName =
+        originalMessage.from?.emailAddress?.name || originalFrom;
+      const receivedDate = new Date(
+        originalMessage.receivedDateTime,
+      ).toLocaleString();
 
       // Construct body with original message content
       const forwardBody = `
@@ -446,7 +460,10 @@ export class MicrosoftGraphService {
       }> = [];
 
       if (originalMessage.hasAttachments) {
-        const graphAttachments = await this.getAttachments(accessToken, messageId);
+        const graphAttachments = await this.getAttachments(
+          accessToken,
+          messageId,
+        );
         for (const attachment of graphAttachments) {
           try {
             // Download attachment content
@@ -457,7 +474,9 @@ export class MicrosoftGraphService {
             );
 
             if (!attachmentContent) {
-              this.logger.warn(`Failed to download attachment ${attachment.name}, skipping`);
+              this.logger.warn(
+                `Failed to download attachment ${attachment.name}, skipping`,
+              );
               continue;
             }
 
@@ -468,10 +487,14 @@ export class MicrosoftGraphService {
               contentBytes: attachmentContent.toString('base64'),
             });
 
-            this.logger.log(`Prepared attachment ${attachment.name} for forward`);
+            this.logger.log(
+              `Prepared attachment ${attachment.name} for forward`,
+            );
           } catch (error) {
             const msg = error instanceof Error ? error.message : String(error);
-            this.logger.warn(`Error preparing attachment ${attachment.name}: ${msg}`);
+            this.logger.warn(
+              `Error preparing attachment ${attachment.name}: ${msg}`,
+            );
           }
         }
       }
@@ -509,15 +532,21 @@ export class MicrosoftGraphService {
 
       if (!replyResponse.ok) {
         const errorText = await replyResponse.text();
-        this.logger.error(`Failed to send forward: ${replyResponse.status} - ${errorText}`);
+        this.logger.error(
+          `Failed to send forward: ${replyResponse.status} - ${errorText}`,
+        );
         return false;
       }
 
-      this.logger.log(`Forward sent to admins via Graph for message ${messageId} (threaded, ${attachments.length} attachments)`);
+      this.logger.log(
+        `Forward sent to admins via Graph for message ${messageId} (threaded, ${attachments.length} attachments)`,
+      );
       return true;
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
-      this.logger.error(`Error forwarding message ${messageId} to admins: ${msg}`);
+      this.logger.error(
+        `Error forwarding message ${messageId} to admins: ${msg}`,
+      );
       return false;
     }
   }
@@ -562,7 +591,9 @@ export class MicrosoftGraphService {
 
       if (!createResponse.ok) {
         const errorText = await createResponse.text();
-        this.logger.error(`Failed to create folder ${folderName}: ${createResponse.status} - ${errorText}`);
+        this.logger.error(
+          `Failed to create folder ${folderName}: ${createResponse.status} - ${errorText}`,
+        );
         return null;
       }
 
@@ -606,7 +637,9 @@ export class MicrosoftGraphService {
           );
           return false; // Not an error, just skip it
         }
-        this.logger.error(`Failed to move message ${messageId}: ${response.status} - ${errorText}`);
+        this.logger.error(
+          `Failed to move message ${messageId}: ${response.status} - ${errorText}`,
+        );
         return false;
       }
 
@@ -640,7 +673,9 @@ export class MicrosoftGraphService {
         }
       } else if (originalMessageCheck.status === 404) {
         // This is expected - original message ID no longer exists (moved successfully)
-        this.logger.debug(`Original message ${messageId} no longer exists (moved successfully)`);
+        this.logger.debug(
+          `Original message ${messageId} no longer exists (moved successfully)`,
+        );
       }
 
       this.logger.log(
@@ -693,7 +728,11 @@ export class MicrosoftGraphService {
       await new Promise((resolve) => setTimeout(resolve, 3000));
 
       // Find all messages in this conversation from multiple sources
-      const allMessages: Array<{ id: string; parentFolderId: string; source: string }> = [];
+      const allMessages: Array<{
+        id: string;
+        parentFolderId: string;
+        source: string;
+      }> = [];
 
       // Check Inbox folder
       const inboxResponse = await fetch(
@@ -708,14 +747,20 @@ export class MicrosoftGraphService {
 
       if (inboxResponse.ok) {
         const inboxData = await inboxResponse.json();
-        const inboxMessages = (inboxData.value || []).map((msg: { id: string; parentFolderId: string }) => ({
-          ...msg,
-          source: 'Inbox',
-        }));
+        const inboxMessages = (inboxData.value || []).map(
+          (msg: { id: string; parentFolderId: string }) => ({
+            ...msg,
+            source: 'Inbox',
+          }),
+        );
         allMessages.push(...inboxMessages);
-        this.logger.debug(`Found ${inboxMessages.length} messages in Inbox for conversation ${conversationId}`);
+        this.logger.debug(
+          `Found ${inboxMessages.length} messages in Inbox for conversation ${conversationId}`,
+        );
       } else {
-        this.logger.warn(`Failed to fetch Inbox messages: ${inboxResponse.status}`);
+        this.logger.warn(
+          `Failed to fetch Inbox messages: ${inboxResponse.status}`,
+        );
       }
 
       // Check Sent Items for the reply-to-self and forward messages
@@ -731,14 +776,20 @@ export class MicrosoftGraphService {
 
       if (sentItemsResponse.ok) {
         const sentData = await sentItemsResponse.json();
-        const sentMessages = (sentData.value || []).map((msg: { id: string; parentFolderId: string }) => ({
-          ...msg,
-          source: 'SentItems',
-        }));
+        const sentMessages = (sentData.value || []).map(
+          (msg: { id: string; parentFolderId: string }) => ({
+            ...msg,
+            source: 'SentItems',
+          }),
+        );
         allMessages.push(...sentMessages);
-        this.logger.debug(`Found ${sentMessages.length} messages in Sent Items for conversation ${conversationId}`);
+        this.logger.debug(
+          `Found ${sentMessages.length} messages in Sent Items for conversation ${conversationId}`,
+        );
       } else {
-        this.logger.warn(`Failed to fetch Sent Items messages: ${sentItemsResponse.status}`);
+        this.logger.warn(
+          `Failed to fetch Sent Items messages: ${sentItemsResponse.status}`,
+        );
       }
 
       // Also check the target folder to see if any messages are already there
@@ -754,12 +805,16 @@ export class MicrosoftGraphService {
 
       if (targetFolderResponse.ok) {
         const targetData = await targetFolderResponse.json();
-        const targetMessages = (targetData.value || []).map((msg: { id: string; parentFolderId: string }) => ({
-          ...msg,
-          source: 'TargetFolder',
-        }));
+        const targetMessages = (targetData.value || []).map(
+          (msg: { id: string; parentFolderId: string }) => ({
+            ...msg,
+            source: 'TargetFolder',
+          }),
+        );
         allMessages.push(...targetMessages);
-        this.logger.debug(`Found ${targetMessages.length} messages already in target folder for conversation ${conversationId}`);
+        this.logger.debug(
+          `Found ${targetMessages.length} messages already in target folder for conversation ${conversationId}`,
+        );
       }
 
       // Deduplicate by message ID (reply appears in both Inbox and Sent Items)
@@ -768,12 +823,14 @@ export class MicrosoftGraphService {
       );
 
       this.logger.log(
-        `Found ${uniqueMessages.length} unique messages in conversation ${conversationId} (sources: ${[...new Set(uniqueMessages.map(m => m.source))].join(', ')})`,
+        `Found ${uniqueMessages.length} unique messages in conversation ${conversationId} (sources: ${[...new Set(uniqueMessages.map((m) => m.source))].join(', ')})`,
       );
 
       // Log each message found
       for (const msg of uniqueMessages) {
-        this.logger.debug(`Message ${msg.id} in ${msg.source} (parentFolderId: ${msg.parentFolderId})`);
+        this.logger.debug(
+          `Message ${msg.id} in ${msg.source} (parentFolderId: ${msg.parentFolderId})`,
+        );
       }
 
       // Move each message that isn't already in the target folder
@@ -786,7 +843,9 @@ export class MicrosoftGraphService {
         if (msg.parentFolderId === folderId) {
           skippedCount++;
           skippedMessageIds.push(msg.id);
-          this.logger.debug(`Message ${msg.id} already in target folder (${msg.source}), skipping`);
+          this.logger.debug(
+            `Message ${msg.id} already in target folder (${msg.source}), skipping`,
+          );
         } else {
           // Retry logic with exponential backoff for messages that might not be indexed yet
           let success = false;
@@ -795,14 +854,18 @@ export class MicrosoftGraphService {
             if (success) {
               movedCount++;
               movedMessageIds.push(msg.id);
-              this.logger.log(`Moved message ${msg.id} from ${msg.source} to target folder (attempt ${attempt + 1})`);
+              this.logger.log(
+                `Moved message ${msg.id} from ${msg.source} to target folder (attempt ${attempt + 1})`,
+              );
               break;
             }
 
             // Exponential backoff: 2s, 4s, 8s delays
             if (attempt < 2) {
               const delayMs = 2000 * Math.pow(2, attempt);
-              this.logger.debug(`Message ${msg.id} move failed, retrying in ${delayMs}ms (attempt ${attempt + 2}/3)`);
+              this.logger.debug(
+                `Message ${msg.id} move failed, retrying in ${delayMs}ms (attempt ${attempt + 2}/3)`,
+              );
               await new Promise((resolve) => setTimeout(resolve, delayMs));
             }
           }
@@ -810,7 +873,9 @@ export class MicrosoftGraphService {
           if (!success) {
             skippedCount++;
             skippedMessageIds.push(msg.id);
-            this.logger.warn(`Failed to move message ${msg.id} from ${msg.source} after 3 attempts`);
+            this.logger.warn(
+              `Failed to move message ${msg.id} from ${msg.source} after 3 attempts`,
+            );
           }
         }
       }
@@ -867,13 +932,13 @@ export class MicrosoftGraphService {
         return false;
       }
 
-      this.logger.log(
-        `Draft reply to broker created for message ${messageId}`,
-      );
+      this.logger.log(`Draft reply to broker created for message ${messageId}`);
       return true;
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
-      this.logger.error(`Error creating draft reply to broker for ${messageId}: ${msg}`);
+      this.logger.error(
+        `Error creating draft reply to broker for ${messageId}: ${msg}`,
+      );
       return false;
     }
   }
@@ -918,13 +983,13 @@ export class MicrosoftGraphService {
       fromName: message.from?.emailAddress?.name || undefined,
       to: message.toRecipients?.map((r) => r.emailAddress.address) || [],
       subject: message.subject || '',
-      bodyHtml: message.body?.contentType === 'html' ? message.body.content : undefined,
-      bodyText: message.body?.contentType === 'text' ? message.body.content : undefined,
+      bodyHtml:
+        message.body?.contentType === 'html' ? message.body.content : undefined,
+      bodyText:
+        message.body?.contentType === 'text' ? message.body.content : undefined,
       attachments,
       receivedAt: new Date(message.receivedDateTime),
       rawData: message,
     };
   }
 }
-
-

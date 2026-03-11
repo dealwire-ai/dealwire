@@ -1,13 +1,13 @@
-# Analyzer
+# Dealwire
 
 AI-powered real estate deal analysis platform. Monitors connected Outlook inboxes for deal-related emails, analyzes them using AI, and provides automated summaries and go/no-go decisions.
 
 ## Structure
 
-| Directory | Description | Deployed To |
-|-----------|-------------|-------------|
-| `apps/api` | NestJS 11 backend | Railway |
-| `apps/web` | Next.js 16 frontend | Vercel |
+| Directory  | Description         | Deployed To |
+| ---------- | ------------------- | ----------- |
+| `apps/api` | NestJS 11 backend   | Railway     |
+| `apps/web` | Next.js 16 frontend | Vercel      |
 
 ## Quick Start
 
@@ -51,12 +51,14 @@ MICROSOFT_WEBHOOK_SECRET=your-secret
 Preferences are stored in the database in the `ScreeningPreferences` table, with a one-to-one relation to `Organization`. Each organization has exactly one ScreeningPreferences record.
 
 Configure per-organization preferences in the database:
+
 - `dealCriteria` - AI evaluates deals against these requirements
 - `logoUrl`, `companyName`, `brandColor` - Email branding
 - `passedFolderName` - Folder name for passed/rejected deals
 - `alwaysSkip` - Criteria for deals to always skip (checked via AI in deal detection)
 
 Preferences are automatically created when an Organization is created via Clerk webhooks.
+
 - `passedFolderName` - Folder for rejected deals
 
 ## Deployment

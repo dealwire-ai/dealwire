@@ -3,8 +3,9 @@
 ## Prerequisites
 
 1. Make sure your API server is running:
+
    ```bash
-   pnpm --filter @analyzer/api dev
+   pnpm --filter @dealwire/api dev
    ```
 
 2. Ensure you have your environment variables set in `.env`:
@@ -17,16 +18,19 @@
 The test script sends a mock webhook payload to your local webhook endpoint, simulating what Resend would send when an email is received.
 
 ### Basic test (sends to isaac@frontstep.ai):
+
 ```bash
 pnpm exec tsx test-webhook.ts
 ```
 
 ### Send to a different email:
+
 ```bash
 pnpm exec tsx test-webhook.ts test123 noah@frontstep.ai
 ```
 
 ### With custom email ID and sender:
+
 ```bash
 pnpm exec tsx test-webhook.ts my_email_id isaac@frontstep.ai
 ```
@@ -47,6 +51,7 @@ pnpm exec tsx test-webhook.ts my_email_id isaac@frontstep.ai
 ## Expected Output
 
 You should see:
+
 1. Console output showing the webhook was processed
 2. An email sent to the sender address with the deal summary and decision
 3. The email will be branded according to the client preferences stored in the database (ScreeningPreferences table)
@@ -54,14 +59,17 @@ You should see:
 ## Troubleshooting
 
 ### "Connection refused"
+
 - Make sure the API server is running on port 3001
-- Run: `pnpm --filter @analyzer/api dev`
+- Run: `pnpm --filter @dealwire/api dev`
 
 ### "Invalid webhook signature"
+
 - Check that `RESEND_WEBHOOK_SECRET` in `.env` matches what's in the test script
 - For local testing, you can use any test secret (they just need to match)
 
 ### "No email received"
+
 - Check the console logs to see if there were errors
 - Verify your `RESEND_API_KEY` is valid
 - Make sure the sender email's user has an organizationId and that organization has ScreeningPreferences configured in the database
@@ -71,6 +79,7 @@ You should see:
 The test will use client preferences based on the sender email's organization. Preferences are stored in the `ScreeningPreferences` table in the database, linked to the user's organization via `organizationId`.
 
 To configure preferences:
+
 1. Ensure the user has an `organizationId` set
 2. Create or update the `ScreeningPreferences` record for that organization in the database
 

@@ -1,5 +1,5 @@
 {
-  "name": "@analyzer/web",
+  "name": "@dealwire/web",
   "version": "0.1.0",
   "private": true,
   "scripts": {

@@ -39,12 +39,12 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma Client
-        run: pnpm --filter @analyzer/api db:generate
+        run: pnpm --filter @dealwire/api db:generate
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://dummy:dummy@localhost:5432/dummy' }}
 
       - name: Run unit tests
-        run: pnpm --filter @analyzer/api test
+        run: pnpm --filter @dealwire/api test
         env:
           CI: true
           DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://dummy:dummy@localhost:5432/dummy' }}
@@ -76,18 +76,18 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma Client
-        run: pnpm --filter @analyzer/api db:generate
+        run: pnpm --filter @dealwire/api db:generate
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://dummy:dummy@localhost:5432/dummy' }}
 
       - name: Lint API
-        run: pnpm --filter @analyzer/api lint
+        run: pnpm --filter @dealwire/api lint
 
       - name: Lint Web
-        run: pnpm --filter @analyzer/web lint
+        run: pnpm --filter @dealwire/web lint
 
       - name: Typecheck API
-        run: pnpm --filter @analyzer/api exec tsc --noEmit
+        run: pnpm --filter @dealwire/api exec tsc --noEmit
 
   secrets:
     name: Secret Scan

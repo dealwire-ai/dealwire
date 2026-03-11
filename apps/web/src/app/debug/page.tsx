@@ -73,11 +73,11 @@ export default function DebugPage() {
                   </p>
                   <div className="relative">
                     <pre className="bg-zinc-800 p-3 rounded font-mono text-xs overflow-auto border border-zinc-700">
-                      {`psql "postgresql://isaac@localhost:5432/analyzer" -c "INSERT INTO \\"User\\" (id, email, \\"organizationId\\", \\"createdAt\\", \\"updatedAt\\") VALUES ('${user.id}', '${user.emailAddresses?.[0]?.emailAddress}', '${user.organizationMemberships[0].organization.id}', NOW(), NOW()) ON CONFLICT (id) DO UPDATE SET \\"organizationId\\" = '${user.organizationMemberships[0].organization.id}', \\"updatedAt\\" = NOW();"`}
+                      {`psql "postgresql://isaac@localhost:5432/dealwire" -c "INSERT INTO \\"User\\" (id, email, \\"organizationId\\", \\"createdAt\\", \\"updatedAt\\") VALUES ('${user.id}', '${user.emailAddresses?.[0]?.emailAddress}', '${user.organizationMemberships[0].organization.id}', NOW(), NOW()) ON CONFLICT (id) DO UPDATE SET \\"organizationId\\" = '${user.organizationMemberships[0].organization.id}', \\"updatedAt\\" = NOW();"`}
                     </pre>
                     <button
                       onClick={() => {
-                        const cmd = `psql "postgresql://isaac@localhost:5432/analyzer" -c "INSERT INTO \\"User\\" (id, email, \\"organizationId\\", \\"createdAt\\", \\"updatedAt\\") VALUES ('${user.id}', '${user.emailAddresses?.[0]?.emailAddress}', '${user.organizationMemberships[0].organization.id}', NOW(), NOW()) ON CONFLICT (id) DO UPDATE SET \\"organizationId\\" = '${user.organizationMemberships[0].organization.id}', \\"updatedAt\\" = NOW();"`;
+                        const cmd = `psql "postgresql://isaac@localhost:5432/dealwire" -c "INSERT INTO \\"User\\" (id, email, \\"organizationId\\", \\"createdAt\\", \\"updatedAt\\") VALUES ('${user.id}', '${user.emailAddresses?.[0]?.emailAddress}', '${user.organizationMemberships[0].organization.id}', NOW(), NOW()) ON CONFLICT (id) DO UPDATE SET \\"organizationId\\" = '${user.organizationMemberships[0].organization.id}', \\"updatedAt\\" = NOW();"`;
                         navigator.clipboard.writeText(cmd);
                         alert("Command copied to clipboard!");
                       }}

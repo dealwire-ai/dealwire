@@ -1,12 +1,12 @@
-# Analyzer Roadmap
+# Dealwire Roadmap
 
 ## Vision
 
-Analyzer is the agentic operating layer for private market acquisitions — starting with commercial real estate and expanding to PE, business acquisitions, and alternative assets.
+Dealwire is the agentic operating layer for private market acquisitions — starting with commercial real estate and expanding to PE, business acquisitions, and alternative assets.
 
 The deal screener is the wedge. The endgame is an autonomous acquisitions analyst that monitors deal flow across channels, enriches it with deep property and market data, manages broker relationships, and executes on opportunities — replacing the work of $250K/yr analysts with software that runs 24/7.
 
-**The most important thing is data quality and fidelity.** Every deal that flows through Analyzer should produce richer, more accurate, more structured intelligence than a human analyst could assemble manually. If the data isn't trustworthy, nothing else matters.
+**The most important thing is data quality and fidelity.** Every deal that flows through Dealwire should produce richer, more accurate, more structured intelligence than a human analyst could assemble manually. If the data isn't trustworthy, nothing else matters.
 
 ## What's Built (as of Mar 2026)
 
@@ -64,7 +64,7 @@ The deal screener is the wedge. The endgame is an autonomous acquisitions analys
 
 ### Phase 1: Data Quality & Fidelity
 
-_The data Analyzer produces must be best-in-class. This is the foundation everything else depends on._
+_The data Dealwire produces must be best-in-class. This is the foundation everything else depends on._
 
 - [x] **HTML image extraction** — Parse HTML emails with cheerio, extract embedded/external images, filter tracking pixels, OCR content images via Vision API. Most deal flow arrives as image-heavy HTML (Mailchimp-style broker blasts) that was previously invisible to the system.
 - [x] **Scanned PDF OCR** — Fallback to pdftoppm + Vision API when pdftotext returns empty (image-only PDFs). Handles scanned OMs that previously produced zero text.
