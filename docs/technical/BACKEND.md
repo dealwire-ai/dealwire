@@ -165,7 +165,7 @@ Preferences are automatically created when an Organization is created via Clerk 
 | `OPENAI_API_KEY`                 | AI services (deal screening, agent)                                                                                                                         |
 | `ANTHROPIC_API_KEY`              | Claude models (underwriting pipeline)                                                                                                                       |
 | `RESEND_API_KEY`                 | Email sending via Resend                                                                                                                                    |
-| `API_BASE_URL`                   | Production URL (https://api.deals.frontstep.ai)                                                                                                             |
+| `API_BASE_URL`                   | Production URL (https://api.dealwire.ai)                                                                                                                    |
 | `MICROSOFT_WEBHOOK_SECRET`       | Graph webhook clientState validation                                                                                                                        |
 | `FRONTEND_URL`                   | Frontend origin for CORS (http://localhost:3000 or production URL)                                                                                          |
 | `REQUIRE_AUTH`                   | Optional. Set to `true` to require Clerk JWT on protected routes even when not in production (default: auth required only when `NODE_ENV === 'production'`) |

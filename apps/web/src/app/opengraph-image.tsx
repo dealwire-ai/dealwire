@@ -117,7 +117,7 @@ export default async function Image() {
           fontFamily: "monospace",
         }}
       >
-        deals.frontstep.ai
+        dealwire.ai
       </div>
     </div>,
     {

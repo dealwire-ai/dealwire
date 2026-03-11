@@ -1,1 +1,1 @@
-Deployed to: https://api.deals.frontstep.ai
+Deployed to: https://api.dealwire.ai
