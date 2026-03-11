@@ -557,33 +557,34 @@ export class CareScraperService {
           }
         }
 
-        // Status
-        if (text.match(/status/i) && !text.match(/foreclosure/i)) {
+        // Lien Status (match "Lien Status" specifically, not generic "Status")
+        if (text.match(/lien\s*status/i)) {
           if (nextText && nextText.length < 100) {
             status = nextText;
           }
         }
 
-        // Sale Date
+        // Sale Date (match "Tax Lien Sale Date" or "Sale Date")
         if (text.match(/sale\s*date/i)) {
-          if (nextText) {
+          if (nextText && nextText.match(/\d{2}\/\d{2}\/\d{4}/)) {
             saleDate = nextText;
           }
         }
 
-        // Redemption Date
+        // Redemption Date (CARE uses "Redm Date")
         if (
+          text.match(/redm\s*date/i) ||
           text.match(/redemption\s*date/i) ||
           text.match(/redeemed\s*date/i)
         ) {
-          if (nextText) {
+          if (nextText && nextText.match(/\d{2}\/\d{2}\/\d{4}/)) {
             redemptionDate = nextText;
           }
         }
 
-        // Tax Year
+        // Tax Year (only accept 4-digit year values)
         if (text.match(/tax\s*year/i) || text.match(/fiscal\s*year/i)) {
-          if (nextText) {
+          if (nextText && nextText.match(/^\d{4}$/)) {
             taxYear = nextText;
           }
         }
