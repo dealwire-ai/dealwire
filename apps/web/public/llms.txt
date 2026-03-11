@@ -4,7 +4,7 @@
 
 Dealwire is not a SaaS dashboard or CRM. We build agentic AI systems — autonomous software employees custom-built for each client's workflows, criteria, and deal pipeline. These agents work through existing channels (Microsoft Outlook, email digests, chat) rather than forcing users into another app. The core insight: the most valuable work in CRE acquisitions — screening deal flow, enriching property data, tracking broker relationships — is repetitive, data-intensive, and perfectly suited for AI.
 
-Founded by Isaac Levine and Noah Weinstein, computer science graduates from Northeastern University who previously co-founded dealwire.ai. Strategic advisors include David Shorenstein (Principal at Hildreth Real Estate Advisors, assembled a $300M+ NYC portfolio across 250+ properties, former CIO at Forrest Shorenstein Capital Partners) and Jordan Karlik (Principal at JK Equities, owns and operates property in 15+ states valued at nearly $2 billion, formerly at Deutsche Bank and Ernst & Young in CMBS).
+Founded by Isaac Levine and Noah Weinstein, computer science graduates from Northeastern University who previously co-founded frontstep.ai. Strategic advisors include David Shorenstein (Principal at Hildreth Real Estate Advisors, assembled a $300M+ NYC portfolio across 250+ properties, former CIO at Forrest Shorenstein Capital Partners) and Jordan Karlik (Principal at JK Equities, owns and operates property in 15+ states valued at nearly $2 billion, formerly at Deutsche Bank and Ernst & Young in CMBS).
 
 Website: https://dealwire.ai
 
