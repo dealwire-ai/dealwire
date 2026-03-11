@@ -19,6 +19,7 @@ import { AuthUser } from '../decorator/auth-user.decorator';
 import { PrismaService } from '../service/prisma/prisma.service';
 import { NycIngestionService } from '../service/public-data/nyc-ingestion.service';
 import { NyctlQuarterlyService } from '../service/public-data/nyctl-quarterly.service';
+import { CareScraperService } from '../service/public-data/care-scraper.service';
 import { ParcelQueryService } from '../service/public-data/parcel-query.service';
 import { SkipTraceService } from '../service/public-data/skip-trace.service';
 import { BOROUGH_NAMES } from '../service/public-data/nyc-utils';
@@ -33,6 +34,7 @@ export class PublicDataController {
     private readonly prisma: PrismaService,
     private readonly ingestion: NycIngestionService,
     private readonly nyctl: NyctlQuarterlyService,
+    private readonly careScraper: CareScraperService,
     private readonly parcelQuery: ParcelQueryService,
     private readonly skipTrace: SkipTraceService,
   ) {}
@@ -132,6 +134,34 @@ export class PublicDataController {
       message: 'NYCTL quarterly ingestion started',
       reportDate: body.reportDate,
     };
+  }
+
+  @Post('ingest/care')
+  async triggerCareScraper(
+    @AuthUser('organizationId') organizationId: string | null,
+  ) {
+    await this.assertParcelsEnabled(organizationId);
+
+    if (this.careScraper.isRunning) {
+      throw new HttpException(
+        'CARE scraper is already running. Wait for it to complete before starting another.',
+        HttpStatus.CONFLICT,
+      );
+    }
+
+    this.logger.log('Triggering CARE portal scraper');
+
+    // Fire-and-forget
+    this.careScraper
+      .scrapeAll()
+      .then((result) => {
+        this.logger.log(`CARE scraper complete: ${JSON.stringify(result)}`);
+      })
+      .catch((err) => {
+        this.logger.error(`CARE scraper failed: ${err.message}`, err.stack);
+      });
+
+    return { message: 'CARE scraper started' };
   }
 
   @Get('parcels')
