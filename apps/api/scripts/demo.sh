@@ -11,7 +11,7 @@
 #   ./scripts/demo.sh --email <email>               # monitor Railway logs (default)
 #   ./scripts/demo.sh --email <email> --wait 90     # fixed sleep instead of log monitoring
 #
-# Requires: RESEND_API_KEY in .env (or exported), railway CLI linked to analyzer-api
+# Requires: RESEND_API_KEY in .env (or exported), railway CLI linked to dealwire-api
 
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -38,7 +38,7 @@ fi
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "  Analyzer Demo"
+echo "  Dealwire Demo"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 echo "  Email:  $EMAIL"
@@ -84,7 +84,7 @@ else
     trap 'kill $LOG_PID 2>/dev/null; rm -f "$TMP_LOG"' EXIT
 
     railway logs \
-      --service analyzer-api \
+      --service dealwire-api \
       --filter "Initial screening completed" \
       2>/dev/null >> "$TMP_LOG" &
     LOG_PID=$!
