@@ -14,7 +14,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { useFeatureFlags } from "@/hooks/use-feature-flags";
-import { isFrontstepUser } from "@/lib/utils";
+import { isInternalUser } from "@/lib/utils";
 import posthog from "posthog-js";
 
 interface NavItem {
@@ -74,7 +74,7 @@ export function Sidebar() {
   const { flags, loading: flagsLoading } = useFeatureFlags();
 
   const email = user?.primaryEmailAddress?.emailAddress;
-  const isFrontstep = isFrontstepUser(email);
+  const isFrontstep = isInternalUser(email);
 
   const initials =
     [user?.firstName?.[0], user?.lastName?.[0]]

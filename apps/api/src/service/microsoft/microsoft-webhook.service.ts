@@ -53,7 +53,9 @@ export class MicrosoftWebhookService {
       return;
     }
 
-    this.logger.log(`Processing ${payload.value.length} notification(s) from Microsoft Graph`);
+    this.logger.log(
+      `Processing ${payload.value.length} notification(s) from Microsoft Graph`,
+    );
 
     for (const notification of payload.value) {
       if (notification.changeType !== 'created') {
@@ -83,7 +85,9 @@ export class MicrosoftWebhookService {
       const userId =
         await this.subscriptionService.getUserBySubscriptionId(subscriptionId);
       if (!userId) {
-        this.logger.warn(`Unknown subscription ${subscriptionId} - no user found`);
+        this.logger.warn(
+          `Unknown subscription ${subscriptionId} - no user found`,
+        );
         return;
       }
 
@@ -97,16 +101,25 @@ export class MicrosoftWebhookService {
       this.processedMessages.set(messageId, now);
       this.cleanupProcessedMessages();
 
-      this.logger.log(`Found user ${userId} for subscription ${subscriptionId}`);
+      this.logger.log(
+        `Found user ${userId} for subscription ${subscriptionId}`,
+      );
 
       // Get access token for this user
-      const accessToken = await this.microsoftGraphService.getMicrosoftOAuthTokenFromClerk(userId);
+      const accessToken =
+        await this.microsoftGraphService.getMicrosoftOAuthTokenFromClerk(
+          userId,
+        );
       if (!accessToken) {
-        this.logger.error(`No access token for user ${userId} - cannot fetch email`);
+        this.logger.error(
+          `No access token for user ${userId} - cannot fetch email`,
+        );
         return;
       }
 
-      this.logger.log(`Retrieved access token for user ${userId}, fetching email ${messageId}`);
+      this.logger.log(
+        `Retrieved access token for user ${userId}, fetching email ${messageId}`,
+      );
 
       // Fetch the email and convert to normalized format
       const emailEvent = await this.microsoftGraphService.toNormalizedEvent(
@@ -116,7 +129,9 @@ export class MicrosoftWebhookService {
       );
 
       if (!emailEvent) {
-        this.logger.error(`Failed to fetch email ${messageId} for user ${userId}`);
+        this.logger.error(
+          `Failed to fetch email ${messageId} for user ${userId}`,
+        );
         return;
       }
 
@@ -150,13 +165,16 @@ export class MicrosoftWebhookService {
         return;
       }
 
-      // Skip all self-sent emails — commands go through screening@analyst.frontstep.ai instead
+      // Skip all self-sent emails — commands go through screening@mail.dealwire.ai instead
       if (emailEvent.from.toLowerCase() === inboxOwner.email.toLowerCase()) {
         this.logger.debug(
           `Skipping self-sent email: ${emailEvent.messageId} - "${emailEvent.subject}"`,
         );
         if (userEmail) {
-          this.metricsService.recordMicrosoftWebhookRequest(userEmail, 'success');
+          this.metricsService.recordMicrosoftWebhookRequest(
+            userEmail,
+            'success',
+          );
         }
         return;
       }
@@ -167,7 +185,10 @@ export class MicrosoftWebhookService {
           `Skipping deal digest email: ${emailEvent.messageId} - "${emailEvent.subject}"`,
         );
         if (userEmail) {
-          this.metricsService.recordMicrosoftWebhookRequest(userEmail, 'success');
+          this.metricsService.recordMicrosoftWebhookRequest(
+            userEmail,
+            'success',
+          );
         }
         return;
       }
@@ -177,7 +198,8 @@ export class MicrosoftWebhookService {
       );
 
       // Deal detection - must happen before S3 upload
-      const bodyText = emailEvent.bodyText || this.htmlToText(emailEvent.bodyHtml || '');
+      const bodyText =
+        emailEvent.bodyText || this.htmlToText(emailEvent.bodyHtml || '');
       const detection = await this.dealDetectionService.isDealEmail(
         emailEvent.subject,
         bodyText,
@@ -192,7 +214,10 @@ export class MicrosoftWebhookService {
         );
         this.metricsService.recordDealSkipped(detection.reason || 'unknown');
         if (userEmail) {
-          this.metricsService.recordMicrosoftWebhookRequest(userEmail, 'success');
+          this.metricsService.recordMicrosoftWebhookRequest(
+            userEmail,
+            'success',
+          );
         }
         return;
       }
@@ -223,7 +248,9 @@ export class MicrosoftWebhookService {
         this.metricsService.recordMicrosoftWebhookRequest(userEmail, 'error');
       }
       const msg = error instanceof Error ? error.message : String(error);
-      this.logger.error(`Error processing email notification ${messageId}: ${msg}`);
+      this.logger.error(
+        `Error processing email notification ${messageId}: ${msg}`,
+      );
       throw error;
     }
   }
@@ -244,7 +271,14 @@ export class MicrosoftWebhookService {
    * Updates emailEvent.attachments with s3Key for each attachment
    */
   private async uploadAttachmentsToS3(
-    emailEvent: { messageId: string; attachments: Array<{ contentId: string; filename: string; s3Key?: string }> },
+    emailEvent: {
+      messageId: string;
+      attachments: Array<{
+        contentId: string;
+        filename: string;
+        s3Key?: string;
+      }>;
+    },
     accessToken: string,
     dealId: string,
   ): Promise<void> {
@@ -257,7 +291,9 @@ export class MicrosoftWebhookService {
       );
 
       if (!content) {
-        this.logger.warn(`Failed to download attachment ${att.filename}, skipping S3 upload`);
+        this.logger.warn(
+          `Failed to download attachment ${att.filename}, skipping S3 upload`,
+        );
         continue;
       }
 

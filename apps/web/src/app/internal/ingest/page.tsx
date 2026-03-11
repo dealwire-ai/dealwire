@@ -39,7 +39,9 @@ export default function IngestPage() {
   }, [isLoaded, user, router]);
 
   const isFrontstep =
-    user?.primaryEmailAddress?.emailAddress?.endsWith("@frontstep.ai") ?? false;
+    (user?.primaryEmailAddress?.emailAddress?.endsWith("@dealwire.ai") ||
+      user?.primaryEmailAddress?.emailAddress?.endsWith("@frontstep.ai")) ??
+    false;
 
   async function handleIngest() {
     if (state === "loading") return;

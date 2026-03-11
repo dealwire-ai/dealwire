@@ -652,7 +652,7 @@ export default function Custom() {
                 role: "Co-Founder",
                 bio: "Software Engineer at CarGurus (NASDAQ: CARG), where he architects agentic AI systems at scale. Computer Science at Northeastern. Co-founded and sold frontstep.ai.",
                 linkedin: "https://www.linkedin.com/in/isaac-levine/",
-                email: "isaac@frontstep.ai",
+                email: "isaac@dealwire.ai",
                 headshot: "/headshots/isaac.webp",
               },
               {
@@ -660,7 +660,7 @@ export default function Custom() {
                 role: "Co-Founder",
                 bio: "Former Software Engineer at Flexcar and Technical Product Manager at Siphox, a venture-backed health tech startup. Computer Science at Northeastern. Co-founded and sold frontstep.ai.",
                 linkedin: "https://www.linkedin.com/in/noahweinstein/",
-                email: "noah@frontstep.ai",
+                email: "noah@dealwire.ai",
                 headshot: "/headshots/noah.webp",
               },
             ].map((founder, index) => (

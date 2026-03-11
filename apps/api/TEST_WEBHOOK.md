@@ -17,7 +17,7 @@
 
 The test script sends a mock webhook payload to your local webhook endpoint, simulating what Resend would send when an email is received.
 
-### Basic test (sends to isaac@frontstep.ai):
+### Basic test (sends to isaac@dealwire.ai):
 
 ```bash
 pnpm exec tsx test-webhook.ts
@@ -26,13 +26,13 @@ pnpm exec tsx test-webhook.ts
 ### Send to a different email:
 
 ```bash
-pnpm exec tsx test-webhook.ts test123 noah@frontstep.ai
+pnpm exec tsx test-webhook.ts test123 noah@dealwire.ai
 ```
 
 ### With custom email ID and sender:
 
 ```bash
-pnpm exec tsx test-webhook.ts my_email_id isaac@frontstep.ai
+pnpm exec tsx test-webhook.ts my_email_id isaac@dealwire.ai
 ```
 
 ## What the test does:
