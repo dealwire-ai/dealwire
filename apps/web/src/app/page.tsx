@@ -543,7 +543,7 @@ export default function Home() {
               },
             ].map((service, index) => (
               <FadeInSection key={index} delay={index * 0.05}>
-                <div className="group flex flex-col md:flex-row md:items-center gap-6 p-6 md:p-8 bg-white/[0.015] border border-white/[0.06] rounded-sm hover:bg-white/[0.025] hover:border-[#C8A96E]/20 transition-all duration-500">
+                <div className="group flex max-md:flex-col items-center max-md:items-start gap-6 p-6 md:p-8 bg-white/[0.015] border border-white/[0.06] rounded-sm hover:bg-white/[0.025] hover:border-[#C8A96E]/20 transition-all duration-500">
                   <div className="flex items-center gap-5 md:w-80 shrink-0">
                     <div className="w-10 h-10 bg-[#C8A96E]/8 border border-[#C8A96E]/15 rounded-sm flex items-center justify-center group-hover:bg-[#C8A96E]/15 transition-colors shrink-0">
                       <service.icon className="w-4 h-4 text-[#C8A96E]" />
@@ -622,7 +622,7 @@ export default function Home() {
               ) => (
                 <FadeInSection key={i} delay={i * 0.1}>
                   <div
-                    className={`flex flex-col md:flex-row md:items-center gap-4 md:gap-0 p-5 md:p-6 ${rowBg} border ${rowBorder} rounded-sm`}
+                    className={`flex max-md:flex-col items-center max-md:items-start gap-4 md:gap-0 p-5 md:p-6 ${rowBg} border ${rowBorder} rounded-sm`}
                   >
                     <div className="md:w-52 shrink-0">
                       <span
@@ -631,7 +631,7 @@ export default function Home() {
                         {label}
                       </span>
                     </div>
-                    <div className="flex-1 flex flex-col md:flex-row gap-4 md:items-center">
+                    <div className="flex-1 flex max-md:flex-col gap-4 items-center max-md:items-start">
                       <div className="md:w-52 shrink-0">
                         <span className="text-white/35 text-sm">
                           {condition}
@@ -920,7 +920,7 @@ export default function Home() {
 
           <FadeInSection delay={0.4}>
             <div className="mt-10 p-8 lg:p-10 bg-[#C8A96E]/[0.04] border border-[#C8A96E]/12 rounded-sm">
-              <div className="flex flex-col lg:flex-row lg:items-center gap-6 lg:gap-12">
+              <div className="flex max-lg:flex-col items-center max-lg:items-start gap-6 lg:gap-12">
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 bg-[#C8A96E]/10 border border-[#C8A96E]/20 rounded-sm flex items-center justify-center">
                     <Sparkles className="w-4 h-4 text-[#C8A96E]" />
@@ -1022,7 +1022,7 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="relative z-10 px-6 lg:px-16 py-10 border-t border-white/[0.04]">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto flex max-md:flex-col items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <SignalMark />
             <span className="text-sm text-white/30 font-mono tracking-wide">
