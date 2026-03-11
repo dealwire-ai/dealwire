@@ -108,6 +108,7 @@ export default function DealsClient() {
 ## Manual Testing Steps
 
 1. **Start both services:**
+
    ```bash
    pnpm dev
    ```
@@ -133,6 +134,7 @@ export default function DealsClient() {
 ## Environment Variables
 
 ### Backend (apps/api/.env)
+
 ```bash
 CLERK_SECRET_KEY=sk_test_...
 FRONTEND_URL=http://localhost:3000  # or production URL
@@ -140,6 +142,7 @@ REQUIRE_AUTH=true  # Optional: force auth even in dev
 ```
 
 ### Frontend (apps/web/.env.local)
+
 ```bash
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
 NEXT_PUBLIC_API_URL=http://localhost:3001
@@ -149,6 +152,7 @@ CLERK_SECRET_KEY=sk_test_...
 ## Files Modified
 
 ### Backend
+
 - ✅ `apps/api/src/controller/deal.controller.ts`
 - ✅ `apps/api/src/controller/screening-preferences.controller.ts`
 - ✅ `apps/api/src/controller/contact.controller.ts`
@@ -157,6 +161,7 @@ CLERK_SECRET_KEY=sk_test_...
 - ✅ `apps/api/.env` (FRONTEND_URL)
 
 ### Frontend
+
 - ✅ `apps/web/src/lib/api.ts` (new)
 - ✅ `apps/web/src/hooks/use-api.ts` (new)
 
@@ -183,6 +188,7 @@ CLERK_SECRET_KEY=sk_test_...
 ### How to Test
 
 1. **Start both services:**
+
    ```bash
    pnpm dev
    ```
@@ -198,9 +204,11 @@ CLERK_SECRET_KEY=sk_test_...
    - Visit http://localhost:3000/debug
    - Copy your Clerk user ID
    - Run this command to sync your user:
+
    ```bash
-   psql "postgresql://isaac@localhost:5432/analyzer" -c "INSERT INTO \"User\" (id, email, \"organizationId\", \"createdAt\", \"updatedAt\") VALUES ('YOUR_USER_ID', 'your@email.com', '931ee21b-59ff-470a-b6f4-988002905bc2', NOW(), NOW()) ON CONFLICT (id) DO UPDATE SET \"organizationId\" = '931ee21b-59ff-470a-b6f4-988002905bc2', \"updatedAt\" = NOW();"
+   psql "postgresql://isaac@localhost:5432/dealwire" -c "INSERT INTO \"User\" (id, email, \"organizationId\", \"createdAt\", \"updatedAt\") VALUES ('YOUR_USER_ID', 'your@email.com', '931ee21b-59ff-470a-b6f4-988002905bc2', NOW(), NOW()) ON CONFLICT (id) DO UPDATE SET \"organizationId\" = '931ee21b-59ff-470a-b6f4-988002905bc2', \"updatedAt\" = NOW();"
    ```
+
    - Alternatively, in production, users are synced automatically via Clerk webhooks
    - The dashboard now shows helpful logs in the API console
 
@@ -216,6 +224,7 @@ CLERK_SECRET_KEY=sk_test_...
 ### Files Created
 
 **Frontend:**
+
 - `apps/web/src/app/sign-in/[[...sign-in]]/page.tsx` - Sign-in page
 - `apps/web/src/app/dashboard/page.tsx` - Protected dashboard
 - `apps/web/src/middleware.ts` - Route protection middleware

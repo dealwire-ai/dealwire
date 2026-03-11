@@ -24,4 +24,4 @@ pre-push:
         fi
     typecheck-api:
       glob: "apps/api/**/*.ts"
-      run: pnpm --filter @analyzer/api exec tsc --noEmit
+      run: pnpm --filter @dealwire/api exec tsc --noEmit

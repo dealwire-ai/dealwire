@@ -50,7 +50,7 @@ Graph webhook → MicrosoftWebhookService
 
 **Key behaviors:**
 
-- Infinite loop prevention: skip self-sent emails via `X-Analyzer-Sent` header
+- Infinite loop prevention: skip self-sent emails via `X-Dealwire-Sent` header
 - Dedup: in-memory cache of processed message IDs
 - Attachments stored in S3 before SQS enqueue (message carries metadata only)
 
@@ -178,7 +178,7 @@ POST /public-data/parcels/skip-trace (or /:bbl/skip-trace)
 
 **Env vars:** `NYC_OPEN_DATA_APP_TOKEN` (optional, avoids rate limits), `TRACERFY_API_KEY`, `TRACERFY_MONTHLY_CREDIT_CAP` (default 500), `NYCTL_REPORT_DATE` (optional, e.g. `9-30-2025` — triggers NYCTL ingestion as part of full ingest)
 
-**Agent tools:** `query_parcels`, `get_parcel_stats` (in `AnalyzerAgentService`)
+**Agent tools:** `query_parcels`, `get_parcel_stats` (in `DealwireAgentService`)
 
 **Default ingestion boroughs:** Brooklyn (3) + Queens (4)
 

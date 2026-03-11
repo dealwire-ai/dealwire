@@ -1,7 +1,7 @@
 Create a pull request for the current branch.
 
 1. Run `git status` and `git log main..HEAD --oneline` to understand what's changed.
-2. Run `pnpm --filter @analyzer/api lint && pnpm --filter @analyzer/api exec tsc --noEmit` — if either fails, fix the issues before proceeding.
+2. Run `pnpm --filter @dealwire/api lint && pnpm --filter @dealwire/api exec tsc --noEmit` — if either fails, fix the issues before proceeding.
 3. Write a PR title in conventional commits format: `type: short description` (under 70 chars, imperative mood, no period).
 4. Write a PR description with:
    - What changed and why (not a list of file names)

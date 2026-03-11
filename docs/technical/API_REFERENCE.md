@@ -1,7 +1,7 @@
 # API Reference
 
 **Base URL (local):** `http://localhost:3001`
-**Base URL (prod):** Railway `analyzer-api` service domain
+**Base URL (prod):** Railway `dealwire-api` service domain
 **Auth:** All endpoints require Clerk session token via `Authorization: Bearer <token>` header unless marked 🔓.
 **CORS:** Restricted to `FRONTEND_URL` env var (`http://localhost:3000` locally).
 

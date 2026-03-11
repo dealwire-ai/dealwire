@@ -140,7 +140,7 @@ In expanded row detail view:
 
 ### Step 7: Update agent tools
 
-In `analyzer-agent.service.ts`:
+In `dealwire-agent.service.ts`:
 
 - Add new fields to `query_parcels` response
 - Add filter params to `query_parcels` tool definition

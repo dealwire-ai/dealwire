@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { marked } from 'marked';
 import { PrismaService } from '../prisma/prisma.service';
-import { AnalyzerAgentService } from '../agent/analyzer-agent.service';
+import { DealwireAgentService } from '../agent/dealwire-agent.service';
 import { EmailSenderService } from '../email/email-sender.service';
 import { EmailProcessingService } from '../email/email-processing.service';
 import { emailConfig } from '../../config/email.config';
@@ -13,7 +13,7 @@ export class ScreeningInboundService {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly analyzerAgent: AnalyzerAgentService,
+    private readonly dealwireAgent: DealwireAgentService,
     private readonly emailSender: EmailSenderService,
     private readonly emailProcessing: EmailProcessingService,
   ) {}
@@ -63,7 +63,7 @@ export class ScreeningInboundService {
       return;
     }
 
-    const responseText = await this.analyzerAgent.generate(
+    const responseText = await this.dealwireAgent.generate(
       { organizationId: orgId },
       userMessage,
     );

@@ -144,7 +144,7 @@ export function Sidebar() {
         <div className="flex items-center gap-2">
           <span className="text-[#C8A96E]">◈</span>
           <span className="text-white font-semibold tracking-tight text-sm">
-            Analyzer
+            Dealwire
           </span>
         </div>
       </div>
