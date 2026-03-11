@@ -1,18 +1,12 @@
 # TODO
 
 ## General Ops
-   - scope project for Thomas Dolan
    - decide on new name / domain
       - (isaac) eng migration
       - (noah) gsuite + related accounts
    - make a really strong, energetic e2e demo (deal screening, underwriting, (and optionally) IC report generation)
 
 ## Biz Dev
-   - Rengage every single contact in our pipeline, send demos of updated work
-   -    for many leads: just offer deal screener for free
-   -    Demos:
-   -       Thomas Dolan -- customer identity enrichment automation
-   -       Jacob Palmer -- internal accountant AI for cashflow analysis (need some example input data from him)
 
 ## Deal Screener
    - **[JK 3/3]** Underwriting pipeline improvements:
@@ -22,11 +16,12 @@
       - Buttons to easily update screening criteria from digest email as well as "mute" deals that keep getting sent over and over  
 
 ## Tax Lien Analyzer
-   - see roadmap
+   - run CARE portal ingestion
 
 ## Frontstep Acquisition
    - execute + track media outreach
-   - lead scoring + auto-scheduling feature (proposal sent)
+   - respond to tyler abt media and appfolio
+   -    lead scoring + auto-scheduling feature (proposal sent)
     
 ## Survey Platform
-   - get M3 payment (65 hrs + $60 for cursor)
+   - do M4 (analytics)
