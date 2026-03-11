@@ -85,7 +85,7 @@ export default function Custom() {
           <div className="flex items-center gap-3">
             <SignalMark />
             <span className="text-base font-medium tracking-tight text-white/90">
-              Levine & Weinstein
+              Dealwire
             </span>
           </div>
           <div className="hidden md:flex items-center gap-8">
@@ -905,7 +905,7 @@ export default function Custom() {
           <div className="flex items-center gap-3">
             <SignalMark />
             <span className="text-sm text-white/30 font-mono tracking-wide">
-              Levine & Weinstein
+              Dealwire
             </span>
           </div>
           <p className="text-xs font-mono text-white/15 tracking-wider">

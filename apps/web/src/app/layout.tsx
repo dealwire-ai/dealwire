@@ -16,16 +16,16 @@ const ibmPlexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Levine & Weinstein",
+  title: "Dealwire",
   description: "Deal intelligence. From inbox to IC memo.",
   metadataBase: new URL("https://dealwire.ai"),
   openGraph: {
-    title: "Levine & Weinstein",
+    title: "Dealwire",
     description: "Deal intelligence. From inbox to IC memo.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Levine & Weinstein",
+    title: "Dealwire",
     description: "Deal intelligence. From inbox to IC memo.",
   },
 };

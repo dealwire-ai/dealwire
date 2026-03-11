@@ -51,7 +51,7 @@ export default function BookPage() {
           <Link href="/" className="flex items-center gap-3">
             <SignalMark />
             <span className="text-base font-medium tracking-tight text-white/90">
-              Levine & Weinstein
+              Dealwire
             </span>
           </Link>
           <Link href="/">
@@ -91,7 +91,7 @@ export default function BookPage() {
           <div className="flex items-center gap-3">
             <SignalMark />
             <span className="text-sm text-white/30 font-mono tracking-wide">
-              Levine & Weinstein
+              Dealwire
             </span>
           </div>
           <p className="text-xs font-mono text-white/15 tracking-wider">

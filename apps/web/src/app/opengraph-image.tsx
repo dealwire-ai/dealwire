@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
 
-export const alt = "Levine & Weinstein — Deal Intelligence";
+export const alt = "Dealwire — Deal Intelligence";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -89,7 +89,7 @@ export default async function Image() {
           marginBottom: "16px",
         }}
       >
-        Levine & Weinstein
+        Dealwire
       </div>
 
       {/* Tagline */}
