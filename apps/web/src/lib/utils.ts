@@ -1,10 +1,12 @@
-import { type ClassValue, clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import { type ClassValue, clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function isFrontstepUser(email: string | null | undefined): boolean {
-  return !!email?.endsWith('@frontstep.ai');
+export function isInternalUser(email: string | null | undefined): boolean {
+  return (
+    !!email?.endsWith("@dealwire.ai") || !!email?.endsWith("@frontstep.ai")
+  );
 }
