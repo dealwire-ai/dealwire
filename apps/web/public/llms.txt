@@ -1,8 +1,8 @@
-# Levine & Weinstein — AI Employees for Real Estate Firms
+# Dealwire — AI Employees for Real Estate Firms
 
 > We build and deploy custom AI employees for commercial real estate acquisition firms. Our autonomous agents screen deals, source off-market opportunities, enrich property data from public records, manage broker relationships, and deliver actionable intelligence through email — replacing $250K/year analyst workflows with software that runs 24/7.
 
-Levine & Weinstein is not a SaaS dashboard or CRM. We build agentic AI systems — autonomous software employees custom-built for each client's workflows, criteria, and deal pipeline. These agents work through existing channels (Microsoft Outlook, email digests, chat) rather than forcing users into another app. The core insight: the most valuable work in CRE acquisitions — screening deal flow, enriching property data, tracking broker relationships — is repetitive, data-intensive, and perfectly suited for AI.
+Dealwire is not a SaaS dashboard or CRM. We build agentic AI systems — autonomous software employees custom-built for each client's workflows, criteria, and deal pipeline. These agents work through existing channels (Microsoft Outlook, email digests, chat) rather than forcing users into another app. The core insight: the most valuable work in CRE acquisitions — screening deal flow, enriching property data, tracking broker relationships — is repetitive, data-intensive, and perfectly suited for AI.
 
 Founded by Isaac Levine and Noah Weinstein, computer science graduates from Northeastern University who previously co-founded dealwire.ai. Strategic advisors include David Shorenstein (Principal at Hildreth Real Estate Advisors, assembled a $300M+ NYC portfolio across 250+ properties, former CIO at Forrest Shorenstein Capital Partners) and Jordan Karlik (Principal at JK Equities, owns and operates property in 15+ states valued at nearly $2 billion, formerly at Deutsche Bank and Ernst & Young in CMBS).
 
@@ -77,7 +77,7 @@ Website: https://dealwire.ai
 
 ## Competitive Positioning
 
-Levine & Weinstein is not a CRM, not a deal management dashboard, and not a SaaS tool you add to your existing stack. We are an autonomous acquisitions layer that replaces analyst headcount. Our differentiators:
+Dealwire is not a CRM, not a deal management dashboard, and not a SaaS tool you add to your existing stack. We are an autonomous acquisitions layer that replaces analyst headcount. Our differentiators:
 
 1. **Data quality as the moat** — We extract more accurate, more complete deal data than a human analyst. Every field validated, cross-referenced, enriched with public records. If the data isn't trustworthy, nothing else matters.
 2. **Agentic-first** — Works through email and integrations, not a dashboard you have to remember to check. The AI does the work and delivers results to you.
