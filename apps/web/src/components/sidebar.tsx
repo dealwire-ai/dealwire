@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { SignalMark } from "@/components/signal-mark";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useClerk, useUser, OrganizationSwitcher } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
@@ -169,7 +170,11 @@ export function Sidebar() {
     {
       title: "Underwriting",
       items: [
-        { label: "Templates", href: "/underwriting", icon: LayoutTemplate },
+        {
+          label: "Model Templates",
+          href: "/underwriting",
+          icon: LayoutTemplate,
+        },
       ],
       flag: flags.underwriting,
     },
@@ -196,18 +201,18 @@ export function Sidebar() {
         {/* Logo + collapse toggle */}
         <div className="px-3 py-4 border-b border-zinc-800/60 flex items-center justify-between min-h-[53px]">
           {!collapsed && (
-            <div className="flex items-center gap-2 min-w-0">
-              <span className="text-[#C8A96E] shrink-0">◈</span>
-              <span className="text-white font-semibold tracking-tight text-sm truncate">
+            <Link href="/" className="flex items-center gap-2.5 min-w-0 group">
+              <SignalMark className="shrink-0 w-[28px]" />
+              <span className="text-white font-semibold tracking-tight text-sm truncate group-hover:text-zinc-300 transition-colors">
                 Dealwire
               </span>
-            </div>
+            </Link>
           )}
           <Tooltip>
             <TooltipTrigger asChild>
               <button
                 onClick={toggleCollapsed}
-                className={`text-zinc-600 hover:text-zinc-300 transition-colors rounded-md p-0.5 hover:bg-zinc-800 ${
+                className={`cursor-pointer text-zinc-600 hover:text-zinc-300 transition-colors rounded-md p-0.5 hover:bg-zinc-800 ${
                   collapsed ? "mx-auto" : "ml-auto"
                 }`}
               >

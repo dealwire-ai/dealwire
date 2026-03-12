@@ -3,7 +3,7 @@ import { Sidebar } from "@/components/sidebar";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex h-screen bg-black text-white overflow-hidden">
+    <div className="flex h-screen bg-[#111111] text-white overflow-hidden">
       <Suspense fallback={null}>
         <Sidebar />
       </Suspense>
