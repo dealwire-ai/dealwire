@@ -79,6 +79,17 @@ export class MicrosoftGraphService {
         const msg = error instanceof Error ? error.message : String(error);
         const clerkErrors = error?.errors || error?.clerkError || error?.data;
 
+        // Don't retry if the user simply doesn't exist in Clerk (deleted/orphaned)
+        const isNotFound = clerkErrors?.some?.(
+          (e: any) => e.code === 'resource_not_found',
+        );
+        if (isNotFound) {
+          this.logger.debug(
+            `User ${userId} not found in Clerk — skipping token fetch`,
+          );
+          return null;
+        }
+
         if (attempt < maxRetries) {
           const delayMs = 1000 * Math.pow(2, attempt - 1); // 1s, 2s
           this.logger.warn(
