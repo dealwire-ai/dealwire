@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { Building2 } from "lucide-react";
 import { Button } from "../components/ui/button";
+import { DealFlowTicker } from "../components/deal-flow-ticker";
 import { useAuth, useClerk } from "@clerk/nextjs";
 import posthog from "posthog-js";
 
@@ -206,6 +207,10 @@ export default function Home() {
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </Link>
+
+              <div className="mt-8">
+                <DealFlowTicker />
+              </div>
             </motion.div>
 
             {/* Right: Terminal widget */}
@@ -329,7 +334,7 @@ export default function Home() {
       <section className="relative z-10 px-6 lg:px-16 py-14 border-t border-white/[0.04]">
         <div className="max-w-7xl mx-auto">
           <p className="text-xs font-mono text-white/20 tracking-widest uppercase text-center mb-10">
-            Trusted by operators who&apos;ve moved $2B+ across private markets
+            Trusted by top operators
           </p>
           <div className="flex flex-wrap items-center justify-center gap-x-14 gap-y-8">
             {[
