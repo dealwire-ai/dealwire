@@ -348,7 +348,7 @@ export default function UnderwritingPage() {
 
   return (
     <DashboardPageShell title="Underwriting Templates">
-      <div className="max-w-4xl">
+      <div>
         {/* Create form */}
         <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6 mb-6">
           <h2 className="text-lg font-semibold mb-4">Add Template</h2>

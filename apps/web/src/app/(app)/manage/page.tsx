@@ -202,7 +202,7 @@ export default function ManagePage() {
         </button>
       }
     >
-      <div className="max-w-4xl">
+      <div>
         {error && (
           <div className="p-4 bg-red-900/20 border border-red-900/50 rounded-lg text-red-400 mb-4">
             {error}
