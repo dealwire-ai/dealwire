@@ -63,7 +63,7 @@ export class PublicDataController {
   ) {
     await this.assertParcelsEnabled(organizationId);
 
-    const boroughs = body.boroughs || ['3', '4']; // Default: Brooklyn + Queens
+    const boroughs = body.boroughs || ['1', '3', '4']; // Default: Manhattan + Brooklyn + Queens
 
     // Validate borough codes
     for (const b of boroughs) {
