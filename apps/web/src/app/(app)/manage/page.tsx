@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { useApi } from "@/hooks/use-api";
+import { DashboardPageShell } from "@/components/dashboard-page-shell";
 
 type BucketAction =
   | "REPLY_TO_SELF"
@@ -186,26 +187,22 @@ export default function ManagePage() {
   }
 
   if (!isLoaded) {
-    return (
-      <div className="p-8">
-        <div className="text-center py-12 text-zinc-400">Loading...</div>
-      </div>
-    );
+    return <div className="text-center py-12 text-zinc-400">Loading...</div>;
   }
 
   return (
-    <div className="p-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold">Screening Buckets</h1>
-          <button
-            onClick={startCreate}
-            className="px-4 py-2 bg-[#C8A96E] hover:bg-[#b8952a] text-black font-medium rounded-lg text-sm transition-colors"
-          >
-            + Add Bucket
-          </button>
-        </div>
-
+    <DashboardPageShell
+      title="Screening Buckets"
+      actions={
+        <button
+          onClick={startCreate}
+          className="px-3 py-1.5 bg-[#C8A96E] hover:bg-[#b8952a] text-black font-medium rounded-md text-sm transition-colors"
+        >
+          + Add Bucket
+        </button>
+      }
+    >
+      <div className="max-w-4xl">
         {error && (
           <div className="p-4 bg-red-900/20 border border-red-900/50 rounded-lg text-red-400 mb-4">
             {error}
@@ -358,7 +355,7 @@ export default function ManagePage() {
         )}
 
         {/* Buckets Table */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden">
+        <div className="border border-zinc-800 rounded-lg overflow-hidden">
           {loading ? (
             <div className="text-center py-12 text-zinc-400">
               Loading buckets...
@@ -465,6 +462,6 @@ export default function ManagePage() {
           )}
         </div>
       </div>
-    </div>
+    </DashboardPageShell>
   );
 }
