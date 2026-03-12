@@ -211,11 +211,11 @@ export default function Custom() {
               </div>
 
               <h1 className="text-5xl md:text-6xl lg:text-[4.5rem] font-normal tracking-tight leading-[1.0] mb-6">
-                AI employees
+                AI employees.
                 <br />
-                <span className="text-[#C8A96E]">that actually</span>
+                <span className="text-[#C8A96E]">Built for your</span>
                 <br />
-                work.
+                business.
               </h1>
 
               <p className="text-lg text-white/45 max-w-lg leading-relaxed mb-10">
