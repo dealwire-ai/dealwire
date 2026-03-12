@@ -17,6 +17,7 @@ import {
   Database,
 } from "lucide-react";
 import { Button } from "../../components/ui/button";
+import { DealFlowTicker } from "../../components/deal-flow-ticker";
 import { useAuth, useClerk } from "@clerk/nextjs";
 import posthog from "posthog-js";
 
@@ -210,18 +211,18 @@ export default function Custom() {
               </div>
 
               <h1 className="text-5xl md:text-6xl lg:text-[4.5rem] font-normal tracking-tight leading-[1.0] mb-6">
-                AI employees
+                AI employees.
                 <br />
-                <span className="text-[#C8A96E]">that actually</span>
+                <span className="text-[#C8A96E]">Built for your</span>
                 <br />
-                work.
+                business.
               </h1>
 
               <p className="text-lg text-white/45 max-w-lg leading-relaxed mb-10">
                 We build custom AI systems that handle the work your team
-                shouldn&apos;t be doing. Not chatbots. Not copilots. Full
-                autonomous agents that read, decide, and act — integrated
-                directly into your existing tools and workflows.
+                shouldn&apos;t be doing. Not chatbots. Not copilots. Autonomous
+                agents integrated directly into your existing tools and
+                workflows.
               </p>
 
               <Link
@@ -242,6 +243,10 @@ export default function Custom() {
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </Link>
+
+              <div className="mt-8">
+                <DealFlowTicker />
+              </div>
             </motion.div>
 
             {/* Right: Terminal widget */}
@@ -352,7 +357,7 @@ export default function Custom() {
       <section className="relative z-10 px-6 lg:px-16 py-14 border-t border-white/[0.04]">
         <div className="max-w-7xl mx-auto">
           <p className="text-xs font-mono text-white/20 tracking-widest uppercase text-center mb-10">
-            Trusted by operators who&apos;ve moved $2B+ across private markets
+            Trusted by top operators
           </p>
           <div className="flex flex-wrap items-center justify-center gap-x-14 gap-y-8">
             {[
