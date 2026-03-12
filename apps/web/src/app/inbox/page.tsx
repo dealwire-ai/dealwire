@@ -466,9 +466,9 @@ export default function InboxPage() {
                 desc: "Every deal email, every attachment, every data point — automatically extracted and structured. Nothing slips through.",
               },
               {
-                value: "< 2 min",
-                label: "Extraction time",
-                desc: "Full OM parsing, rent roll extraction, and data structuring in under two minutes. Not hours.",
+                value: "24 / 7",
+                label: "Automatic organization",
+                desc: "Every deal email, attachment, and data point — filed, tagged, and structured around the clock. No manual sorting.",
               },
               {
                 value: "∞",
@@ -550,7 +550,7 @@ export default function InboxPage() {
               },
             ].map((service, index) => (
               <FadeInSection key={index} delay={index * 0.05}>
-                <div className="group flex flex-col md:flex-row md:items-center gap-6 p-6 md:p-8 bg-white/[0.015] border border-white/[0.06] rounded-sm hover:bg-white/[0.025] hover:border-[#C8A96E]/20 transition-all duration-500">
+                <div className="group flex max-md:flex-col items-center max-md:items-start gap-6 p-6 md:p-8 bg-white/[0.015] border border-white/[0.06] rounded-sm hover:bg-white/[0.025] hover:border-[#C8A96E]/20 transition-all duration-500">
                   <div className="flex items-center gap-5 md:w-80 shrink-0">
                     <div className="w-10 h-10 bg-[#C8A96E]/8 border border-[#C8A96E]/15 rounded-sm flex items-center justify-center group-hover:bg-[#C8A96E]/15 transition-colors shrink-0">
                       <service.icon className="w-4 h-4 text-[#C8A96E]" />
@@ -802,7 +802,7 @@ export default function InboxPage() {
 
           <FadeInSection delay={0.4}>
             <div className="mt-10 p-8 lg:p-10 bg-[#C8A96E]/[0.04] border border-[#C8A96E]/12 rounded-sm">
-              <div className="flex flex-col lg:flex-row lg:items-center gap-6 lg:gap-12">
+              <div className="flex max-lg:flex-col items-center max-lg:items-start gap-6 lg:gap-12">
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 bg-[#C8A96E]/10 border border-[#C8A96E]/20 rounded-sm flex items-center justify-center">
                     <Sparkles className="w-4 h-4 text-[#C8A96E]" />
