@@ -41,7 +41,10 @@ export class ClerkWebhookService {
         await this.addUserToOrganization(data);
         break;
       case 'organizationMembership.deleted':
-        await this.removeUserFromOrganization(data.public_user_data?.user_id);
+        await this.removeUserFromOrganization(
+          data.public_user_data?.user_id,
+          data.organization?.id,
+        );
         break;
       default:
         this.logger.log(`Unhandled Clerk event: ${eventType}`);
@@ -127,13 +130,14 @@ export class ClerkWebhookService {
 
   private async createMicrosoftSubscription(userId: string): Promise<void> {
     try {
-      const success = await this.microsoftSubscription.createSubscription(userId);
+      const success =
+        await this.microsoftSubscription.createSubscription(userId);
       if (success) {
         this.logger.log(`Microsoft subscription created for user ${userId}`);
       } else {
         this.logger.debug(
           `Failed to create Microsoft subscription for user ${userId} - ` +
-          `token may not be available yet`,
+            `token may not be available yet`,
         );
       }
     } catch (error) {
@@ -160,7 +164,7 @@ export class ClerkWebhookService {
     }
 
     this.logger.log(`Microsoft OAuth token created for user ${userId}`);
-    
+
     // Ensure user exists in our DB first
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
@@ -204,7 +208,9 @@ export class ClerkWebhookService {
     } catch (error) {
       // Don't fail user deletion if subscription deletion fails
       const msg = error instanceof Error ? error.message : String(error);
-      this.logger.warn(`Failed to delete Microsoft subscription for ${id}: ${msg}`);
+      this.logger.warn(
+        `Failed to delete Microsoft subscription for ${id}: ${msg}`,
+      );
     }
 
     try {
@@ -232,7 +238,9 @@ export class ClerkWebhookService {
       },
     });
     await this.screeningBucketService.ensureDefaultBuckets(data.id);
-    this.logger.log(`Organization created: ${data.id} with default screening preferences and buckets`);
+    this.logger.log(
+      `Organization created: ${data.id} with default screening preferences and buckets`,
+    );
   }
 
   private async upsertOrganization(data: any): Promise<void> {
@@ -267,7 +275,9 @@ export class ClerkWebhookService {
           organizationId: data.id,
         },
       });
-      this.logger.log(`Created default screening preferences for organization ${data.id}`);
+      this.logger.log(
+        `Created default screening preferences for organization ${data.id}`,
+      );
     }
 
     await this.screeningBucketService.ensureDefaultBuckets(data.id);
@@ -325,7 +335,9 @@ export class ClerkWebhookService {
             organizationId,
           },
         });
-        this.logger.log(`Created default screening preferences for organization ${organizationId}`);
+        this.logger.log(
+          `Created default screening preferences for organization ${organizationId}`,
+        );
       }
 
       await this.screeningBucketService.ensureDefaultBuckets(organizationId);
@@ -350,11 +362,28 @@ export class ClerkWebhookService {
     this.logger.log(`User ${userId} added to org ${organizationId}`);
   }
 
-  private async removeUserFromOrganization(userId: string): Promise<void> {
-    await this.prisma.user.update({
-      where: { id: userId },
+  private async removeUserFromOrganization(
+    userId: string,
+    organizationId?: string,
+  ): Promise<void> {
+    // Only null out the org if the user is still in the org being removed from.
+    // When moving a user between orgs, Clerk fires membership.created (new org)
+    // and membership.deleted (old org) in quick succession — if deleted fires after
+    // created, we'd otherwise wipe the new org assignment.
+    const where: any = { id: userId };
+    if (organizationId) {
+      where.organizationId = organizationId;
+    }
+    const result = await this.prisma.user.updateMany({
+      where,
       data: { organizationId: null },
     });
-    this.logger.log(`User ${userId} removed from org`);
+    if (result.count > 0) {
+      this.logger.log(`User ${userId} removed from org ${organizationId}`);
+    } else {
+      this.logger.log(
+        `User ${userId} already reassigned to a different org — skipping remove from ${organizationId}`,
+      );
+    }
   }
 }
