@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { useApi } from "@/hooks/use-api";
+import { DashboardPageShell } from "@/components/dashboard-page-shell";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -342,20 +343,12 @@ export default function UnderwritingPage() {
   };
 
   if (!isLoaded) {
-    return (
-      <div className="p-8">
-        <div className="text-center py-12 text-zinc-400">Loading...</div>
-      </div>
-    );
+    return <div className="text-center py-12 text-zinc-400">Loading...</div>;
   }
 
   return (
-    <div className="p-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold">Underwriting Templates</h1>
-        </div>
-
+    <DashboardPageShell title="Underwriting Templates">
+      <div className="max-w-4xl">
         {/* Create form */}
         <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6 mb-6">
           <h2 className="text-lg font-semibold mb-4">Add Template</h2>
@@ -422,6 +415,6 @@ export default function UnderwritingPage() {
           </div>
         )}
       </div>
-    </div>
+    </DashboardPageShell>
   );
 }
