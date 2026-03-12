@@ -84,8 +84,15 @@ export class MicrosoftSubscriptionService {
 
       if (!response.ok) {
         const errorText = await response.text();
+        const user = await this.prisma.user.findUnique({
+          where: { id: userId },
+          select: { firstName: true, lastName: true, email: true },
+        });
+        const userLabel = user
+          ? `${user.firstName ?? ''} ${user.lastName ?? ''} <${user.email}>`.trim()
+          : userId;
         this.logger.error(
-          `Failed to create subscription for ${userId}: ${response.status} - ${errorText}`,
+          `Failed to create subscription for ${userLabel}: ${response.status} - ${errorText}`,
         );
         return false;
       }
