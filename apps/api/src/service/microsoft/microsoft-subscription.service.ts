@@ -27,6 +27,15 @@ export class MicrosoftSubscriptionService {
     private readonly graphService: MicrosoftGraphService,
   ) {}
 
+  private async userLabel(userId: string): Promise<string> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { firstName: true, lastName: true, email: true },
+    });
+    if (!user) return userId;
+    return `${user.firstName ?? ''} ${user.lastName ?? ''} <${user.email}>`.trim();
+  }
+
   /**
    * Create a new Microsoft Graph subscription for a user's inbox
    */
@@ -48,7 +57,7 @@ export class MicrosoftSubscriptionService {
 
     if (existing) {
       this.logger.log(
-        `User ${userId} already has subscription ${existing.subscriptionId}`,
+        `User ${await this.userLabel(userId)} already has subscription ${existing.subscriptionId}`,
       );
       const hoursUntilExpiry =
         (existing.expiresAt.getTime() - Date.now()) / (1000 * 60 * 60);
@@ -84,15 +93,8 @@ export class MicrosoftSubscriptionService {
 
       if (!response.ok) {
         const errorText = await response.text();
-        const user = await this.prisma.user.findUnique({
-          where: { id: userId },
-          select: { firstName: true, lastName: true, email: true },
-        });
-        const userLabel = user
-          ? `${user.firstName ?? ''} ${user.lastName ?? ''} <${user.email}>`.trim()
-          : userId;
         this.logger.error(
-          `Failed to create subscription for ${userLabel}: ${response.status} - ${errorText}`,
+          `Failed to create subscription for ${await this.userLabel(userId)}: ${response.status} - ${errorText}`,
         );
         return false;
       }
@@ -109,7 +111,7 @@ export class MicrosoftSubscriptionService {
       });
 
       this.logger.log(
-        `Created subscription ${subscription.id} for user ${userId}`,
+        `Created subscription ${subscription.id} for ${await this.userLabel(userId)}`,
       );
       return true;
     } catch (error) {
@@ -373,7 +375,7 @@ export class MicrosoftSubscriptionService {
 
       // User has token but no subscription - create it
       this.logger.log(
-        `Found user ${user.id} with Microsoft token but no subscription, creating...`,
+        `Found ${await this.userLabel(user.id)} with Microsoft token but no subscription, creating...`,
       );
       const success = await this.createSubscription(user.id);
       if (success) {
