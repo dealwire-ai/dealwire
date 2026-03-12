@@ -221,8 +221,8 @@ export default function Custom() {
               <p className="text-lg text-white/45 max-w-lg leading-relaxed mb-10">
                 We build custom AI systems that handle the work your team
                 shouldn&apos;t be doing. Not chatbots. Not copilots. Full
-                autonomous agents that read, decide, and act — integrated
-                directly into your existing tools and workflows.
+                autonomous agents integrated directly into your existing tools
+                and workflows.
               </p>
 
               <Link
