@@ -38,10 +38,12 @@ export default function IngestPage() {
     }
   }, [isLoaded, user, router]);
 
+  const email = user?.primaryEmailAddress?.emailAddress ?? "";
   const isFrontstep =
-    (user?.primaryEmailAddress?.emailAddress?.endsWith("@dealwire.ai") ||
-      user?.primaryEmailAddress?.emailAddress?.endsWith("@frontstep.ai")) ??
-    false;
+    email.endsWith("@dealwire.ai") ||
+    email.endsWith("@frontstep.ai") ||
+    email === "imlevine@outlook.com" ||
+    email === "noahweinstein345@outlook.com";
 
   async function handleIngest() {
     if (state === "loading") return;
