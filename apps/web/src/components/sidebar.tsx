@@ -21,7 +21,7 @@ import {
 import { useFeatureFlags } from "@/hooks/use-feature-flags";
 import { isInternalUser } from "@/lib/utils";
 import posthog from "posthog-js";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import {
   Tooltip,
   TooltipContent,
@@ -109,12 +109,11 @@ export function Sidebar() {
   const { user } = useUser();
   const { flags, loading: flagsLoading } = useFeatureFlags();
 
-  const [collapsed, setCollapsed] = useState(false);
-
-  useEffect(() => {
-    const stored = localStorage.getItem("sidebar-collapsed");
-    if (stored !== null) setCollapsed(stored === "true");
-  }, []);
+  const [collapsed, setCollapsed] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      localStorage.getItem("sidebar-collapsed") === "true",
+  );
 
   const toggleCollapsed = useCallback(() => {
     setCollapsed((prev) => {
