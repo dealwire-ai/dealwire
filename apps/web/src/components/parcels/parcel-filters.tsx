@@ -171,6 +171,7 @@ export function expandBuildingClassGroups(groupIds: string[]): string[] {
 }
 
 const BOROUGHS = [
+  { code: "1", name: "Manhattan" },
   { code: "3", name: "Brooklyn" },
   { code: "4", name: "Queens" },
 ];
@@ -201,6 +202,7 @@ export function ParcelFilters({ filters, onSetFilter }: ParcelFiltersProps) {
             </SelectItem>
           ))}
           <SelectItem value="3,4">BK + QN</SelectItem>
+          <SelectItem value="1,3,4">MN + BK + QN</SelectItem>
         </SelectContent>
       </Select>
 
