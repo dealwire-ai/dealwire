@@ -20,6 +20,7 @@ import { TableSkeleton } from "@/components/table-skeleton";
 import { useApi } from "@/hooks/use-api";
 import { useTableState } from "@/hooks/use-table-state";
 import { Chatbot } from "@/components/chat/chatbot";
+import { DashboardPageShell } from "@/components/dashboard-page-shell";
 import posthog from "posthog-js";
 
 interface Deal {
@@ -257,187 +258,179 @@ export default function DashboardPage() {
   }, [assetsTable.page]);
 
   if (!isLoaded) {
-    return (
-      <div className="p-8">
-        <div className="text-center py-12 text-zinc-400">Loading...</div>
-      </div>
-    );
+    return <div className="text-center py-12 text-zinc-400">Loading...</div>;
   }
 
   return (
-    <div className="p-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6">
-          <Tabs
-            value={activeTab}
-            onValueChange={handleTabChange}
-            className="w-full"
-          >
-            <TabsList>
-              <TabsTrigger value="deals">Deals</TabsTrigger>
-              <TabsTrigger value="contacts">Contacts</TabsTrigger>
-              <TabsTrigger value="properties">Properties</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="deals" className="mt-6">
-              <TableToolbar
-                search={dealsTable.search}
-                onSearchChange={dealsTable.setSearch}
-                totalLabel="deals"
-                total={dealsTable.meta.total}
+    <Tabs value={activeTab} onValueChange={handleTabChange} className="h-full">
+      <DashboardPageShell
+        title="Deal Screening"
+        headerTabNavigation={
+          <TabsList>
+            <TabsTrigger value="deals">Deals</TabsTrigger>
+            <TabsTrigger value="contacts">Contacts</TabsTrigger>
+            <TabsTrigger value="properties">Properties</TabsTrigger>
+          </TabsList>
+        }
+      >
+        <div>
+          <TabsContent value="deals">
+            <TableToolbar
+              search={dealsTable.search}
+              onSearchChange={dealsTable.setSearch}
+              totalLabel="deals"
+              total={dealsTable.meta.total}
+              hasActiveFilters={dealsTable.hasActiveFilters}
+              onClearFilters={dealsTable.clearFilters}
+              filterSlot={
+                <Select
+                  value={dealsTable.filters.decision || "all"}
+                  onValueChange={(value) =>
+                    dealsTable.setFilter(
+                      "decision",
+                      value === "all" ? "" : value,
+                    )
+                  }
+                >
+                  <SelectTrigger className="w-[130px] bg-zinc-950 border-zinc-800 text-white">
+                    <SelectValue placeholder="Decision" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All</SelectItem>
+                    <SelectItem value="YES">Yes</SelectItem>
+                    <SelectItem value="NO">No</SelectItem>
+                  </SelectContent>
+                </Select>
+              }
+            />
+            {errors.deals && (
+              <div className="p-4 bg-red-900/20 border border-red-900/50 rounded-lg text-red-400 mb-4">
+                {errors.deals}
+              </div>
+            )}
+            {loading.deals ? (
+              <TableSkeleton columns={6} />
+            ) : (
+              <DealsTable
+                deals={deals}
+                assets={assets}
+                contacts={contacts}
+                expandedRows={expandedDeals}
+                onToggleRow={(id) => {
+                  const newExpanded = new Set(expandedDeals);
+                  if (newExpanded.has(id)) {
+                    newExpanded.delete(id);
+                  } else {
+                    newExpanded.add(id);
+                    posthog.capture("deal_row_expanded", { deal_id: id });
+                  }
+                  setExpandedDeals(newExpanded);
+                }}
+                onNavigateToAsset={(assetId) =>
+                  navigateToTabAndExpand("properties", assetId)
+                }
+                onNavigateToContact={(contactId) =>
+                  navigateToTabAndExpand("contacts", contactId)
+                }
                 hasActiveFilters={dealsTable.hasActiveFilters}
                 onClearFilters={dealsTable.clearFilters}
-                filterSlot={
-                  <Select
-                    value={dealsTable.filters.decision || "all"}
-                    onValueChange={(value) =>
-                      dealsTable.setFilter(
-                        "decision",
-                        value === "all" ? "" : value,
-                      )
-                    }
-                  >
-                    <SelectTrigger className="w-[130px] bg-zinc-950 border-zinc-800 text-white">
-                      <SelectValue placeholder="Decision" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All</SelectItem>
-                      <SelectItem value="YES">Yes</SelectItem>
-                      <SelectItem value="NO">No</SelectItem>
-                    </SelectContent>
-                  </Select>
-                }
               />
-              {errors.deals && (
-                <div className="p-4 bg-red-900/20 border border-red-900/50 rounded-lg text-red-400 mb-4">
-                  {errors.deals}
-                </div>
-              )}
-              {loading.deals ? (
-                <TableSkeleton columns={6} />
-              ) : (
-                <DealsTable
-                  deals={deals}
-                  assets={assets}
-                  contacts={contacts}
-                  expandedRows={expandedDeals}
-                  onToggleRow={(id) => {
-                    const newExpanded = new Set(expandedDeals);
-                    if (newExpanded.has(id)) {
-                      newExpanded.delete(id);
-                    } else {
-                      newExpanded.add(id);
-                      posthog.capture("deal_row_expanded", { deal_id: id });
-                    }
-                    setExpandedDeals(newExpanded);
-                  }}
-                  onNavigateToAsset={(assetId) =>
-                    navigateToTabAndExpand("properties", assetId)
-                  }
-                  onNavigateToContact={(contactId) =>
-                    navigateToTabAndExpand("contacts", contactId)
-                  }
-                  hasActiveFilters={dealsTable.hasActiveFilters}
-                  onClearFilters={dealsTable.clearFilters}
-                />
-              )}
-              <TablePagination
-                page={dealsTable.page}
-                totalPages={dealsTable.meta.totalPages}
-                total={dealsTable.meta.total}
-                limit={dealsTable.limit}
-                onPageChange={dealsTable.setPage}
-              />
-            </TabsContent>
+            )}
+            <TablePagination
+              page={dealsTable.page}
+              totalPages={dealsTable.meta.totalPages}
+              total={dealsTable.meta.total}
+              limit={dealsTable.limit}
+              onPageChange={dealsTable.setPage}
+            />
+          </TabsContent>
 
-            <TabsContent value="contacts" className="mt-6">
-              <TableToolbar
-                search={contactsTable.search}
-                onSearchChange={contactsTable.setSearch}
-                totalLabel="contacts"
-                total={contactsTable.meta.total}
+          <TabsContent value="contacts">
+            <TableToolbar
+              search={contactsTable.search}
+              onSearchChange={contactsTable.setSearch}
+              totalLabel="contacts"
+              total={contactsTable.meta.total}
+              hasActiveFilters={contactsTable.hasActiveFilters}
+              onClearFilters={contactsTable.clearFilters}
+            />
+            {errors.contacts && (
+              <div className="p-4 bg-red-900/20 border border-red-900/50 rounded-lg text-red-400 mb-4">
+                {errors.contacts}
+              </div>
+            )}
+            {loading.contacts ? (
+              <TableSkeleton columns={5} />
+            ) : (
+              <ContactsTable
+                contacts={contacts}
+                expandedRows={expandedContacts}
+                onToggleRow={(id) => {
+                  const newExpanded = new Set(expandedContacts);
+                  if (newExpanded.has(id)) {
+                    newExpanded.delete(id);
+                  } else {
+                    newExpanded.add(id);
+                  }
+                  setExpandedContacts(newExpanded);
+                }}
                 hasActiveFilters={contactsTable.hasActiveFilters}
                 onClearFilters={contactsTable.clearFilters}
               />
-              {errors.contacts && (
-                <div className="p-4 bg-red-900/20 border border-red-900/50 rounded-lg text-red-400 mb-4">
-                  {errors.contacts}
-                </div>
-              )}
-              {loading.contacts ? (
-                <TableSkeleton columns={5} />
-              ) : (
-                <ContactsTable
-                  contacts={contacts}
-                  expandedRows={expandedContacts}
-                  onToggleRow={(id) => {
-                    const newExpanded = new Set(expandedContacts);
-                    if (newExpanded.has(id)) {
-                      newExpanded.delete(id);
-                    } else {
-                      newExpanded.add(id);
-                    }
-                    setExpandedContacts(newExpanded);
-                  }}
-                  hasActiveFilters={contactsTable.hasActiveFilters}
-                  onClearFilters={contactsTable.clearFilters}
-                />
-              )}
-              <TablePagination
-                page={contactsTable.page}
-                totalPages={contactsTable.meta.totalPages}
-                total={contactsTable.meta.total}
-                limit={contactsTable.limit}
-                onPageChange={contactsTable.setPage}
-              />
-            </TabsContent>
+            )}
+            <TablePagination
+              page={contactsTable.page}
+              totalPages={contactsTable.meta.totalPages}
+              total={contactsTable.meta.total}
+              limit={contactsTable.limit}
+              onPageChange={contactsTable.setPage}
+            />
+          </TabsContent>
 
-            <TabsContent value="properties" className="mt-6">
-              <TableToolbar
-                search={assetsTable.search}
-                onSearchChange={assetsTable.setSearch}
-                totalLabel="properties"
-                total={assetsTable.meta.total}
+          <TabsContent value="properties">
+            <TableToolbar
+              search={assetsTable.search}
+              onSearchChange={assetsTable.setSearch}
+              totalLabel="properties"
+              total={assetsTable.meta.total}
+              hasActiveFilters={assetsTable.hasActiveFilters}
+              onClearFilters={assetsTable.clearFilters}
+            />
+            {errors.assets && (
+              <div className="p-4 bg-red-900/20 border border-red-900/50 rounded-lg text-red-400 mb-4">
+                {errors.assets}
+              </div>
+            )}
+            {loading.assets ? (
+              <TableSkeleton columns={6} />
+            ) : (
+              <AssetsTable
+                assets={assets}
+                expandedRows={expandedAssets}
+                onToggleRow={(id) => {
+                  const newExpanded = new Set(expandedAssets);
+                  if (newExpanded.has(id)) {
+                    newExpanded.delete(id);
+                  } else {
+                    newExpanded.add(id);
+                  }
+                  setExpandedAssets(newExpanded);
+                }}
                 hasActiveFilters={assetsTable.hasActiveFilters}
                 onClearFilters={assetsTable.clearFilters}
               />
-              {errors.assets && (
-                <div className="p-4 bg-red-900/20 border border-red-900/50 rounded-lg text-red-400 mb-4">
-                  {errors.assets}
-                </div>
-              )}
-              {loading.assets ? (
-                <TableSkeleton columns={6} />
-              ) : (
-                <AssetsTable
-                  assets={assets}
-                  expandedRows={expandedAssets}
-                  onToggleRow={(id) => {
-                    const newExpanded = new Set(expandedAssets);
-                    if (newExpanded.has(id)) {
-                      newExpanded.delete(id);
-                    } else {
-                      newExpanded.add(id);
-                    }
-                    setExpandedAssets(newExpanded);
-                  }}
-                  hasActiveFilters={assetsTable.hasActiveFilters}
-                  onClearFilters={assetsTable.clearFilters}
-                />
-              )}
-              <TablePagination
-                page={assetsTable.page}
-                totalPages={assetsTable.meta.totalPages}
-                total={assetsTable.meta.total}
-                limit={assetsTable.limit}
-                onPageChange={assetsTable.setPage}
-              />
-            </TabsContent>
-          </Tabs>
+            )}
+            <TablePagination
+              page={assetsTable.page}
+              totalPages={assetsTable.meta.totalPages}
+              total={assetsTable.meta.total}
+              limit={assetsTable.limit}
+              onPageChange={assetsTable.setPage}
+            />
+          </TabsContent>
         </div>
-
         <Chatbot />
-      </div>
-    </div>
+      </DashboardPageShell>
+    </Tabs>
   );
 }
