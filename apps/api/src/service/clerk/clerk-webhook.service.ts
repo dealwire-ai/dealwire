@@ -117,7 +117,8 @@ export class ClerkWebhookService {
 
     // Only attempt Microsoft Graph subscription if user signed up with Microsoft
     const hasMicrosoft = data.external_accounts?.some(
-      (acc: any) => acc.provider === 'microsoft',
+      (acc: any) =>
+        acc.provider === 'microsoft' || acc.provider === 'oauth_microsoft',
     );
     if (hasMicrosoft) {
       this.createMicrosoftSubscription(data.id);
@@ -147,6 +148,25 @@ export class ClerkWebhookService {
   }
 
   /**
+   * Poll for a user to appear in the DB, retrying a few times with a short delay.
+   * Handles the race where oauth_access_token.created fires before user.created is processed.
+   */
+  private async waitForUser(
+    userId: string,
+    retries = 5,
+    delayMs = 2000,
+  ): Promise<boolean> {
+    for (let i = 0; i < retries; i++) {
+      const user = await this.prisma.user.findUnique({ where: { id: userId } });
+      if (user) return true;
+      if (i < retries - 1) {
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
+      }
+    }
+    return false;
+  }
+
+  /**
    * Handle OAuth token creation - create subscription when Microsoft is connected
    */
   private async handleOAuthTokenCreated(data: any): Promise<void> {
@@ -154,7 +174,7 @@ export class ClerkWebhookService {
     const provider = data.provider;
 
     // Only handle Microsoft OAuth connections
-    if (provider !== 'microsoft') {
+    if (provider !== 'microsoft' && provider !== 'oauth_microsoft') {
       return;
     }
 
@@ -165,14 +185,13 @@ export class ClerkWebhookService {
 
     this.logger.log(`Microsoft OAuth token created for user ${userId}`);
 
-    // Ensure user exists in our DB first
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-    });
+    // Ensure user exists in our DB first — retry a few times in case
+    // user.created webhook hasn't been processed yet (common race condition)
+    const userExists = await this.waitForUser(userId);
 
-    if (!user) {
+    if (!userExists) {
       this.logger.warn(
-        `User ${userId} not found in DB, cannot create subscription yet`,
+        `User ${userId} not found in DB after retries — subscription will be created by next cron run`,
       );
       return;
     }

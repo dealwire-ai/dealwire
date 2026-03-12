@@ -32,7 +32,10 @@ export class MicrosoftSubscriptionService {
    */
   async createSubscription(userId: string): Promise<boolean> {
     // Use debug level - it's expected that users might not have connected Microsoft yet
-    const accessToken = await this.graphService.getMicrosoftOAuthTokenFromClerk(userId, 'debug');
+    const accessToken = await this.graphService.getMicrosoftOAuthTokenFromClerk(
+      userId,
+      'debug',
+    );
     if (!accessToken) {
       this.logger.debug(`Cannot create subscription: no token for ${userId}`);
       return false;
@@ -44,7 +47,9 @@ export class MicrosoftSubscriptionService {
     });
 
     if (existing) {
-      this.logger.log(`User ${userId} already has subscription ${existing.subscriptionId}`);
+      this.logger.log(
+        `User ${userId} already has subscription ${existing.subscriptionId}`,
+      );
       const hoursUntilExpiry =
         (existing.expiresAt.getTime() - Date.now()) / (1000 * 60 * 60);
       if (hoursUntilExpiry < 24) {
@@ -120,7 +125,8 @@ export class MicrosoftSubscriptionService {
       return this.createSubscription(userId);
     }
 
-    const accessToken = await this.graphService.getMicrosoftOAuthTokenFromClerk(userId);
+    const accessToken =
+      await this.graphService.getMicrosoftOAuthTokenFromClerk(userId);
     if (!accessToken) {
       this.logger.error(`Cannot renew subscription: no token for ${userId}`);
       return false;
@@ -193,7 +199,8 @@ export class MicrosoftSubscriptionService {
 
     if (!subscription) return;
 
-    const accessToken = await this.graphService.getMicrosoftOAuthTokenFromClerk(userId);
+    const accessToken =
+      await this.graphService.getMicrosoftOAuthTokenFromClerk(userId);
     if (accessToken) {
       try {
         await fetch(
@@ -270,7 +277,9 @@ export class MicrosoftSubscriptionService {
   /**
    * Get user ID by Graph subscription ID (for webhook handling)
    */
-  async getUserBySubscriptionId(subscriptionId: string): Promise<string | null> {
+  async getUserBySubscriptionId(
+    subscriptionId: string,
+  ): Promise<string | null> {
     const subscription = await this.prisma.microsoftSubscription.findUnique({
       where: { subscriptionId },
     });
@@ -289,7 +298,9 @@ export class MicrosoftSubscriptionService {
       where: { expiresAt: { lt: threshold } },
     });
 
-    this.logger.log(`Found ${expiring.length} subscriptions expiring within 24 hours`);
+    this.logger.log(
+      `Found ${expiring.length} subscriptions expiring within 24 hours`,
+    );
 
     let renewed = 0;
     let failed = 0;
@@ -322,7 +333,9 @@ export class MicrosoftSubscriptionService {
       select: { id: true },
     });
 
-    this.logger.log(`Checking ${allUsers.length} users for missing subscriptions`);
+    this.logger.log(
+      `Checking ${allUsers.length} users for missing subscriptions`,
+    );
 
     let created = 0;
     let failed = 0;
@@ -341,10 +354,11 @@ export class MicrosoftSubscriptionService {
       }
 
       // Check if user has a Microsoft OAuth token (use debug level - expected that many users won't have tokens)
-      const accessToken = await this.graphService.getMicrosoftOAuthTokenFromClerk(
-        user.id,
-        'debug',
-      );
+      const accessToken =
+        await this.graphService.getMicrosoftOAuthTokenFromClerk(
+          user.id,
+          'debug',
+        );
       if (!accessToken) {
         skipped++;
         continue;
@@ -364,8 +378,8 @@ export class MicrosoftSubscriptionService {
 
     this.logger.log(
       `Subscription check complete: ${allUsers.length} users checked, ` +
-      `${alreadyHasSubscription} already have subscriptions, ` +
-      `${created} created, ${failed} failed, ${skipped} skipped (no token)`,
+        `${alreadyHasSubscription} already have subscriptions, ` +
+        `${created} created, ${failed} failed, ${skipped} skipped (no token)`,
     );
   }
 
@@ -410,5 +424,3 @@ export class MicrosoftSubscriptionService {
     }
   }
 }
-
-
