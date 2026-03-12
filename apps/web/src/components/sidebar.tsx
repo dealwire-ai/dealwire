@@ -13,8 +13,8 @@ import {
   LayoutTemplate,
   Map,
   LogOut,
-  ChevronLeft,
-  ChevronRight,
+  PanelLeftClose,
+  PanelLeftOpen,
   Settings,
   Building,
   MoreHorizontal,
@@ -72,7 +72,7 @@ function NavLink({ item, collapsed }: { item: NavItem; collapsed: boolean }) {
   const linkContent = (
     <Link
       href={item.href}
-      className={`group flex items-center gap-2.5 rounded-md text-sm transition-all ${
+      className={`group flex items-center gap-2.5 rounded-md text-[13px] transition-all ${
         collapsed ? "px-3 py-2 justify-center" : "px-3 py-1.5"
       } ${
         isActive
@@ -194,12 +194,12 @@ export function Sidebar() {
   return (
     <TooltipProvider delayDuration={200}>
       <aside
-        className={`flex flex-col bg-zinc-950 border-r border-zinc-800/60 h-screen shrink-0 transition-all duration-200 ${
-          collapsed ? "w-[56px]" : "w-[220px]"
+        className={`flex flex-col h-screen shrink-0 transition-all duration-200 ${
+          collapsed ? "w-[56px]" : "w-[240px]"
         }`}
       >
         {/* Logo + collapse toggle */}
-        <div className="px-3 py-4 border-b border-zinc-800/60 flex items-center justify-between min-h-[53px]">
+        <div className="px-3 py-4 flex items-center justify-between min-h-[53px]">
           {!collapsed && (
             <Link href="/" className="flex items-center gap-2.5 min-w-0 group">
               <SignalMark className="shrink-0 w-[28px]" />
@@ -208,25 +208,18 @@ export function Sidebar() {
               </span>
             </Link>
           )}
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                onClick={toggleCollapsed}
-                className={`cursor-pointer text-zinc-600 hover:text-zinc-300 transition-colors rounded-md p-0.5 hover:bg-zinc-800 ${
-                  collapsed ? "mx-auto" : "ml-auto"
-                }`}
-              >
-                {collapsed ? (
-                  <ChevronRight className="w-4 h-4" />
-                ) : (
-                  <ChevronLeft className="w-4 h-4" />
-                )}
-              </button>
-            </TooltipTrigger>
-            <TooltipContent side="right" className="text-xs">
-              {collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            </TooltipContent>
-          </Tooltip>
+          <button
+            onClick={toggleCollapsed}
+            className={`cursor-pointer text-zinc-600 hover:text-zinc-300 transition-colors rounded-md p-0.5 hover:bg-zinc-800 ${
+              collapsed ? "mx-auto" : "ml-auto"
+            }`}
+          >
+            {collapsed ? (
+              <PanelLeftOpen className="w-5 h-5" />
+            ) : (
+              <PanelLeftClose className="w-5 h-5" />
+            )}
+          </button>
         </div>
 
         {/* Nav */}
@@ -240,7 +233,7 @@ export function Sidebar() {
             return (
               <div key={section.title}>
                 {!collapsed && (
-                  <p className="px-3 mb-1 text-[10px] font-medium uppercase tracking-widest text-zinc-600">
+                  <p className="px-3 mb-1 text-[11px] font-medium uppercase tracking-widest text-zinc-600">
                     {section.title}
                   </p>
                 )}
@@ -260,7 +253,7 @@ export function Sidebar() {
         </nav>
 
         {/* Footer */}
-        <div className="border-t border-zinc-800/60 p-2">
+        <div className="p-2">
           <DropdownMenu>
             <Tooltip>
               <TooltipTrigger asChild>
