@@ -303,11 +303,22 @@ export class DealDigestService implements OnModuleInit {
         return;
       }
 
-      // Find a user with Microsoft subscription (prefer first user by createdAt)
+      // Pick the sender: prefer the designated monitoring inbox user, then fall back
+      // to the oldest user with a subscription (same priority as inbox monitoring).
       type UserType = (typeof org.users)[0];
+      const designatedEmail = preferences?.designatedMonitoringInboxEmail;
+      const usersWithSub = org.users.filter(
+        (u: UserType) => u.microsoftSubscription !== null,
+      );
       const userWithMicrosoft =
-        org.users.find((u: UserType) => u.microsoftSubscription !== null) ||
-        org.users[0]; // Fallback to first user if none have Microsoft
+        (designatedEmail
+          ? usersWithSub.find(
+              (u: UserType) =>
+                u.email?.toLowerCase() === designatedEmail.toLowerCase(),
+            )
+          : undefined) ||
+        usersWithSub[0] || // oldest user with subscription (already ordered by createdAt asc)
+        org.users[0]; // last resort: no one has a subscription
 
       // Get Microsoft access token for the selected user
       const accessToken = userWithMicrosoft
