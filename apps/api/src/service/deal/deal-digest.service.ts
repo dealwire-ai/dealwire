@@ -48,11 +48,6 @@ export class DealDigestService implements OnModuleInit {
     this.logger.log(`Deal digest checker scheduled: ${cronExpression}`);
   }
 
-  async checkAndSendDigests(): Promise<void> {
-    this.logger.log('Running deal digest check job');
-    await this.sendDigestsForScheduledOrgs();
-  }
-
   /**
    * Send digests for all organizations that have digestSchedule configured
    */
