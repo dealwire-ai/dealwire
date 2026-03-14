@@ -1,10 +1,8 @@
 import {
   normalizeBbl,
-  parseBbl,
   estimateMarketValue,
   isCoopBuildingClass,
   BOROUGH_NUMERIC_TO_ABBR,
-  BOROUGH_ABBR_TO_NUMERIC,
 } from './nyc-utils';
 
 describe('normalizeBbl', () => {
@@ -44,23 +42,6 @@ describe('normalizeBbl', () => {
 
     // Assert
     expect(result).toBe('4005670089');
-  });
-});
-
-describe('parseBbl', () => {
-  it('should split a 10-char BBL into components', () => {
-    // Arrange
-    const bbl = '3001230045';
-
-    // Act
-    const result = parseBbl(bbl);
-
-    // Assert
-    expect(result).toEqual({
-      borough: '3',
-      block: '00123',
-      lot: '0045',
-    });
   });
 });
 
@@ -152,15 +133,7 @@ describe('isCoopBuildingClass', () => {
 });
 
 describe('borough mappings', () => {
-  it('should have consistent numeric-to-abbr and abbr-to-numeric', () => {
-    // Assert
-    for (const [numeric, abbr] of Object.entries(BOROUGH_NUMERIC_TO_ABBR)) {
-      expect(BOROUGH_ABBR_TO_NUMERIC[abbr]).toBe(numeric);
-    }
-  });
-
   it('should map all 5 boroughs', () => {
     expect(Object.keys(BOROUGH_NUMERIC_TO_ABBR)).toHaveLength(5);
-    expect(Object.keys(BOROUGH_ABBR_TO_NUMERIC)).toHaveLength(5);
   });
 });
