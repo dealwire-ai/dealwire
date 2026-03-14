@@ -109,18 +109,6 @@ export class MicrosoftGraphService {
   }
 
   /**
-   * Check if a message has the X-Dealwire-Sent header (our bot fingerprint)
-   */
-  hasDealwireSentHeader(message: {
-    internetMessageHeaders?: InternetMessageHeader[];
-  }): boolean {
-    const headers = message.internetMessageHeaders || [];
-    return headers.some(
-      (h) => h.name?.toLowerCase() === 'x-dealwire-sent' && h.value === '1',
-    );
-  }
-
-  /**
    * Extract MAPI entry ID from a Graph message's extended properties.
    * Returns the entry ID as an uppercase hex string, or null if not present.
    */
@@ -698,30 +686,6 @@ export class MicrosoftGraphService {
       this.logger.error(`Error moving message ${messageId}: ${msg}`);
       return false;
     }
-  }
-
-  /**
-   * Move a message to a "passed deals" folder (gets or creates folder first)
-   */
-  async moveMessageToPassedFolder(
-    accessToken: string,
-    messageId: string,
-    folderName: string,
-  ): Promise<boolean> {
-    const folderId = await this.getOrCreateFolder(accessToken, folderName);
-    if (!folderId) {
-      return false;
-    }
-
-    // Get the conversation ID to move all messages in the thread
-    const message = await this.getMessage(accessToken, messageId);
-    if (!message?.conversationId) {
-      // Fallback: just move the single message
-      return this.moveMessage(accessToken, messageId, folderId);
-    }
-
-    // Move all messages in the conversation
-    return this.moveConversation(accessToken, message.conversationId, folderId);
   }
 
   /**

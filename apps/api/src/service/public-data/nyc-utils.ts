@@ -13,14 +13,6 @@ export const BOROUGH_NUMERIC_TO_ABBR: Record<string, string> = {
   '5': 'SI', // Staten Island
 };
 
-export const BOROUGH_ABBR_TO_NUMERIC: Record<string, string> = {
-  MN: '1',
-  BX: '2',
-  BK: '3',
-  QN: '4',
-  SI: '5',
-};
-
 export const BOROUGH_NAMES: Record<string, string> = {
   '1': 'Manhattan',
   '2': 'Bronx',
@@ -31,29 +23,30 @@ export const BOROUGH_NAMES: Record<string, string> = {
 
 // Building classes that indicate co-ops (should be excluded from distress analysis)
 export const COOP_BUILDING_CLASSES = [
-  'A8', 'C6', 'C8', 'CC', 'D0', 'D4', 'DC', 'H7', 'R9',
+  'A8',
+  'C6',
+  'C8',
+  'CC',
+  'D0',
+  'D4',
+  'DC',
+  'H7',
+  'R9',
 ];
 
 /**
  * Normalize borough, block, lot into a 10-character BBL string.
  * Format: borough(1) + block(5, zero-padded) + lot(4, zero-padded)
  */
-export function normalizeBbl(borough: string, block: string, lot: string): string {
+export function normalizeBbl(
+  borough: string,
+  block: string,
+  lot: string,
+): string {
   const b = borough.trim();
   const bl = block.trim().padStart(5, '0');
   const lt = lot.trim().padStart(4, '0');
   return `${b}${bl}${lt}`;
-}
-
-/**
- * Parse a 10-char BBL into its components.
- */
-export function parseBbl(bbl: string): { borough: string; block: string; lot: string } {
-  return {
-    borough: bbl.substring(0, 1),
-    block: bbl.substring(1, 6),
-    lot: bbl.substring(6, 10),
-  };
 }
 
 /**
@@ -80,7 +73,9 @@ export function estimateMarketValue(
 /**
  * Check if a building class indicates a co-op.
  */
-export function isCoopBuildingClass(buildingClass: string | null | undefined): boolean {
+export function isCoopBuildingClass(
+  buildingClass: string | null | undefined,
+): boolean {
   if (!buildingClass) return false;
   return COOP_BUILDING_CLASSES.includes(buildingClass.trim().toUpperCase());
 }
