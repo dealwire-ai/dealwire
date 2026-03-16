@@ -16,6 +16,7 @@
 
 ## Tax Lien Analyzer
    - run CARE portal ingestion
+   - Setup Daniel Gabay org
 
 ## Frontstep Acquisition
    - execute + track media outreach
