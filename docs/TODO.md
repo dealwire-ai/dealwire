@@ -1,12 +1,11 @@
 # TODO
 
 ## General Ops
-   - decide on new name / domain
-      - (isaac) eng migration
-      - (noah) gsuite + related accounts
+   - (noah) gsuite + related accounts
    - make a really strong, energetic e2e demo (deal screening, underwriting, (and optionally) IC report generation)
 
 ## Biz Dev
+   -  Send custom deal screener demo to Quinn Breslin
 
 ## Deal Screener
    - **[JK 3/3]** Underwriting pipeline improvements:
@@ -24,4 +23,4 @@
    -    lead scoring + auto-scheduling feature (proposal sent)
     
 ## Survey Platform
-   - do M4 (analytics)
+   - demo M4 (analytics)
