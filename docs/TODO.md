@@ -15,8 +15,6 @@
       - Buttons to easily update screening criteria from digest email as well as "mute" deals that keep getting sent over and over  
 
 ## Tax Lien Analyzer
-   - run CARE portal ingestion
-   - Setup Daniel Gabay org
 
 ## Frontstep Acquisition
    - execute + track media outreach
