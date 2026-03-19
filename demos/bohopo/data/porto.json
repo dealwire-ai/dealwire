@@ -1,602 +1,1642 @@
 [
   {
-    "id": "5df62512-49db-449f-8f59-0d4a602f32e0",
-    "name": "Hotel Grande Batalha",
-    "city": "Porto",
-    "country": "PT",
-    "flag": "\ud83c\uddf5\ud83c\uddf9",
-    "address": "Rua dos Cl\u00e9rigos 28, Porto 4029",
-    "lat": 41.160828,
-    "lng": -8.613194,
-    "rating": 3.8,
-    "review_count": 170,
-    "price_level": 3,
-    "acquisition_score": 25,
-    "maps_url": "https://maps.google.com/?q=41.160828,-8.613194"
-  },
-  {
-    "id": "d3f31719-cef5-44e0-87b6-8e45b51e77d2",
-    "name": "Porto AS 1829",
-    "city": "Porto",
-    "country": "PT",
-    "flag": "\ud83c\uddf5\ud83c\uddf9",
-    "address": "Rua das Flores 31, Porto 4063",
-    "lat": 41.166237,
-    "lng": -8.620503,
-    "rating": 2.4,
-    "review_count": 623,
-    "price_level": 2,
-    "acquisition_score": 65,
-    "maps_url": "https://maps.google.com/?q=41.166237,-8.620503"
-  },
-  {
-    "id": "ab0be3ef-7271-4dca-8a18-8e8863983747",
-    "name": "Hotel Casa do Conto",
-    "city": "Porto",
-    "country": "PT",
-    "flag": "\ud83c\uddf5\ud83c\uddf9",
-    "address": "Rua 31 de Janeiro 66, Porto 4083",
-    "lat": 41.142416,
-    "lng": -8.65405,
-    "rating": 4.2,
-    "review_count": 558,
-    "price_level": 2,
-    "acquisition_score": 20,
-    "maps_url": "https://maps.google.com/?q=41.142416,-8.65405"
-  },
-  {
-    "id": "c01146ed-d639-4612-999a-db6ac8468775",
-    "name": "Ribeira House",
-    "city": "Porto",
-    "country": "PT",
-    "flag": "\ud83c\uddf5\ud83c\uddf9",
-    "address": "Rua 31 de Janeiro 86, Porto 4020",
-    "lat": 41.159309,
-    "lng": -8.638858,
-    "rating": 4.0,
-    "review_count": 444,
-    "price_level": 4,
-    "acquisition_score": 25,
-    "maps_url": "https://maps.google.com/?q=41.159309,-8.638858"
-  },
-  {
-    "id": "162c7b7c-ee75-4996-af1e-585268a0689c",
+    "id": "5e12dad5-3392-43a6-92ff-4d8a64b2adf6",
     "name": "Hotel Carris",
     "city": "Porto",
     "country": "PT",
     "flag": "\ud83c\uddf5\ud83c\uddf9",
-    "address": "Rua das Flores 50, Porto 4070",
-    "lat": 41.130512,
-    "lng": -8.637018,
-    "rating": 4.5,
-    "review_count": 529,
-    "price_level": 2,
-    "acquisition_score": 12,
-    "maps_url": "https://maps.google.com/?q=41.130512,-8.637018"
-  },
-  {
-    "id": "1b07ab9e-e4ae-4055-b500-acb9df8c569c",
-    "name": "Porto City Hotel",
-    "city": "Porto",
-    "country": "PT",
-    "flag": "\ud83c\uddf5\ud83c\uddf9",
-    "address": "Avenida dos Aliados 94, Porto 4094",
-    "lat": 41.165595,
-    "lng": -8.610095,
-    "rating": 4.1,
-    "review_count": 159,
+    "address": "Rua de Cedofeita 45, Porto 4085",
+    "lat": 41.176177,
+    "lng": -8.60055,
+    "rating": 3.1,
+    "review_count": 1154,
     "price_level": 3,
-    "acquisition_score": 18,
-    "maps_url": "https://maps.google.com/?q=41.165595,-8.610095"
+    "room_count": 36,
+    "avg_nightly_rate": 144.0,
+    "cleanliness_rating": 2.8,
+    "service_rating": 3.3,
+    "location_rating": 3.8,
+    "value_rating": 2.6,
+    "review_velocity": 21.0,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-02-27",
+        "rating": 1.4,
+        "text": "Walls are paper thin. Could hear everything from neighboring rooms all night."
+      },
+      {
+        "date": "2026-02-20",
+        "rating": 2.0,
+        "text": "Bed was uncomfortable and linens felt cheap. Expected more for the price."
+      },
+      {
+        "date": "2025-12-29",
+        "rating": 1.8,
+        "text": "Room was outdated and the AC didn't work properly. Staff seemed overwhelmed."
+      }
+    ],
+    "last_updated": "2026-03-19T00:00:00Z",
+    "acquisition_score": 56,
+    "maps_url": "https://maps.google.com/?q=41.176177,-8.60055"
   },
   {
-    "id": "0da27fce-cc46-4955-a3b0-d727a502fa20",
-    "name": "Hotel Corinthia Porto",
+    "id": "3177bf34-b7b2-4879-8d66-e3163f09e587",
+    "name": "Hotel Grande Batalha",
     "city": "Porto",
     "country": "PT",
     "flag": "\ud83c\uddf5\ud83c\uddf9",
-    "address": "Rua de Fernandes Tom\u00e1s 83, Porto 4032",
-    "lat": 41.177723,
-    "lng": -8.616172,
-    "rating": 3.8,
-    "review_count": 568,
-    "price_level": 4,
+    "address": "Rua do Almada 55, Porto 4093",
+    "lat": 41.163022,
+    "lng": -8.645809,
+    "rating": 4.1,
+    "review_count": 396,
+    "price_level": 3,
+    "room_count": 35,
+    "avg_nightly_rate": 159.0,
+    "cleanliness_rating": 4.5,
+    "service_rating": 3.9,
+    "location_rating": 4.3,
+    "value_rating": 4.1,
+    "review_velocity": 7.5,
+    "rating_trend": "flat",
+    "recent_reviews": [
+      {
+        "date": "2026-03-01",
+        "rating": 3.4,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      },
+      {
+        "date": "2026-02-01",
+        "rating": 4.2,
+        "text": "Central location makes up for the small room size. Good value."
+      },
+      {
+        "date": "2026-01-06",
+        "rating": 4.3,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      }
+    ],
+    "last_updated": "2026-03-17T19:00:00Z",
     "acquisition_score": 30,
-    "maps_url": "https://maps.google.com/?q=41.177723,-8.616172"
+    "maps_url": "https://maps.google.com/?q=41.163022,-8.645809"
   },
   {
-    "id": "451a1275-e510-407f-a316-1694a71ec989",
-    "name": "Grande Hotel do Porto",
-    "city": "Porto",
-    "country": "PT",
-    "flag": "\ud83c\uddf5\ud83c\uddf9",
-    "address": "Rua do Carmo 100, Porto 4068",
-    "lat": 41.130119,
-    "lng": -8.649989,
-    "rating": 4.0,
-    "review_count": 214,
-    "price_level": 3,
-    "acquisition_score": 22,
-    "maps_url": "https://maps.google.com/?q=41.130119,-8.649989"
-  },
-  {
-    "id": "255e2a50-fd7d-4865-8d2d-9f231c68d06d",
-    "name": "Hotel Boa Vista",
-    "city": "Porto",
-    "country": "PT",
-    "flag": "\ud83c\uddf5\ud83c\uddf9",
-    "address": "Rua de Cedofeita 105, Porto 4079",
-    "lat": 41.156304,
-    "lng": -8.661537,
-    "rating": 4.1,
-    "review_count": 351,
-    "price_level": 3,
-    "acquisition_score": 21,
-    "maps_url": "https://maps.google.com/?q=41.156304,-8.661537"
-  },
-  {
-    "id": "0e115a58-e2b2-486e-b764-5cd7b1b62da7",
-    "name": "Hotel Ipanema Park",
-    "city": "Porto",
-    "country": "PT",
-    "flag": "\ud83c\uddf5\ud83c\uddf9",
-    "address": "Rua 31 de Janeiro 43, Porto 4044",
-    "lat": 41.135369,
-    "lng": -8.638339,
-    "rating": 3.2,
-    "review_count": 338,
-    "price_level": 3,
-    "acquisition_score": 42,
-    "maps_url": "https://maps.google.com/?q=41.135369,-8.638339"
-  },
-  {
-    "id": "5577daee-0861-44b7-ae29-23c89fd4e1d3",
-    "name": "Dom Henrique Hotel",
-    "city": "Porto",
-    "country": "PT",
-    "flag": "\ud83c\uddf5\ud83c\uddf9",
-    "address": "Rua do Almada 64, Porto 4098",
-    "lat": 41.157751,
-    "lng": -8.599398,
-    "rating": 4.6,
-    "review_count": 417,
-    "price_level": 3,
-    "acquisition_score": 10,
-    "maps_url": "https://maps.google.com/?q=41.157751,-8.599398"
-  },
-  {
-    "id": "b3f37f1a-8409-4cd0-8cfe-e34ac0dd8662",
-    "name": "Hotel Real Pal\u00e1cio Porto",
-    "city": "Porto",
-    "country": "PT",
-    "flag": "\ud83c\uddf5\ud83c\uddf9",
-    "address": "Rua do Bonjardim 106, Porto 4033",
-    "lat": 41.160628,
-    "lng": -8.641615,
-    "rating": 4.5,
-    "review_count": 170,
-    "price_level": 2,
-    "acquisition_score": 10,
-    "maps_url": "https://maps.google.com/?q=41.160628,-8.641615"
-  },
-  {
-    "id": "3b17438c-4e1e-465d-9374-7d9640f5bb99",
-    "name": "Sheraton Porto",
-    "city": "Porto",
-    "country": "PT",
-    "flag": "\ud83c\uddf5\ud83c\uddf9",
-    "address": "Rua de Cedofeita 22, Porto 4098",
-    "lat": 41.154535,
-    "lng": -8.632801,
-    "rating": 4.1,
-    "review_count": 628,
-    "price_level": 3,
-    "acquisition_score": 23,
-    "maps_url": "https://maps.google.com/?q=41.154535,-8.632801"
-  },
-  {
-    "id": "af3b4c1b-aaea-465a-a569-cdbd0c2d893e",
-    "name": "Hotel das Artes",
-    "city": "Porto",
-    "country": "PT",
-    "flag": "\ud83c\uddf5\ud83c\uddf9",
-    "address": "Rua 31 de Janeiro 102, Porto 4017",
-    "lat": 41.132402,
-    "lng": -8.619474,
-    "rating": 4.4,
-    "review_count": 460,
-    "price_level": 2,
-    "acquisition_score": 15,
-    "maps_url": "https://maps.google.com/?q=41.132402,-8.619474"
-  },
-  {
-    "id": "9286ecaf-eb18-4b49-b2e2-a2252bc927d0",
-    "name": "Hotel Nacional Porto",
-    "city": "Porto",
-    "country": "PT",
-    "flag": "\ud83c\uddf5\ud83c\uddf9",
-    "address": "Rua do Almada 109, Porto 4087",
-    "lat": 41.168585,
-    "lng": -8.633428,
-    "rating": 4.4,
-    "review_count": 1199,
-    "price_level": 2,
-    "acquisition_score": 15,
-    "maps_url": "https://maps.google.com/?q=41.168585,-8.633428"
-  },
-  {
-    "id": "99ec8358-aad1-487a-ac39-12ccc4e27a75",
-    "name": "Hotel Flow",
-    "city": "Porto",
-    "country": "PT",
-    "flag": "\ud83c\uddf5\ud83c\uddf9",
-    "address": "Rua do Bonjardim 5, Porto 4087",
-    "lat": 41.137106,
-    "lng": -8.632605,
-    "rating": 2.9,
-    "review_count": 676,
-    "price_level": 2,
-    "acquisition_score": 52,
-    "maps_url": "https://maps.google.com/?q=41.137106,-8.632605"
-  },
-  {
-    "id": "a8b413d2-4ece-49f7-a92c-4f4b0a3b7223",
-    "name": "Hotel Mercure Porto",
-    "city": "Porto",
-    "country": "PT",
-    "flag": "\ud83c\uddf5\ud83c\uddf9",
-    "address": "Rua do Infante D. Henrique 51, Porto 4050",
-    "lat": 41.166874,
-    "lng": -8.646627,
-    "rating": 3.9,
-    "review_count": 216,
-    "price_level": 2,
-    "acquisition_score": 24,
-    "maps_url": "https://maps.google.com/?q=41.166874,-8.646627"
-  },
-  {
-    "id": "622957f5-6dae-4747-806e-44c2708c3010",
-    "name": "Douro Palace Hotel",
-    "city": "Porto",
-    "country": "PT",
-    "flag": "\ud83c\uddf5\ud83c\uddf9",
-    "address": "Rua da Vit\u00f3ria 16, Porto 4043",
-    "lat": 41.174398,
-    "lng": -8.614817,
-    "rating": 4.2,
-    "review_count": 417,
-    "price_level": 2,
-    "acquisition_score": 19,
-    "maps_url": "https://maps.google.com/?q=41.174398,-8.614817"
-  },
-  {
-    "id": "bf9884c6-e8a1-4ab1-8437-73c9876095ff",
-    "name": "Hotel Arca d'\u00c1gua",
-    "city": "Porto",
-    "country": "PT",
-    "flag": "\ud83c\uddf5\ud83c\uddf9",
-    "address": "Avenida dos Aliados 16, Porto 4027",
-    "lat": 41.17907,
-    "lng": -8.632457,
-    "rating": 4.4,
-    "review_count": 1448,
-    "price_level": 3,
-    "acquisition_score": 15,
-    "maps_url": "https://maps.google.com/?q=41.17907,-8.632457"
-  },
-  {
-    "id": "ae1d64c0-0d27-435a-b940-277e74b7666c",
-    "name": "Porto Palacio",
-    "city": "Porto",
-    "country": "PT",
-    "flag": "\ud83c\uddf5\ud83c\uddf9",
-    "address": "Rua de Fernandes Tom\u00e1s 41, Porto 4095",
-    "lat": 41.148746,
-    "lng": -8.659554,
-    "rating": 3.9,
-    "review_count": 720,
-    "price_level": 3,
-    "acquisition_score": 28,
-    "maps_url": "https://maps.google.com/?q=41.148746,-8.659554"
-  },
-  {
-    "id": "85447ad5-31f9-4646-9470-cc69d8ac38d8",
-    "name": "H\u00f4tel Universal Porto",
-    "city": "Porto",
-    "country": "PT",
-    "flag": "\ud83c\uddf5\ud83c\uddf9",
-    "address": "Rua do Carmo 82, Porto 4032",
-    "lat": 41.175522,
-    "lng": -8.628487,
-    "rating": 4.6,
-    "review_count": 757,
-    "price_level": 2,
-    "acquisition_score": 10,
-    "maps_url": "https://maps.google.com/?q=41.175522,-8.628487"
-  },
-  {
-    "id": "6d5765bb-5a55-460d-b07e-7e7294bdc72d",
-    "name": "The Yeatman",
-    "city": "Porto",
-    "country": "PT",
-    "flag": "\ud83c\uddf5\ud83c\uddf9",
-    "address": "Rua das Flores 47, Porto 4080",
-    "lat": 41.162237,
-    "lng": -8.631382,
-    "rating": 2.2,
-    "review_count": 1155,
-    "price_level": 4,
-    "acquisition_score": 70,
-    "maps_url": "https://maps.google.com/?q=41.162237,-8.631382"
-  },
-  {
-    "id": "5570e9d0-08d2-46a3-9344-b11aff79dd4c",
-    "name": "Hotel Vit\u00f3ria",
-    "city": "Porto",
-    "country": "PT",
-    "flag": "\ud83c\uddf5\ud83c\uddf9",
-    "address": "Rua de Cedofeita 92, Porto 4071",
-    "lat": 41.159442,
-    "lng": -8.610258,
-    "rating": 3.2,
-    "review_count": 370,
-    "price_level": 3,
-    "acquisition_score": 43,
-    "maps_url": "https://maps.google.com/?q=41.159442,-8.610258"
-  },
-  {
-    "id": "8ed6c49a-adbd-431b-b5e7-0945512630f1",
-    "name": "Hotel Infante Sagres",
-    "city": "Porto",
-    "country": "PT",
-    "flag": "\ud83c\uddf5\ud83c\uddf9",
-    "address": "Rua Mouzinho da Silveira 60, Porto 4097",
-    "lat": 41.158942,
-    "lng": -8.655117,
-    "rating": 3.4,
-    "review_count": 958,
-    "price_level": 3,
-    "acquisition_score": 40,
-    "maps_url": "https://maps.google.com/?q=41.158942,-8.655117"
-  },
-  {
-    "id": "feda6d33-2653-42e9-b83f-9129c1f8de7c",
-    "name": "Hotel Inatel Porto",
-    "city": "Porto",
-    "country": "PT",
-    "flag": "\ud83c\uddf5\ud83c\uddf9",
-    "address": "Rua do Almada 56, Porto 4074",
-    "lat": 41.182543,
-    "lng": -8.660221,
-    "rating": 4.3,
-    "review_count": 833,
-    "price_level": 2,
-    "acquisition_score": 18,
-    "maps_url": "https://maps.google.com/?q=41.182543,-8.660221"
-  },
-  {
-    "id": "0e1ab516-1c8b-45c5-a6d2-d30520276d45",
-    "name": "Hotel Am\u00e9rica",
-    "city": "Porto",
-    "country": "PT",
-    "flag": "\ud83c\uddf5\ud83c\uddf9",
-    "address": "Rua do Carmo 29, Porto 4054",
-    "lat": 41.184749,
-    "lng": -8.627777,
-    "rating": 2.2,
-    "review_count": 641,
-    "price_level": 2,
-    "acquisition_score": 70,
-    "maps_url": "https://maps.google.com/?q=41.184749,-8.627777"
-  },
-  {
-    "id": "252cc585-7aaa-4f77-b152-5e97e3fc4060",
-    "name": "Hotel Modern Porto",
-    "city": "Porto",
-    "country": "PT",
-    "flag": "\ud83c\uddf5\ud83c\uddf9",
-    "address": "Rua dos Cl\u00e9rigos 17, Porto 4090",
-    "lat": 41.146069,
-    "lng": -8.626757,
-    "rating": 2.3,
-    "review_count": 1506,
-    "price_level": 3,
-    "acquisition_score": 68,
-    "maps_url": "https://maps.google.com/?q=41.146069,-8.626757"
-  },
-  {
-    "id": "a184500b-a962-452a-a8e6-acc6a5a814e7",
-    "name": "Hotel Leix\u00f5es",
-    "city": "Porto",
-    "country": "PT",
-    "flag": "\ud83c\uddf5\ud83c\uddf9",
-    "address": "Rua 31 de Janeiro 80, Porto 4087",
-    "lat": 41.148157,
-    "lng": -8.599425,
-    "rating": 3.3,
-    "review_count": 488,
-    "price_level": 1,
-    "acquisition_score": 42,
-    "maps_url": "https://maps.google.com/?q=41.148157,-8.599425"
-  },
-  {
-    "id": "b666c5d1-9577-4b3f-8927-310cfe04c910",
-    "name": "InterContinental Porto",
-    "city": "Porto",
-    "country": "PT",
-    "flag": "\ud83c\uddf5\ud83c\uddf9",
-    "address": "Rua das Taipas 74, Porto 4043",
-    "lat": 41.166968,
-    "lng": -8.610413,
-    "rating": 3.9,
-    "review_count": 1186,
-    "price_level": 2,
-    "acquisition_score": 28,
-    "maps_url": "https://maps.google.com/?q=41.166968,-8.610413"
-  },
-  {
-    "id": "93d6818e-e02f-450c-a3eb-61f989dd4541",
-    "name": "Hotel Quality Inn Porto",
-    "city": "Porto",
-    "country": "PT",
-    "flag": "\ud83c\uddf5\ud83c\uddf9",
-    "address": "Rua dos Cl\u00e9rigos 83, Porto 4048",
-    "lat": 41.156877,
-    "lng": -8.607772,
-    "rating": 4.2,
-    "review_count": 655,
-    "price_level": 3,
-    "acquisition_score": 20,
-    "maps_url": "https://maps.google.com/?q=41.156877,-8.607772"
-  },
-  {
-    "id": "3fba7d66-9c01-4fa2-8c60-bafe1fa113c5",
+    "id": "3c4cb908-414f-4c59-979e-8fc593a34ea9",
     "name": "Hotel Monumental",
     "city": "Porto",
     "country": "PT",
     "flag": "\ud83c\uddf5\ud83c\uddf9",
-    "address": "Rua Mouzinho da Silveira 54, Porto 4071",
-    "lat": 41.155767,
-    "lng": -8.640287,
-    "rating": 2.1,
-    "review_count": 360,
-    "price_level": 2,
-    "acquisition_score": 69,
-    "maps_url": "https://maps.google.com/?q=41.155767,-8.640287"
-  },
-  {
-    "id": "7e29c711-e40c-40d6-bf83-202cd1b22300",
-    "name": "Hotel Malaposta",
-    "city": "Porto",
-    "country": "PT",
-    "flag": "\ud83c\uddf5\ud83c\uddf9",
-    "address": "Rua do Infante D. Henrique 52, Porto 4026",
-    "lat": 41.17354,
-    "lng": -8.628051,
-    "rating": 4.1,
-    "review_count": 1348,
-    "price_level": 2,
-    "acquisition_score": 23,
-    "maps_url": "https://maps.google.com/?q=41.17354,-8.628051"
-  },
-  {
-    "id": "9bed17cf-d659-4bb8-84d7-c8cb36cea881",
-    "name": "Hotel Bessa",
-    "city": "Porto",
-    "country": "PT",
-    "flag": "\ud83c\uddf5\ud83c\uddf9",
-    "address": "Rua do Almada 13, Porto 4016",
-    "lat": 41.145313,
-    "lng": -8.63721,
-    "rating": 2.2,
-    "review_count": 756,
+    "address": "Rua do Almada 13, Porto 4037",
+    "lat": 41.158401,
+    "lng": -8.609074,
+    "rating": 2.3,
+    "review_count": 1144,
     "price_level": 3,
-    "acquisition_score": 70,
-    "maps_url": "https://maps.google.com/?q=41.145313,-8.63721"
+    "room_count": 37,
+    "avg_nightly_rate": 165.0,
+    "cleanliness_rating": 1.8,
+    "service_rating": 2.1,
+    "location_rating": 2.8,
+    "value_rating": 2.5,
+    "review_velocity": 28.6,
+    "rating_trend": "declining",
+    "recent_reviews": [
+      {
+        "date": "2026-02-21",
+        "rating": 1.2,
+        "text": "Elevator was broken during our entire stay. Had to carry luggage up 4 flights."
+      },
+      {
+        "date": "2026-02-04",
+        "rating": 1.7,
+        "text": "Checked in at 3pm and the room still wasn't ready. No apology from front desk."
+      },
+      {
+        "date": "2025-12-24",
+        "rating": 2.4,
+        "text": "Room was outdated and the AC didn't work properly. Staff seemed overwhelmed."
+      }
+    ],
+    "last_updated": "2026-03-18T12:00:00Z",
+    "acquisition_score": 76,
+    "maps_url": "https://maps.google.com/?q=41.158401,-8.609074"
   },
   {
-    "id": "d821beee-fc82-403f-a668-6f00c16ae671",
-    "name": "Hotel Exe Almada Porto",
+    "id": "bbd40cc8-1709-47a1-9219-b56297730f1e",
+    "name": "Hotel Casa do Conto",
     "city": "Porto",
     "country": "PT",
     "flag": "\ud83c\uddf5\ud83c\uddf9",
-    "address": "Rua do Infante D. Henrique 120, Porto 4083",
-    "lat": 41.171168,
-    "lng": -8.650812,
-    "rating": 3.2,
-    "review_count": 494,
+    "address": "Rua do Bonjardim 8, Porto 4032",
+    "lat": 41.166317,
+    "lng": -8.633372,
+    "rating": 4.3,
+    "review_count": 757,
     "price_level": 2,
-    "acquisition_score": 45,
-    "maps_url": "https://maps.google.com/?q=41.171168,-8.650812"
+    "room_count": 38,
+    "avg_nightly_rate": 117.0,
+    "cleanliness_rating": 4.0,
+    "service_rating": 3.7,
+    "location_rating": 4.8,
+    "value_rating": 4.2,
+    "review_velocity": 17.6,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-02-19",
+        "rating": 3.5,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
+      },
+      {
+        "date": "2026-02-20",
+        "rating": 3.1,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      },
+      {
+        "date": "2026-01-14",
+        "rating": 3.5,
+        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
+      }
+    ],
+    "last_updated": "2026-03-18T12:00:00Z",
+    "acquisition_score": 26,
+    "maps_url": "https://maps.google.com/?q=41.166317,-8.633372"
   },
   {
-    "id": "9de094f6-a9ba-4ebc-91f2-e3e5cdfeed63",
-    "name": "Hotel Casa da Cal\u00e7ada",
+    "id": "bff424d8-89a9-46de-8a00-5749e295f2a5",
+    "name": "Hotel Inatel Porto",
     "city": "Porto",
     "country": "PT",
     "flag": "\ud83c\uddf5\ud83c\uddf9",
-    "address": "Rua Mouzinho da Silveira 3, Porto 4021",
-    "lat": 41.184614,
-    "lng": -8.628719,
-    "rating": 4.2,
-    "review_count": 1019,
-    "price_level": 4,
+    "address": "Rua do Carmo 9, Porto 4021",
+    "lat": 41.160876,
+    "lng": -8.61327,
+    "rating": 4.0,
+    "review_count": 91,
+    "price_level": 3,
+    "room_count": 36,
+    "avg_nightly_rate": 138.0,
+    "cleanliness_rating": 4.2,
+    "service_rating": 3.6,
+    "location_rating": 4.8,
+    "value_rating": 3.9,
+    "review_velocity": 1.9,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-03-04",
+        "rating": 3.6,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      },
+      {
+        "date": "2026-02-14",
+        "rating": 3.8,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      },
+      {
+        "date": "2026-01-10",
+        "rating": 4.2,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      }
+    ],
+    "last_updated": "2026-03-18T21:00:00Z",
+    "acquisition_score": 26,
+    "maps_url": "https://maps.google.com/?q=41.160876,-8.61327"
+  },
+  {
+    "id": "d15cd494-4cf3-43f9-9105-2e90c467c3f4",
+    "name": "Hotel Vit\u00f3ria",
+    "city": "Porto",
+    "country": "PT",
+    "flag": "\ud83c\uddf5\ud83c\uddf9",
+    "address": "Rua do Carmo 57, Porto 4058",
+    "lat": 41.16169,
+    "lng": -8.610202,
+    "rating": 4.5,
+    "review_count": 598,
+    "price_level": 3,
+    "room_count": 52,
+    "avg_nightly_rate": 147.0,
+    "cleanliness_rating": 4.4,
+    "service_rating": 4.5,
+    "location_rating": 4.5,
+    "value_rating": 4.0,
+    "review_velocity": 15.7,
+    "rating_trend": "flat",
+    "recent_reviews": [
+      {
+        "date": "2026-03-05",
+        "rating": 4.2,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      },
+      {
+        "date": "2026-01-25",
+        "rating": 3.8,
+        "text": "Central location makes up for the small room size. Good value."
+      },
+      {
+        "date": "2026-01-31",
+        "rating": 3.4,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      }
+    ],
+    "last_updated": "2026-03-19T08:00:00Z",
+    "acquisition_score": 16,
+    "maps_url": "https://maps.google.com/?q=41.16169,-8.610202"
+  },
+  {
+    "id": "9779554d-007b-41a3-9434-34f4ad8ddec5",
+    "name": "Hotel Real Pal\u00e1cio Porto",
+    "city": "Porto",
+    "country": "PT",
+    "flag": "\ud83c\uddf5\ud83c\uddf9",
+    "address": "Rua da Vit\u00f3ria 120, Porto 4032",
+    "lat": 41.156493,
+    "lng": -8.639352,
+    "rating": 4.5,
+    "review_count": 378,
+    "price_level": 3,
+    "room_count": 28,
+    "avg_nightly_rate": 186.0,
+    "cleanliness_rating": 4.6,
+    "service_rating": 4.8,
+    "location_rating": 4.9,
+    "value_rating": 4.1,
+    "review_velocity": 6.4,
+    "rating_trend": "flat",
+    "recent_reviews": [
+      {
+        "date": "2026-03-04",
+        "rating": 3.3,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      },
+      {
+        "date": "2026-02-05",
+        "rating": 3.2,
+        "text": "Central location makes up for the small room size. Good value."
+      },
+      {
+        "date": "2026-01-25",
+        "rating": 4.4,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      }
+    ],
+    "last_updated": "2026-03-17T18:00:00Z",
     "acquisition_score": 20,
-    "maps_url": "https://maps.google.com/?q=41.184614,-8.628719"
+    "maps_url": "https://maps.google.com/?q=41.156493,-8.639352"
   },
   {
-    "id": "c468b4da-8ca2-4884-be2e-87c5e1be3e36",
-    "name": "Hotel Pestana Porto",
-    "city": "Porto",
-    "country": "PT",
-    "flag": "\ud83c\uddf5\ud83c\uddf9",
-    "address": "Rua Mouzinho da Silveira 77, Porto 4093",
-    "lat": 41.168251,
-    "lng": -8.644098,
-    "rating": 2.5,
-    "review_count": 343,
-    "price_level": 1,
-    "acquisition_score": 59,
-    "maps_url": "https://maps.google.com/?q=41.168251,-8.644098"
-  },
-  {
-    "id": "b9c999fb-628f-44a1-b426-c3218c38571e",
-    "name": "Hotel Eurostars",
-    "city": "Porto",
-    "country": "PT",
-    "flag": "\ud83c\uddf5\ud83c\uddf9",
-    "address": "Rua do Infante D. Henrique 98, Porto 4061",
-    "lat": 41.149856,
-    "lng": -8.636059,
-    "rating": 2.2,
-    "review_count": 593,
-    "price_level": 3,
-    "acquisition_score": 70,
-    "maps_url": "https://maps.google.com/?q=41.149856,-8.636059"
-  },
-  {
-    "id": "6a250e9f-4501-4865-bba7-74974946d14c",
-    "name": "Hotel da Bolsa",
-    "city": "Porto",
-    "country": "PT",
-    "flag": "\ud83c\uddf5\ud83c\uddf9",
-    "address": "Rua da Vit\u00f3ria 58, Porto 4080",
-    "lat": 41.144683,
-    "lng": -8.594864,
-    "rating": 2.8,
-    "review_count": 383,
-    "price_level": 3,
-    "acquisition_score": 53,
-    "maps_url": "https://maps.google.com/?q=41.144683,-8.594864"
-  },
-  {
-    "id": "df57d2cd-1b55-4833-a83f-0e1592ab169a",
+    "id": "48303227-1587-4f60-be2c-973182f9a500",
     "name": "Hotel Ateneu",
     "city": "Porto",
     "country": "PT",
     "flag": "\ud83c\uddf5\ud83c\uddf9",
-    "address": "Rua das Taipas 44, Porto 4081",
-    "lat": 41.184237,
-    "lng": -8.611252,
-    "rating": 3.4,
-    "review_count": 704,
+    "address": "Rua de Fernandes Tom\u00e1s 70, Porto 4015",
+    "lat": 41.178781,
+    "lng": -8.638116,
+    "rating": 4.2,
+    "review_count": 70,
     "price_level": 2,
-    "acquisition_score": 40,
-    "maps_url": "https://maps.google.com/?q=41.184237,-8.611252"
+    "room_count": 48,
+    "avg_nightly_rate": 122.0,
+    "cleanliness_rating": 4.2,
+    "service_rating": 3.9,
+    "location_rating": 4.3,
+    "value_rating": 4.4,
+    "review_velocity": 1.3,
+    "rating_trend": "flat",
+    "recent_reviews": [
+      {
+        "date": "2026-03-05",
+        "rating": 3.1,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      },
+      {
+        "date": "2026-01-24",
+        "rating": 4.4,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      },
+      {
+        "date": "2026-01-29",
+        "rating": 3.6,
+        "text": "Central location makes up for the small room size. Good value."
+      }
+    ],
+    "last_updated": "2026-03-17T18:00:00Z",
+    "acquisition_score": 22,
+    "maps_url": "https://maps.google.com/?q=41.178781,-8.638116"
   },
   {
-    "id": "f3756221-3e60-4fa5-9ba6-15073bd4f427",
+    "id": "20efc87b-867b-4f99-afd9-ac75617db1e0",
+    "name": "Hotel Infante Sagres",
+    "city": "Porto",
+    "country": "PT",
+    "flag": "\ud83c\uddf5\ud83c\uddf9",
+    "address": "Rua da Vit\u00f3ria 59, Porto 4050",
+    "lat": 41.169253,
+    "lng": -8.663273,
+    "rating": 4.2,
+    "review_count": 203,
+    "price_level": 2,
+    "room_count": 36,
+    "avg_nightly_rate": 86.0,
+    "cleanliness_rating": 4.2,
+    "service_rating": 3.9,
+    "location_rating": 4.6,
+    "value_rating": 3.8,
+    "review_velocity": 4.0,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-03-02",
+        "rating": 3.3,
+        "text": "Central location makes up for the small room size. Good value."
+      },
+      {
+        "date": "2026-01-24",
+        "rating": 3.6,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      },
+      {
+        "date": "2026-01-08",
+        "rating": 4.3,
+        "text": "Central location makes up for the small room size. Good value."
+      }
+    ],
+    "last_updated": "2026-03-18T20:00:00Z",
+    "acquisition_score": 25,
+    "maps_url": "https://maps.google.com/?q=41.169253,-8.663273"
+  },
+  {
+    "id": "2de8d6db-1d02-484b-b31c-95dcac831669",
+    "name": "Ribeira House",
+    "city": "Porto",
+    "country": "PT",
+    "flag": "\ud83c\uddf5\ud83c\uddf9",
+    "address": "Rua 31 de Janeiro 30, Porto 4022",
+    "lat": 41.171149,
+    "lng": -8.607814,
+    "rating": 4.3,
+    "review_count": 1300,
+    "price_level": 3,
+    "room_count": 46,
+    "avg_nightly_rate": 126.0,
+    "cleanliness_rating": 4.5,
+    "service_rating": 4.4,
+    "location_rating": 4.7,
+    "value_rating": 3.7,
+    "review_velocity": 26.5,
+    "rating_trend": "flat",
+    "recent_reviews": [
+      {
+        "date": "2026-02-20",
+        "rating": 4.2,
+        "text": "Central location makes up for the small room size. Good value."
+      },
+      {
+        "date": "2026-02-01",
+        "rating": 3.8,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      },
+      {
+        "date": "2025-12-26",
+        "rating": 3.6,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
+      }
+    ],
+    "last_updated": "2026-03-17T17:00:00Z",
+    "acquisition_score": 26,
+    "maps_url": "https://maps.google.com/?q=41.171149,-8.607814"
+  },
+  {
+    "id": "03688bbe-5344-4024-aa50-5c9bb816dbb8",
+    "name": "Hotel Malaposta",
+    "city": "Porto",
+    "country": "PT",
+    "flag": "\ud83c\uddf5\ud83c\uddf9",
+    "address": "Rua de Fernandes Tom\u00e1s 81, Porto 4022",
+    "lat": 41.154891,
+    "lng": -8.640674,
+    "rating": 2.3,
+    "review_count": 584,
+    "price_level": 2,
+    "room_count": 35,
+    "avg_nightly_rate": 126.0,
+    "cleanliness_rating": 2.0,
+    "service_rating": 1.7,
+    "location_rating": 2.4,
+    "value_rating": 2.6,
+    "review_velocity": 10.6,
+    "rating_trend": "declining",
+    "recent_reviews": [
+      {
+        "date": "2026-02-22",
+        "rating": 2.3,
+        "text": "Rude reception staff. Asked for extra towels twice and never received them."
+      },
+      {
+        "date": "2026-02-09",
+        "rating": 1.6,
+        "text": "Breakfast options were minimal and low quality. Stale bread, instant coffee."
+      },
+      {
+        "date": "2026-01-11",
+        "rating": 2.0,
+        "text": "Rude reception staff. Asked for extra towels twice and never received them."
+      }
+    ],
+    "last_updated": "2026-03-17T14:00:00Z",
+    "acquisition_score": 76,
+    "maps_url": "https://maps.google.com/?q=41.154891,-8.640674"
+  },
+  {
+    "id": "768d145c-5550-4199-b4d2-aeb081c4a16d",
+    "name": "InterContinental Porto",
+    "city": "Porto",
+    "country": "PT",
+    "flag": "\ud83c\uddf5\ud83c\uddf9",
+    "address": "Rua Mouzinho da Silveira 81, Porto 4028",
+    "lat": 41.179995,
+    "lng": -8.619259,
+    "rating": 3.9,
+    "review_count": 640,
+    "price_level": 4,
+    "room_count": 32,
+    "avg_nightly_rate": 233.0,
+    "cleanliness_rating": 3.7,
+    "service_rating": 4.2,
+    "location_rating": 4.0,
+    "value_rating": 3.6,
+    "review_velocity": 13.9,
+    "rating_trend": "flat",
+    "recent_reviews": [
+      {
+        "date": "2026-03-03",
+        "rating": 3.9,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      },
+      {
+        "date": "2026-01-26",
+        "rating": 4.3,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      },
+      {
+        "date": "2026-01-08",
+        "rating": 3.6,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      }
+    ],
+    "last_updated": "2026-03-19T02:00:00Z",
+    "acquisition_score": 36,
+    "maps_url": "https://maps.google.com/?q=41.179995,-8.619259"
+  },
+  {
+    "id": "529c40ac-0ddf-4b04-9688-b8acc7331755",
+    "name": "Hotel Casa da Cal\u00e7ada",
+    "city": "Porto",
+    "country": "PT",
+    "flag": "\ud83c\uddf5\ud83c\uddf9",
+    "address": "Rua dos Cl\u00e9rigos 96, Porto 4099",
+    "lat": 41.172884,
+    "lng": -8.64936,
+    "rating": 3.9,
+    "review_count": 290,
+    "price_level": 2,
+    "room_count": 23,
+    "avg_nightly_rate": 126.0,
+    "cleanliness_rating": 3.8,
+    "service_rating": 3.4,
+    "location_rating": 4.5,
+    "value_rating": 3.8,
+    "review_velocity": 7.6,
+    "rating_trend": "flat",
+    "recent_reviews": [
+      {
+        "date": "2026-02-21",
+        "rating": 3.1,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      },
+      {
+        "date": "2026-01-27",
+        "rating": 3.3,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      },
+      {
+        "date": "2026-01-13",
+        "rating": 3.9,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      }
+    ],
+    "last_updated": "2026-03-19T05:00:00Z",
+    "acquisition_score": 33,
+    "maps_url": "https://maps.google.com/?q=41.172884,-8.64936"
+  },
+  {
+    "id": "9def3d32-499b-4b4a-8898-044fa82c41fe",
+    "name": "Hotel da Bolsa",
+    "city": "Porto",
+    "country": "PT",
+    "flag": "\ud83c\uddf5\ud83c\uddf9",
+    "address": "Rua do Infante D. Henrique 111, Porto 4051",
+    "lat": 41.179754,
+    "lng": -8.631396,
+    "rating": 4.0,
+    "review_count": 123,
+    "price_level": 3,
+    "room_count": 50,
+    "avg_nightly_rate": 154.0,
+    "cleanliness_rating": 3.5,
+    "service_rating": 4.3,
+    "location_rating": 4.4,
+    "value_rating": 4.0,
+    "review_velocity": 2.5,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-02-20",
+        "rating": 3.8,
+        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
+      },
+      {
+        "date": "2026-02-01",
+        "rating": 3.7,
+        "text": "Central location makes up for the small room size. Good value."
+      },
+      {
+        "date": "2026-01-17",
+        "rating": 3.7,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      }
+    ],
+    "last_updated": "2026-03-18T14:00:00Z",
+    "acquisition_score": 27,
+    "maps_url": "https://maps.google.com/?q=41.179754,-8.631396"
+  },
+  {
+    "id": "0486e41d-0085-4e94-8090-fab043180747",
+    "name": "Hotel Eurostars",
+    "city": "Porto",
+    "country": "PT",
+    "flag": "\ud83c\uddf5\ud83c\uddf9",
+    "address": "Rua da Vit\u00f3ria 105, Porto 4027",
+    "lat": 41.148533,
+    "lng": -8.631256,
+    "rating": 3.9,
+    "review_count": 81,
+    "price_level": 1,
+    "room_count": 49,
+    "avg_nightly_rate": 83.0,
+    "cleanliness_rating": 3.8,
+    "service_rating": 3.3,
+    "location_rating": 4.2,
+    "value_rating": 3.6,
+    "review_velocity": 1.9,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-02-23",
+        "rating": 3.3,
+        "text": "Central location makes up for the small room size. Good value."
+      },
+      {
+        "date": "2026-01-24",
+        "rating": 3.4,
+        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
+      },
+      {
+        "date": "2025-12-21",
+        "rating": 4.2,
+        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
+      }
+    ],
+    "last_updated": "2026-03-18T23:00:00Z",
+    "acquisition_score": 27,
+    "maps_url": "https://maps.google.com/?q=41.148533,-8.631256"
+  },
+  {
+    "id": "5cda1466-81aa-477d-bed8-735445c4b365",
+    "name": "Sheraton Porto",
+    "city": "Porto",
+    "country": "PT",
+    "flag": "\ud83c\uddf5\ud83c\uddf9",
+    "address": "Rua das Taipas 103, Porto 4088",
+    "lat": 41.176354,
+    "lng": -8.616175,
+    "rating": 2.6,
+    "review_count": 571,
+    "price_level": 2,
+    "room_count": 41,
+    "avg_nightly_rate": 118.0,
+    "cleanliness_rating": 2.4,
+    "service_rating": 2.9,
+    "location_rating": 2.7,
+    "value_rating": 2.3,
+    "review_velocity": 10.2,
+    "rating_trend": "declining",
+    "recent_reviews": [
+      {
+        "date": "2026-02-26",
+        "rating": 2.4,
+        "text": "Walls are paper thin. Could hear everything from neighboring rooms all night."
+      },
+      {
+        "date": "2026-01-20",
+        "rating": 1.6,
+        "text": "Checked in at 3pm and the room still wasn't ready. No apology from front desk."
+      },
+      {
+        "date": "2026-01-22",
+        "rating": 2.9,
+        "text": "Room was outdated and the AC didn't work properly. Staff seemed overwhelmed."
+      }
+    ],
+    "last_updated": "2026-03-19T12:00:00Z",
+    "acquisition_score": 68,
+    "maps_url": "https://maps.google.com/?q=41.176354,-8.616175"
+  },
+  {
+    "id": "670bdcee-8ead-4105-9b51-a106e6c6d1d0",
+    "name": "Hotel Bessa",
+    "city": "Porto",
+    "country": "PT",
+    "flag": "\ud83c\uddf5\ud83c\uddf9",
+    "address": "Rua do Carmo 57, Porto 4011",
+    "lat": 41.141869,
+    "lng": -8.653552,
+    "rating": 2.1,
+    "review_count": 597,
+    "price_level": 2,
+    "room_count": 30,
+    "avg_nightly_rate": 85.0,
+    "cleanliness_rating": 2.3,
+    "service_rating": 2.5,
+    "location_rating": 2.5,
+    "value_rating": 2.3,
+    "review_velocity": 13.0,
+    "rating_trend": "declining",
+    "recent_reviews": [
+      {
+        "date": "2026-03-08",
+        "rating": 1.5,
+        "text": "Room was outdated and the AC didn't work properly. Staff seemed overwhelmed."
+      },
+      {
+        "date": "2026-01-26",
+        "rating": 2.1,
+        "text": "Terrible experience. Dirty bathroom, noisy hallway, and breakfast was inedible."
+      },
+      {
+        "date": "2026-01-20",
+        "rating": 2.8,
+        "text": "Checked in at 3pm and the room still wasn't ready. No apology from front desk."
+      }
+    ],
+    "last_updated": "2026-03-18T21:00:00Z",
+    "acquisition_score": 80,
+    "maps_url": "https://maps.google.com/?q=41.141869,-8.653552"
+  },
+  {
+    "id": "c7632130-6c01-4fb9-b4fd-27f2e226223e",
+    "name": "Hotel Exe Almada Porto",
+    "city": "Porto",
+    "country": "PT",
+    "flag": "\ud83c\uddf5\ud83c\uddf9",
+    "address": "Rua das Taipas 92, Porto 4041",
+    "lat": 41.150988,
+    "lng": -8.595852,
+    "rating": 4.5,
+    "review_count": 204,
+    "price_level": 2,
+    "room_count": 57,
+    "avg_nightly_rate": 78.0,
+    "cleanliness_rating": 4.6,
+    "service_rating": 4.0,
+    "location_rating": 5.0,
+    "value_rating": 4.1,
+    "review_velocity": 4.2,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-03-03",
+        "rating": 3.2,
+        "text": "Central location makes up for the small room size. Good value."
+      },
+      {
+        "date": "2026-02-18",
+        "rating": 3.4,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      },
+      {
+        "date": "2025-12-22",
+        "rating": 3.3,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      }
+    ],
+    "last_updated": "2026-03-19T10:00:00Z",
+    "acquisition_score": 14,
+    "maps_url": "https://maps.google.com/?q=41.150988,-8.595852"
+  },
+  {
+    "id": "72628e15-d624-47fa-87a9-bdc2a33f9825",
+    "name": "Hotel Flow",
+    "city": "Porto",
+    "country": "PT",
+    "flag": "\ud83c\uddf5\ud83c\uddf9",
+    "address": "Rua 31 de Janeiro 56, Porto 4051",
+    "lat": 41.128804,
+    "lng": -8.608493,
+    "rating": 4.0,
+    "review_count": 197,
+    "price_level": 3,
+    "room_count": 31,
+    "avg_nightly_rate": 129.0,
+    "cleanliness_rating": 4.4,
+    "service_rating": 4.0,
+    "location_rating": 4.6,
+    "value_rating": 4.1,
+    "review_velocity": 4.9,
+    "rating_trend": "flat",
+    "recent_reviews": [
+      {
+        "date": "2026-03-10",
+        "rating": 3.2,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      },
+      {
+        "date": "2026-02-15",
+        "rating": 4.4,
+        "text": "Central location makes up for the small room size. Good value."
+      },
+      {
+        "date": "2025-12-22",
+        "rating": 3.1,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
+      }
+    ],
+    "last_updated": "2026-03-17T20:00:00Z",
+    "acquisition_score": 29,
+    "maps_url": "https://maps.google.com/?q=41.128804,-8.608493"
+  },
+  {
+    "id": "139b4d03-557f-44c1-a1b7-c6683b964289",
+    "name": "Hotel Mercure Porto",
+    "city": "Porto",
+    "country": "PT",
+    "flag": "\ud83c\uddf5\ud83c\uddf9",
+    "address": "Rua Mouzinho da Silveira 30, Porto 4050",
+    "lat": 41.186801,
+    "lng": -8.608901,
+    "rating": 2.8,
+    "review_count": 432,
+    "price_level": 3,
+    "room_count": 43,
+    "avg_nightly_rate": 145.0,
+    "cleanliness_rating": 2.4,
+    "service_rating": 2.9,
+    "location_rating": 3.1,
+    "value_rating": 2.3,
+    "review_velocity": 11.7,
+    "rating_trend": "declining",
+    "recent_reviews": [
+      {
+        "date": "2026-02-26",
+        "rating": 1.6,
+        "text": "WiFi barely worked and there's no workspace in the rooms. Not suitable for business travel."
+      },
+      {
+        "date": "2026-01-20",
+        "rating": 2.1,
+        "text": "Checked in at 3pm and the room still wasn't ready. No apology from front desk."
+      },
+      {
+        "date": "2025-12-28",
+        "rating": 1.6,
+        "text": "The photos online are completely misleading. Hotel looks nothing like the pictures."
+      }
+    ],
+    "last_updated": "2026-03-18T08:00:00Z",
+    "acquisition_score": 62,
+    "maps_url": "https://maps.google.com/?q=41.186801,-8.608901"
+  },
+  {
+    "id": "901be38c-ded5-40cf-bcd6-20a0f8d61af5",
+    "name": "Hotel Nacional Porto",
+    "city": "Porto",
+    "country": "PT",
+    "flag": "\ud83c\uddf5\ud83c\uddf9",
+    "address": "Rua da Vit\u00f3ria 21, Porto 4018",
+    "lat": 41.159768,
+    "lng": -8.632643,
+    "rating": 3.2,
+    "review_count": 1388,
+    "price_level": 3,
+    "room_count": 35,
+    "avg_nightly_rate": 146.0,
+    "cleanliness_rating": 3.4,
+    "service_rating": 3.1,
+    "location_rating": 3.8,
+    "value_rating": 3.5,
+    "review_velocity": 25.2,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-02-21",
+        "rating": 1.6,
+        "text": "Checked in at 3pm and the room still wasn't ready. No apology from front desk."
+      },
+      {
+        "date": "2026-02-16",
+        "rating": 2.9,
+        "text": "Rude reception staff. Asked for extra towels twice and never received them."
+      },
+      {
+        "date": "2026-01-07",
+        "rating": 2.0,
+        "text": "Checked in at 3pm and the room still wasn't ready. No apology from front desk."
+      }
+    ],
+    "last_updated": "2026-03-18T06:00:00Z",
+    "acquisition_score": 53,
+    "maps_url": "https://maps.google.com/?q=41.159768,-8.632643"
+  },
+  {
+    "id": "ad3909a6-76f5-4926-a97d-ca1402daf071",
+    "name": "Hotel Boa Vista",
+    "city": "Porto",
+    "country": "PT",
+    "flag": "\ud83c\uddf5\ud83c\uddf9",
+    "address": "Rua de Cedofeita 83, Porto 4051",
+    "lat": 41.134528,
+    "lng": -8.627476,
+    "rating": 3.9,
+    "review_count": 329,
+    "price_level": 2,
+    "room_count": 45,
+    "avg_nightly_rate": 73.0,
+    "cleanliness_rating": 4.2,
+    "service_rating": 3.5,
+    "location_rating": 4.3,
+    "value_rating": 3.4,
+    "review_velocity": 6.1,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-02-28",
+        "rating": 3.8,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      },
+      {
+        "date": "2026-02-04",
+        "rating": 3.5,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
+      },
+      {
+        "date": "2025-12-24",
+        "rating": 3.0,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      }
+    ],
+    "last_updated": "2026-03-19T00:00:00Z",
+    "acquisition_score": 34,
+    "maps_url": "https://maps.google.com/?q=41.134528,-8.627476"
+  },
+  {
+    "id": "096fd534-347a-4694-94c9-9d019dae66f3",
+    "name": "Hotel Pestana Porto",
+    "city": "Porto",
+    "country": "PT",
+    "flag": "\ud83c\uddf5\ud83c\uddf9",
+    "address": "Rua Mouzinho da Silveira 103, Porto 4091",
+    "lat": 41.131542,
+    "lng": -8.625039,
+    "rating": 4.6,
+    "review_count": 933,
+    "price_level": 4,
+    "room_count": 31,
+    "avg_nightly_rate": 204.0,
+    "cleanliness_rating": 4.7,
+    "service_rating": 4.8,
+    "location_rating": 4.8,
+    "value_rating": 4.0,
+    "review_velocity": 24.6,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-03-10",
+        "rating": 4.4,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      },
+      {
+        "date": "2026-02-14",
+        "rating": 4.1,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      },
+      {
+        "date": "2025-12-28",
+        "rating": 3.3,
+        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
+      }
+    ],
+    "last_updated": "2026-03-18T04:00:00Z",
+    "acquisition_score": 18,
+    "maps_url": "https://maps.google.com/?q=41.131542,-8.625039"
+  },
+  {
+    "id": "64761840-1b4f-4b5a-a513-64c0c7cb2893",
+    "name": "Hotel das Artes",
+    "city": "Porto",
+    "country": "PT",
+    "flag": "\ud83c\uddf5\ud83c\uddf9",
+    "address": "Rua da Vit\u00f3ria 96, Porto 4081",
+    "lat": 41.152811,
+    "lng": -8.656714,
+    "rating": 4.3,
+    "review_count": 1183,
+    "price_level": 3,
+    "room_count": 30,
+    "avg_nightly_rate": 147.0,
+    "cleanliness_rating": 4.4,
+    "service_rating": 4.6,
+    "location_rating": 4.4,
+    "value_rating": 3.9,
+    "review_velocity": 24.6,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-02-19",
+        "rating": 3.8,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      },
+      {
+        "date": "2026-01-23",
+        "rating": 4.4,
+        "text": "Central location makes up for the small room size. Good value."
+      },
+      {
+        "date": "2025-12-27",
+        "rating": 4.3,
+        "text": "Central location makes up for the small room size. Good value."
+      }
+    ],
+    "last_updated": "2026-03-18T11:00:00Z",
+    "acquisition_score": 26,
+    "maps_url": "https://maps.google.com/?q=41.152811,-8.656714"
+  },
+  {
+    "id": "1817700a-85e9-460d-af0a-302d43303ac1",
+    "name": "Hotel Corinthia Porto",
+    "city": "Porto",
+    "country": "PT",
+    "flag": "\ud83c\uddf5\ud83c\uddf9",
+    "address": "Rua do Bonjardim 31, Porto 4082",
+    "lat": 41.160638,
+    "lng": -8.637846,
+    "rating": 4.2,
+    "review_count": 776,
+    "price_level": 3,
+    "room_count": 41,
+    "avg_nightly_rate": 139.0,
+    "cleanliness_rating": 4.1,
+    "service_rating": 4.6,
+    "location_rating": 4.2,
+    "value_rating": 3.6,
+    "review_velocity": 17.2,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-02-24",
+        "rating": 4.5,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      },
+      {
+        "date": "2026-02-01",
+        "rating": 3.5,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
+      },
+      {
+        "date": "2026-01-17",
+        "rating": 4.3,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      }
+    ],
+    "last_updated": "2026-03-19T12:00:00Z",
+    "acquisition_score": 28,
+    "maps_url": "https://maps.google.com/?q=41.160638,-8.637846"
+  },
+  {
+    "id": "ac662944-a0ff-4884-8e45-5a7066b5c99d",
+    "name": "Porto City Hotel",
+    "city": "Porto",
+    "country": "PT",
+    "flag": "\ud83c\uddf5\ud83c\uddf9",
+    "address": "Rua da Vit\u00f3ria 66, Porto 4081",
+    "lat": 41.16214,
+    "lng": -8.624087,
+    "rating": 4.6,
+    "review_count": 917,
+    "price_level": 2,
+    "room_count": 33,
+    "avg_nightly_rate": 75.0,
+    "cleanliness_rating": 4.3,
+    "service_rating": 4.9,
+    "location_rating": 4.8,
+    "value_rating": 4.3,
+    "review_velocity": 20.4,
+    "rating_trend": "declining",
+    "recent_reviews": [
+      {
+        "date": "2026-02-28",
+        "rating": 4.1,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      },
+      {
+        "date": "2026-01-31",
+        "rating": 3.3,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      },
+      {
+        "date": "2025-12-26",
+        "rating": 3.9,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      }
+    ],
+    "last_updated": "2026-03-18T18:00:00Z",
+    "acquisition_score": 18,
+    "maps_url": "https://maps.google.com/?q=41.16214,-8.624087"
+  },
+  {
+    "id": "ee542844-a369-4b25-9ee1-e0c62fc690d8",
+    "name": "Hotel Quality Inn Porto",
+    "city": "Porto",
+    "country": "PT",
+    "flag": "\ud83c\uddf5\ud83c\uddf9",
+    "address": "Rua das Taipas 8, Porto 4052",
+    "lat": 41.148776,
+    "lng": -8.6069,
+    "rating": 3.1,
+    "review_count": 693,
+    "price_level": 2,
+    "room_count": 46,
+    "avg_nightly_rate": 122.0,
+    "cleanliness_rating": 2.7,
+    "service_rating": 3.2,
+    "location_rating": 3.6,
+    "value_rating": 2.5,
+    "review_velocity": 11.6,
+    "rating_trend": "flat",
+    "recent_reviews": [
+      {
+        "date": "2026-03-11",
+        "rating": 2.0,
+        "text": "Walls are paper thin. Could hear everything from neighboring rooms all night."
+      },
+      {
+        "date": "2026-01-31",
+        "rating": 2.1,
+        "text": "WiFi barely worked and there's no workspace in the rooms. Not suitable for business travel."
+      },
+      {
+        "date": "2026-01-11",
+        "rating": 2.4,
+        "text": "WiFi barely worked and there's no workspace in the rooms. Not suitable for business travel."
+      }
+    ],
+    "last_updated": "2026-03-19T04:00:00Z",
+    "acquisition_score": 56,
+    "maps_url": "https://maps.google.com/?q=41.148776,-8.6069"
+  },
+  {
+    "id": "2604dca9-f01e-441a-bdda-175ebd02e76f",
+    "name": "Dom Henrique Hotel",
+    "city": "Porto",
+    "country": "PT",
+    "flag": "\ud83c\uddf5\ud83c\uddf9",
+    "address": "Rua Mouzinho da Silveira 97, Porto 4086",
+    "lat": 41.162415,
+    "lng": -8.657794,
+    "rating": 3.0,
+    "review_count": 703,
+    "price_level": 2,
+    "room_count": 43,
+    "avg_nightly_rate": 75.0,
+    "cleanliness_rating": 2.7,
+    "service_rating": 2.9,
+    "location_rating": 3.6,
+    "value_rating": 2.9,
+    "review_velocity": 16.0,
+    "rating_trend": "declining",
+    "recent_reviews": [
+      {
+        "date": "2026-02-24",
+        "rating": 2.5,
+        "text": "Elevator was broken during our entire stay. Had to carry luggage up 4 flights."
+      },
+      {
+        "date": "2026-02-12",
+        "rating": 1.3,
+        "text": "Breakfast options were minimal and low quality. Stale bread, instant coffee."
+      },
+      {
+        "date": "2025-12-27",
+        "rating": 2.0,
+        "text": "Checked in at 3pm and the room still wasn't ready. No apology from front desk."
+      }
+    ],
+    "last_updated": "2026-03-17T20:00:00Z",
+    "acquisition_score": 58,
+    "maps_url": "https://maps.google.com/?q=41.162415,-8.657794"
+  },
+  {
+    "id": "65480889-8da2-4e5d-86ef-6e29cc48617f",
+    "name": "Hotel Modern Porto",
+    "city": "Porto",
+    "country": "PT",
+    "flag": "\ud83c\uddf5\ud83c\uddf9",
+    "address": "Rua da Vit\u00f3ria 32, Porto 4041",
+    "lat": 41.132199,
+    "lng": -8.609726,
+    "rating": 4.3,
+    "review_count": 1425,
+    "price_level": 2,
+    "room_count": 49,
+    "avg_nightly_rate": 71.0,
+    "cleanliness_rating": 4.4,
+    "service_rating": 4.1,
+    "location_rating": 4.6,
+    "value_rating": 4.0,
+    "review_velocity": 25.9,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-03-03",
+        "rating": 4.5,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      },
+      {
+        "date": "2026-01-23",
+        "rating": 3.7,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      },
+      {
+        "date": "2026-01-17",
+        "rating": 4.0,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      }
+    ],
+    "last_updated": "2026-03-19T04:00:00Z",
+    "acquisition_score": 26,
+    "maps_url": "https://maps.google.com/?q=41.132199,-8.609726"
+  },
+  {
+    "id": "6eea0962-54dd-442a-9c2d-aa2e124ec891",
+    "name": "Douro Palace Hotel",
+    "city": "Porto",
+    "country": "PT",
+    "flag": "\ud83c\uddf5\ud83c\uddf9",
+    "address": "Rua das Flores 32, Porto 4089",
+    "lat": 41.183504,
+    "lng": -8.603287,
+    "rating": 4.6,
+    "review_count": 197,
+    "price_level": 3,
+    "room_count": 18,
+    "avg_nightly_rate": 166.0,
+    "cleanliness_rating": 4.1,
+    "service_rating": 4.5,
+    "location_rating": 4.6,
+    "value_rating": 4.2,
+    "review_velocity": 3.7,
+    "rating_trend": "flat",
+    "recent_reviews": [
+      {
+        "date": "2026-02-23",
+        "rating": 3.8,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      },
+      {
+        "date": "2026-02-11",
+        "rating": 3.6,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
+      },
+      {
+        "date": "2025-12-20",
+        "rating": 3.4,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
+      }
+    ],
+    "last_updated": "2026-03-19T10:00:00Z",
+    "acquisition_score": 12,
+    "maps_url": "https://maps.google.com/?q=41.183504,-8.603287"
+  },
+  {
+    "id": "578c0429-ec9a-456d-9fa1-920aff3c4def",
+    "name": "Porto Palacio",
+    "city": "Porto",
+    "country": "PT",
+    "flag": "\ud83c\uddf5\ud83c\uddf9",
+    "address": "Rua das Flores 60, Porto 4093",
+    "lat": 41.184611,
+    "lng": -8.659438,
+    "rating": 3.1,
+    "review_count": 930,
+    "price_level": 3,
+    "room_count": 38,
+    "avg_nightly_rate": 183.0,
+    "cleanliness_rating": 2.9,
+    "service_rating": 2.6,
+    "location_rating": 3.3,
+    "value_rating": 3.4,
+    "review_velocity": 19.4,
+    "rating_trend": "declining",
+    "recent_reviews": [
+      {
+        "date": "2026-02-28",
+        "rating": 3.0,
+        "text": "WiFi barely worked and there's no workspace in the rooms. Not suitable for business travel."
+      },
+      {
+        "date": "2026-02-14",
+        "rating": 1.6,
+        "text": "Air conditioning leaked water onto the floor. Maintenance never came."
+      },
+      {
+        "date": "2025-12-24",
+        "rating": 1.2,
+        "text": "WiFi barely worked and there's no workspace in the rooms. Not suitable for business travel."
+      }
+    ],
+    "last_updated": "2026-03-19T01:00:00Z",
+    "acquisition_score": 56,
+    "maps_url": "https://maps.google.com/?q=41.184611,-8.659438"
+  },
+  {
+    "id": "59cfae4e-a26a-42c5-b62e-6dbad1bf156b",
+    "name": "H\u00f4tel Universal Porto",
+    "city": "Porto",
+    "country": "PT",
+    "flag": "\ud83c\uddf5\ud83c\uddf9",
+    "address": "Rua das Flores 6, Porto 4041",
+    "lat": 41.183236,
+    "lng": -8.642755,
+    "rating": 4.2,
+    "review_count": 1124,
+    "price_level": 2,
+    "room_count": 41,
+    "avg_nightly_rate": 66.0,
+    "cleanliness_rating": 4.3,
+    "service_rating": 4.0,
+    "location_rating": 4.4,
+    "value_rating": 4.6,
+    "review_velocity": 21.6,
+    "rating_trend": "flat",
+    "recent_reviews": [
+      {
+        "date": "2026-03-11",
+        "rating": 4.3,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      },
+      {
+        "date": "2026-02-19",
+        "rating": 3.3,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      },
+      {
+        "date": "2026-01-10",
+        "rating": 4.0,
+        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
+      }
+    ],
+    "last_updated": "2026-03-19T08:00:00Z",
+    "acquisition_score": 28,
+    "maps_url": "https://maps.google.com/?q=41.183236,-8.642755"
+  },
+  {
+    "id": "6632aedf-7322-4183-9d07-5430b58c965e",
+    "name": "The Yeatman",
+    "city": "Porto",
+    "country": "PT",
+    "flag": "\ud83c\uddf5\ud83c\uddf9",
+    "address": "Rua de Fernandes Tom\u00e1s 81, Porto 4097",
+    "lat": 41.141546,
+    "lng": -8.647275,
+    "rating": 4.3,
+    "review_count": 715,
+    "price_level": 2,
+    "room_count": 53,
+    "avg_nightly_rate": 124.0,
+    "cleanliness_rating": 4.0,
+    "service_rating": 4.2,
+    "location_rating": 4.5,
+    "value_rating": 3.8,
+    "review_velocity": 13.5,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-03-06",
+        "rating": 3.5,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      },
+      {
+        "date": "2026-01-18",
+        "rating": 3.6,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      },
+      {
+        "date": "2026-01-22",
+        "rating": 3.5,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      }
+    ],
+    "last_updated": "2026-03-18T02:00:00Z",
+    "acquisition_score": 21,
+    "maps_url": "https://maps.google.com/?q=41.141546,-8.647275"
+  },
+  {
+    "id": "f977947d-76b4-4508-b45d-ce5502692c78",
     "name": "Hotel Aliados",
     "city": "Porto",
     "country": "PT",
     "flag": "\ud83c\uddf5\ud83c\uddf9",
-    "address": "Rua do Almada 92, Porto 4052",
-    "lat": 41.176138,
-    "lng": -8.627747,
-    "rating": 4.3,
-    "review_count": 136,
+    "address": "Rua de Fernandes Tom\u00e1s 113, Porto 4028",
+    "lat": 41.171525,
+    "lng": -8.61052,
+    "rating": 4.4,
+    "review_count": 251,
+    "price_level": 3,
+    "room_count": 31,
+    "avg_nightly_rate": 143.0,
+    "cleanliness_rating": 4.2,
+    "service_rating": 4.7,
+    "location_rating": 5.0,
+    "value_rating": 4.7,
+    "review_velocity": 5.7,
+    "rating_trend": "flat",
+    "recent_reviews": [
+      {
+        "date": "2026-03-06",
+        "rating": 3.2,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      },
+      {
+        "date": "2026-02-19",
+        "rating": 3.9,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      },
+      {
+        "date": "2025-12-23",
+        "rating": 3.9,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      }
+    ],
+    "last_updated": "2026-03-18T23:00:00Z",
+    "acquisition_score": 21,
+    "maps_url": "https://maps.google.com/?q=41.171525,-8.61052"
+  },
+  {
+    "id": "3e0564e7-5b0d-4303-976d-e7b8fdd0ec26",
+    "name": "Grande Hotel do Porto",
+    "city": "Porto",
+    "country": "PT",
+    "flag": "\ud83c\uddf5\ud83c\uddf9",
+    "address": "Rua Mouzinho da Silveira 18, Porto 4074",
+    "lat": 41.178668,
+    "lng": -8.631287,
+    "rating": 4.1,
+    "review_count": 728,
+    "price_level": 3,
+    "room_count": 26,
+    "avg_nightly_rate": 141.0,
+    "cleanliness_rating": 4.0,
+    "service_rating": 3.7,
+    "location_rating": 4.3,
+    "value_rating": 3.9,
+    "review_velocity": 20.2,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-02-27",
+        "rating": 4.1,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      },
+      {
+        "date": "2026-02-08",
+        "rating": 3.1,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      },
+      {
+        "date": "2026-01-03",
+        "rating": 4.0,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      }
+    ],
+    "last_updated": "2026-03-18T08:00:00Z",
+    "acquisition_score": 31,
+    "maps_url": "https://maps.google.com/?q=41.178668,-8.631287"
+  },
+  {
+    "id": "44d27ab7-f947-4d52-a78c-485551f6ad93",
+    "name": "Hotel Ipanema Park",
+    "city": "Porto",
+    "country": "PT",
+    "flag": "\ud83c\uddf5\ud83c\uddf9",
+    "address": "Rua do Bonjardim 95, Porto 4058",
+    "lat": 41.171112,
+    "lng": -8.636509,
+    "rating": 4.2,
+    "review_count": 846,
+    "price_level": 4,
+    "room_count": 35,
+    "avg_nightly_rate": 224.0,
+    "cleanliness_rating": 4.2,
+    "service_rating": 4.3,
+    "location_rating": 4.2,
+    "value_rating": 3.7,
+    "review_velocity": 16.9,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-03-11",
+        "rating": 3.8,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      },
+      {
+        "date": "2026-01-26",
+        "rating": 3.8,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
+      },
+      {
+        "date": "2025-12-29",
+        "rating": 3.3,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
+      }
+    ],
+    "last_updated": "2026-03-18T09:00:00Z",
+    "acquisition_score": 28,
+    "maps_url": "https://maps.google.com/?q=41.171112,-8.636509"
+  },
+  {
+    "id": "3622caa4-79f8-4a34-b70b-0c985061eddb",
+    "name": "Hotel Arca d'\u00c1gua",
+    "city": "Porto",
+    "country": "PT",
+    "flag": "\ud83c\uddf5\ud83c\uddf9",
+    "address": "Rua Mouzinho da Silveira 22, Porto 4064",
+    "lat": 41.145565,
+    "lng": -8.599768,
+    "rating": 4.1,
+    "review_count": 926,
+    "price_level": 3,
+    "room_count": 48,
+    "avg_nightly_rate": 147.0,
+    "cleanliness_rating": 4.1,
+    "service_rating": 3.6,
+    "location_rating": 4.5,
+    "value_rating": 3.7,
+    "review_velocity": 17.1,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-02-18",
+        "rating": 3.6,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      },
+      {
+        "date": "2026-01-31",
+        "rating": 3.0,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      },
+      {
+        "date": "2026-01-02",
+        "rating": 4.3,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      }
+    ],
+    "last_updated": "2026-03-19T08:00:00Z",
+    "acquisition_score": 31,
+    "maps_url": "https://maps.google.com/?q=41.145565,-8.599768"
+  },
+  {
+    "id": "2b322f76-4111-4f98-9450-1aab0d93d5c2",
+    "name": "Hotel Am\u00e9rica",
+    "city": "Porto",
+    "country": "PT",
+    "flag": "\ud83c\uddf5\ud83c\uddf9",
+    "address": "Rua das Taipas 21, Porto 4025",
+    "lat": 41.133371,
+    "lng": -8.614664,
+    "rating": 3.0,
+    "review_count": 1371,
+    "price_level": 3,
+    "room_count": 22,
+    "avg_nightly_rate": 167.0,
+    "cleanliness_rating": 3.1,
+    "service_rating": 3.4,
+    "location_rating": 3.5,
+    "value_rating": 2.6,
+    "review_velocity": 25.9,
+    "rating_trend": "declining",
+    "recent_reviews": [
+      {
+        "date": "2026-03-07",
+        "rating": 1.7,
+        "text": "Air conditioning leaked water onto the floor. Maintenance never came."
+      },
+      {
+        "date": "2026-02-11",
+        "rating": 2.7,
+        "text": "Location is great but the hotel desperately needs renovation. Everything feels worn out."
+      },
+      {
+        "date": "2026-01-20",
+        "rating": 2.4,
+        "text": "Breakfast options were minimal and low quality. Stale bread, instant coffee."
+      }
+    ],
+    "last_updated": "2026-03-18T11:00:00Z",
+    "acquisition_score": 58,
+    "maps_url": "https://maps.google.com/?q=41.133371,-8.614664"
+  },
+  {
+    "id": "c9088c02-62ff-4f8e-8037-f5ad217e253f",
+    "name": "Porto AS 1829",
+    "city": "Porto",
+    "country": "PT",
+    "flag": "\ud83c\uddf5\ud83c\uddf9",
+    "address": "Rua dos Cl\u00e9rigos 81, Porto 4033",
+    "lat": 41.134953,
+    "lng": -8.65489,
+    "rating": 4.5,
+    "review_count": 1226,
     "price_level": 2,
-    "acquisition_score": 14,
-    "maps_url": "https://maps.google.com/?q=41.176138,-8.627747"
+    "room_count": 37,
+    "avg_nightly_rate": 81.0,
+    "cleanliness_rating": 4.4,
+    "service_rating": 4.8,
+    "location_rating": 4.9,
+    "value_rating": 3.9,
+    "review_velocity": 24.0,
+    "rating_trend": "flat",
+    "recent_reviews": [
+      {
+        "date": "2026-02-22",
+        "rating": 3.7,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      },
+      {
+        "date": "2026-01-23",
+        "rating": 3.9,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      },
+      {
+        "date": "2026-01-31",
+        "rating": 4.3,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      }
+    ],
+    "last_updated": "2026-03-18T20:00:00Z",
+    "acquisition_score": 20,
+    "maps_url": "https://maps.google.com/?q=41.134953,-8.65489"
+  },
+  {
+    "id": "71a94269-587d-463e-bc58-1d0d0da3dfed",
+    "name": "Hotel Leix\u00f5es",
+    "city": "Porto",
+    "country": "PT",
+    "flag": "\ud83c\uddf5\ud83c\uddf9",
+    "address": "Rua das Flores 24, Porto 4028",
+    "lat": 41.131204,
+    "lng": -8.639669,
+    "rating": 4.3,
+    "review_count": 922,
+    "price_level": 2,
+    "room_count": 19,
+    "avg_nightly_rate": 103.0,
+    "cleanliness_rating": 4.3,
+    "service_rating": 4.0,
+    "location_rating": 4.4,
+    "value_rating": 3.8,
+    "review_velocity": 22.5,
+    "rating_trend": "flat",
+    "recent_reviews": [
+      {
+        "date": "2026-03-03",
+        "rating": 4.4,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      },
+      {
+        "date": "2026-01-28",
+        "rating": 3.1,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
+      },
+      {
+        "date": "2026-01-12",
+        "rating": 3.6,
+        "text": "Central location makes up for the small room size. Good value."
+      }
+    ],
+    "last_updated": "2026-03-18T13:00:00Z",
+    "acquisition_score": 21,
+    "maps_url": "https://maps.google.com/?q=41.131204,-8.639669"
   }
 ]

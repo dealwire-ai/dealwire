@@ -1,602 +1,1642 @@
 [
   {
-    "id": "e43a1ca0-9791-4127-a953-753bf5064fa2",
-    "name": "Rex Hotel",
-    "city": "Thessaloniki",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Ionos Dragoumi 69, Thessaloniki 54697",
-    "lat": 40.653266,
-    "lng": 22.961337,
-    "rating": 3.0,
-    "review_count": 185,
-    "price_level": 3,
-    "acquisition_score": 42,
-    "maps_url": "https://maps.google.com/?q=40.653266,22.961337"
-  },
-  {
-    "id": "da1f20d1-348d-4a2e-9959-7c9e01228ac9",
-    "name": "Vardaris Hotel",
-    "city": "Thessaloniki",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Nikis 80, Thessaloniki 54650",
-    "lat": 40.649903,
-    "lng": 22.918124,
-    "rating": 3.9,
-    "review_count": 698,
-    "price_level": 4,
-    "acquisition_score": 28,
-    "maps_url": "https://maps.google.com/?q=40.649903,22.918124"
-  },
-  {
-    "id": "d39c425d-f192-4d21-9ecb-ddc7247c15fa",
-    "name": "Thessaly Hotel",
-    "city": "Thessaloniki",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Olympou 38, Thessaloniki 54680",
-    "lat": 40.617737,
-    "lng": 22.938831,
-    "rating": 4.4,
-    "review_count": 365,
-    "price_level": 4,
-    "acquisition_score": 14,
-    "maps_url": "https://maps.google.com/?q=40.617737,22.938831"
-  },
-  {
-    "id": "fa52cf48-03e1-490b-bd2e-af61d3021cc7",
-    "name": "Thermaikos Hotel",
-    "city": "Thessaloniki",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Proxenou Koromila 52, Thessaloniki 54680",
-    "lat": 40.660124,
-    "lng": 22.930671,
-    "rating": 4.6,
-    "review_count": 642,
-    "price_level": 2,
-    "acquisition_score": 10,
-    "maps_url": "https://maps.google.com/?q=40.660124,22.930671"
-  },
-  {
-    "id": "b1513efb-b947-4ca9-87d5-f3e15e4b7442",
-    "name": "Hotel Olympos",
-    "city": "Thessaloniki",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Agias Sofias 57, Thessaloniki 54696",
-    "lat": 40.622922,
-    "lng": 22.942523,
-    "rating": 4.3,
-    "review_count": 361,
-    "price_level": 4,
-    "acquisition_score": 17,
-    "maps_url": "https://maps.google.com/?q=40.622922,22.942523"
-  },
-  {
-    "id": "a3d13f51-8f24-47a8-89d7-fb20df2ce213",
-    "name": "Egnatia Hotel",
-    "city": "Thessaloniki",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Ermou 85, Thessaloniki 54691",
-    "lat": 40.647256,
-    "lng": 22.915937,
-    "rating": 4.0,
-    "review_count": 175,
-    "price_level": 4,
-    "acquisition_score": 21,
-    "maps_url": "https://maps.google.com/?q=40.647256,22.915937"
-  },
-  {
-    "id": "b57c94cd-a1fb-4d1e-9de9-b2311dda569f",
-    "name": "Hotel Kastoria",
-    "city": "Thessaloniki",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Aristotelous 4, Thessaloniki 54615",
-    "lat": 40.624791,
-    "lng": 22.94266,
-    "rating": 2.4,
-    "review_count": 1181,
-    "price_level": 3,
-    "acquisition_score": 65,
-    "maps_url": "https://maps.google.com/?q=40.624791,22.94266"
-  },
-  {
-    "id": "77942d79-c929-47fc-86c7-4f278a84c2aa",
-    "name": "Hotel Tourist",
-    "city": "Thessaloniki",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Mitropoleos 92, Thessaloniki 54699",
-    "lat": 40.633139,
-    "lng": 22.937376,
-    "rating": 2.6,
-    "review_count": 943,
-    "price_level": 2,
-    "acquisition_score": 60,
-    "maps_url": "https://maps.google.com/?q=40.633139,22.937376"
-  },
-  {
-    "id": "e50027b0-2145-405f-8296-be2c28e094fc",
-    "name": "Hotel Excelsior",
-    "city": "Thessaloniki",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Egnatia 100, Thessaloniki 54664",
-    "lat": 40.62323,
-    "lng": 22.965688,
-    "rating": 4.6,
-    "review_count": 983,
-    "price_level": 3,
-    "acquisition_score": 10,
-    "maps_url": "https://maps.google.com/?q=40.62323,22.965688"
-  },
-  {
-    "id": "f47fc90f-e7f4-431c-aa75-6515eb0be606",
-    "name": "Rotonda Hotel",
-    "city": "Thessaloniki",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Egnatia 59, Thessaloniki 54627",
-    "lat": 40.658185,
-    "lng": 22.95613,
-    "rating": 4.3,
-    "review_count": 1102,
-    "price_level": 4,
-    "acquisition_score": 18,
-    "maps_url": "https://maps.google.com/?q=40.658185,22.95613"
-  },
-  {
-    "id": "7f61330b-d478-4d47-b8aa-be4e68a0fc55",
-    "name": "Hotel Ariston",
-    "city": "Thessaloniki",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Dragoumi 105, Thessaloniki 54674",
-    "lat": 40.635704,
-    "lng": 22.97288,
-    "rating": 4.7,
-    "review_count": 1044,
-    "price_level": 2,
-    "acquisition_score": 7,
-    "maps_url": "https://maps.google.com/?q=40.635704,22.97288"
-  },
-  {
-    "id": "b8684642-9e6e-4972-8781-72a5bb4b513a",
+    "id": "356646a9-53c5-4880-96c1-ec37b17ef577",
     "name": "Hotel Anthemion",
     "city": "Thessaloniki",
     "country": "GR",
     "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Ionos Dragoumi 32, Thessaloniki 54691",
-    "lat": 40.626739,
-    "lng": 22.963837,
-    "rating": 3.2,
-    "review_count": 756,
+    "address": "Ermou 33, Thessaloniki 54632",
+    "lat": 40.616696,
+    "lng": 22.970051,
+    "rating": 3.4,
+    "review_count": 1642,
     "price_level": 2,
-    "acquisition_score": 45,
-    "maps_url": "https://maps.google.com/?q=40.626739,22.963837"
+    "room_count": 30,
+    "avg_nightly_rate": 116.0,
+    "cleanliness_rating": 3.4,
+    "service_rating": 2.8,
+    "location_rating": 3.6,
+    "value_rating": 2.9,
+    "review_velocity": 33.5,
+    "rating_trend": "flat",
+    "recent_reviews": [
+      {
+        "date": "2026-02-17",
+        "rating": 2.0,
+        "text": "Terrible experience. Dirty bathroom, noisy hallway, and breakfast was inedible."
+      },
+      {
+        "date": "2026-01-28",
+        "rating": 2.2,
+        "text": "WiFi barely worked and there's no workspace in the rooms. Not suitable for business travel."
+      },
+      {
+        "date": "2026-01-03",
+        "rating": 1.4,
+        "text": "WiFi barely worked and there's no workspace in the rooms. Not suitable for business travel."
+      }
+    ],
+    "last_updated": "2026-03-17T22:00:00Z",
+    "acquisition_score": 48,
+    "maps_url": "https://maps.google.com/?q=40.616696,22.970051"
   },
   {
-    "id": "c1d51a7f-5a67-4519-9345-6bcc2e631d6f",
+    "id": "c2f3df34-6795-4455-bcb6-ade0d24e9366",
     "name": "Hotel Niki",
     "city": "Thessaloniki",
     "country": "GR",
     "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Mitropoleos 35, Thessaloniki 54652",
-    "lat": 40.629283,
-    "lng": 22.947211,
-    "rating": 2.6,
-    "review_count": 1046,
-    "price_level": 2,
-    "acquisition_score": 60,
-    "maps_url": "https://maps.google.com/?q=40.629283,22.947211"
+    "address": "Ermou 39, Thessaloniki 54668",
+    "lat": 40.6487,
+    "lng": 22.911581,
+    "rating": 3.1,
+    "review_count": 1286,
+    "price_level": 4,
+    "room_count": 45,
+    "avg_nightly_rate": 211.0,
+    "cleanliness_rating": 2.6,
+    "service_rating": 3.2,
+    "location_rating": 3.5,
+    "value_rating": 3.4,
+    "review_velocity": 28.0,
+    "rating_trend": "flat",
+    "recent_reviews": [
+      {
+        "date": "2026-03-10",
+        "rating": 1.6,
+        "text": "Location is great but the hotel desperately needs renovation. Everything feels worn out."
+      },
+      {
+        "date": "2026-01-31",
+        "rating": 3.0,
+        "text": "Elevator was broken during our entire stay. Had to carry luggage up 4 flights."
+      },
+      {
+        "date": "2025-12-29",
+        "rating": 1.9,
+        "text": "Walls are paper thin. Could hear everything from neighboring rooms all night."
+      }
+    ],
+    "last_updated": "2026-03-17T23:00:00Z",
+    "acquisition_score": 56,
+    "maps_url": "https://maps.google.com/?q=40.6487,22.911581"
   },
   {
-    "id": "00e79d46-0660-4a93-8d3a-f086bf3da288",
+    "id": "471f57aa-c8f2-4a78-b96a-137a86f8d6ad",
     "name": "Ladadika Boutique",
     "city": "Thessaloniki",
     "country": "GR",
     "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Egnatia 54, Thessaloniki 54662",
-    "lat": 40.629953,
-    "lng": 22.942015,
-    "rating": 3.0,
-    "review_count": 1037,
+    "address": "Komninon 84, Thessaloniki 54680",
+    "lat": 40.65335,
+    "lng": 22.924452,
+    "rating": 4.5,
+    "review_count": 199,
     "price_level": 2,
-    "acquisition_score": 50,
-    "maps_url": "https://maps.google.com/?q=40.629953,22.942015"
+    "room_count": 27,
+    "avg_nightly_rate": 87.0,
+    "cleanliness_rating": 4.4,
+    "service_rating": 4.3,
+    "location_rating": 4.6,
+    "value_rating": 4.3,
+    "review_velocity": 3.5,
+    "rating_trend": "flat",
+    "recent_reviews": [
+      {
+        "date": "2026-03-08",
+        "rating": 3.1,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      },
+      {
+        "date": "2026-02-15",
+        "rating": 3.6,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      },
+      {
+        "date": "2026-01-08",
+        "rating": 3.8,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      }
+    ],
+    "last_updated": "2026-03-18T00:00:00Z",
+    "acquisition_score": 19,
+    "maps_url": "https://maps.google.com/?q=40.65335,22.924452"
   },
   {
-    "id": "f189088e-a318-4080-bc5c-5ef7cedca890",
-    "name": "Thessaloniki Grand",
-    "city": "Thessaloniki",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Olympou 3, Thessaloniki 54683",
-    "lat": 40.632923,
-    "lng": 22.909813,
-    "rating": 4.2,
-    "review_count": 836,
-    "price_level": 2,
-    "acquisition_score": 20,
-    "maps_url": "https://maps.google.com/?q=40.632923,22.909813"
-  },
-  {
-    "id": "28aad732-e2b1-4303-b5a3-3a4e97bfb3bd",
+    "id": "7f7a2ff0-46c8-4463-a201-ce50bd22670f",
     "name": "Hotel Makedonia",
     "city": "Thessaloniki",
     "country": "GR",
     "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Venizelou 69, Thessaloniki 54679",
-    "lat": 40.658092,
-    "lng": 22.972247,
-    "rating": 4.6,
-    "review_count": 1201,
-    "price_level": 2,
-    "acquisition_score": 10,
-    "maps_url": "https://maps.google.com/?q=40.658092,22.972247"
-  },
-  {
-    "id": "b2c807cf-41a1-4a6b-91e7-ddb3c4e94595",
-    "name": "Hotel Panorama",
-    "city": "Thessaloniki",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Komninon 87, Thessaloniki 54661",
-    "lat": 40.653551,
-    "lng": 22.968235,
-    "rating": 2.7,
-    "review_count": 699,
-    "price_level": 4,
-    "acquisition_score": 57,
-    "maps_url": "https://maps.google.com/?q=40.653551,22.968235"
-  },
-  {
-    "id": "930c4f6f-1184-47e5-8b67-3b171886826d",
-    "name": "Hotel Aristotle",
-    "city": "Thessaloniki",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Dragoumi 73, Thessaloniki 54694",
-    "lat": 40.611726,
-    "lng": 22.954392,
+    "address": "Venizelou 46, Thessaloniki 54695",
+    "lat": 40.666568,
+    "lng": 22.939006,
     "rating": 4.3,
-    "review_count": 1078,
-    "price_level": 2,
-    "acquisition_score": 18,
-    "maps_url": "https://maps.google.com/?q=40.611726,22.954392"
+    "review_count": 705,
+    "price_level": 4,
+    "room_count": 20,
+    "avg_nightly_rate": 195.0,
+    "cleanliness_rating": 4.0,
+    "service_rating": 3.8,
+    "location_rating": 4.7,
+    "value_rating": 3.9,
+    "review_velocity": 13.8,
+    "rating_trend": "flat",
+    "recent_reviews": [
+      {
+        "date": "2026-03-09",
+        "rating": 4.3,
+        "text": "Central location makes up for the small room size. Good value."
+      },
+      {
+        "date": "2026-01-28",
+        "rating": 4.1,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      },
+      {
+        "date": "2025-12-26",
+        "rating": 4.2,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      }
+    ],
+    "last_updated": "2026-03-18T02:00:00Z",
+    "acquisition_score": 26,
+    "maps_url": "https://maps.google.com/?q=40.666568,22.939006"
   },
   {
-    "id": "bd6a4115-841f-4fa3-a607-d31fe366407f",
-    "name": "Hotel Macedonia",
-    "city": "Thessaloniki",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Mitropoleos 59, Thessaloniki 54651",
-    "lat": 40.63035,
-    "lng": 22.970975,
-    "rating": 3.8,
-    "review_count": 410,
-    "price_level": 2,
-    "acquisition_score": 29,
-    "maps_url": "https://maps.google.com/?q=40.63035,22.970975"
-  },
-  {
-    "id": "b069efd7-a6e6-4c3d-8939-4dfe5a385280",
-    "name": "Hotel Vergina",
-    "city": "Thessaloniki",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Agias Sofias 3, Thessaloniki 54679",
-    "lat": 40.613225,
-    "lng": 22.976034,
-    "rating": 4.2,
-    "review_count": 938,
-    "price_level": 2,
-    "acquisition_score": 20,
-    "maps_url": "https://maps.google.com/?q=40.613225,22.976034"
-  },
-  {
-    "id": "7adfabf7-afda-4434-b723-aa38196b217e",
-    "name": "Nea Egnatia Hotel",
-    "city": "Thessaloniki",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Tsimiski 32, Thessaloniki 54635",
-    "lat": 40.660454,
-    "lng": 22.952893,
-    "rating": 3.3,
-    "review_count": 322,
-    "price_level": 2,
-    "acquisition_score": 40,
-    "maps_url": "https://maps.google.com/?q=40.660454,22.952893"
-  },
-  {
-    "id": "26279120-f346-427d-a3e7-2afee30e676e",
-    "name": "Hotel Augustos",
-    "city": "Thessaloniki",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Agias Sofias 90, Thessaloniki 54642",
-    "lat": 40.656114,
-    "lng": 22.921145,
-    "rating": 3.9,
-    "review_count": 1184,
-    "price_level": 3,
-    "acquisition_score": 28,
-    "maps_url": "https://maps.google.com/?q=40.656114,22.921145"
-  },
-  {
-    "id": "83133215-0a26-40a2-a036-a2649a764a62",
-    "name": "Hotel Aristotelous",
-    "city": "Thessaloniki",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Proxenou Koromila 14, Thessaloniki 54684",
-    "lat": 40.611641,
-    "lng": 22.931237,
-    "rating": 3.9,
-    "review_count": 912,
-    "price_level": 3,
-    "acquisition_score": 28,
-    "maps_url": "https://maps.google.com/?q=40.611641,22.931237"
-  },
-  {
-    "id": "e70626b1-d807-4e6e-9b48-41a827c05913",
-    "name": "Hotel Continental",
-    "city": "Thessaloniki",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Egnatia 76, Thessaloniki 54698",
-    "lat": 40.659934,
-    "lng": 22.926399,
-    "rating": 4.2,
-    "review_count": 762,
-    "price_level": 3,
-    "acquisition_score": 20,
-    "maps_url": "https://maps.google.com/?q=40.659934,22.926399"
-  },
-  {
-    "id": "35a6ac32-d227-4e53-9c71-bf38b491ab60",
-    "name": "Hotel Pella",
-    "city": "Thessaloniki",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Ionos Dragoumi 73, Thessaloniki 54615",
-    "lat": 40.630932,
-    "lng": 22.939386,
-    "rating": 4.4,
-    "review_count": 890,
-    "price_level": 2,
-    "acquisition_score": 15,
-    "maps_url": "https://maps.google.com/?q=40.630932,22.939386"
-  },
-  {
-    "id": "6aad5fa0-1b0b-47a3-8315-55941591e9b7",
-    "name": "Porto Palace",
-    "city": "Thessaloniki",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Pavlou Mela 63, Thessaloniki 54623",
-    "lat": 40.636111,
-    "lng": 22.934753,
-    "rating": 4.1,
-    "review_count": 963,
-    "price_level": 3,
-    "acquisition_score": 23,
-    "maps_url": "https://maps.google.com/?q=40.636111,22.934753"
-  },
-  {
-    "id": "d317c210-e5dd-40d0-a8a2-557afb0d9ae4",
-    "name": "Hotel Domotel",
-    "city": "Thessaloniki",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Ermou 84, Thessaloniki 54644",
-    "lat": 40.647055,
-    "lng": 22.973773,
-    "rating": 3.9,
-    "review_count": 245,
-    "price_level": 3,
-    "acquisition_score": 24,
-    "maps_url": "https://maps.google.com/?q=40.647055,22.973773"
-  },
-  {
-    "id": "0af36114-d720-44aa-a1e6-f60677135645",
-    "name": "Hotel Amalia",
-    "city": "Thessaloniki",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Nikis 110, Thessaloniki 54641",
-    "lat": 40.659944,
-    "lng": 22.915466,
-    "rating": 4.5,
-    "review_count": 617,
-    "price_level": 3,
-    "acquisition_score": 12,
-    "maps_url": "https://maps.google.com/?q=40.659944,22.915466"
-  },
-  {
-    "id": "34a250a7-0524-4307-96b2-aafd03110465",
-    "name": "White Tower Hotel",
-    "city": "Thessaloniki",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Venizelou 44, Thessaloniki 54613",
-    "lat": 40.639758,
-    "lng": 22.932151,
-    "rating": 2.7,
-    "review_count": 921,
-    "price_level": 2,
-    "acquisition_score": 57,
-    "maps_url": "https://maps.google.com/?q=40.639758,22.932151"
-  },
-  {
-    "id": "72fd3baf-ad1f-4179-a0df-10225dfa9f6f",
-    "name": "Hotel Philippos",
-    "city": "Thessaloniki",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Dragoumi 90, Thessaloniki 54645",
-    "lat": 40.643447,
-    "lng": 22.945564,
-    "rating": 4.0,
-    "review_count": 326,
-    "price_level": 2,
-    "acquisition_score": 23,
-    "maps_url": "https://maps.google.com/?q=40.643447,22.945564"
-  },
-  {
-    "id": "e88bc7fd-a083-448e-af77-a3146c10ed83",
-    "name": "Byzantine Hotel",
-    "city": "Thessaloniki",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Mitropoleos 89, Thessaloniki 54670",
-    "lat": 40.648854,
-    "lng": 22.943757,
-    "rating": 2.6,
-    "review_count": 861,
-    "price_level": 3,
-    "acquisition_score": 60,
-    "maps_url": "https://maps.google.com/?q=40.648854,22.943757"
-  },
-  {
-    "id": "816d8b21-0111-4853-9ac9-7a4df7f19b57",
+    "id": "3f947e4b-24e2-4cc7-99df-6c66376e3681",
     "name": "Hotel Mandrino",
     "city": "Thessaloniki",
     "country": "GR",
     "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Proxenou Koromila 85, Thessaloniki 54684",
-    "lat": 40.632241,
-    "lng": 22.948143,
-    "rating": 2.3,
-    "review_count": 1018,
-    "price_level": 2,
-    "acquisition_score": 68,
-    "maps_url": "https://maps.google.com/?q=40.632241,22.948143"
-  },
-  {
-    "id": "2bf679d6-ab43-4932-b507-4d2702e49fe4",
-    "name": "Thessaloniki Inn",
-    "city": "Thessaloniki",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Agias Sofias 35, Thessaloniki 54649",
-    "lat": 40.625184,
-    "lng": 22.917846,
-    "rating": 4.3,
-    "review_count": 387,
-    "price_level": 2,
-    "acquisition_score": 17,
-    "maps_url": "https://maps.google.com/?q=40.625184,22.917846"
-  },
-  {
-    "id": "58bb831a-e38f-4abe-ac05-b1abb8e7a626",
-    "name": "Hotel Capsis",
-    "city": "Thessaloniki",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Aristotelous 25, Thessaloniki 54637",
-    "lat": 40.654416,
-    "lng": 22.928755,
-    "rating": 2.8,
-    "review_count": 1113,
+    "address": "Komninon 72, Thessaloniki 54613",
+    "lat": 40.64664,
+    "lng": 22.955448,
+    "rating": 4.5,
+    "review_count": 640,
     "price_level": 3,
-    "acquisition_score": 55,
-    "maps_url": "https://maps.google.com/?q=40.654416,22.928755"
+    "room_count": 19,
+    "avg_nightly_rate": 132.0,
+    "cleanliness_rating": 4.7,
+    "service_rating": 4.8,
+    "location_rating": 4.8,
+    "value_rating": 4.1,
+    "review_velocity": 16.0,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-02-28",
+        "rating": 3.2,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      },
+      {
+        "date": "2026-02-19",
+        "rating": 4.1,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      },
+      {
+        "date": "2026-01-18",
+        "rating": 3.6,
+        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
+      }
+    ],
+    "last_updated": "2026-03-18T16:00:00Z",
+    "acquisition_score": 16,
+    "maps_url": "https://maps.google.com/?q=40.64664,22.955448"
   },
   {
-    "id": "b31fd146-0d2a-48ed-a722-a68d277ef388",
-    "name": "Thessaloniki Palace",
+    "id": "f77675ce-0bc6-4687-967a-2e428fadc8a8",
+    "name": "Hotel Continental",
     "city": "Thessaloniki",
     "country": "GR",
     "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Pavlou Mela 25, Thessaloniki 54647",
-    "lat": 40.623749,
-    "lng": 22.921961,
-    "rating": 4.3,
-    "review_count": 1307,
-    "price_level": 1,
-    "acquisition_score": 18,
-    "maps_url": "https://maps.google.com/?q=40.623749,22.921961"
-  },
-  {
-    "id": "18f47569-8f36-4cbe-8dd5-f0c6a3d1ed44",
-    "name": "Agios Dimitrios Hotel",
-    "city": "Thessaloniki",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Ermou 38, Thessaloniki 54699",
-    "lat": 40.666745,
-    "lng": 22.954051,
-    "rating": 4.0,
-    "review_count": 1278,
+    "address": "Dragoumi 77, Thessaloniki 54620",
+    "lat": 40.663101,
+    "lng": 22.920291,
+    "rating": 2.4,
+    "review_count": 643,
     "price_level": 3,
-    "acquisition_score": 25,
-    "maps_url": "https://maps.google.com/?q=40.666745,22.954051"
+    "room_count": 20,
+    "avg_nightly_rate": 117.0,
+    "cleanliness_rating": 2.2,
+    "service_rating": 2.2,
+    "location_rating": 2.9,
+    "value_rating": 2.2,
+    "review_velocity": 15.3,
+    "rating_trend": "flat",
+    "recent_reviews": [
+      {
+        "date": "2026-03-09",
+        "rating": 1.9,
+        "text": "The photos online are completely misleading. Hotel looks nothing like the pictures."
+      },
+      {
+        "date": "2026-02-02",
+        "rating": 2.4,
+        "text": "Rude reception staff. Asked for extra towels twice and never received them."
+      },
+      {
+        "date": "2025-12-31",
+        "rating": 2.3,
+        "text": "WiFi barely worked and there's no workspace in the rooms. Not suitable for business travel."
+      }
+    ],
+    "last_updated": "2026-03-19T11:00:00Z",
+    "acquisition_score": 73,
+    "maps_url": "https://maps.google.com/?q=40.663101,22.920291"
   },
   {
-    "id": "bbddb7a6-8454-4b06-a1c8-25d75a645d0d",
-    "name": "Hotel Electra Palace",
-    "city": "Thessaloniki",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Agias Sofias 57, Thessaloniki 54653",
-    "lat": 40.621162,
-    "lng": 22.912996,
-    "rating": 2.0,
-    "review_count": 609,
-    "price_level": 4,
-    "acquisition_score": 75,
-    "maps_url": "https://maps.google.com/?q=40.621162,22.912996"
-  },
-  {
-    "id": "8fe49d9b-c600-4444-b47e-ee0df24eca00",
+    "id": "2217366c-99b2-4cfc-b714-12ecfd2543d3",
     "name": "Thessaloniki City",
     "city": "Thessaloniki",
     "country": "GR",
     "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Egnatia 74, Thessaloniki 54690",
-    "lat": 40.651287,
-    "lng": 22.920021,
-    "rating": 4.5,
-    "review_count": 429,
-    "price_level": 3,
-    "acquisition_score": 12,
-    "maps_url": "https://maps.google.com/?q=40.651287,22.920021"
+    "address": "Mitropoleos 39, Thessaloniki 54637",
+    "lat": 40.656141,
+    "lng": 22.962891,
+    "rating": 3.4,
+    "review_count": 351,
+    "price_level": 2,
+    "room_count": 23,
+    "avg_nightly_rate": 97.0,
+    "cleanliness_rating": 3.2,
+    "service_rating": 2.9,
+    "location_rating": 3.8,
+    "value_rating": 3.0,
+    "review_velocity": 6.6,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-03-01",
+        "rating": 1.8,
+        "text": "Terrible experience. Dirty bathroom, noisy hallway, and breakfast was inedible."
+      },
+      {
+        "date": "2026-02-18",
+        "rating": 1.0,
+        "text": "Elevator was broken during our entire stay. Had to carry luggage up 4 flights."
+      },
+      {
+        "date": "2026-01-27",
+        "rating": 1.6,
+        "text": "Cockroach in the room. Management offered to move us but the other room was just as bad."
+      }
+    ],
+    "last_updated": "2026-03-18T10:00:00Z",
+    "acquisition_score": 46,
+    "maps_url": "https://maps.google.com/?q=40.656141,22.962891"
   },
   {
-    "id": "ae0432c3-b175-4098-9ff2-4363c580f661",
+    "id": "85a15183-85c0-4e5f-a0d2-26c3d248f09e",
+    "name": "Vardaris Hotel",
+    "city": "Thessaloniki",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Egnatia 52, Thessaloniki 54612",
+    "lat": 40.668072,
+    "lng": 22.921431,
+    "rating": 4.4,
+    "review_count": 445,
+    "price_level": 4,
+    "room_count": 33,
+    "avg_nightly_rate": 243.0,
+    "cleanliness_rating": 4.2,
+    "service_rating": 4.2,
+    "location_rating": 4.5,
+    "value_rating": 4.2,
+    "review_velocity": 9.3,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-02-28",
+        "rating": 4.1,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      },
+      {
+        "date": "2026-02-06",
+        "rating": 4.2,
+        "text": "Central location makes up for the small room size. Good value."
+      },
+      {
+        "date": "2026-01-27",
+        "rating": 3.8,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      }
+    ],
+    "last_updated": "2026-03-19T01:00:00Z",
+    "acquisition_score": 23,
+    "maps_url": "https://maps.google.com/?q=40.668072,22.921431"
+  },
+  {
+    "id": "6344f2ff-e62c-4b83-8a38-a1c42151503a",
+    "name": "Hotel Philippos",
+    "city": "Thessaloniki",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Pavlou Mela 83, Thessaloniki 54628",
+    "lat": 40.624276,
+    "lng": 22.919651,
+    "rating": 4.1,
+    "review_count": 778,
+    "price_level": 2,
+    "room_count": 36,
+    "avg_nightly_rate": 114.0,
+    "cleanliness_rating": 4.2,
+    "service_rating": 3.7,
+    "location_rating": 4.7,
+    "value_rating": 4.0,
+    "review_velocity": 13.0,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-02-22",
+        "rating": 4.0,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      },
+      {
+        "date": "2026-01-31",
+        "rating": 3.2,
+        "text": "Central location makes up for the small room size. Good value."
+      },
+      {
+        "date": "2026-01-27",
+        "rating": 3.7,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      }
+    ],
+    "last_updated": "2026-03-18T18:00:00Z",
+    "acquisition_score": 31,
+    "maps_url": "https://maps.google.com/?q=40.624276,22.919651"
+  },
+  {
+    "id": "541b1d64-e597-40f3-847c-9b37db17ac52",
+    "name": "Hotel Amalia",
+    "city": "Thessaloniki",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Egnatia 40, Thessaloniki 54669",
+    "lat": 40.637215,
+    "lng": 22.913382,
+    "rating": 4.3,
+    "review_count": 387,
+    "price_level": 3,
+    "room_count": 22,
+    "avg_nightly_rate": 179.0,
+    "cleanliness_rating": 4.6,
+    "service_rating": 4.3,
+    "location_rating": 4.7,
+    "value_rating": 4.2,
+    "review_velocity": 7.3,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-02-17",
+        "rating": 3.7,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
+      },
+      {
+        "date": "2026-02-08",
+        "rating": 3.9,
+        "text": "Central location makes up for the small room size. Good value."
+      },
+      {
+        "date": "2025-12-30",
+        "rating": 4.4,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      }
+    ],
+    "last_updated": "2026-03-18T09:00:00Z",
+    "acquisition_score": 25,
+    "maps_url": "https://maps.google.com/?q=40.637215,22.913382"
+  },
+  {
+    "id": "1443103d-896d-41f4-9cd3-9a5c9866cea6",
+    "name": "Hotel Domotel",
+    "city": "Thessaloniki",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Olympou 11, Thessaloniki 54674",
+    "lat": 40.648868,
+    "lng": 22.91214,
+    "rating": 3.3,
+    "review_count": 659,
+    "price_level": 3,
+    "room_count": 56,
+    "avg_nightly_rate": 152.0,
+    "cleanliness_rating": 3.3,
+    "service_rating": 3.1,
+    "location_rating": 4.0,
+    "value_rating": 3.1,
+    "review_velocity": 11.0,
+    "rating_trend": "flat",
+    "recent_reviews": [
+      {
+        "date": "2026-02-21",
+        "rating": 2.6,
+        "text": "Room was outdated and the AC didn't work properly. Staff seemed overwhelmed."
+      },
+      {
+        "date": "2026-01-30",
+        "rating": 1.7,
+        "text": "Terrible experience. Dirty bathroom, noisy hallway, and breakfast was inedible."
+      },
+      {
+        "date": "2025-12-27",
+        "rating": 1.8,
+        "text": "Rude reception staff. Asked for extra towels twice and never received them."
+      }
+    ],
+    "last_updated": "2026-03-18T21:00:00Z",
+    "acquisition_score": 46,
+    "maps_url": "https://maps.google.com/?q=40.648868,22.91214"
+  },
+  {
+    "id": "7413c46f-6832-462a-a1e3-6d2e9c5e0b8d",
     "name": "ABC Hotel",
     "city": "Thessaloniki",
     "country": "GR",
     "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Ermou 98, Thessaloniki 54663",
-    "lat": 40.646479,
-    "lng": 22.964752,
-    "rating": 3.9,
-    "review_count": 301,
-    "price_level": 2,
-    "acquisition_score": 25,
-    "maps_url": "https://maps.google.com/?q=40.646479,22.964752"
+    "address": "Pavlou Mela 20, Thessaloniki 54652",
+    "lat": 40.61499,
+    "lng": 22.955853,
+    "rating": 4.4,
+    "review_count": 1076,
+    "price_level": 4,
+    "room_count": 29,
+    "avg_nightly_rate": 239.0,
+    "cleanliness_rating": 4.5,
+    "service_rating": 3.9,
+    "location_rating": 5.0,
+    "value_rating": 3.9,
+    "review_velocity": 20.3,
+    "rating_trend": "flat",
+    "recent_reviews": [
+      {
+        "date": "2026-03-02",
+        "rating": 4.0,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      },
+      {
+        "date": "2026-01-18",
+        "rating": 4.0,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      },
+      {
+        "date": "2026-01-04",
+        "rating": 3.0,
+        "text": "Central location makes up for the small room size. Good value."
+      }
+    ],
+    "last_updated": "2026-03-18T18:00:00Z",
+    "acquisition_score": 23,
+    "maps_url": "https://maps.google.com/?q=40.61499,22.955853"
   },
   {
-    "id": "952ac912-d4f4-4c3e-9b0a-b6f10fb6ee0b",
+    "id": "88b756e3-76a2-4fa2-bab7-d05f056a7959",
+    "name": "Thessaloniki Grand",
+    "city": "Thessaloniki",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Agias Sofias 25, Thessaloniki 54638",
+    "lat": 40.670099,
+    "lng": 22.920246,
+    "rating": 2.3,
+    "review_count": 1478,
+    "price_level": 2,
+    "room_count": 43,
+    "avg_nightly_rate": 98.0,
+    "cleanliness_rating": 2.2,
+    "service_rating": 2.4,
+    "location_rating": 2.7,
+    "value_rating": 2.4,
+    "review_velocity": 24.6,
+    "rating_trend": "flat",
+    "recent_reviews": [
+      {
+        "date": "2026-02-21",
+        "rating": 1.3,
+        "text": "Elevator was broken during our entire stay. Had to carry luggage up 4 flights."
+      },
+      {
+        "date": "2026-02-09",
+        "rating": 2.4,
+        "text": "Cockroach in the room. Management offered to move us but the other room was just as bad."
+      },
+      {
+        "date": "2025-12-23",
+        "rating": 2.8,
+        "text": "Breakfast options were minimal and low quality. Stale bread, instant coffee."
+      }
+    ],
+    "last_updated": "2026-03-17T15:00:00Z",
+    "acquisition_score": 76,
+    "maps_url": "https://maps.google.com/?q=40.670099,22.920246"
+  },
+  {
+    "id": "77ab1e46-d991-47e1-a151-fa09098866c8",
+    "name": "Thessaloniki Inn",
+    "city": "Thessaloniki",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Mitropoleos 57, Thessaloniki 54688",
+    "lat": 40.627196,
+    "lng": 22.961798,
+    "rating": 4.2,
+    "review_count": 713,
+    "price_level": 2,
+    "room_count": 34,
+    "avg_nightly_rate": 85.0,
+    "cleanliness_rating": 4.4,
+    "service_rating": 4.1,
+    "location_rating": 4.9,
+    "value_rating": 4.0,
+    "review_velocity": 13.2,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-02-26",
+        "rating": 4.2,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      },
+      {
+        "date": "2026-01-19",
+        "rating": 4.4,
+        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
+      },
+      {
+        "date": "2026-01-19",
+        "rating": 4.3,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      }
+    ],
+    "last_updated": "2026-03-19T10:00:00Z",
+    "acquisition_score": 28,
+    "maps_url": "https://maps.google.com/?q=40.627196,22.961798"
+  },
+  {
+    "id": "54a10cb0-9403-4558-b8f2-710ccf34a03c",
     "name": "Hotel Anatolia",
     "city": "Thessaloniki",
     "country": "GR",
     "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Pavlou Mela 76, Thessaloniki 54664",
-    "lat": 40.628423,
-    "lng": 22.952872,
-    "rating": 4.2,
-    "review_count": 468,
+    "address": "Egnatia 92, Thessaloniki 54676",
+    "lat": 40.66117,
+    "lng": 22.929354,
+    "rating": 4.6,
+    "review_count": 577,
     "price_level": 3,
+    "room_count": 28,
+    "avg_nightly_rate": 182.0,
+    "cleanliness_rating": 4.1,
+    "service_rating": 4.4,
+    "location_rating": 5.0,
+    "value_rating": 4.2,
+    "review_velocity": 11.5,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-03-12",
+        "rating": 3.1,
+        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
+      },
+      {
+        "date": "2026-01-19",
+        "rating": 3.4,
+        "text": "Central location makes up for the small room size. Good value."
+      },
+      {
+        "date": "2026-01-26",
+        "rating": 3.3,
+        "text": "Central location makes up for the small room size. Good value."
+      }
+    ],
+    "last_updated": "2026-03-18T17:00:00Z",
+    "acquisition_score": 18,
+    "maps_url": "https://maps.google.com/?q=40.66117,22.929354"
+  },
+  {
+    "id": "e7c126e6-6a63-44d6-982e-7445741f82c0",
+    "name": "Hotel Olympos",
+    "city": "Thessaloniki",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Ionos Dragoumi 19, Thessaloniki 54627",
+    "lat": 40.612398,
+    "lng": 22.973618,
+    "rating": 4.6,
+    "review_count": 682,
+    "price_level": 2,
+    "room_count": 44,
+    "avg_nightly_rate": 114.0,
+    "cleanliness_rating": 4.5,
+    "service_rating": 4.6,
+    "location_rating": 5.0,
+    "value_rating": 4.0,
+    "review_velocity": 16.2,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-02-23",
+        "rating": 3.2,
+        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
+      },
+      {
+        "date": "2026-02-02",
+        "rating": 3.5,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      },
+      {
+        "date": "2026-01-28",
+        "rating": 3.6,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      }
+    ],
+    "last_updated": "2026-03-17T22:00:00Z",
+    "acquisition_score": 18,
+    "maps_url": "https://maps.google.com/?q=40.612398,22.973618"
+  },
+  {
+    "id": "cc4e212b-a4e5-4398-921e-74b749a1bff2",
+    "name": "Hotel Vergina",
+    "city": "Thessaloniki",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Dragoumi 69, Thessaloniki 54612",
+    "lat": 40.648017,
+    "lng": 22.949653,
+    "rating": 3.9,
+    "review_count": 1074,
+    "price_level": 3,
+    "room_count": 29,
+    "avg_nightly_rate": 110.0,
+    "cleanliness_rating": 3.7,
+    "service_rating": 3.9,
+    "location_rating": 4.0,
+    "value_rating": 4.0,
+    "review_velocity": 20.7,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-03-10",
+        "rating": 3.6,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
+      },
+      {
+        "date": "2026-01-21",
+        "rating": 4.0,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
+      },
+      {
+        "date": "2026-01-08",
+        "rating": 4.1,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      }
+    ],
+    "last_updated": "2026-03-18T15:00:00Z",
+    "acquisition_score": 36,
+    "maps_url": "https://maps.google.com/?q=40.648017,22.949653"
+  },
+  {
+    "id": "6f9028b7-2091-4ddd-8156-44d5da23f2b3",
+    "name": "Hotel Panorama",
+    "city": "Thessaloniki",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Komninon 14, Thessaloniki 54684",
+    "lat": 40.654211,
+    "lng": 22.932676,
+    "rating": 4.1,
+    "review_count": 785,
+    "price_level": 1,
+    "room_count": 35,
+    "avg_nightly_rate": 78.0,
+    "cleanliness_rating": 3.7,
+    "service_rating": 4.3,
+    "location_rating": 4.5,
+    "value_rating": 4.2,
+    "review_velocity": 14.0,
+    "rating_trend": "flat",
+    "recent_reviews": [
+      {
+        "date": "2026-03-08",
+        "rating": 4.1,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      },
+      {
+        "date": "2026-01-22",
+        "rating": 3.4,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
+      },
+      {
+        "date": "2026-01-29",
+        "rating": 4.3,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      }
+    ],
+    "last_updated": "2026-03-18T17:00:00Z",
+    "acquisition_score": 31,
+    "maps_url": "https://maps.google.com/?q=40.654211,22.932676"
+  },
+  {
+    "id": "010d2116-bed5-403e-9806-c17ece8c3606",
+    "name": "Hotel Macedonia",
+    "city": "Thessaloniki",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Ermou 61, Thessaloniki 54642",
+    "lat": 40.612297,
+    "lng": 22.954683,
+    "rating": 4.3,
+    "review_count": 1355,
+    "price_level": 2,
+    "room_count": 46,
+    "avg_nightly_rate": 68.0,
+    "cleanliness_rating": 4.4,
+    "service_rating": 4.0,
+    "location_rating": 4.9,
+    "value_rating": 4.1,
+    "review_velocity": 28.2,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-02-28",
+        "rating": 4.5,
+        "text": "Central location makes up for the small room size. Good value."
+      },
+      {
+        "date": "2026-01-20",
+        "rating": 3.6,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      },
+      {
+        "date": "2025-12-29",
+        "rating": 4.2,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      }
+    ],
+    "last_updated": "2026-03-17T15:00:00Z",
+    "acquisition_score": 26,
+    "maps_url": "https://maps.google.com/?q=40.612297,22.954683"
+  },
+  {
+    "id": "402753aa-7890-4814-8149-e0307abaac89",
+    "name": "Hotel Augustos",
+    "city": "Thessaloniki",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Aristotelous 70, Thessaloniki 54647",
+    "lat": 40.629373,
+    "lng": 22.915005,
+    "rating": 4.2,
+    "review_count": 1403,
+    "price_level": 3,
+    "room_count": 29,
+    "avg_nightly_rate": 158.0,
+    "cleanliness_rating": 4.0,
+    "service_rating": 4.3,
+    "location_rating": 4.5,
+    "value_rating": 3.6,
+    "review_velocity": 29.9,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-02-27",
+        "rating": 4.0,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      },
+      {
+        "date": "2026-02-17",
+        "rating": 4.0,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      },
+      {
+        "date": "2026-01-06",
+        "rating": 3.8,
+        "text": "Central location makes up for the small room size. Good value."
+      }
+    ],
+    "last_updated": "2026-03-17T14:00:00Z",
+    "acquisition_score": 28,
+    "maps_url": "https://maps.google.com/?q=40.629373,22.915005"
+  },
+  {
+    "id": "486c1998-b957-4496-b330-2e1f64780937",
+    "name": "Hotel Kastoria",
+    "city": "Thessaloniki",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Dragoumi 87, Thessaloniki 54666",
+    "lat": 40.612188,
+    "lng": 22.914106,
+    "rating": 4.7,
+    "review_count": 220,
+    "price_level": 3,
+    "room_count": 30,
+    "avg_nightly_rate": 141.0,
+    "cleanliness_rating": 4.7,
+    "service_rating": 4.7,
+    "location_rating": 5.0,
+    "value_rating": 5.0,
+    "review_velocity": 4.7,
+    "rating_trend": "flat",
+    "recent_reviews": [
+      {
+        "date": "2026-03-10",
+        "rating": 3.8,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      },
+      {
+        "date": "2026-01-26",
+        "rating": 4.0,
+        "text": "Central location makes up for the small room size. Good value."
+      },
+      {
+        "date": "2026-01-16",
+        "rating": 3.0,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      }
+    ],
+    "last_updated": "2026-03-19T02:00:00Z",
+    "acquisition_score": 15,
+    "maps_url": "https://maps.google.com/?q=40.612188,22.914106"
+  },
+  {
+    "id": "f2703177-ad14-42a3-82df-3f6c7cf599f7",
+    "name": "Hotel Electra Palace",
+    "city": "Thessaloniki",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Proxenou Koromila 100, Thessaloniki 54643",
+    "lat": 40.652342,
+    "lng": 22.92442,
+    "rating": 4.1,
+    "review_count": 584,
+    "price_level": 3,
+    "room_count": 39,
+    "avg_nightly_rate": 190.0,
+    "cleanliness_rating": 3.7,
+    "service_rating": 3.6,
+    "location_rating": 4.2,
+    "value_rating": 3.7,
+    "review_velocity": 10.1,
+    "rating_trend": "flat",
+    "recent_reviews": [
+      {
+        "date": "2026-03-10",
+        "rating": 4.0,
+        "text": "Central location makes up for the small room size. Good value."
+      },
+      {
+        "date": "2026-02-16",
+        "rating": 4.3,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      },
+      {
+        "date": "2026-01-21",
+        "rating": 4.2,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      }
+    ],
+    "last_updated": "2026-03-18T05:00:00Z",
+    "acquisition_score": 31,
+    "maps_url": "https://maps.google.com/?q=40.652342,22.92442"
+  },
+  {
+    "id": "26dc7ac4-cbce-4bec-a4ad-7bf56ebb32a9",
+    "name": "Hotel Aristotle",
+    "city": "Thessaloniki",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Mitropoleos 102, Thessaloniki 54673",
+    "lat": 40.611677,
+    "lng": 22.948182,
+    "rating": 3.4,
+    "review_count": 1158,
+    "price_level": 2,
+    "room_count": 43,
+    "avg_nightly_rate": 101.0,
+    "cleanliness_rating": 3.4,
+    "service_rating": 2.9,
+    "location_rating": 3.6,
+    "value_rating": 3.8,
+    "review_velocity": 19.6,
+    "rating_trend": "flat",
+    "recent_reviews": [
+      {
+        "date": "2026-02-27",
+        "rating": 1.8,
+        "text": "Breakfast options were minimal and low quality. Stale bread, instant coffee."
+      },
+      {
+        "date": "2026-02-16",
+        "rating": 2.9,
+        "text": "Location is great but the hotel desperately needs renovation. Everything feels worn out."
+      },
+      {
+        "date": "2025-12-21",
+        "rating": 1.9,
+        "text": "Terrible experience. Dirty bathroom, noisy hallway, and breakfast was inedible."
+      }
+    ],
+    "last_updated": "2026-03-17T18:00:00Z",
+    "acquisition_score": 48,
+    "maps_url": "https://maps.google.com/?q=40.611677,22.948182"
+  },
+  {
+    "id": "37ff88dc-587c-4f54-ae50-05c5c1a503fb",
+    "name": "Thessaly Hotel",
+    "city": "Thessaloniki",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Ermou 82, Thessaloniki 54685",
+    "lat": 40.621018,
+    "lng": 22.977039,
+    "rating": 3.9,
+    "review_count": 928,
+    "price_level": 2,
+    "room_count": 49,
+    "avg_nightly_rate": 69.0,
+    "cleanliness_rating": 3.4,
+    "service_rating": 3.5,
+    "location_rating": 4.0,
+    "value_rating": 3.6,
+    "review_velocity": 16.0,
+    "rating_trend": "flat",
+    "recent_reviews": [
+      {
+        "date": "2026-02-24",
+        "rating": 4.3,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      },
+      {
+        "date": "2026-02-04",
+        "rating": 4.0,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      },
+      {
+        "date": "2025-12-27",
+        "rating": 3.2,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      }
+    ],
+    "last_updated": "2026-03-18T18:00:00Z",
+    "acquisition_score": 36,
+    "maps_url": "https://maps.google.com/?q=40.621018,22.977039"
+  },
+  {
+    "id": "b8992393-7dc4-43ca-ae28-9a98f04aa4ba",
+    "name": "Byzantine Hotel",
+    "city": "Thessaloniki",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Dragoumi 75, Thessaloniki 54629",
+    "lat": 40.620372,
+    "lng": 22.953114,
+    "rating": 3.9,
+    "review_count": 671,
+    "price_level": 4,
+    "room_count": 30,
+    "avg_nightly_rate": 271.0,
+    "cleanliness_rating": 3.3,
+    "service_rating": 4.2,
+    "location_rating": 4.0,
+    "value_rating": 4.2,
+    "review_velocity": 11.2,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-02-20",
+        "rating": 4.2,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      },
+      {
+        "date": "2026-01-25",
+        "rating": 3.7,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
+      },
+      {
+        "date": "2025-12-22",
+        "rating": 4.0,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      }
+    ],
+    "last_updated": "2026-03-18T18:00:00Z",
+    "acquisition_score": 36,
+    "maps_url": "https://maps.google.com/?q=40.620372,22.953114"
+  },
+  {
+    "id": "9cc777e2-3a64-4ee7-b3ce-b5cc540b568f",
+    "name": "Hotel Capsis",
+    "city": "Thessaloniki",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Proxenou Koromila 59, Thessaloniki 54619",
+    "lat": 40.651417,
+    "lng": 22.920466,
+    "rating": 4.5,
+    "review_count": 724,
+    "price_level": 2,
+    "room_count": 33,
+    "avg_nightly_rate": 87.0,
+    "cleanliness_rating": 4.0,
+    "service_rating": 4.8,
+    "location_rating": 4.8,
+    "value_rating": 4.9,
+    "review_velocity": 15.4,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-03-08",
+        "rating": 3.8,
+        "text": "Central location makes up for the small room size. Good value."
+      },
+      {
+        "date": "2026-02-14",
+        "rating": 3.4,
+        "text": "Central location makes up for the small room size. Good value."
+      },
+      {
+        "date": "2026-01-24",
+        "rating": 3.7,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      }
+    ],
+    "last_updated": "2026-03-19T04:00:00Z",
     "acquisition_score": 20,
-    "maps_url": "https://maps.google.com/?q=40.628423,22.952872"
+    "maps_url": "https://maps.google.com/?q=40.651417,22.920466"
+  },
+  {
+    "id": "95756f73-7105-4b2a-85e1-13bce48c0428",
+    "name": "Thessaloniki Palace",
+    "city": "Thessaloniki",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Dragoumi 54, Thessaloniki 54641",
+    "lat": 40.667861,
+    "lng": 22.972562,
+    "rating": 2.4,
+    "review_count": 695,
+    "price_level": 3,
+    "room_count": 50,
+    "avg_nightly_rate": 168.0,
+    "cleanliness_rating": 2.0,
+    "service_rating": 2.0,
+    "location_rating": 3.2,
+    "value_rating": 2.3,
+    "review_velocity": 15.4,
+    "rating_trend": "declining",
+    "recent_reviews": [
+      {
+        "date": "2026-03-10",
+        "rating": 2.0,
+        "text": "Elevator was broken during our entire stay. Had to carry luggage up 4 flights."
+      },
+      {
+        "date": "2026-02-05",
+        "rating": 2.2,
+        "text": "Checked in at 3pm and the room still wasn't ready. No apology from front desk."
+      },
+      {
+        "date": "2026-01-28",
+        "rating": 1.6,
+        "text": "Room was outdated and the AC didn't work properly. Staff seemed overwhelmed."
+      }
+    ],
+    "last_updated": "2026-03-17T23:00:00Z",
+    "acquisition_score": 73,
+    "maps_url": "https://maps.google.com/?q=40.667861,22.972562"
+  },
+  {
+    "id": "c959b759-d93b-4dab-a0ab-eec0f3748e39",
+    "name": "Porto Palace",
+    "city": "Thessaloniki",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Ermou 2, Thessaloniki 54623",
+    "lat": 40.635956,
+    "lng": 22.971172,
+    "rating": 4.4,
+    "review_count": 494,
+    "price_level": 3,
+    "room_count": 42,
+    "avg_nightly_rate": 139.0,
+    "cleanliness_rating": 4.2,
+    "service_rating": 4.4,
+    "location_rating": 4.6,
+    "value_rating": 4.4,
+    "review_velocity": 13.0,
+    "rating_trend": "flat",
+    "recent_reviews": [
+      {
+        "date": "2026-02-26",
+        "rating": 4.2,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      },
+      {
+        "date": "2026-02-13",
+        "rating": 4.5,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      },
+      {
+        "date": "2026-01-06",
+        "rating": 4.2,
+        "text": "Central location makes up for the small room size. Good value."
+      }
+    ],
+    "last_updated": "2026-03-18T16:00:00Z",
+    "acquisition_score": 23,
+    "maps_url": "https://maps.google.com/?q=40.635956,22.971172"
+  },
+  {
+    "id": "35d49ea1-b285-4e54-841e-8d88d6916d14",
+    "name": "Hotel Pella",
+    "city": "Thessaloniki",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Dragoumi 66, Thessaloniki 54661",
+    "lat": 40.640105,
+    "lng": 22.912571,
+    "rating": 4.1,
+    "review_count": 221,
+    "price_level": 2,
+    "room_count": 29,
+    "avg_nightly_rate": 96.0,
+    "cleanliness_rating": 4.0,
+    "service_rating": 4.1,
+    "location_rating": 4.5,
+    "value_rating": 3.8,
+    "review_velocity": 4.0,
+    "rating_trend": "flat",
+    "recent_reviews": [
+      {
+        "date": "2026-02-28",
+        "rating": 3.9,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      },
+      {
+        "date": "2026-01-19",
+        "rating": 4.1,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      },
+      {
+        "date": "2026-01-12",
+        "rating": 4.2,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      }
+    ],
+    "last_updated": "2026-03-18T14:00:00Z",
+    "acquisition_score": 28,
+    "maps_url": "https://maps.google.com/?q=40.640105,22.912571"
+  },
+  {
+    "id": "1981ac2e-47b8-4d4d-8d3c-d4bba4acaa6f",
+    "name": "Hotel Ariston",
+    "city": "Thessaloniki",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Proxenou Koromila 102, Thessaloniki 54698",
+    "lat": 40.647856,
+    "lng": 22.951184,
+    "rating": 3.9,
+    "review_count": 444,
+    "price_level": 2,
+    "room_count": 38,
+    "avg_nightly_rate": 128.0,
+    "cleanliness_rating": 3.9,
+    "service_rating": 3.5,
+    "location_rating": 3.9,
+    "value_rating": 3.8,
+    "review_velocity": 8.5,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-02-21",
+        "rating": 3.2,
+        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
+      },
+      {
+        "date": "2026-02-05",
+        "rating": 3.9,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
+      },
+      {
+        "date": "2026-01-24",
+        "rating": 3.0,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      }
+    ],
+    "last_updated": "2026-03-18T17:00:00Z",
+    "acquisition_score": 35,
+    "maps_url": "https://maps.google.com/?q=40.647856,22.951184"
+  },
+  {
+    "id": "5264e7b0-c5bd-41e8-ae0b-3efdcf6162ba",
+    "name": "Nea Egnatia Hotel",
+    "city": "Thessaloniki",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Ermou 100, Thessaloniki 54688",
+    "lat": 40.665331,
+    "lng": 22.970497,
+    "rating": 4.2,
+    "review_count": 266,
+    "price_level": 3,
+    "room_count": 21,
+    "avg_nightly_rate": 121.0,
+    "cleanliness_rating": 3.8,
+    "service_rating": 3.9,
+    "location_rating": 4.7,
+    "value_rating": 4.1,
+    "review_velocity": 5.8,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-02-26",
+        "rating": 3.8,
+        "text": "Central location makes up for the small room size. Good value."
+      },
+      {
+        "date": "2026-02-04",
+        "rating": 3.3,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      },
+      {
+        "date": "2026-01-16",
+        "rating": 3.8,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      }
+    ],
+    "last_updated": "2026-03-18T23:00:00Z",
+    "acquisition_score": 26,
+    "maps_url": "https://maps.google.com/?q=40.665331,22.970497"
+  },
+  {
+    "id": "27c3181e-1234-494b-8a6d-19a2a689a539",
+    "name": "Hotel Aristotelous",
+    "city": "Thessaloniki",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Olympou 27, Thessaloniki 54698",
+    "lat": 40.652399,
+    "lng": 22.931593,
+    "rating": 4.7,
+    "review_count": 838,
+    "price_level": 2,
+    "room_count": 50,
+    "avg_nightly_rate": 117.0,
+    "cleanliness_rating": 4.4,
+    "service_rating": 4.2,
+    "location_rating": 5.0,
+    "value_rating": 4.5,
+    "review_velocity": 17.5,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-03-08",
+        "rating": 3.1,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      },
+      {
+        "date": "2026-02-15",
+        "rating": 4.4,
+        "text": "Central location makes up for the small room size. Good value."
+      },
+      {
+        "date": "2025-12-21",
+        "rating": 4.1,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      }
+    ],
+    "last_updated": "2026-03-19T00:00:00Z",
+    "acquisition_score": 15,
+    "maps_url": "https://maps.google.com/?q=40.652399,22.931593"
+  },
+  {
+    "id": "0653e79e-dc43-4a75-8fda-362c41e7e496",
+    "name": "Rotonda Hotel",
+    "city": "Thessaloniki",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Olympou 35, Thessaloniki 54627",
+    "lat": 40.616654,
+    "lng": 22.961262,
+    "rating": 2.8,
+    "review_count": 1435,
+    "price_level": 2,
+    "room_count": 20,
+    "avg_nightly_rate": 124.0,
+    "cleanliness_rating": 2.4,
+    "service_rating": 2.4,
+    "location_rating": 2.9,
+    "value_rating": 2.5,
+    "review_velocity": 28.1,
+    "rating_trend": "declining",
+    "recent_reviews": [
+      {
+        "date": "2026-03-08",
+        "rating": 2.9,
+        "text": "Room was outdated and the AC didn't work properly. Staff seemed overwhelmed."
+      },
+      {
+        "date": "2026-02-10",
+        "rating": 2.3,
+        "text": "Elevator was broken during our entire stay. Had to carry luggage up 4 flights."
+      },
+      {
+        "date": "2026-01-01",
+        "rating": 2.3,
+        "text": "Found mold in the shower. Reported it and nothing was done."
+      }
+    ],
+    "last_updated": "2026-03-18T19:00:00Z",
+    "acquisition_score": 63,
+    "maps_url": "https://maps.google.com/?q=40.616654,22.961262"
+  },
+  {
+    "id": "8726e880-c57e-4ec9-af59-74388d6b684f",
+    "name": "Thermaikos Hotel",
+    "city": "Thessaloniki",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Egnatia 84, Thessaloniki 54683",
+    "lat": 40.624033,
+    "lng": 22.961108,
+    "rating": 4.4,
+    "review_count": 1080,
+    "price_level": 3,
+    "room_count": 20,
+    "avg_nightly_rate": 184.0,
+    "cleanliness_rating": 4.2,
+    "service_rating": 4.6,
+    "location_rating": 5.0,
+    "value_rating": 3.8,
+    "review_velocity": 22.5,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-03-07",
+        "rating": 4.3,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      },
+      {
+        "date": "2026-02-20",
+        "rating": 3.9,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      },
+      {
+        "date": "2026-01-25",
+        "rating": 3.4,
+        "text": "Central location makes up for the small room size. Good value."
+      }
+    ],
+    "last_updated": "2026-03-17T20:00:00Z",
+    "acquisition_score": 23,
+    "maps_url": "https://maps.google.com/?q=40.624033,22.961108"
+  },
+  {
+    "id": "5b921108-0fbf-4d52-8de1-e7743ab675b0",
+    "name": "Hotel Excelsior",
+    "city": "Thessaloniki",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Pavlou Mela 65, Thessaloniki 54669",
+    "lat": 40.62647,
+    "lng": 22.966017,
+    "rating": 4.2,
+    "review_count": 1157,
+    "price_level": 2,
+    "room_count": 40,
+    "avg_nightly_rate": 107.0,
+    "cleanliness_rating": 4.3,
+    "service_rating": 3.6,
+    "location_rating": 4.5,
+    "value_rating": 3.9,
+    "review_velocity": 20.3,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-03-07",
+        "rating": 4.2,
+        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
+      },
+      {
+        "date": "2026-01-19",
+        "rating": 3.1,
+        "text": "Central location makes up for the small room size. Good value."
+      },
+      {
+        "date": "2025-12-20",
+        "rating": 3.3,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      }
+    ],
+    "last_updated": "2026-03-19T05:00:00Z",
+    "acquisition_score": 28,
+    "maps_url": "https://maps.google.com/?q=40.62647,22.966017"
+  },
+  {
+    "id": "39cd2118-e01f-4ee0-b09c-18b1a6637da0",
+    "name": "Agios Dimitrios Hotel",
+    "city": "Thessaloniki",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Venizelou 31, Thessaloniki 54667",
+    "lat": 40.655325,
+    "lng": 22.976182,
+    "rating": 4.6,
+    "review_count": 71,
+    "price_level": 2,
+    "room_count": 40,
+    "avg_nightly_rate": 66.0,
+    "cleanliness_rating": 4.7,
+    "service_rating": 4.7,
+    "location_rating": 4.6,
+    "value_rating": 4.1,
+    "review_velocity": 1.6,
+    "rating_trend": "flat",
+    "recent_reviews": [
+      {
+        "date": "2026-02-19",
+        "rating": 4.0,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      },
+      {
+        "date": "2026-02-02",
+        "rating": 3.9,
+        "text": "Central location makes up for the small room size. Good value."
+      },
+      {
+        "date": "2026-01-17",
+        "rating": 3.7,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      }
+    ],
+    "last_updated": "2026-03-18T08:00:00Z",
+    "acquisition_score": 15,
+    "maps_url": "https://maps.google.com/?q=40.655325,22.976182"
+  },
+  {
+    "id": "452cfcd2-28aa-450e-b798-7393e48c8530",
+    "name": "Rex Hotel",
+    "city": "Thessaloniki",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Ermou 117, Thessaloniki 54670",
+    "lat": 40.655541,
+    "lng": 22.96554,
+    "rating": 4.3,
+    "review_count": 443,
+    "price_level": 3,
+    "room_count": 42,
+    "avg_nightly_rate": 164.0,
+    "cleanliness_rating": 4.3,
+    "service_rating": 4.5,
+    "location_rating": 4.7,
+    "value_rating": 4.2,
+    "review_velocity": 9.4,
+    "rating_trend": "declining",
+    "recent_reviews": [
+      {
+        "date": "2026-02-22",
+        "rating": 3.1,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      },
+      {
+        "date": "2026-01-19",
+        "rating": 3.9,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      },
+      {
+        "date": "2026-01-22",
+        "rating": 3.5,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      }
+    ],
+    "last_updated": "2026-03-18T04:00:00Z",
+    "acquisition_score": 25,
+    "maps_url": "https://maps.google.com/?q=40.655541,22.96554"
+  },
+  {
+    "id": "afda8da9-bfa4-496b-a3d5-65de977bc183",
+    "name": "Egnatia Hotel",
+    "city": "Thessaloniki",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Agias Sofias 12, Thessaloniki 54675",
+    "lat": 40.636829,
+    "lng": 22.913295,
+    "rating": 4.4,
+    "review_count": 764,
+    "price_level": 2,
+    "room_count": 31,
+    "avg_nightly_rate": 102.0,
+    "cleanliness_rating": 4.4,
+    "service_rating": 4.5,
+    "location_rating": 4.6,
+    "value_rating": 3.8,
+    "review_velocity": 17.4,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-02-17",
+        "rating": 3.9,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      },
+      {
+        "date": "2026-02-18",
+        "rating": 3.5,
+        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
+      },
+      {
+        "date": "2026-01-27",
+        "rating": 4.4,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
+      }
+    ],
+    "last_updated": "2026-03-19T09:00:00Z",
+    "acquisition_score": 23,
+    "maps_url": "https://maps.google.com/?q=40.636829,22.913295"
+  },
+  {
+    "id": "f56bf582-ddec-4d72-bcf3-a0bb435e69fe",
+    "name": "Hotel Tourist",
+    "city": "Thessaloniki",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Aristotelous 99, Thessaloniki 54627",
+    "lat": 40.65605,
+    "lng": 22.977883,
+    "rating": 4.2,
+    "review_count": 332,
+    "price_level": 3,
+    "room_count": 32,
+    "avg_nightly_rate": 189.0,
+    "cleanliness_rating": 4.0,
+    "service_rating": 4.5,
+    "location_rating": 4.9,
+    "value_rating": 4.0,
+    "review_velocity": 5.8,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-02-23",
+        "rating": 4.0,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      },
+      {
+        "date": "2026-01-29",
+        "rating": 3.3,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      },
+      {
+        "date": "2025-12-28",
+        "rating": 3.8,
+        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
+      }
+    ],
+    "last_updated": "2026-03-17T15:00:00Z",
+    "acquisition_score": 27,
+    "maps_url": "https://maps.google.com/?q=40.65605,22.977883"
+  },
+  {
+    "id": "509bc701-8268-4a7f-9a97-b79d4fa62dc5",
+    "name": "White Tower Hotel",
+    "city": "Thessaloniki",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Proxenou Koromila 60, Thessaloniki 54696",
+    "lat": 40.653246,
+    "lng": 22.939089,
+    "rating": 4.6,
+    "review_count": 817,
+    "price_level": 2,
+    "room_count": 27,
+    "avg_nightly_rate": 95.0,
+    "cleanliness_rating": 4.2,
+    "service_rating": 4.2,
+    "location_rating": 5.0,
+    "value_rating": 4.8,
+    "review_velocity": 22.1,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-02-27",
+        "rating": 3.4,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
+      },
+      {
+        "date": "2026-02-16",
+        "rating": 3.9,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      },
+      {
+        "date": "2026-01-03",
+        "rating": 3.4,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
+      }
+    ],
+    "last_updated": "2026-03-19T11:00:00Z",
+    "acquisition_score": 18,
+    "maps_url": "https://maps.google.com/?q=40.653246,22.939089"
   }
 ]
