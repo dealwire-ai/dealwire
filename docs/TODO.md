@@ -15,11 +15,12 @@
       - Buttons to easily update screening criteria from digest email as well as "mute" deals that keep getting sent over and over  
 
 ## Tax Lien Analyzer
+   - see docs for roadmap
+   - look into ATTOM or other valuation APIs
 
 ## Frontstep Acquisition
    - execute + track media outreach
-   - respond to tyler abt media and appfolio
-   -    lead scoring + auto-scheduling feature (proposal sent)
+   - prepare to close
     
 ## Survey Platform
    - demo M4 (analytics)
