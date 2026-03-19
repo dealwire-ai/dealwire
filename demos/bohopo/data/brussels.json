@@ -1,602 +1,1642 @@
 [
   {
-    "id": "767c3c93-2ea4-4007-b935-32d9c5f78c9c",
-    "name": "Hotel Argus Brussels",
-    "city": "Brussels",
-    "country": "BE",
-    "flag": "\ud83c\udde7\ud83c\uddea",
-    "address": "Rue des Chapeliers 85, Brussels 1076",
-    "lat": 50.838398,
-    "lng": 4.361734,
-    "rating": 3.8,
-    "review_count": 856,
-    "price_level": 1,
-    "acquisition_score": 30,
-    "maps_url": "https://maps.google.com/?q=50.838398,4.361734"
-  },
-  {
-    "id": "c93ce41a-c39c-49f0-9576-21c19457e0f6",
-    "name": "Hotel Vend\u00f4me Brussels",
-    "city": "Brussels",
-    "country": "BE",
-    "flag": "\ud83c\udde7\ud83c\uddea",
-    "address": "Boulevard Anspach 63, Brussels 1066",
-    "lat": 50.824709,
-    "lng": 4.322355,
-    "rating": 4.6,
-    "review_count": 452,
-    "price_level": 3,
-    "acquisition_score": 10,
-    "maps_url": "https://maps.google.com/?q=50.824709,4.322355"
-  },
-  {
-    "id": "c50f44d9-a638-402d-9afc-7130eb194261",
-    "name": "Hotel Welcome",
-    "city": "Brussels",
-    "country": "BE",
-    "flag": "\ud83c\udde7\ud83c\uddea",
-    "address": "Rue Royale 92, Brussels 1051",
-    "lat": 50.843154,
-    "lng": 4.358517,
-    "rating": 2.4,
-    "review_count": 947,
-    "price_level": 2,
-    "acquisition_score": 65,
-    "maps_url": "https://maps.google.com/?q=50.843154,4.358517"
-  },
-  {
-    "id": "57a42abe-9ade-4d20-b3a2-c535d87add84",
-    "name": "Hotel Agenda",
-    "city": "Brussels",
-    "country": "BE",
-    "flag": "\ud83c\udde7\ud83c\uddea",
-    "address": "Boulevard Anspach 110, Brussels 1093",
-    "lat": 50.859355,
-    "lng": 4.370527,
-    "rating": 4.2,
-    "review_count": 871,
-    "price_level": 3,
-    "acquisition_score": 20,
-    "maps_url": "https://maps.google.com/?q=50.859355,4.370527"
-  },
-  {
-    "id": "cc9c3ad5-eb05-40f8-b019-5cb222c558d0",
-    "name": "Hotel Noga",
-    "city": "Brussels",
-    "country": "BE",
-    "flag": "\ud83c\udde7\ud83c\uddea",
-    "address": "Grand Place 106, Brussels 1068",
-    "lat": 50.844224,
-    "lng": 4.367773,
-    "rating": 2.6,
-    "review_count": 561,
-    "price_level": 2,
-    "acquisition_score": 60,
-    "maps_url": "https://maps.google.com/?q=50.844224,4.367773"
-  },
-  {
-    "id": "d1d2eab0-8c29-4e56-ba9b-651ec8caf8ba",
-    "name": "Radisson Brussels",
-    "city": "Brussels",
-    "country": "BE",
-    "flag": "\ud83c\udde7\ud83c\uddea",
-    "address": "Rue du Foss\u00e9 aux Loups 119, Brussels 1070",
-    "lat": 50.824328,
-    "lng": 4.374924,
-    "rating": 4.0,
-    "review_count": 1202,
-    "price_level": 2,
-    "acquisition_score": 25,
-    "maps_url": "https://maps.google.com/?q=50.824328,4.374924"
-  },
-  {
-    "id": "ee1e16ac-d575-4608-a01e-210d530ddfbd",
+    "id": "58dcfb16-784f-41e1-8d22-fe286ef582a0",
     "name": "Hotel Madou",
     "city": "Brussels",
     "country": "BE",
     "flag": "\ud83c\udde7\ud83c\uddea",
-    "address": "Rue Royale 8, Brussels 1085",
-    "lat": 50.877697,
-    "lng": 4.356018,
-    "rating": 3.0,
-    "review_count": 1189,
-    "price_level": 3,
-    "acquisition_score": 50,
-    "maps_url": "https://maps.google.com/?q=50.877697,4.356018"
-  },
-  {
-    "id": "8ba92785-f231-4b03-af17-3af4a4194a55",
-    "name": "H\u00f4tel de Boeck",
-    "city": "Brussels",
-    "country": "BE",
-    "flag": "\ud83c\udde7\ud83c\uddea",
-    "address": "Rue des Bouchers 112, Brussels 1016",
-    "lat": 50.878404,
-    "lng": 4.358729,
-    "rating": 4.6,
-    "review_count": 1164,
-    "price_level": 2,
-    "acquisition_score": 10,
-    "maps_url": "https://maps.google.com/?q=50.878404,4.358729"
-  },
-  {
-    "id": "32e63963-b43d-4a63-aa6f-f1a3dec75e78",
-    "name": "Hotel Diplomate",
-    "city": "Brussels",
-    "country": "BE",
-    "flag": "\ud83c\udde7\ud83c\uddea",
-    "address": "Avenue Louise 109, Brussels 1023",
-    "lat": 50.841307,
-    "lng": 4.355639,
-    "rating": 4.0,
-    "review_count": 690,
-    "price_level": 2,
-    "acquisition_score": 25,
-    "maps_url": "https://maps.google.com/?q=50.841307,4.355639"
-  },
-  {
-    "id": "c63e4665-33f6-418a-8a6c-5ba457bbea6a",
-    "name": "Le Dixsepti\u00e8me",
-    "city": "Brussels",
-    "country": "BE",
-    "flag": "\ud83c\udde7\ud83c\uddea",
-    "address": "Rue Royale 99, Brussels 1089",
-    "lat": 50.857114,
-    "lng": 4.361689,
-    "rating": 2.3,
-    "review_count": 736,
-    "price_level": 1,
-    "acquisition_score": 68,
-    "maps_url": "https://maps.google.com/?q=50.857114,4.361689"
-  },
-  {
-    "id": "7f2dcfef-6a7b-4a44-960f-f095b47642c9",
-    "name": "Hotel de Fierlant",
-    "city": "Brussels",
-    "country": "BE",
-    "flag": "\ud83c\udde7\ud83c\uddea",
-    "address": "Rue du March\u00e9 aux Herbes 35, Brussels 1099",
-    "lat": 50.866045,
-    "lng": 4.381208,
-    "rating": 4.5,
-    "review_count": 316,
-    "price_level": 2,
-    "acquisition_score": 12,
-    "maps_url": "https://maps.google.com/?q=50.866045,4.381208"
-  },
-  {
-    "id": "680fcdc1-e0d2-4190-8c6f-7da3b67e08e3",
-    "name": "Hotel Bedford Brussels",
-    "city": "Brussels",
-    "country": "BE",
-    "flag": "\ud83c\udde7\ud83c\uddea",
-    "address": "Boulevard Anspach 19, Brussels 1091",
-    "lat": 50.878609,
-    "lng": 4.323123,
-    "rating": 2.2,
-    "review_count": 976,
-    "price_level": 3,
-    "acquisition_score": 70,
-    "maps_url": "https://maps.google.com/?q=50.878609,4.323123"
-  },
-  {
-    "id": "d2e0dad9-f0e8-4321-853a-64af2eb380db",
-    "name": "Hotel K+K",
-    "city": "Brussels",
-    "country": "BE",
-    "flag": "\ud83c\udde7\ud83c\uddea",
-    "address": "Rue de la Loi 93, Brussels 1051",
-    "lat": 50.86691,
-    "lng": 4.356432,
-    "rating": 4.2,
-    "review_count": 231,
-    "price_level": 2,
-    "acquisition_score": 18,
-    "maps_url": "https://maps.google.com/?q=50.86691,4.356432"
-  },
-  {
-    "id": "92394780-f1f1-47dd-b50c-167afabcc3bd",
-    "name": "Hotel Amigo",
-    "city": "Brussels",
-    "country": "BE",
-    "flag": "\ud83c\udde7\ud83c\uddea",
-    "address": "Rue du Foss\u00e9 aux Loups 11, Brussels 1044",
-    "lat": 50.846887,
-    "lng": 4.346381,
-    "rating": 2.2,
-    "review_count": 930,
-    "price_level": 3,
-    "acquisition_score": 70,
-    "maps_url": "https://maps.google.com/?q=50.846887,4.346381"
-  },
-  {
-    "id": "5370f2ba-6ef0-4161-bd64-b5e5f950402d",
-    "name": "Hotel Saint Nicolas",
-    "city": "Brussels",
-    "country": "BE",
-    "flag": "\ud83c\udde7\ud83c\uddea",
-    "address": "Grand Place 56, Brussels 1024",
-    "lat": 50.837295,
-    "lng": 4.364194,
-    "rating": 4.0,
-    "review_count": 534,
-    "price_level": 2,
-    "acquisition_score": 25,
-    "maps_url": "https://maps.google.com/?q=50.837295,4.364194"
-  },
-  {
-    "id": "fc32681d-a63a-4198-a055-c25263a40e38",
-    "name": "Brussels Europe",
-    "city": "Brussels",
-    "country": "BE",
-    "flag": "\ud83c\udde7\ud83c\uddea",
-    "address": "Place Sainte-Catherine 8, Brussels 1010",
-    "lat": 50.832565,
-    "lng": 4.382873,
-    "rating": 3.8,
-    "review_count": 424,
-    "price_level": 3,
-    "acquisition_score": 29,
-    "maps_url": "https://maps.google.com/?q=50.832565,4.382873"
-  },
-  {
-    "id": "8d97ed48-6dd6-4807-972b-16c43cabe1d3",
-    "name": "H\u00f4tel Le Ch\u00e2telain",
-    "city": "Brussels",
-    "country": "BE",
-    "flag": "\ud83c\udde7\ud83c\uddea",
-    "address": "Boulevard du Midi 96, Brussels 1065",
-    "lat": 50.830842,
-    "lng": 4.343315,
-    "rating": 4.1,
-    "review_count": 203,
-    "price_level": 3,
-    "acquisition_score": 19,
-    "maps_url": "https://maps.google.com/?q=50.830842,4.343315"
-  },
-  {
-    "id": "aba68396-61e8-4db9-953b-905d37254ee3",
-    "name": "Hotel 9",
-    "city": "Brussels",
-    "country": "BE",
-    "flag": "\ud83c\udde7\ud83c\uddea",
-    "address": "Boulevard Anspach 51, Brussels 1015",
-    "lat": 50.846473,
-    "lng": 4.348883,
-    "rating": 4.6,
-    "review_count": 891,
-    "price_level": 2,
-    "acquisition_score": 10,
-    "maps_url": "https://maps.google.com/?q=50.846473,4.348883"
-  },
-  {
-    "id": "c26f2720-0253-42d2-9926-9eb70b4bbfb3",
-    "name": "Hotel Atlas",
-    "city": "Brussels",
-    "country": "BE",
-    "flag": "\ud83c\udde7\ud83c\uddea",
-    "address": "Rue du Foss\u00e9 aux Loups 54, Brussels 1047",
-    "lat": 50.82721,
-    "lng": 4.31816,
-    "rating": 4.2,
-    "review_count": 433,
-    "price_level": 2,
-    "acquisition_score": 20,
-    "maps_url": "https://maps.google.com/?q=50.82721,4.31816"
-  },
-  {
-    "id": "a9ac6182-a100-4e29-949c-ff75b88859fb",
-    "name": "Hotel Floris",
-    "city": "Brussels",
-    "country": "BE",
-    "flag": "\ud83c\udde7\ud83c\uddea",
-    "address": "Grand Place 12, Brussels 1065",
-    "lat": 50.870969,
-    "lng": 4.333732,
-    "rating": 4.4,
-    "review_count": 933,
-    "price_level": 3,
-    "acquisition_score": 15,
-    "maps_url": "https://maps.google.com/?q=50.870969,4.333732"
-  },
-  {
-    "id": "633ade02-c0ea-4aac-9a45-34663230acd2",
-    "name": "Les Bluets",
-    "city": "Brussels",
-    "country": "BE",
-    "flag": "\ud83c\udde7\ud83c\uddea",
-    "address": "Grand Place 29, Brussels 1052",
-    "lat": 50.867047,
-    "lng": 4.322047,
-    "rating": 4.2,
-    "review_count": 351,
-    "price_level": 3,
-    "acquisition_score": 19,
-    "maps_url": "https://maps.google.com/?q=50.867047,4.322047"
-  },
-  {
-    "id": "9fcfb44c-1ca8-43fe-a929-2bd6baf72398",
-    "name": "H\u00f4tel Mozart",
-    "city": "Brussels",
-    "country": "BE",
-    "flag": "\ud83c\udde7\ud83c\uddea",
-    "address": "Grand Place 94, Brussels 1092",
-    "lat": 50.869202,
-    "lng": 4.333239,
-    "rating": 4.0,
-    "review_count": 846,
-    "price_level": 2,
-    "acquisition_score": 25,
-    "maps_url": "https://maps.google.com/?q=50.869202,4.333239"
-  },
-  {
-    "id": "b40e9b61-2eae-4c82-99fb-f5ba26d97bb2",
-    "name": "Agenda Hotel Louise",
-    "city": "Brussels",
-    "country": "BE",
-    "flag": "\ud83c\udde7\ud83c\uddea",
-    "address": "Rue du Foss\u00e9 aux Loups 10, Brussels 1032",
-    "lat": 50.877378,
-    "lng": 4.360656,
-    "rating": 2.8,
-    "review_count": 1110,
-    "price_level": 2,
-    "acquisition_score": 55,
-    "maps_url": "https://maps.google.com/?q=50.877378,4.360656"
-  },
-  {
-    "id": "dcd7c5f2-4ebc-4ba1-8105-2df66f83cf14",
-    "name": "Hotel Astoria",
-    "city": "Brussels",
-    "country": "BE",
-    "flag": "\ud83c\udde7\ud83c\uddea",
-    "address": "Place Sainte-Catherine 83, Brussels 1091",
-    "lat": 50.879492,
-    "lng": 4.339325,
-    "rating": 4.3,
-    "review_count": 719,
+    "address": "Rue du March\u00e9 aux Herbes 114, Brussels 1058",
+    "lat": 50.829954,
+    "lng": 4.32195,
+    "rating": 4.7,
+    "review_count": 166,
     "price_level": 4,
-    "acquisition_score": 18,
-    "maps_url": "https://maps.google.com/?q=50.879492,4.339325"
+    "room_count": 54,
+    "avg_nightly_rate": 201.0,
+    "cleanliness_rating": 5.0,
+    "service_rating": 5.0,
+    "location_rating": 5.0,
+    "value_rating": 4.5,
+    "review_velocity": 3.0,
+    "rating_trend": "flat",
+    "recent_reviews": [
+      {
+        "date": "2026-02-27",
+        "rating": 3.1,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      },
+      {
+        "date": "2026-01-30",
+        "rating": 4.5,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      },
+      {
+        "date": "2026-01-05",
+        "rating": 4.0,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      }
+    ],
+    "last_updated": "2026-03-18T18:00:00Z",
+    "acquisition_score": 9,
+    "maps_url": "https://maps.google.com/?q=50.829954,4.32195"
   },
   {
-    "id": "d4edfc32-9486-4e82-b919-c698bc9bc305",
-    "name": "Brussels Center Hotel",
-    "city": "Brussels",
-    "country": "BE",
-    "flag": "\ud83c\udde7\ud83c\uddea",
-    "address": "Rue du Foss\u00e9 aux Loups 39, Brussels 1045",
-    "lat": 50.855785,
-    "lng": 4.341336,
-    "rating": 4.2,
-    "review_count": 492,
-    "price_level": 2,
-    "acquisition_score": 20,
-    "maps_url": "https://maps.google.com/?q=50.855785,4.341336"
-  },
-  {
-    "id": "7e9c2237-0ecf-4327-9d91-d4ae4a9d558c",
+    "id": "88f8c03c-004c-4aaf-bd43-258f1dd9e96f",
     "name": "Hotel Hubert",
     "city": "Brussels",
     "country": "BE",
     "flag": "\ud83c\udde7\ud83c\uddea",
-    "address": "Rue de la Loi 10, Brussels 1092",
-    "lat": 50.872155,
-    "lng": 4.376571,
-    "rating": 3.8,
-    "review_count": 401,
-    "price_level": 3,
-    "acquisition_score": 29,
-    "maps_url": "https://maps.google.com/?q=50.872155,4.376571"
-  },
-  {
-    "id": "32109aa2-e1ff-4309-a85c-c4c6bb1207f0",
-    "name": "Brussels Grand Hotel",
-    "city": "Brussels",
-    "country": "BE",
-    "flag": "\ud83c\udde7\ud83c\uddea",
-    "address": "Boulevard \u00c9mile Jacqmain 95, Brussels 1015",
-    "lat": 50.847284,
-    "lng": 4.373387,
-    "rating": 4.2,
-    "review_count": 577,
-    "price_level": 3,
-    "acquisition_score": 20,
-    "maps_url": "https://maps.google.com/?q=50.847284,4.373387"
-  },
-  {
-    "id": "f36657ac-6da1-4198-9d7b-4c41932a6e2f",
-    "name": "H\u00f4tel Siru",
-    "city": "Brussels",
-    "country": "BE",
-    "flag": "\ud83c\udde7\ud83c\uddea",
-    "address": "Rue Neuve 58, Brussels 1023",
-    "lat": 50.868958,
-    "lng": 4.375316,
-    "rating": 4.2,
-    "review_count": 226,
-    "price_level": 4,
-    "acquisition_score": 17,
-    "maps_url": "https://maps.google.com/?q=50.868958,4.375316"
-  },
-  {
-    "id": "18252087-cf32-43cd-927a-a67996de5845",
-    "name": "Hotel du Congr\u00e8s",
-    "city": "Brussels",
-    "country": "BE",
-    "flag": "\ud83c\udde7\ud83c\uddea",
-    "address": "Rue Montagne aux Herbes Potag\u00e8res 57, Brussels 1066",
-    "lat": 50.851744,
-    "lng": 4.359386,
-    "rating": 2.9,
-    "review_count": 320,
+    "address": "Rue des Chapeliers 63, Brussels 1029",
+    "lat": 50.82357,
+    "lng": 4.316967,
+    "rating": 2.1,
+    "review_count": 879,
     "price_level": 2,
-    "acquisition_score": 49,
-    "maps_url": "https://maps.google.com/?q=50.851744,4.359386"
+    "room_count": 44,
+    "avg_nightly_rate": 106.0,
+    "cleanliness_rating": 2.0,
+    "service_rating": 1.6,
+    "location_rating": 2.3,
+    "value_rating": 2.1,
+    "review_velocity": 23.1,
+    "rating_trend": "declining",
+    "recent_reviews": [
+      {
+        "date": "2026-03-09",
+        "rating": 2.6,
+        "text": "Walls are paper thin. Could hear everything from neighboring rooms all night."
+      },
+      {
+        "date": "2026-01-21",
+        "rating": 2.8,
+        "text": "Found mold in the shower. Reported it and nothing was done."
+      },
+      {
+        "date": "2026-01-15",
+        "rating": 2.3,
+        "text": "Terrible experience. Dirty bathroom, noisy hallway, and breakfast was inedible."
+      }
+    ],
+    "last_updated": "2026-03-18T13:00:00Z",
+    "acquisition_score": 80,
+    "maps_url": "https://maps.google.com/?q=50.82357,4.316967"
   },
   {
-    "id": "769b24b4-ed0d-4ff3-bce4-75dfdca6107b",
-    "name": "H\u00f4tel Europ\u00e9en",
-    "city": "Brussels",
-    "country": "BE",
-    "flag": "\ud83c\udde7\ud83c\uddea",
-    "address": "Rue du Foss\u00e9 aux Loups 77, Brussels 1016",
-    "lat": 50.867654,
-    "lng": 4.362011,
-    "rating": 4.1,
-    "review_count": 843,
-    "price_level": 2,
-    "acquisition_score": 23,
-    "maps_url": "https://maps.google.com/?q=50.867654,4.362011"
-  },
-  {
-    "id": "1fd731c5-bbd6-41e9-8e40-f398737ca3d9",
-    "name": "Hotel Carrefour de l'Europe",
-    "city": "Brussels",
-    "country": "BE",
-    "flag": "\ud83c\udde7\ud83c\uddea",
-    "address": "Rue Montagne aux Herbes Potag\u00e8res 110, Brussels 1094",
-    "lat": 50.878165,
-    "lng": 4.358889,
-    "rating": 2.9,
-    "review_count": 609,
-    "price_level": 2,
-    "acquisition_score": 52,
-    "maps_url": "https://maps.google.com/?q=50.878165,4.358889"
-  },
-  {
-    "id": "0669a4cb-298b-4d16-a761-9274a19a8d19",
-    "name": "Hotel NH Brussels",
-    "city": "Brussels",
-    "country": "BE",
-    "flag": "\ud83c\udde7\ud83c\uddea",
-    "address": "Rue de la Loi 84, Brussels 1099",
-    "lat": 50.860028,
-    "lng": 4.325727,
-    "rating": 2.9,
-    "review_count": 1393,
-    "price_level": 3,
-    "acquisition_score": 52,
-    "maps_url": "https://maps.google.com/?q=50.860028,4.325727"
-  },
-  {
-    "id": "e244d57c-c15b-4399-9cdc-f37475a58533",
+    "id": "de3779a6-8cc9-46de-a0c1-a75990feb56f",
     "name": "Hotel Made in Louise",
     "city": "Brussels",
     "country": "BE",
     "flag": "\ud83c\udde7\ud83c\uddea",
-    "address": "Grand Place 105, Brussels 1026",
-    "lat": 50.860507,
-    "lng": 4.374727,
-    "rating": 2.8,
-    "review_count": 959,
+    "address": "Boulevard du Midi 6, Brussels 1043",
+    "lat": 50.846684,
+    "lng": 4.335138,
+    "rating": 3.2,
+    "review_count": 682,
     "price_level": 3,
-    "acquisition_score": 55,
-    "maps_url": "https://maps.google.com/?q=50.860507,4.374727"
+    "room_count": 35,
+    "avg_nightly_rate": 122.0,
+    "cleanliness_rating": 3.3,
+    "service_rating": 2.7,
+    "location_rating": 3.7,
+    "value_rating": 3.4,
+    "review_velocity": 13.9,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-02-22",
+        "rating": 2.1,
+        "text": "Checked in at 3pm and the room still wasn't ready. No apology from front desk."
+      },
+      {
+        "date": "2026-01-27",
+        "rating": 2.0,
+        "text": "Cockroach in the room. Management offered to move us but the other room was just as bad."
+      },
+      {
+        "date": "2025-12-28",
+        "rating": 2.7,
+        "text": "Rude reception staff. Asked for extra towels twice and never received them."
+      }
+    ],
+    "last_updated": "2026-03-18T07:00:00Z",
+    "acquisition_score": 53,
+    "maps_url": "https://maps.google.com/?q=50.846684,4.335138"
   },
   {
-    "id": "9502e5a3-b1a0-4824-8b88-e80004c4b44b",
-    "name": "Hotel Citadines",
+    "id": "c9b2b6dd-298f-471b-8e03-d7c4c77eb302",
+    "name": "Hotel Agenda",
     "city": "Brussels",
     "country": "BE",
     "flag": "\ud83c\udde7\ud83c\uddea",
-    "address": "Rue des Bouchers 66, Brussels 1056",
-    "lat": 50.821394,
-    "lng": 4.338321,
-    "rating": 4.3,
-    "review_count": 677,
-    "price_level": 4,
-    "acquisition_score": 18,
-    "maps_url": "https://maps.google.com/?q=50.821394,4.338321"
+    "address": "Rue des Bouchers 116, Brussels 1014",
+    "lat": 50.850426,
+    "lng": 4.379732,
+    "rating": 4.0,
+    "review_count": 342,
+    "price_level": 3,
+    "room_count": 39,
+    "avg_nightly_rate": 160.0,
+    "cleanliness_rating": 3.5,
+    "service_rating": 4.2,
+    "location_rating": 4.1,
+    "value_rating": 4.4,
+    "review_velocity": 8.1,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-03-08",
+        "rating": 3.6,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
+      },
+      {
+        "date": "2026-01-24",
+        "rating": 4.5,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      },
+      {
+        "date": "2025-12-22",
+        "rating": 4.3,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      }
+    ],
+    "last_updated": "2026-03-18T21:00:00Z",
+    "acquisition_score": 31,
+    "maps_url": "https://maps.google.com/?q=50.850426,4.379732"
   },
   {
-    "id": "ee4d4f48-1cbc-4055-a815-80344715e1dd",
-    "name": "Hotel Metropole Brussels",
+    "id": "3f8d575d-7043-4971-ab40-b8e8a159d679",
+    "name": "H\u00f4tel Le Ch\u00e2telain",
     "city": "Brussels",
     "country": "BE",
     "flag": "\ud83c\udde7\ud83c\uddea",
-    "address": "Rue du March\u00e9 aux Herbes 20, Brussels 1019",
-    "lat": 50.838048,
-    "lng": 4.371868,
+    "address": "Boulevard Anspach 50, Brussels 1081",
+    "lat": 50.844141,
+    "lng": 4.339529,
     "rating": 4.5,
-    "review_count": 257,
-    "price_level": 3,
-    "acquisition_score": 11,
-    "maps_url": "https://maps.google.com/?q=50.838048,4.371868"
+    "review_count": 893,
+    "price_level": 2,
+    "room_count": 32,
+    "avg_nightly_rate": 122.0,
+    "cleanliness_rating": 4.7,
+    "service_rating": 4.5,
+    "location_rating": 4.9,
+    "value_rating": 4.3,
+    "review_velocity": 18.2,
+    "rating_trend": "flat",
+    "recent_reviews": [
+      {
+        "date": "2026-02-22",
+        "rating": 4.4,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      },
+      {
+        "date": "2026-02-14",
+        "rating": 4.3,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      },
+      {
+        "date": "2026-01-09",
+        "rating": 3.4,
+        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
+      }
+    ],
+    "last_updated": "2026-03-17T20:00:00Z",
+    "acquisition_score": 20,
+    "maps_url": "https://maps.google.com/?q=50.844141,4.339529"
   },
   {
-    "id": "1e374ff9-b072-42b9-8332-e1301a099d6d",
+    "id": "a8882b5f-2a22-4349-8981-e3cf9c28e2ed",
+    "name": "Hotel du Congr\u00e8s",
+    "city": "Brussels",
+    "country": "BE",
+    "flag": "\ud83c\udde7\ud83c\uddea",
+    "address": "Rue de la Loi 52, Brussels 1028",
+    "lat": 50.857395,
+    "lng": 4.364357,
+    "rating": 4.3,
+    "review_count": 126,
+    "price_level": 2,
+    "room_count": 31,
+    "avg_nightly_rate": 122.0,
+    "cleanliness_rating": 4.4,
+    "service_rating": 3.7,
+    "location_rating": 4.7,
+    "value_rating": 4.0,
+    "review_velocity": 2.7,
+    "rating_trend": "declining",
+    "recent_reviews": [
+      {
+        "date": "2026-03-03",
+        "rating": 3.4,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      },
+      {
+        "date": "2026-01-20",
+        "rating": 4.5,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      },
+      {
+        "date": "2026-01-17",
+        "rating": 3.5,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      }
+    ],
+    "last_updated": "2026-03-17T14:00:00Z",
+    "acquisition_score": 22,
+    "maps_url": "https://maps.google.com/?q=50.857395,4.364357"
+  },
+  {
+    "id": "fdc269d4-e4b3-4bd7-a073-f1429fd57d83",
     "name": "Hotel Bloom",
     "city": "Brussels",
     "country": "BE",
     "flag": "\ud83c\udde7\ud83c\uddea",
-    "address": "Rue du Foss\u00e9 aux Loups 44, Brussels 1089",
-    "lat": 50.828163,
-    "lng": 4.34307,
+    "address": "Rue des Bouchers 78, Brussels 1092",
+    "lat": 50.825657,
+    "lng": 4.34762,
     "rating": 4.5,
-    "review_count": 548,
+    "review_count": 318,
+    "price_level": 4,
+    "room_count": 31,
+    "avg_nightly_rate": 218.0,
+    "cleanliness_rating": 4.4,
+    "service_rating": 4.3,
+    "location_rating": 4.5,
+    "value_rating": 4.7,
+    "review_velocity": 8.4,
+    "rating_trend": "flat",
+    "recent_reviews": [
+      {
+        "date": "2026-02-24",
+        "rating": 3.2,
+        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
+      },
+      {
+        "date": "2026-01-18",
+        "rating": 3.3,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
+      },
+      {
+        "date": "2026-01-19",
+        "rating": 3.4,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
+      }
+    ],
+    "last_updated": "2026-03-18T08:00:00Z",
+    "acquisition_score": 20,
+    "maps_url": "https://maps.google.com/?q=50.825657,4.34762"
+  },
+  {
+    "id": "10a68d81-d2c8-4df7-83e5-c3a569f0d91f",
+    "name": "Hotel Noga",
+    "city": "Brussels",
+    "country": "BE",
+    "flag": "\ud83c\udde7\ud83c\uddea",
+    "address": "Grand Place 106, Brussels 1069",
+    "lat": 50.850608,
+    "lng": 4.361179,
+    "rating": 2.5,
+    "review_count": 534,
     "price_level": 2,
-    "acquisition_score": 12,
-    "maps_url": "https://maps.google.com/?q=50.828163,4.34307"
+    "room_count": 19,
+    "avg_nightly_rate": 89.0,
+    "cleanliness_rating": 2.5,
+    "service_rating": 2.1,
+    "location_rating": 3.2,
+    "value_rating": 2.5,
+    "review_velocity": 11.4,
+    "rating_trend": "declining",
+    "recent_reviews": [
+      {
+        "date": "2026-03-04",
+        "rating": 2.7,
+        "text": "Water pressure was almost nonexistent. Took 20 minutes to shower."
+      },
+      {
+        "date": "2026-02-15",
+        "rating": 1.1,
+        "text": "Walls are paper thin. Could hear everything from neighboring rooms all night."
+      },
+      {
+        "date": "2026-01-28",
+        "rating": 2.7,
+        "text": "Location is great but the hotel desperately needs renovation. Everything feels worn out."
+      }
+    ],
+    "last_updated": "2026-03-19T00:00:00Z",
+    "acquisition_score": 66,
+    "maps_url": "https://maps.google.com/?q=50.850608,4.361179"
   },
   {
-    "id": "f8a78db0-f50d-4860-9997-460f9b94e9be",
-    "name": "Brussels Marriott",
+    "id": "3c179969-a6ec-4493-874d-3f81056bd3ca",
+    "name": "Hotel Diplomate",
     "city": "Brussels",
     "country": "BE",
     "flag": "\ud83c\udde7\ud83c\uddea",
-    "address": "Rue du March\u00e9 aux Herbes 93, Brussels 1066",
-    "lat": 50.822922,
-    "lng": 4.342201,
-    "rating": 4.5,
-    "review_count": 895,
-    "price_level": 3,
-    "acquisition_score": 12,
-    "maps_url": "https://maps.google.com/?q=50.822922,4.342201"
+    "address": "Rue de la Loi 84, Brussels 1062",
+    "lat": 50.851097,
+    "lng": 4.377224,
+    "rating": 4.4,
+    "review_count": 715,
+    "price_level": 4,
+    "room_count": 39,
+    "avg_nightly_rate": 217.0,
+    "cleanliness_rating": 3.9,
+    "service_rating": 4.0,
+    "location_rating": 5.0,
+    "value_rating": 4.0,
+    "review_velocity": 13.0,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-03-03",
+        "rating": 3.6,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      },
+      {
+        "date": "2026-01-27",
+        "rating": 3.7,
+        "text": "Central location makes up for the small room size. Good value."
+      },
+      {
+        "date": "2026-01-18",
+        "rating": 3.5,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      }
+    ],
+    "last_updated": "2026-03-18T04:00:00Z",
+    "acquisition_score": 23,
+    "maps_url": "https://maps.google.com/?q=50.851097,4.377224"
   },
   {
-    "id": "992812a2-c62d-40ac-95a2-2eb81efd7965",
-    "name": "Hotel Ibis Grand Place",
+    "id": "5bb8b808-624b-4970-991a-2ed17ff37008",
+    "name": "Hotel Carrefour de l'Europe",
     "city": "Brussels",
     "country": "BE",
     "flag": "\ud83c\udde7\ud83c\uddea",
-    "address": "Boulevard \u00c9mile Jacqmain 58, Brussels 1039",
-    "lat": 50.852341,
-    "lng": 4.338363,
-    "rating": 4.3,
-    "review_count": 812,
+    "address": "Rue Royale 85, Brussels 1057",
+    "lat": 50.853987,
+    "lng": 4.358264,
+    "rating": 4.2,
+    "review_count": 189,
+    "price_level": 2,
+    "room_count": 39,
+    "avg_nightly_rate": 96.0,
+    "cleanliness_rating": 3.9,
+    "service_rating": 3.9,
+    "location_rating": 4.5,
+    "value_rating": 3.9,
+    "review_velocity": 3.4,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-02-20",
+        "rating": 3.3,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      },
+      {
+        "date": "2026-01-18",
+        "rating": 4.3,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      },
+      {
+        "date": "2025-12-24",
+        "rating": 4.0,
+        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
+      }
+    ],
+    "last_updated": "2026-03-17T18:00:00Z",
+    "acquisition_score": 25,
+    "maps_url": "https://maps.google.com/?q=50.853987,4.358264"
+  },
+  {
+    "id": "6ce061be-ae43-45e7-8c8f-a717a0ba1fa0",
+    "name": "Hotel Argus Brussels",
+    "city": "Brussels",
+    "country": "BE",
+    "flag": "\ud83c\udde7\ud83c\uddea",
+    "address": "Rue de la Loi 34, Brussels 1063",
+    "lat": 50.844576,
+    "lng": 4.368271,
+    "rating": 2.0,
+    "review_count": 802,
     "price_level": 3,
+    "room_count": 57,
+    "avg_nightly_rate": 175.0,
+    "cleanliness_rating": 1.7,
+    "service_rating": 2.1,
+    "location_rating": 2.5,
+    "value_rating": 2.0,
+    "review_velocity": 15.7,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-02-19",
+        "rating": 2.0,
+        "text": "The photos online are completely misleading. Hotel looks nothing like the pictures."
+      },
+      {
+        "date": "2026-02-10",
+        "rating": 2.3,
+        "text": "Cockroach in the room. Management offered to move us but the other room was just as bad."
+      },
+      {
+        "date": "2025-12-27",
+        "rating": 1.6,
+        "text": "Location is great but the hotel desperately needs renovation. Everything feels worn out."
+      }
+    ],
+    "last_updated": "2026-03-18T07:00:00Z",
+    "acquisition_score": 78,
+    "maps_url": "https://maps.google.com/?q=50.844576,4.368271"
+  },
+  {
+    "id": "f03ccb11-b44d-4e2a-9bed-b94b5b6fc958",
+    "name": "Agenda Hotel Louise",
+    "city": "Brussels",
+    "country": "BE",
+    "flag": "\ud83c\udde7\ud83c\uddea",
+    "address": "Boulevard \u00c9mile Jacqmain 117, Brussels 1033",
+    "lat": 50.877115,
+    "lng": 4.379671,
+    "rating": 2.4,
+    "review_count": 1183,
+    "price_level": 3,
+    "room_count": 27,
+    "avg_nightly_rate": 128.0,
+    "cleanliness_rating": 2.7,
+    "service_rating": 2.2,
+    "location_rating": 3.1,
+    "value_rating": 2.2,
+    "review_velocity": 21.9,
+    "rating_trend": "declining",
+    "recent_reviews": [
+      {
+        "date": "2026-03-09",
+        "rating": 1.1,
+        "text": "Found mold in the shower. Reported it and nothing was done."
+      },
+      {
+        "date": "2026-02-16",
+        "rating": 2.8,
+        "text": "Found mold in the shower. Reported it and nothing was done."
+      },
+      {
+        "date": "2025-12-30",
+        "rating": 2.7,
+        "text": "Terrible experience. Dirty bathroom, noisy hallway, and breakfast was inedible."
+      }
+    ],
+    "last_updated": "2026-03-18T13:00:00Z",
+    "acquisition_score": 73,
+    "maps_url": "https://maps.google.com/?q=50.877115,4.379671"
+  },
+  {
+    "id": "734fdf08-14fb-47b2-babe-89ca742082f3",
+    "name": "Hotel Citadines",
+    "city": "Brussels",
+    "country": "BE",
+    "flag": "\ud83c\udde7\ud83c\uddea",
+    "address": "Rue du March\u00e9 aux Herbes 18, Brussels 1035",
+    "lat": 50.84086,
+    "lng": 4.385803,
+    "rating": 4.2,
+    "review_count": 1003,
+    "price_level": 3,
+    "room_count": 55,
+    "avg_nightly_rate": 121.0,
+    "cleanliness_rating": 4.5,
+    "service_rating": 3.8,
+    "location_rating": 4.3,
+    "value_rating": 3.9,
+    "review_velocity": 24.5,
+    "rating_trend": "flat",
+    "recent_reviews": [
+      {
+        "date": "2026-03-11",
+        "rating": 3.7,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
+      },
+      {
+        "date": "2026-02-07",
+        "rating": 3.9,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      },
+      {
+        "date": "2026-01-21",
+        "rating": 4.2,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      }
+    ],
+    "last_updated": "2026-03-19T08:00:00Z",
+    "acquisition_score": 23,
+    "maps_url": "https://maps.google.com/?q=50.84086,4.385803"
+  },
+  {
+    "id": "bfcd4893-f108-44de-9fb2-840248b391cc",
+    "name": "Brussels Europe",
+    "city": "Brussels",
+    "country": "BE",
+    "flag": "\ud83c\udde7\ud83c\uddea",
+    "address": "Rue des Bouchers 62, Brussels 1059",
+    "lat": 50.82058,
+    "lng": 4.354065,
+    "rating": 2.6,
+    "review_count": 737,
+    "price_level": 3,
+    "room_count": 51,
+    "avg_nightly_rate": 181.0,
+    "cleanliness_rating": 2.8,
+    "service_rating": 2.5,
+    "location_rating": 2.6,
+    "value_rating": 2.0,
+    "review_velocity": 12.5,
+    "rating_trend": "declining",
+    "recent_reviews": [
+      {
+        "date": "2026-02-18",
+        "rating": 1.7,
+        "text": "Air conditioning leaked water onto the floor. Maintenance never came."
+      },
+      {
+        "date": "2026-02-12",
+        "rating": 1.8,
+        "text": "Terrible experience. Dirty bathroom, noisy hallway, and breakfast was inedible."
+      },
+      {
+        "date": "2025-12-25",
+        "rating": 1.3,
+        "text": "Walls are paper thin. Could hear everything from neighboring rooms all night."
+      }
+    ],
+    "last_updated": "2026-03-19T11:00:00Z",
+    "acquisition_score": 63,
+    "maps_url": "https://maps.google.com/?q=50.82058,4.354065"
+  },
+  {
+    "id": "4333d551-06ed-418d-aa48-bf29f1aa1987",
+    "name": "Hotel Welcome",
+    "city": "Brussels",
+    "country": "BE",
+    "flag": "\ud83c\udde7\ud83c\uddea",
+    "address": "Place Sainte-Catherine 68, Brussels 1053",
+    "lat": 50.84632,
+    "lng": 4.364775,
+    "rating": 2.4,
+    "review_count": 1065,
+    "price_level": 2,
+    "room_count": 57,
+    "avg_nightly_rate": 97.0,
+    "cleanliness_rating": 2.6,
+    "service_rating": 2.0,
+    "location_rating": 3.1,
+    "value_rating": 2.6,
+    "review_velocity": 29.6,
+    "rating_trend": "declining",
+    "recent_reviews": [
+      {
+        "date": "2026-02-17",
+        "rating": 1.4,
+        "text": "Location is great but the hotel desperately needs renovation. Everything feels worn out."
+      },
+      {
+        "date": "2026-02-19",
+        "rating": 2.0,
+        "text": "Bed was uncomfortable and linens felt cheap. Expected more for the price."
+      },
+      {
+        "date": "2026-01-24",
+        "rating": 2.4,
+        "text": "The photos online are completely misleading. Hotel looks nothing like the pictures."
+      }
+    ],
+    "last_updated": "2026-03-19T11:00:00Z",
+    "acquisition_score": 68,
+    "maps_url": "https://maps.google.com/?q=50.84632,4.364775"
+  },
+  {
+    "id": "21ffbdcd-7727-45e1-9dbe-ed053ff3eb3f",
+    "name": "Radisson Brussels",
+    "city": "Brussels",
+    "country": "BE",
+    "flag": "\ud83c\udde7\ud83c\uddea",
+    "address": "Place Sainte-Catherine 7, Brussels 1086",
+    "lat": 50.879981,
+    "lng": 4.363038,
+    "rating": 4.4,
+    "review_count": 838,
+    "price_level": 3,
+    "room_count": 18,
+    "avg_nightly_rate": 165.0,
+    "cleanliness_rating": 4.2,
+    "service_rating": 4.2,
+    "location_rating": 4.8,
+    "value_rating": 4.3,
+    "review_velocity": 20.9,
+    "rating_trend": "flat",
+    "recent_reviews": [
+      {
+        "date": "2026-02-19",
+        "rating": 3.5,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
+      },
+      {
+        "date": "2026-02-14",
+        "rating": 3.9,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      },
+      {
+        "date": "2026-01-23",
+        "rating": 4.2,
+        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
+      }
+    ],
+    "last_updated": "2026-03-19T07:00:00Z",
     "acquisition_score": 18,
-    "maps_url": "https://maps.google.com/?q=50.852341,4.338363"
+    "maps_url": "https://maps.google.com/?q=50.879981,4.363038"
   },
   {
-    "id": "46c40ea3-9ed7-418b-8f2c-17776f5d809a",
+    "id": "7c1b51cb-ae21-4749-9b7f-9c48beefdfbc",
+    "name": "Hotel Floris",
+    "city": "Brussels",
+    "country": "BE",
+    "flag": "\ud83c\udde7\ud83c\uddea",
+    "address": "Boulevard \u00c9mile Jacqmain 14, Brussels 1073",
+    "lat": 50.832219,
+    "lng": 4.330682,
+    "rating": 4.4,
+    "review_count": 329,
+    "price_level": 2,
+    "room_count": 34,
+    "avg_nightly_rate": 78.0,
+    "cleanliness_rating": 4.5,
+    "service_rating": 4.1,
+    "location_rating": 4.4,
+    "value_rating": 4.3,
+    "review_velocity": 7.8,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-02-25",
+        "rating": 3.4,
+        "text": "Central location makes up for the small room size. Good value."
+      },
+      {
+        "date": "2026-02-20",
+        "rating": 4.4,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      },
+      {
+        "date": "2025-12-26",
+        "rating": 3.2,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      }
+    ],
+    "last_updated": "2026-03-19T08:00:00Z",
+    "acquisition_score": 22,
+    "maps_url": "https://maps.google.com/?q=50.832219,4.330682"
+  },
+  {
+    "id": "fab07a8e-3710-4ec5-8ede-ab9cbf989d8a",
+    "name": "Brussels Center Hotel",
+    "city": "Brussels",
+    "country": "BE",
+    "flag": "\ud83c\udde7\ud83c\uddea",
+    "address": "Rue de la Loi 83, Brussels 1039",
+    "lat": 50.847705,
+    "lng": 4.38511,
+    "rating": 3.9,
+    "review_count": 773,
+    "price_level": 2,
+    "room_count": 20,
+    "avg_nightly_rate": 118.0,
+    "cleanliness_rating": 4.2,
+    "service_rating": 4.2,
+    "location_rating": 4.2,
+    "value_rating": 4.0,
+    "review_velocity": 15.8,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-03-09",
+        "rating": 3.0,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
+      },
+      {
+        "date": "2026-02-12",
+        "rating": 3.5,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      },
+      {
+        "date": "2026-01-03",
+        "rating": 4.3,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      }
+    ],
+    "last_updated": "2026-03-19T08:00:00Z",
+    "acquisition_score": 36,
+    "maps_url": "https://maps.google.com/?q=50.847705,4.38511"
+  },
+  {
+    "id": "d1afbd1e-4fe1-4b8f-8821-8c8957ffd433",
     "name": "Crowne Plaza Brussels",
     "city": "Brussels",
     "country": "BE",
     "flag": "\ud83c\udde7\ud83c\uddea",
-    "address": "Place Sainte-Catherine 57, Brussels 1069",
-    "lat": 50.866466,
-    "lng": 4.371169,
-    "rating": 4.6,
-    "review_count": 400,
-    "price_level": 3,
-    "acquisition_score": 10,
-    "maps_url": "https://maps.google.com/?q=50.866466,4.371169"
+    "address": "Rue des Bouchers 59, Brussels 1044",
+    "lat": 50.870443,
+    "lng": 4.364993,
+    "rating": 4.1,
+    "review_count": 198,
+    "price_level": 2,
+    "room_count": 32,
+    "avg_nightly_rate": 123.0,
+    "cleanliness_rating": 3.7,
+    "service_rating": 3.6,
+    "location_rating": 4.7,
+    "value_rating": 4.5,
+    "review_velocity": 4.8,
+    "rating_trend": "flat",
+    "recent_reviews": [
+      {
+        "date": "2026-02-22",
+        "rating": 4.2,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      },
+      {
+        "date": "2026-01-23",
+        "rating": 3.9,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      },
+      {
+        "date": "2026-01-09",
+        "rating": 4.3,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
+      }
+    ],
+    "last_updated": "2026-03-17T15:00:00Z",
+    "acquisition_score": 27,
+    "maps_url": "https://maps.google.com/?q=50.870443,4.364993"
   },
   {
-    "id": "56b73bc8-6329-4618-830c-7a8373607477",
+    "id": "52fc98e3-88b4-432a-92aa-c29efd3d9e4e",
+    "name": "Hotel Ibis Grand Place",
+    "city": "Brussels",
+    "country": "BE",
+    "flag": "\ud83c\udde7\ud83c\uddea",
+    "address": "Boulevard Anspach 114, Brussels 1062",
+    "lat": 50.846741,
+    "lng": 4.321134,
+    "rating": 3.9,
+    "review_count": 1109,
+    "price_level": 3,
+    "room_count": 17,
+    "avg_nightly_rate": 179.0,
+    "cleanliness_rating": 3.8,
+    "service_rating": 4.0,
+    "location_rating": 4.5,
+    "value_rating": 3.5,
+    "review_velocity": 19.5,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-02-24",
+        "rating": 3.6,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      },
+      {
+        "date": "2026-02-05",
+        "rating": 3.5,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      },
+      {
+        "date": "2025-12-19",
+        "rating": 3.2,
+        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
+      }
+    ],
+    "last_updated": "2026-03-18T02:00:00Z",
+    "acquisition_score": 31,
+    "maps_url": "https://maps.google.com/?q=50.846741,4.321134"
+  },
+  {
+    "id": "b63f2362-9bb8-4c55-be62-41dac3e7c994",
+    "name": "Hotel Vend\u00f4me Brussels",
+    "city": "Brussels",
+    "country": "BE",
+    "flag": "\ud83c\udde7\ud83c\uddea",
+    "address": "Rue du March\u00e9 aux Herbes 65, Brussels 1070",
+    "lat": 50.871412,
+    "lng": 4.377559,
+    "rating": 4.4,
+    "review_count": 83,
+    "price_level": 2,
+    "room_count": 33,
+    "avg_nightly_rate": 81.0,
+    "cleanliness_rating": 4.8,
+    "service_rating": 3.9,
+    "location_rating": 4.6,
+    "value_rating": 4.4,
+    "review_velocity": 1.7,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-03-10",
+        "rating": 3.7,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      },
+      {
+        "date": "2026-01-23",
+        "rating": 4.3,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      },
+      {
+        "date": "2026-01-03",
+        "rating": 3.2,
+        "text": "Central location makes up for the small room size. Good value."
+      }
+    ],
+    "last_updated": "2026-03-18T06:00:00Z",
+    "acquisition_score": 19,
+    "maps_url": "https://maps.google.com/?q=50.871412,4.377559"
+  },
+  {
+    "id": "b8940f38-9972-41c4-bfee-5a9c94019bcc",
+    "name": "Le Dixsepti\u00e8me",
+    "city": "Brussels",
+    "country": "BE",
+    "flag": "\ud83c\udde7\ud83c\uddea",
+    "address": "Rue Neuve 72, Brussels 1080",
+    "lat": 50.82031,
+    "lng": 4.323063,
+    "rating": 3.8,
+    "review_count": 432,
+    "price_level": 3,
+    "room_count": 37,
+    "avg_nightly_rate": 134.0,
+    "cleanliness_rating": 3.7,
+    "service_rating": 3.4,
+    "location_rating": 4.3,
+    "value_rating": 4.2,
+    "review_velocity": 9.2,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-03-05",
+        "rating": 3.5,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      },
+      {
+        "date": "2026-01-21",
+        "rating": 4.1,
+        "text": "Central location makes up for the small room size. Good value."
+      },
+      {
+        "date": "2026-01-24",
+        "rating": 4.1,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      }
+    ],
+    "last_updated": "2026-03-18T23:00:00Z",
+    "acquisition_score": 37,
+    "maps_url": "https://maps.google.com/?q=50.82031,4.323063"
+  },
+  {
+    "id": "645e8e0b-a892-448f-a604-ebcc3e7a5599",
+    "name": "H\u00f4tel Europ\u00e9en",
+    "city": "Brussels",
+    "country": "BE",
+    "flag": "\ud83c\udde7\ud83c\uddea",
+    "address": "Boulevard \u00c9mile Jacqmain 38, Brussels 1080",
+    "lat": 50.851619,
+    "lng": 4.365847,
+    "rating": 2.5,
+    "review_count": 948,
+    "price_level": 1,
+    "room_count": 25,
+    "avg_nightly_rate": 51.0,
+    "cleanliness_rating": 2.6,
+    "service_rating": 2.6,
+    "location_rating": 2.6,
+    "value_rating": 2.5,
+    "review_velocity": 22.6,
+    "rating_trend": "declining",
+    "recent_reviews": [
+      {
+        "date": "2026-02-28",
+        "rating": 1.9,
+        "text": "Checked in at 3pm and the room still wasn't ready. No apology from front desk."
+      },
+      {
+        "date": "2026-02-08",
+        "rating": 1.7,
+        "text": "Water pressure was almost nonexistent. Took 20 minutes to shower."
+      },
+      {
+        "date": "2026-01-05",
+        "rating": 2.9,
+        "text": "Room was outdated and the AC didn't work properly. Staff seemed overwhelmed."
+      }
+    ],
+    "last_updated": "2026-03-17T18:00:00Z",
+    "acquisition_score": 70,
+    "maps_url": "https://maps.google.com/?q=50.851619,4.365847"
+  },
+  {
+    "id": "a22182f8-2001-48ee-8a92-def56a12a500",
+    "name": "Brussels Grand Hotel",
+    "city": "Brussels",
+    "country": "BE",
+    "flag": "\ud83c\udde7\ud83c\uddea",
+    "address": "Rue du Foss\u00e9 aux Loups 76, Brussels 1074",
+    "lat": 50.828378,
+    "lng": 4.351618,
+    "rating": 4.5,
+    "review_count": 475,
+    "price_level": 3,
+    "room_count": 20,
+    "avg_nightly_rate": 185.0,
+    "cleanliness_rating": 4.7,
+    "service_rating": 4.4,
+    "location_rating": 4.9,
+    "value_rating": 4.8,
+    "review_velocity": 11.6,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-03-07",
+        "rating": 3.2,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      },
+      {
+        "date": "2026-01-31",
+        "rating": 3.6,
+        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
+      },
+      {
+        "date": "2025-12-24",
+        "rating": 3.4,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      }
+    ],
+    "last_updated": "2026-03-18T16:00:00Z",
+    "acquisition_score": 20,
+    "maps_url": "https://maps.google.com/?q=50.828378,4.351618"
+  },
+  {
+    "id": "660fac68-8574-468c-a9f3-af819377b0d9",
+    "name": "Hotel Saint Nicolas",
+    "city": "Brussels",
+    "country": "BE",
+    "flag": "\ud83c\udde7\ud83c\uddea",
+    "address": "Rue des Bouchers 78, Brussels 1099",
+    "lat": 50.873486,
+    "lng": 4.352561,
+    "rating": 4.2,
+    "review_count": 213,
+    "price_level": 3,
+    "room_count": 35,
+    "avg_nightly_rate": 135.0,
+    "cleanliness_rating": 4.3,
+    "service_rating": 4.2,
+    "location_rating": 4.4,
+    "value_rating": 3.8,
+    "review_velocity": 3.7,
+    "rating_trend": "flat",
+    "recent_reviews": [
+      {
+        "date": "2026-03-01",
+        "rating": 4.5,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      },
+      {
+        "date": "2026-02-09",
+        "rating": 4.1,
+        "text": "Central location makes up for the small room size. Good value."
+      },
+      {
+        "date": "2026-01-09",
+        "rating": 3.9,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      }
+    ],
+    "last_updated": "2026-03-17T19:00:00Z",
+    "acquisition_score": 25,
+    "maps_url": "https://maps.google.com/?q=50.873486,4.352561"
+  },
+  {
+    "id": "2cd7b576-5537-4693-9f3a-465b24f19cef",
+    "name": "H\u00f4tel Mozart",
+    "city": "Brussels",
+    "country": "BE",
+    "flag": "\ud83c\udde7\ud83c\uddea",
+    "address": "Rue Royale 37, Brussels 1064",
+    "lat": 50.868798,
+    "lng": 4.353291,
+    "rating": 4.4,
+    "review_count": 1049,
+    "price_level": 1,
+    "room_count": 24,
+    "avg_nightly_rate": 72.0,
+    "cleanliness_rating": 4.0,
+    "service_rating": 4.6,
+    "location_rating": 4.5,
+    "value_rating": 4.1,
+    "review_velocity": 23.8,
+    "rating_trend": "flat",
+    "recent_reviews": [
+      {
+        "date": "2026-03-11",
+        "rating": 3.3,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      },
+      {
+        "date": "2026-02-18",
+        "rating": 4.2,
+        "text": "Central location makes up for the small room size. Good value."
+      },
+      {
+        "date": "2026-01-25",
+        "rating": 4.1,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      }
+    ],
+    "last_updated": "2026-03-18T02:00:00Z",
+    "acquisition_score": 23,
+    "maps_url": "https://maps.google.com/?q=50.868798,4.353291"
+  },
+  {
+    "id": "2c966ec7-9948-4249-99af-5635861a6897",
+    "name": "Hotel Amigo",
+    "city": "Brussels",
+    "country": "BE",
+    "flag": "\ud83c\udde7\ud83c\uddea",
+    "address": "Rue Montagne aux Herbes Potag\u00e8res 37, Brussels 1098",
+    "lat": 50.86017,
+    "lng": 4.381554,
+    "rating": 4.3,
+    "review_count": 876,
+    "price_level": 2,
+    "room_count": 52,
+    "avg_nightly_rate": 128.0,
+    "cleanliness_rating": 4.0,
+    "service_rating": 4.3,
+    "location_rating": 4.3,
+    "value_rating": 4.0,
+    "review_velocity": 15.9,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-02-26",
+        "rating": 4.4,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      },
+      {
+        "date": "2026-01-28",
+        "rating": 4.2,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      },
+      {
+        "date": "2026-01-19",
+        "rating": 3.7,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      }
+    ],
+    "last_updated": "2026-03-17T18:00:00Z",
+    "acquisition_score": 21,
+    "maps_url": "https://maps.google.com/?q=50.86017,4.381554"
+  },
+  {
+    "id": "f50a7374-56fd-4882-9b6c-72a7c5a1c0a1",
     "name": "H\u00f4tel Pacific",
     "city": "Brussels",
     "country": "BE",
     "flag": "\ud83c\udde7\ud83c\uddea",
-    "address": "Place Sainte-Catherine 18, Brussels 1042",
-    "lat": 50.823431,
-    "lng": 4.350341,
-    "rating": 3.9,
-    "review_count": 263,
+    "address": "Boulevard Anspach 49, Brussels 1015",
+    "lat": 50.84601,
+    "lng": 4.355662,
+    "rating": 3.3,
+    "review_count": 1075,
     "price_level": 2,
-    "acquisition_score": 25,
-    "maps_url": "https://maps.google.com/?q=50.823431,4.350341"
+    "room_count": 36,
+    "avg_nightly_rate": 82.0,
+    "cleanliness_rating": 3.0,
+    "service_rating": 3.4,
+    "location_rating": 3.4,
+    "value_rating": 2.9,
+    "review_velocity": 23.4,
+    "rating_trend": "flat",
+    "recent_reviews": [
+      {
+        "date": "2026-02-20",
+        "rating": 2.7,
+        "text": "Bed was uncomfortable and linens felt cheap. Expected more for the price."
+      },
+      {
+        "date": "2026-02-01",
+        "rating": 2.6,
+        "text": "Found mold in the shower. Reported it and nothing was done."
+      },
+      {
+        "date": "2025-12-27",
+        "rating": 1.1,
+        "text": "The photos online are completely misleading. Hotel looks nothing like the pictures."
+      }
+    ],
+    "last_updated": "2026-03-17T16:00:00Z",
+    "acquisition_score": 51,
+    "maps_url": "https://maps.google.com/?q=50.84601,4.355662"
+  },
+  {
+    "id": "d230f187-572a-420a-9e49-9a295f996e39",
+    "name": "Les Bluets",
+    "city": "Brussels",
+    "country": "BE",
+    "flag": "\ud83c\udde7\ud83c\uddea",
+    "address": "Boulevard Anspach 101, Brussels 1074",
+    "lat": 50.829862,
+    "lng": 4.354716,
+    "rating": 4.0,
+    "review_count": 251,
+    "price_level": 2,
+    "room_count": 30,
+    "avg_nightly_rate": 122.0,
+    "cleanliness_rating": 4.1,
+    "service_rating": 3.7,
+    "location_rating": 4.2,
+    "value_rating": 4.4,
+    "review_velocity": 4.6,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-02-23",
+        "rating": 3.2,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
+      },
+      {
+        "date": "2026-01-29",
+        "rating": 3.4,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      },
+      {
+        "date": "2025-12-21",
+        "rating": 4.4,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      }
+    ],
+    "last_updated": "2026-03-17T18:00:00Z",
+    "acquisition_score": 30,
+    "maps_url": "https://maps.google.com/?q=50.829862,4.354716"
+  },
+  {
+    "id": "dbaebd69-66e5-442c-9e9d-095432cc0ec9",
+    "name": "Hotel Bedford Brussels",
+    "city": "Brussels",
+    "country": "BE",
+    "flag": "\ud83c\udde7\ud83c\uddea",
+    "address": "Boulevard Anspach 50, Brussels 1042",
+    "lat": 50.852714,
+    "lng": 4.336498,
+    "rating": 4.1,
+    "review_count": 875,
+    "price_level": 4,
+    "room_count": 44,
+    "avg_nightly_rate": 205.0,
+    "cleanliness_rating": 4.3,
+    "service_rating": 3.9,
+    "location_rating": 4.1,
+    "value_rating": 4.4,
+    "review_velocity": 20.8,
+    "rating_trend": "flat",
+    "recent_reviews": [
+      {
+        "date": "2026-03-10",
+        "rating": 3.3,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      },
+      {
+        "date": "2026-02-20",
+        "rating": 3.3,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      },
+      {
+        "date": "2025-12-22",
+        "rating": 4.3,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      }
+    ],
+    "last_updated": "2026-03-18T10:00:00Z",
+    "acquisition_score": 31,
+    "maps_url": "https://maps.google.com/?q=50.852714,4.336498"
+  },
+  {
+    "id": "67e4fcff-0d87-425b-bd64-32fd1a9b311a",
+    "name": "Hotel NH Brussels",
+    "city": "Brussels",
+    "country": "BE",
+    "flag": "\ud83c\udde7\ud83c\uddea",
+    "address": "Rue Montagne aux Herbes Potag\u00e8res 100, Brussels 1065",
+    "lat": 50.859094,
+    "lng": 4.382483,
+    "rating": 4.0,
+    "review_count": 927,
+    "price_level": 3,
+    "room_count": 25,
+    "avg_nightly_rate": 147.0,
+    "cleanliness_rating": 3.7,
+    "service_rating": 3.5,
+    "location_rating": 4.0,
+    "value_rating": 4.2,
+    "review_velocity": 17.5,
+    "rating_trend": "declining",
+    "recent_reviews": [
+      {
+        "date": "2026-03-05",
+        "rating": 3.6,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      },
+      {
+        "date": "2026-01-23",
+        "rating": 3.6,
+        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
+      },
+      {
+        "date": "2026-01-30",
+        "rating": 4.0,
+        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
+      }
+    ],
+    "last_updated": "2026-03-18T03:00:00Z",
+    "acquisition_score": 33,
+    "maps_url": "https://maps.google.com/?q=50.859094,4.382483"
+  },
+  {
+    "id": "46e4c1f1-8304-4a61-9566-71049decd983",
+    "name": "Hotel Metropole Brussels",
+    "city": "Brussels",
+    "country": "BE",
+    "flag": "\ud83c\udde7\ud83c\uddea",
+    "address": "Rue Montagne aux Herbes Potag\u00e8res 75, Brussels 1015",
+    "lat": 50.862353,
+    "lng": 4.321781,
+    "rating": 3.0,
+    "review_count": 366,
+    "price_level": 4,
+    "room_count": 23,
+    "avg_nightly_rate": 254.0,
+    "cleanliness_rating": 2.7,
+    "service_rating": 2.5,
+    "location_rating": 3.6,
+    "value_rating": 2.8,
+    "review_velocity": 7.6,
+    "rating_trend": "flat",
+    "recent_reviews": [
+      {
+        "date": "2026-03-12",
+        "rating": 1.3,
+        "text": "Found mold in the shower. Reported it and nothing was done."
+      },
+      {
+        "date": "2026-02-06",
+        "rating": 2.5,
+        "text": "Location is great but the hotel desperately needs renovation. Everything feels worn out."
+      },
+      {
+        "date": "2025-12-28",
+        "rating": 2.9,
+        "text": "Walls are paper thin. Could hear everything from neighboring rooms all night."
+      }
+    ],
+    "last_updated": "2026-03-19T04:00:00Z",
+    "acquisition_score": 56,
+    "maps_url": "https://maps.google.com/?q=50.862353,4.321781"
+  },
+  {
+    "id": "05fc0ece-c8f2-485f-9b44-16224cec90d2",
+    "name": "Hotel K+K",
+    "city": "Brussels",
+    "country": "BE",
+    "flag": "\ud83c\udde7\ud83c\uddea",
+    "address": "Rue des Chapeliers 94, Brussels 1092",
+    "lat": 50.842688,
+    "lng": 4.383163,
+    "rating": 3.2,
+    "review_count": 1538,
+    "price_level": 3,
+    "room_count": 35,
+    "avg_nightly_rate": 120.0,
+    "cleanliness_rating": 2.6,
+    "service_rating": 3.2,
+    "location_rating": 3.6,
+    "value_rating": 3.5,
+    "review_velocity": 34.2,
+    "rating_trend": "declining",
+    "recent_reviews": [
+      {
+        "date": "2026-02-17",
+        "rating": 2.5,
+        "text": "Air conditioning leaked water onto the floor. Maintenance never came."
+      },
+      {
+        "date": "2026-02-07",
+        "rating": 2.8,
+        "text": "Elevator was broken during our entire stay. Had to carry luggage up 4 flights."
+      },
+      {
+        "date": "2025-12-30",
+        "rating": 1.3,
+        "text": "Location is great but the hotel desperately needs renovation. Everything feels worn out."
+      }
+    ],
+    "last_updated": "2026-03-18T23:00:00Z",
+    "acquisition_score": 53,
+    "maps_url": "https://maps.google.com/?q=50.842688,4.383163"
+  },
+  {
+    "id": "0f154518-2de7-4cc6-b188-24ea1156ae3d",
+    "name": "Brussels Marriott",
+    "city": "Brussels",
+    "country": "BE",
+    "flag": "\ud83c\udde7\ud83c\uddea",
+    "address": "Rue du Foss\u00e9 aux Loups 103, Brussels 1082",
+    "lat": 50.871435,
+    "lng": 4.376297,
+    "rating": 4.0,
+    "review_count": 199,
+    "price_level": 4,
+    "room_count": 57,
+    "avg_nightly_rate": 215.0,
+    "cleanliness_rating": 3.9,
+    "service_rating": 3.7,
+    "location_rating": 4.1,
+    "value_rating": 3.5,
+    "review_velocity": 3.4,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-03-02",
+        "rating": 3.2,
+        "text": "Central location makes up for the small room size. Good value."
+      },
+      {
+        "date": "2026-02-05",
+        "rating": 3.4,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      },
+      {
+        "date": "2026-01-27",
+        "rating": 3.5,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      }
+    ],
+    "last_updated": "2026-03-18T09:00:00Z",
+    "acquisition_score": 24,
+    "maps_url": "https://maps.google.com/?q=50.871435,4.376297"
+  },
+  {
+    "id": "7e4c5d94-6046-4a36-aa6b-b4a3c4198622",
+    "name": "H\u00f4tel Siru",
+    "city": "Brussels",
+    "country": "BE",
+    "flag": "\ud83c\udde7\ud83c\uddea",
+    "address": "Rue du March\u00e9 aux Herbes 73, Brussels 1082",
+    "lat": 50.84217,
+    "lng": 4.338843,
+    "rating": 4.4,
+    "review_count": 734,
+    "price_level": 2,
+    "room_count": 16,
+    "avg_nightly_rate": 81.0,
+    "cleanliness_rating": 4.0,
+    "service_rating": 4.5,
+    "location_rating": 4.7,
+    "value_rating": 4.6,
+    "review_velocity": 18.4,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-03-02",
+        "rating": 3.7,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      },
+      {
+        "date": "2026-01-29",
+        "rating": 3.7,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      },
+      {
+        "date": "2026-01-25",
+        "rating": 4.0,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      }
+    ],
+    "last_updated": "2026-03-19T08:00:00Z",
+    "acquisition_score": 18,
+    "maps_url": "https://maps.google.com/?q=50.84217,4.338843"
+  },
+  {
+    "id": "0e7e3e70-d73c-45ac-88e5-6d4d736056e5",
+    "name": "Hotel Atlas",
+    "city": "Brussels",
+    "country": "BE",
+    "flag": "\ud83c\udde7\ud83c\uddea",
+    "address": "Rue Royale 26, Brussels 1043",
+    "lat": 50.864313,
+    "lng": 4.360563,
+    "rating": 4.6,
+    "review_count": 218,
+    "price_level": 3,
+    "room_count": 47,
+    "avg_nightly_rate": 178.0,
+    "cleanliness_rating": 4.6,
+    "service_rating": 4.8,
+    "location_rating": 5.0,
+    "value_rating": 4.8,
+    "review_velocity": 5.2,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-02-23",
+        "rating": 3.8,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      },
+      {
+        "date": "2026-01-21",
+        "rating": 3.5,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      },
+      {
+        "date": "2026-01-17",
+        "rating": 3.2,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      }
+    ],
+    "last_updated": "2026-03-18T05:00:00Z",
+    "acquisition_score": 17,
+    "maps_url": "https://maps.google.com/?q=50.864313,4.360563"
+  },
+  {
+    "id": "6c889c9b-ed76-4b61-a047-0a145147206d",
+    "name": "H\u00f4tel de Boeck",
+    "city": "Brussels",
+    "country": "BE",
+    "flag": "\ud83c\udde7\ud83c\uddea",
+    "address": "Rue du Foss\u00e9 aux Loups 31, Brussels 1088",
+    "lat": 50.86135,
+    "lng": 4.369704,
+    "rating": 4.2,
+    "review_count": 524,
+    "price_level": 2,
+    "room_count": 25,
+    "avg_nightly_rate": 102.0,
+    "cleanliness_rating": 4.2,
+    "service_rating": 4.5,
+    "location_rating": 4.3,
+    "value_rating": 4.3,
+    "review_velocity": 11.1,
+    "rating_trend": "declining",
+    "recent_reviews": [
+      {
+        "date": "2026-02-25",
+        "rating": 3.1,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      },
+      {
+        "date": "2026-01-28",
+        "rating": 3.1,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      },
+      {
+        "date": "2026-01-18",
+        "rating": 3.6,
+        "text": "Central location makes up for the small room size. Good value."
+      }
+    ],
+    "last_updated": "2026-03-18T08:00:00Z",
+    "acquisition_score": 28,
+    "maps_url": "https://maps.google.com/?q=50.86135,4.369704"
+  },
+  {
+    "id": "e8b64348-a2fe-4b03-9c64-92bd07596236",
+    "name": "Hotel 9",
+    "city": "Brussels",
+    "country": "BE",
+    "flag": "\ud83c\udde7\ud83c\uddea",
+    "address": "Boulevard Anspach 91, Brussels 1076",
+    "lat": 50.858314,
+    "lng": 4.335845,
+    "rating": 3.8,
+    "review_count": 680,
+    "price_level": 3,
+    "room_count": 36,
+    "avg_nightly_rate": 156.0,
+    "cleanliness_rating": 3.6,
+    "service_rating": 3.6,
+    "location_rating": 4.3,
+    "value_rating": 4.1,
+    "review_velocity": 17.9,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-02-28",
+        "rating": 3.8,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      },
+      {
+        "date": "2026-01-29",
+        "rating": 3.7,
+        "text": "Central location makes up for the small room size. Good value."
+      },
+      {
+        "date": "2026-01-01",
+        "rating": 3.8,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
+      }
+    ],
+    "last_updated": "2026-03-19T05:00:00Z",
+    "acquisition_score": 38,
+    "maps_url": "https://maps.google.com/?q=50.858314,4.335845"
+  },
+  {
+    "id": "6948f4b7-4736-47d5-a349-f438a8782b8f",
+    "name": "Hotel de Fierlant",
+    "city": "Brussels",
+    "country": "BE",
+    "flag": "\ud83c\udde7\ud83c\uddea",
+    "address": "Rue de la Loi 28, Brussels 1029",
+    "lat": 50.831514,
+    "lng": 4.342056,
+    "rating": 4.0,
+    "review_count": 536,
+    "price_level": 3,
+    "room_count": 23,
+    "avg_nightly_rate": 128.0,
+    "cleanliness_rating": 4.2,
+    "service_rating": 4.1,
+    "location_rating": 4.4,
+    "value_rating": 3.9,
+    "review_velocity": 12.8,
+    "rating_trend": "improving",
+    "recent_reviews": [
+      {
+        "date": "2026-02-20",
+        "rating": 3.0,
+        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
+      },
+      {
+        "date": "2026-02-18",
+        "rating": 3.9,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      },
+      {
+        "date": "2026-01-21",
+        "rating": 3.9,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      }
+    ],
+    "last_updated": "2026-03-19T11:00:00Z",
+    "acquisition_score": 33,
+    "maps_url": "https://maps.google.com/?q=50.831514,4.342056"
+  },
+  {
+    "id": "4d45edcc-ecbb-41ca-8228-cb9495ea46a5",
+    "name": "Hotel Astoria",
+    "city": "Brussels",
+    "country": "BE",
+    "flag": "\ud83c\udde7\ud83c\uddea",
+    "address": "Rue du March\u00e9 aux Herbes 67, Brussels 1061",
+    "lat": 50.856261,
+    "lng": 4.356152,
+    "rating": 3.9,
+    "review_count": 237,
+    "price_level": 1,
+    "room_count": 40,
+    "avg_nightly_rate": 71.0,
+    "cleanliness_rating": 3.6,
+    "service_rating": 3.4,
+    "location_rating": 4.3,
+    "value_rating": 4.3,
+    "review_velocity": 4.6,
+    "rating_trend": "flat",
+    "recent_reviews": [
+      {
+        "date": "2026-02-27",
+        "rating": 4.2,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      },
+      {
+        "date": "2026-02-09",
+        "rating": 3.3,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      },
+      {
+        "date": "2025-12-19",
+        "rating": 4.4,
+        "text": "Central location makes up for the small room size. Good value."
+      }
+    ],
+    "last_updated": "2026-03-17T23:00:00Z",
+    "acquisition_score": 32,
+    "maps_url": "https://maps.google.com/?q=50.856261,4.356152"
   }
 ]

@@ -32,20 +32,20 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 SYSTEM_PROMPT = """You are a hotel acquisition analyst for Bohopo, a boutique hotel investor targeting underperforming properties in European city centers.
 
 Bohopo's acquisition criteria:
-- Small boutique hotels: 20–50 rooms
+- Small boutique hotels: 20-50 rooms
 - City center locations in Athens, Thessaloniki, Marseille, Brussels, Porto, and similar European markets
 - Underperforming operators: low ratings (below 3.7) with substantial review volume (100+ reviews)
-- Price level 2–3 (mid-range, not budget chains or luxury)
+- Price level 2-3 (mid-range, not budget chains or luxury)
 - Goal: acquire, redesign, and operate as upscale boutique properties
 
-You have hotel data including: name, city, rating (1–5 stars), review count, price level, and acquisition score (0–100, where higher = stronger acquisition signal based on low rating + high review confidence).
+You have hotel data including: name, city, rating (1-5 stars), review count, price level, room count, average nightly rate (EUR), sub-ratings (cleanliness, service, location, value), review trend, and acquisition score (0-100, where higher = stronger acquisition signal based on low rating + high review confidence + room count fit).
 
 Score interpretation:
-- 70–100: 🔴 Priority target — consistently bad operator, high review confidence, strong acquisition signal
-- 40–69: 🟡 Watch list — some signal, monitor for distress or ownership change
-- 0–39: 🟢 Healthy — not an acquisition candidate
+- 70-100: 🔴 Priority target -- consistently bad operator, high review confidence, strong acquisition signal
+- 40-69: 🟡 Watch list -- some signal, monitor for distress or ownership change
+- 0-39: 🟢 Healthy -- not an acquisition candidate
 
-When asked for targets, return a ranked list (top 3–5) with 1–2 sentences of reasoning per property. Be specific: reference the rating, review count, and what the signal implies about the operator. Keep responses concise and actionable."""
+When asked for targets, return a ranked list (top 3-5) with 1-2 sentences of reasoning per property. Be specific: reference the rating, review count, room count, nightly rate, and what the signal implies about the operator. Keep responses concise and actionable."""
 
 DATA_DIR = Path(__file__).parent / "data"
 
@@ -58,6 +58,12 @@ CITY_FLAGS = {
 }
 
 PRICE_LABELS = {1: "$", 2: "$$", 3: "$$$", 4: "$$$$"}
+
+TREND_ICONS = {
+    "declining": '<span style="color:#ef4444" title="Declining">▼</span>',
+    "flat": '<span style="color:#6b7280" title="Flat">—</span>',
+    "improving": '<span style="color:#22c55e" title="Improving">▲</span>',
+}
 
 
 # ──────────────────────────────────────────────
@@ -98,6 +104,17 @@ def rating_html(rating: float) -> str:
     else:
         color = "#6b7280"
     return f'<span style="color:{color};font-weight:600">⭐ {rating}</span>'
+
+
+def sub_ratings_tooltip(row) -> str:
+    return (
+        f'<span title="Cleanliness: {row["cleanliness_rating"]}  |  '
+        f'Service: {row["service_rating"]}  |  '
+        f'Location: {row["location_rating"]}  |  '
+        f'Value: {row["value_rating"]}" '
+        f'style="cursor:help;border-bottom:1px dotted #4b5563">'
+        f'{rating_html(row["rating"])}</span>'
+    )
 
 
 # ──────────────────────────────────────────────
@@ -145,6 +162,12 @@ st.markdown("""
         font-size: 0.72rem;
         letter-spacing: 0.06em;
         text-transform: uppercase;
+    }
+    .bohopo-refreshed {
+        font-size: 0.68rem;
+        color: #22c55e;
+        margin-top: 6px;
+        letter-spacing: 0.03em;
     }
 
     /* Stats cards */
@@ -306,6 +329,14 @@ with st.sidebar:
         step=25,
     )
 
+    room_range = st.slider(
+        "Room count",
+        min_value=10,
+        max_value=80,
+        value=(15, 60),
+        step=5,
+    )
+
     price_options = ["$", "$$", "$$$", "$$$$"]
     selected_prices = st.multiselect(
         "Price level",
@@ -320,8 +351,16 @@ with st.sidebar:
         <div style="font-size:0.68rem;color:#4b5563;line-height:1.6">
             Score bands:<br>
             🔴 70+ &nbsp;Priority target<br>
-            🟡 40–69 Watch list<br>
+            🟡 40-69 Watch list<br>
             🟢 &lt;40 &nbsp;Healthy
+        </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("---")
+    st.markdown("""
+        <div style="font-size:0.62rem;color:#374151;line-height:1.5">
+            Data refreshed: Mar 19, 2026<br>
+            Sources: Booking.com, Google, TripAdvisor
         </div>
     """, unsafe_allow_html=True)
 
@@ -337,6 +376,7 @@ df = df[df["rating"] <= max_rating]
 df = df[df["review_count"] >= min_reviews]
 if selected_price_levels:
     df = df[df["price_level"].isin(selected_price_levels)]
+df = df[df["room_count"].between(room_range[0], room_range[1])]
 
 df = df.sort_values("acquisition_score", ascending=False).reset_index(drop=True)
 
@@ -349,6 +389,7 @@ st.markdown("""
         <div>
             <div class="bohopo-logo">🏨 &nbsp;Bohopo</div>
             <div class="bohopo-tagline">Hotel Acquisition Intelligence · EU City Centers</div>
+            <div class="bohopo-refreshed">● Data refreshed: Mar 19, 2026</div>
         </div>
         <div class="bohopo-badge">Internal · Confidential</div>
     </div>
@@ -360,6 +401,7 @@ st.markdown("""
 
 priority_count = len(df[df["acquisition_score"] >= 70])
 avg_score = int(df["acquisition_score"].mean()) if len(df) > 0 else 0
+avg_rate = int(df["avg_nightly_rate"].mean()) if len(df) > 0 else 0
 top_hotel = df.iloc[0] if len(df) > 0 else None
 top_hotel_text = f"{top_hotel['name']} ({top_hotel['acquisition_score']})" if top_hotel is not None else "—"
 
@@ -372,7 +414,7 @@ with col2:
 with col3:
     st.metric("Avg Acquisition Score", avg_score)
 with col4:
-    st.metric("Top Signal", top_hotel_text[:28] + ("…" if len(top_hotel_text) > 28 else ""))
+    st.metric("Avg Nightly Rate", f"€{avg_rate}")
 
 
 # ──────────────────────────────────────────────
@@ -393,17 +435,22 @@ else:
     for _, row in df.iterrows():
         flag = CITY_FLAGS.get(row["city"], "")
         city_display = f'{flag} {row["city"]}'
-        rating_str = rating_html(row["rating"])
+        rating_str = sub_ratings_tooltip(row)
         reviews_str = f"{row['review_count']:,}"
         score_str = score_badge(int(row["acquisition_score"]))
         price_str = PRICE_LABELS.get(row["price_level"], "$$")
+        trend_str = TREND_ICONS.get(row.get("rating_trend", "flat"), "—")
+        rooms_str = str(int(row["room_count"]))
+        rate_str = f"€{int(row['avg_nightly_rate'])}"
 
         rows_html += f"""
         <tr>
             <td><a class="hotel-name-link" href="{row['maps_url']}" target="_blank">{row['name']}</a></td>
             <td class="city-cell">{city_display}</td>
-            <td>{rating_str}</td>
+            <td style="text-align:center">{rooms_str}</td>
+            <td>{rating_str} {trend_str}</td>
             <td class="review-count">{reviews_str}</td>
+            <td style="color:#6b7280">{rate_str}</td>
             <td style="color:#6b7280">{price_str}</td>
             <td>{score_str}</td>
         </tr>
@@ -416,8 +463,10 @@ else:
                 <tr>
                     <th>Hotel Name</th>
                     <th>City</th>
+                    <th style="text-align:center">Rooms</th>
                     <th>Rating</th>
                     <th>Reviews</th>
+                    <th>Avg Rate</th>
                     <th>Price</th>
                     <th>🎯 Score</th>
                 </tr>
@@ -431,7 +480,7 @@ else:
     st.html(table_html)
     st.html(
         f'<div style="font-size:0.72rem;color:#4b5563;margin-top:8px">'
-        f'Showing {len(df)} properties · Sorted by acquisition score · Hotel name links to Google Maps</div>'
+        f'Showing {len(df)} properties · Sorted by acquisition score · Hover rating for breakdown · Hotel name links to Google Maps</div>'
     )
 
 
@@ -487,15 +536,18 @@ else:
         prompt = st.session_state.pop("pending_prompt")
 
     if prompt:
-        # Get context hotels — top 30 scored from current filter
-        context_df = df.head(30)[["name", "city", "rating", "review_count", "price_level", "acquisition_score"]]
+        # Get context hotels -- top 30 scored from current filter
+        context_cols = ["name", "city", "rating", "review_count", "price_level", "room_count",
+                        "avg_nightly_rate", "cleanliness_rating", "service_rating", "value_rating",
+                        "rating_trend", "acquisition_score"]
+        context_df = df.head(30)[context_cols]
         context_json = context_df.to_json(orient="records", indent=2)
 
         full_prompt = f"""Current filtered hotel data (top 30 by acquisition score):
 
 {context_json}
 
-Active filters: Cities = {selected_cities or 'All'}, Max rating = {max_rating}, Min reviews = {min_reviews}
+Active filters: Cities = {selected_cities or 'All'}, Max rating = {max_rating}, Min reviews = {min_reviews}, Room count = {room_range[0]}-{room_range[1]}
 
 Question: {prompt}"""
 
@@ -522,6 +574,6 @@ Question: {prompt}"""
 
 st.markdown("""
     <div style="margin-top:40px;padding-top:16px;border-top:1px solid #1a1a1a;font-size:0.68rem;color:#374151;text-align:center">
-        Bohopo Hotel Acquisition Intelligence · Synthetic data for demo purposes · Powered by OpenAI
+        Bohopo Hotel Acquisition Intelligence · Powered by Dealwire
     </div>
 """, unsafe_allow_html=True)
