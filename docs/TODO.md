@@ -6,6 +6,10 @@
 
 ## Biz Dev
    -  Send custom deal screener demo to Quinn Breslin
+   -  play around with pinchfin
+   -  follow  up w
+   -     minas (bohopo)
+   -     jeff harper (foxfield)
 
 ## Deal Screener
    - **[JK 3/3]** Underwriting pipeline improvements:
