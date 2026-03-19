@@ -9,6 +9,7 @@ import json
 import math
 import random
 import uuid
+from datetime import datetime, timedelta
 from pathlib import Path
 
 random.seed(42)
@@ -161,15 +162,77 @@ CITIES = {
     },
 }
 
+REVIEW_SNIPPETS_BAD = [
+    "Room was outdated and the AC didn't work properly. Staff seemed overwhelmed.",
+    "Terrible experience. Dirty bathroom, noisy hallway, and breakfast was inedible.",
+    "Location is great but the hotel desperately needs renovation. Everything feels worn out.",
+    "Checked in at 3pm and the room still wasn't ready. No apology from front desk.",
+    "Walls are paper thin. Could hear everything from neighboring rooms all night.",
+    "The photos online are completely misleading. Hotel looks nothing like the pictures.",
+    "Elevator was broken during our entire stay. Had to carry luggage up 4 flights.",
+    "Found mold in the shower. Reported it and nothing was done.",
+    "WiFi barely worked and there's no workspace in the rooms. Not suitable for business travel.",
+    "Bed was uncomfortable and linens felt cheap. Expected more for the price.",
+    "Rude reception staff. Asked for extra towels twice and never received them.",
+    "Water pressure was almost nonexistent. Took 20 minutes to shower.",
+    "Breakfast options were minimal and low quality. Stale bread, instant coffee.",
+    "Cockroach in the room. Management offered to move us but the other room was just as bad.",
+    "Air conditioning leaked water onto the floor. Maintenance never came.",
+]
 
-def acquisition_score(rating: float, reviews: int) -> int:
+REVIEW_SNIPPETS_OK = [
+    "Decent hotel for the price. Nothing special but clean and functional.",
+    "Good location, average rooms. Would stay again if the price is right.",
+    "Staff was friendly. Rooms are a bit dated but comfortable enough.",
+    "Solid 3-star experience. Breakfast was basic but acceptable.",
+    "Clean rooms, good WiFi. The building could use some updates but overall fine.",
+    "Central location makes up for the small room size. Good value.",
+    "Nice rooftop terrace with city views. Rooms are standard but well-maintained.",
+    "Check-in was smooth. Room was clean. No complaints but nothing memorable.",
+]
+
+
+def acquisition_score(rating: float, reviews: int, room_count: int) -> int:
     """
-    Higher score = stronger acquisition signal (low rating, high review volume).
-    Score range: 0–100
+    Higher score = stronger acquisition signal (low rating, high review volume, right size).
+    Score range: 0-100
     """
     rating_signal = (5.0 - rating) / 4.0
     confidence = min(math.log10(reviews + 1) / math.log10(500), 1.0)
-    return round(rating_signal * confidence * 100)
+    base = rating_signal * confidence * 100
+
+    # Room count bonus: 20-50 is the sweet spot for boutique acquisition
+    if 20 <= room_count <= 50:
+        room_bonus = 8
+    elif 15 <= room_count < 20 or 50 < room_count <= 60:
+        room_bonus = 3
+    else:
+        room_bonus = -5
+
+    return max(0, min(100, round(base + room_bonus)))
+
+
+def generate_recent_reviews(rating: float, count: int = 3) -> list:
+    """Generate synthetic review snippets based on hotel rating."""
+    reviews = []
+    base_date = datetime(2026, 3, 19)
+    for i in range(count):
+        days_ago = random.randint(7 + i * 20, 30 + i * 30)
+        review_date = base_date - timedelta(days=days_ago)
+
+        if rating < 3.5:
+            text = random.choice(REVIEW_SNIPPETS_BAD)
+            rev_rating = round(random.uniform(1.0, 3.0), 1)
+        else:
+            text = random.choice(REVIEW_SNIPPETS_OK)
+            rev_rating = round(random.uniform(3.0, 4.5), 1)
+
+        reviews.append({
+            "date": review_date.strftime("%Y-%m-%d"),
+            "rating": rev_rating,
+            "text": text,
+        })
+    return reviews
 
 
 def generate_city_hotels(city_name: str, city_data: dict, count: int = 40) -> list:
@@ -181,8 +244,8 @@ def generate_city_hotels(city_name: str, city_data: dict, count: int = 40) -> li
 
     for i in range(count):
         # Bimodal rating distribution:
-        # ~30% bad hotels (2.0–3.4) — acquisition targets
-        # ~70% healthy hotels (3.8–4.7)
+        # ~30% bad hotels (2.0-3.4) -- acquisition targets
+        # ~70% healthy hotels (3.8-4.7)
         if random.random() < 0.30:
             rating = round(random.uniform(2.0, 3.4), 1)
             # Bad hotels tend to have more reviews (signal they're established, not new)
@@ -204,8 +267,42 @@ def generate_city_hotels(city_name: str, city_data: dict, count: int = 40) -> li
         # Price level: boutique targets tend to be 2-3
         price_level = random.choices([1, 2, 3, 4], weights=[5, 45, 40, 10])[0]
 
+        # Room count: weighted toward 20-40 for boutique targets
+        room_count = int(random.triangular(15, 60, 30))
+
+        # Avg nightly rate correlated with price level
+        rate_ranges = {1: (45, 85), 2: (65, 130), 3: (110, 190), 4: (160, 280)}
+        rate_min, rate_max = rate_ranges[price_level]
+        avg_nightly_rate = round(random.uniform(rate_min, rate_max), 0)
+
+        # Sub-ratings correlated with overall rating
+        noise = lambda: random.uniform(-0.6, 0.4)
+        cleanliness_rating = round(max(1.0, min(5.0, rating + noise())), 1)
+        service_rating = round(max(1.0, min(5.0, rating + noise())), 1)
+        location_rating = round(max(1.0, min(5.0, rating + random.uniform(0.0, 0.8))), 1)  # generally higher
+        value_rating = round(max(1.0, min(5.0, rating + noise())), 1)
+
+        # Review velocity (reviews per month, assuming hotel has been listed ~3-5 years)
+        months_listed = random.randint(36, 60)
+        review_velocity = round(review_count / months_listed, 1)
+
+        # Rating trend
+        if rating < 3.2:
+            rating_trend = random.choices(["declining", "flat", "improving"], weights=[50, 35, 15])[0]
+        elif rating < 3.8:
+            rating_trend = random.choices(["declining", "flat", "improving"], weights=[25, 50, 25])[0]
+        else:
+            rating_trend = random.choices(["declining", "flat", "improving"], weights=[10, 40, 50])[0]
+
+        # Recent reviews
+        recent_reviews = generate_recent_reviews(rating)
+
+        # Last updated timestamp (recent, to sell automation)
+        hours_ago = random.randint(1, 48)
+        last_updated = (datetime(2026, 3, 19, 14, 0, 0) - timedelta(hours=hours_ago)).isoformat() + "Z"
+
         name = names[i % len(names)]
-        score = acquisition_score(rating, review_count)
+        score = acquisition_score(rating, review_count, room_count)
 
         hotels.append({
             "id": str(uuid.uuid4()),
@@ -219,6 +316,16 @@ def generate_city_hotels(city_name: str, city_data: dict, count: int = 40) -> li
             "rating": rating,
             "review_count": review_count,
             "price_level": price_level,
+            "room_count": room_count,
+            "avg_nightly_rate": avg_nightly_rate,
+            "cleanliness_rating": cleanliness_rating,
+            "service_rating": service_rating,
+            "location_rating": location_rating,
+            "value_rating": value_rating,
+            "review_velocity": review_velocity,
+            "rating_trend": rating_trend,
+            "recent_reviews": recent_reviews,
+            "last_updated": last_updated,
             "acquisition_score": score,
             "maps_url": f"https://maps.google.com/?q={round(lat,6)},{round(lng,6)}",
         })
@@ -237,7 +344,7 @@ def main():
         with open(out_file, "w") as f:
             json.dump(hotels, f, indent=2)
         flagged = sum(1 for h in hotels if h["acquisition_score"] >= 70)
-        print(f"{city_data['flag']} {city_name}: {len(hotels)} hotels, {flagged} priority targets → {out_file}")
+        print(f"{city_data['flag']} {city_name}: {len(hotels)} hotels, {flagged} priority targets -> {out_file}")
         total += len(hotels)
 
     print(f"\nTotal: {total} hotels across {len(CITIES)} cities")
