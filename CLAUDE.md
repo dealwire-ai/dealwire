@@ -191,6 +191,116 @@ Before pushing commits or opening a PR:
 
 ---
 
+## GitHub Issues & Project Board
+
+**Org:** `dealwire-ai` | **Repo:** `dealwire-ai/dealwire` | **Project board:** `Dealwire` (project #9)
+
+All task tracking lives in GitHub Issues on the project board. Do not track work in markdown TODO files — use issues.
+
+### Labels
+
+| Type      | Labels                                                                                       |
+| --------- | -------------------------------------------------------------------------------------------- |
+| Domain    | `feat`, `fix`, `chore`, `infra`, `data`, `email`, `underwriting`, `frontend`, `api`          |
+| Client    | `client:jk` (Jordan Karlik), `client:gabay` (Daniel Gabay), `client:bohopo` (Minas Terlidis) |
+| Priority  | `priority:high`, `priority:low`                                                              |
+| Structure | `epic` (groups related issues into a workstream)                                             |
+
+### Creating issues
+
+Always assign issues to the project board and apply relevant labels (at minimum: one domain label, one client label if client-specific).
+
+```bash
+# Standard issue
+gh issue create --repo dealwire-ai/dealwire \
+  --title "feat: lis pendens alert pipeline" \
+  --label "feat,data,client:gabay,priority:high" \
+  --project "Dealwire" \
+  --body "Description here"
+
+# Epic (parent issue that groups related work)
+gh issue create --repo dealwire-ai/dealwire \
+  --title "epic: tax lien platform phase 3" \
+  --label "epic,data,client:gabay" \
+  --project "Dealwire" \
+  --body "## Scope\n\nDescription of the workstream."
+```
+
+### Linking sub-issues to epics
+
+Use the GraphQL API to create native parent/child relationships (shows in sidebar with progress tracking):
+
+```bash
+# 1. Get node IDs for the epic and child issue
+gh api graphql -f query='query {
+  repository(owner: "dealwire-ai", name: "dealwire") {
+    parent: issue(number: EPIC_NUMBER) { id }
+    child: issue(number: CHILD_NUMBER) { id }
+  }
+}'
+
+# 2. Link child as a sub-issue of the epic
+gh api graphql -f query='mutation {
+  addSubIssue(input: {
+    issueId: "PARENT_NODE_ID",
+    subIssueId: "CHILD_NODE_ID"
+  }) { issue { number } }
+}'
+```
+
+Do NOT use "Part of #N" text in issue bodies — use native sub-issues instead.
+
+### Querying issues for context
+
+Before starting work on a ticket, pull its full context:
+
+```bash
+# Read a specific issue (description, labels, comments, linked PRs)
+gh issue view 123 --repo dealwire-ai/dealwire --comments
+
+# List all open issues for a client
+gh issue list --repo dealwire-ai/dealwire --label "client:gabay"
+
+# List all sub-issues of an epic
+gh api graphql -f query='query {
+  repository(owner: "dealwire-ai", name: "dealwire") {
+    issue(number: 123) {
+      subIssues(first: 50) { nodes { number title state } }
+    }
+  }
+}'
+
+# List high-priority work
+gh issue list --repo dealwire-ai/dealwire --label "priority:high"
+
+# List issues by domain
+gh issue list --repo dealwire-ai/dealwire --label "underwriting"
+```
+
+### Linking PRs to issues
+
+Reference related issues in the PR body with `Relates to #<number>`. Do NOT use closing keywords (`Closes`, `Fixes`, `Resolves`) — issues should be closed manually when the work is verified, not auto-closed on merge.
+
+### Workflow
+
+1. **Pick or create an issue** — check the board first, create if needed
+2. **Branch from issue** — `git checkout -b feat/123-short-description`
+3. **Work + commit** — reference the issue number in commits when relevant
+4. **PR linked to issue** — `Relates to #123` in the PR body
+5. **Merge** — issue auto-closes, board updates
+
+### Client context
+
+Each client has a `client:*` label and a notes file in `docs/clients/`. When working on a client-specific issue, read the client notes file for context (meeting history, Drive folders, preferences, domain knowledge).
+
+| Client         | Label           | Notes file                                   | Domain doc                          |
+| -------------- | --------------- | -------------------------------------------- | ----------------------------------- |
+| Jordan Karlik  | `client:jk`     | `docs/clients/JK_NOTES.md`                   | `docs/product/UNDERWRITING.md`      |
+| Daniel Gabay   | `client:gabay`  | `docs/clients/TAX_LIEN_NOTES.md`             | `docs/product/TAX_LIEN_PLATFORM.md` |
+| Minas Terlidis | `client:bohopo` | `docs/clients/BOUTIQUE_HOTEL_OPPORTUNITY.md` | —                                   |
+
+---
+
 ## Tech Stack
 
 This project uses **TypeScript** throughout — **NestJS 11** on the backend, **Next.js 16 / React 19** on the frontend, **Prisma ORM** with **Supabase Postgres**. Always verify field names against the actual Prisma schema (`apps/api/prisma/schema.prisma`) before writing queries or any code that references DB columns. Do not assume a field exists — read the schema first.
