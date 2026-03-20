@@ -208,7 +208,7 @@ All task tracking lives in GitHub Issues on the project board. Do not track work
 
 ### Creating issues
 
-Always assign issues to the project board and apply relevant labels (at minimum: one domain label, one client label if client-specific).
+Always assign issues to the project board and apply relevant labels (at minimum: one domain label, one client label if client-specific). Keep issue titles and bodies concise — a few bullet points, not essays. If context exists in a doc or Drive file, link to it instead of duplicating it.
 
 ```bash
 # Standard issue
