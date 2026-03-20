@@ -6,7 +6,7 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { SkipTraceService } from '../service/public-data/skip-trace.service';
+import { TracerfyProvider } from '../service/public-data/tracerfy.provider';
 
 /**
  * Receives Tracerfy webhook callbacks when a skip trace queue completes.
@@ -19,15 +19,15 @@ import { SkipTraceService } from '../service/public-data/skip-trace.service';
 export class SkipTraceWebhookController {
   private readonly logger = new Logger(SkipTraceWebhookController.name);
 
-  constructor(private readonly skipTrace: SkipTraceService) {}
+  constructor(private readonly tracerfy: TracerfyProvider) {}
 
   @Post('tracerfy')
   @HttpCode(HttpStatus.OK)
-  async handleTracerfyWebhook(@Body() payload: Record<string, unknown>) {
-    this.logger.log(
-      `Received Tracerfy webhook, queue_id=${payload.id ?? payload.queue_id ?? 'unknown'}`,
-    );
-    await this.skipTrace.handleWebhook(payload);
+  handleTracerfyWebhook(@Body() payload: Record<string, unknown>) {
+    const rawId = payload.id ?? payload.queue_id;
+    const queueId = rawId != null ? `${rawId as string | number}` : 'unknown';
+    this.logger.log(`Received Tracerfy webhook, queue_id=${queueId}`);
+    this.tracerfy.handleWebhookPayload(payload);
     return { ok: true };
   }
 }
