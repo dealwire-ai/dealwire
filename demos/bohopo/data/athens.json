@@ -1,6 +1,6 @@
 [
   {
-    "id": "86fe13da-0779-4921-801a-ce4d1d865b50",
+    "id": "49c6a11e-229f-453b-8ac6-41378e621447",
     "name": "Kolonaki Suites",
     "city": "Athens",
     "country": "GR",
@@ -19,1624 +19,1664 @@
     "value_rating": 4.2,
     "review_velocity": 8.5,
     "rating_trend": "improving",
+    "rating_30d_change": 0.32,
     "recent_reviews": [
       {
-        "date": "2026-03-03",
+        "date": "2026-03-10",
         "rating": 4.3,
-        "text": "Good location, average rooms. Would stay again if the price is right."
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
       },
       {
-        "date": "2026-02-14",
-        "rating": 3.4,
-        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
+        "date": "2026-01-27",
+        "rating": 3.7,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
       },
       {
-        "date": "2025-12-22",
-        "rating": 3.2,
-        "text": "Central location makes up for the small room size. Good value."
+        "date": "2026-01-08",
+        "rating": 3.6,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
       }
     ],
-    "last_updated": "2026-03-18T15:00:00Z",
+    "last_updated": "2026-03-19T00:00:00Z",
     "acquisition_score": 29,
     "maps_url": "https://maps.google.com/?q=37.977674,23.767918"
   },
   {
-    "id": "55e3286a-97b0-4df6-81e2-d5d909e2dade",
+    "id": "86a2c8a1-f6d2-4f46-96e0-e2fd2f215c57",
     "name": "Hotel Parthenon",
     "city": "Athens",
     "country": "GR",
     "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Voulis 10, Athens 10587",
-    "lat": 37.983599,
-    "lng": 23.73719,
-    "rating": 2.4,
-    "review_count": 1445,
+    "address": "Ermou 78, Athens 10591",
+    "lat": 37.955768,
+    "lng": 23.750839,
+    "rating": 4.4,
+    "review_count": 722,
     "price_level": 2,
-    "room_count": 33,
-    "avg_nightly_rate": 83.0,
-    "cleanliness_rating": 2.7,
-    "service_rating": 2.5,
-    "location_rating": 2.6,
-    "value_rating": 2.1,
-    "review_velocity": 24.1,
-    "rating_trend": "flat",
+    "room_count": 31,
+    "avg_nightly_rate": 129.0,
+    "cleanliness_rating": 4.4,
+    "service_rating": 4.4,
+    "location_rating": 4.9,
+    "value_rating": 4.6,
+    "review_velocity": 12.0,
+    "rating_trend": "declining",
+    "rating_30d_change": -0.19,
     "recent_reviews": [
       {
-        "date": "2026-03-05",
-        "rating": 1.1,
-        "text": "Cockroach in the room. Management offered to move us but the other room was just as bad."
+        "date": "2026-03-02",
+        "rating": 3.4,
+        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
       },
       {
-        "date": "2026-01-31",
-        "rating": 1.5,
-        "text": "Elevator was broken during our entire stay. Had to carry luggage up 4 flights."
+        "date": "2026-02-07",
+        "rating": 3.3,
+        "text": "Central location makes up for the small room size. Good value."
       },
       {
-        "date": "2026-01-18",
-        "rating": 2.9,
-        "text": "Air conditioning leaked water onto the floor. Maintenance never came."
+        "date": "2025-12-31",
+        "rating": 4.3,
+        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
       }
     ],
-    "last_updated": "2026-03-17T16:00:00Z",
-    "acquisition_score": 73,
-    "maps_url": "https://maps.google.com/?q=37.983599,23.73719"
+    "last_updated": "2026-03-17T20:00:00Z",
+    "acquisition_score": 23,
+    "maps_url": "https://maps.google.com/?q=37.955768,23.750839"
   },
   {
-    "id": "6d14775a-db1b-4111-81a7-64cf6752ee4e",
+    "id": "c836f785-8e67-4436-8b97-36b5c573b3f3",
     "name": "Hotel Hermes",
     "city": "Athens",
     "country": "GR",
     "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Kidathineon 83, Athens 10568",
-    "lat": 37.954072,
-    "lng": 23.709574,
-    "rating": 4.4,
-    "review_count": 425,
+    "address": "Kolonaki 69, Athens 10543",
+    "lat": 37.990321,
+    "lng": 23.72979,
+    "rating": 4.0,
+    "review_count": 300,
     "price_level": 3,
-    "room_count": 35,
-    "avg_nightly_rate": 170.0,
-    "cleanliness_rating": 4.2,
-    "service_rating": 4.4,
-    "location_rating": 4.7,
-    "value_rating": 4.8,
-    "review_velocity": 10.6,
+    "room_count": 30,
+    "avg_nightly_rate": 190.0,
+    "cleanliness_rating": 3.5,
+    "service_rating": 3.9,
+    "location_rating": 4.6,
+    "value_rating": 4.3,
+    "review_velocity": 7.5,
     "rating_trend": "improving",
+    "rating_30d_change": 0.33,
     "recent_reviews": [
       {
-        "date": "2026-03-10",
-        "rating": 4.3,
-        "text": "Decent hotel for the price. Nothing special but clean and functional."
-      },
-      {
-        "date": "2026-02-11",
-        "rating": 4.2,
-        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
-      },
-      {
-        "date": "2026-01-04",
+        "date": "2026-02-27",
         "rating": 3.6,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      },
+      {
+        "date": "2026-01-22",
+        "rating": 4.5,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      },
+      {
+        "date": "2026-01-31",
+        "rating": 4.0,
         "text": "Good location, average rooms. Would stay again if the price is right."
       }
     ],
-    "last_updated": "2026-03-17T23:00:00Z",
-    "acquisition_score": 23,
-    "maps_url": "https://maps.google.com/?q=37.954072,23.709574"
+    "last_updated": "2026-03-18T03:00:00Z",
+    "acquisition_score": 31,
+    "maps_url": "https://maps.google.com/?q=37.990321,23.72979"
   },
   {
-    "id": "f8b74a2a-fb2d-470b-9bfa-de30c58be9f6",
+    "id": "7f142f8f-c13b-4cb9-aceb-9795f36ee498",
     "name": "Zea Hotel",
     "city": "Athens",
     "country": "GR",
     "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Apollonos 2, Athens 10597",
-    "lat": 37.988743,
-    "lng": 23.74752,
-    "rating": 4.3,
-    "review_count": 1264,
+    "address": "Athinas 56, Athens 10530",
+    "lat": 37.972723,
+    "lng": 23.766567,
+    "rating": 4.5,
+    "review_count": 377,
     "price_level": 3,
     "room_count": 28,
-    "avg_nightly_rate": 161.0,
-    "cleanliness_rating": 3.8,
-    "service_rating": 4.1,
-    "location_rating": 4.7,
-    "value_rating": 4.7,
-    "review_velocity": 21.4,
-    "rating_trend": "flat",
+    "avg_nightly_rate": 150.0,
+    "cleanliness_rating": 4.1,
+    "service_rating": 4.8,
+    "location_rating": 5.0,
+    "value_rating": 4.2,
+    "review_velocity": 6.7,
+    "rating_trend": "improving",
+    "rating_30d_change": 0.12,
     "recent_reviews": [
       {
-        "date": "2026-02-24",
+        "date": "2026-03-01",
         "rating": 3.8,
         "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
       },
       {
-        "date": "2026-02-14",
-        "rating": 4.3,
-        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+        "date": "2026-01-18",
+        "rating": 3.9,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
       },
       {
-        "date": "2025-12-30",
+        "date": "2025-12-31",
         "rating": 3.2,
-        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
       }
     ],
-    "last_updated": "2026-03-19T03:00:00Z",
-    "acquisition_score": 26,
-    "maps_url": "https://maps.google.com/?q=37.988743,23.74752"
+    "last_updated": "2026-03-18T14:00:00Z",
+    "acquisition_score": 20,
+    "maps_url": "https://maps.google.com/?q=37.972723,23.766567"
   },
   {
-    "id": "521ef1dc-6afb-41cb-a18e-4de2b0c19710",
+    "id": "82ceac27-e6c8-4235-a76c-887b8bc860e9",
     "name": "Athens Boutique",
     "city": "Athens",
     "country": "GR",
     "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Adrianou 77, Athens 10551",
-    "lat": 37.974816,
-    "lng": 23.707631,
+    "address": "Adrianou 31, Athens 10582",
+    "lat": 38.002317,
+    "lng": 23.705796,
     "rating": 4.5,
-    "review_count": 552,
+    "review_count": 349,
     "price_level": 2,
-    "room_count": 55,
-    "avg_nightly_rate": 117.0,
-    "cleanliness_rating": 4.1,
-    "service_rating": 4.1,
-    "location_rating": 5.0,
-    "value_rating": 4.0,
-    "review_velocity": 9.4,
-    "rating_trend": "flat",
+    "room_count": 21,
+    "avg_nightly_rate": 114.0,
+    "cleanliness_rating": 4.7,
+    "service_rating": 4.0,
+    "location_rating": 4.9,
+    "value_rating": 4.4,
+    "review_velocity": 7.9,
+    "rating_trend": "improving",
+    "rating_30d_change": 0.26,
     "recent_reviews": [
       {
-        "date": "2026-03-10",
+        "date": "2026-03-06",
+        "rating": 4.1,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      },
+      {
+        "date": "2026-01-26",
+        "rating": 3.7,
+        "text": "Central location makes up for the small room size. Good value."
+      },
+      {
+        "date": "2025-12-29",
         "rating": 3.2,
-        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
-      },
-      {
-        "date": "2026-01-21",
-        "rating": 3.4,
-        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
-      },
-      {
-        "date": "2025-12-24",
-        "rating": 4.4,
-        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
       }
     ],
-    "last_updated": "2026-03-18T03:00:00Z",
-    "acquisition_score": 16,
-    "maps_url": "https://maps.google.com/?q=37.974816,23.707631"
+    "last_updated": "2026-03-18T23:00:00Z",
+    "acquisition_score": 20,
+    "maps_url": "https://maps.google.com/?q=38.002317,23.705796"
   },
   {
-    "id": "bc84a185-4be6-4b17-9612-747d68564dc2",
+    "id": "50571e25-9f60-47d9-9c59-27483f6ce8f2",
     "name": "Hotel Iris",
     "city": "Athens",
     "country": "GR",
     "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Panepistimiou 86, Athens 10593",
-    "lat": 37.967905,
-    "lng": 23.762773,
-    "rating": 4.4,
-    "review_count": 759,
+    "address": "Plaka 29, Athens 10510",
+    "lat": 37.94976,
+    "lng": 23.743977,
+    "rating": 2.0,
+    "review_count": 860,
     "price_level": 2,
-    "room_count": 27,
-    "avg_nightly_rate": 69.0,
-    "cleanliness_rating": 3.8,
-    "service_rating": 4.4,
-    "location_rating": 4.9,
-    "value_rating": 3.8,
-    "review_velocity": 13.1,
-    "rating_trend": "improving",
-    "recent_reviews": [
-      {
-        "date": "2026-03-05",
-        "rating": 4.4,
-        "text": "Good location, average rooms. Would stay again if the price is right."
-      },
-      {
-        "date": "2026-01-30",
-        "rating": 3.8,
-        "text": "Good location, average rooms. Would stay again if the price is right."
-      },
-      {
-        "date": "2026-01-14",
-        "rating": 3.3,
-        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
-      }
-    ],
-    "last_updated": "2026-03-19T05:00:00Z",
-    "acquisition_score": 23,
-    "maps_url": "https://maps.google.com/?q=37.967905,23.762773"
-  },
-  {
-    "id": "65fe9649-0689-4724-8a3c-5edb3b276a7e",
-    "name": "Ermou Hotel",
-    "city": "Athens",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Mitropoleos 101, Athens 10570",
-    "lat": 37.99395,
-    "lng": 23.713129,
-    "rating": 4.6,
-    "review_count": 600,
-    "price_level": 2,
-    "room_count": 32,
-    "avg_nightly_rate": 93.0,
-    "cleanliness_rating": 4.5,
-    "service_rating": 4.7,
-    "location_rating": 5.0,
-    "value_rating": 5.0,
-    "review_velocity": 15.4,
-    "rating_trend": "declining",
-    "recent_reviews": [
-      {
-        "date": "2026-02-17",
-        "rating": 4.2,
-        "text": "Central location makes up for the small room size. Good value."
-      },
-      {
-        "date": "2026-02-14",
-        "rating": 3.3,
-        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
-      },
-      {
-        "date": "2025-12-28",
-        "rating": 3.2,
-        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
-      }
-    ],
-    "last_updated": "2026-03-19T02:00:00Z",
-    "acquisition_score": 18,
-    "maps_url": "https://maps.google.com/?q=37.99395,23.713129"
-  },
-  {
-    "id": "43a564bc-231d-4ac5-812d-6118d53b638f",
-    "name": "Athens Panorama",
-    "city": "Athens",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Syntagma 104, Athens 10580",
-    "lat": 37.951375,
-    "lng": 23.74545,
-    "rating": 2.3,
-    "review_count": 1410,
-    "price_level": 3,
-    "room_count": 18,
-    "avg_nightly_rate": 117.0,
-    "cleanliness_rating": 2.5,
-    "service_rating": 1.9,
-    "location_rating": 2.6,
-    "value_rating": 2.2,
-    "review_velocity": 29.4,
-    "rating_trend": "improving",
-    "recent_reviews": [
-      {
-        "date": "2026-03-07",
-        "rating": 1.0,
-        "text": "Elevator was broken during our entire stay. Had to carry luggage up 4 flights."
-      },
-      {
-        "date": "2026-01-27",
-        "rating": 2.9,
-        "text": "Walls are paper thin. Could hear everything from neighboring rooms all night."
-      },
-      {
-        "date": "2026-01-02",
-        "rating": 1.8,
-        "text": "Walls are paper thin. Could hear everything from neighboring rooms all night."
-      }
-    ],
-    "last_updated": "2026-03-17T15:00:00Z",
-    "acquisition_score": 70,
-    "maps_url": "https://maps.google.com/?q=37.951375,23.74545"
-  },
-  {
-    "id": "a9b8aa87-e79a-406e-8be4-69d1ff9c0d2d",
-    "name": "Monastiraki Boutique",
-    "city": "Athens",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Monastiraki 25, Athens 10547",
-    "lat": 37.958562,
-    "lng": 23.703894,
-    "rating": 4.3,
-    "review_count": 766,
-    "price_level": 3,
-    "room_count": 21,
-    "avg_nightly_rate": 135.0,
-    "cleanliness_rating": 3.8,
-    "service_rating": 4.2,
-    "location_rating": 5.0,
-    "value_rating": 4.2,
-    "review_velocity": 20.7,
-    "rating_trend": "improving",
-    "recent_reviews": [
-      {
-        "date": "2026-03-10",
-        "rating": 3.1,
-        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
-      },
-      {
-        "date": "2026-02-16",
-        "rating": 3.6,
-        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
-      },
-      {
-        "date": "2025-12-26",
-        "rating": 3.9,
-        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
-      }
-    ],
-    "last_updated": "2026-03-19T11:00:00Z",
-    "acquisition_score": 26,
-    "maps_url": "https://maps.google.com/?q=37.958562,23.703894"
-  },
-  {
-    "id": "7c376d0a-8eab-43e3-af31-11dc83c22f46",
-    "name": "Athens Dreams",
-    "city": "Athens",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Kolonaki 41, Athens 10543",
-    "lat": 37.957756,
-    "lng": 23.749933,
-    "rating": 4.2,
-    "review_count": 608,
-    "price_level": 2,
-    "room_count": 31,
-    "avg_nightly_rate": 109.0,
-    "cleanliness_rating": 3.9,
-    "service_rating": 3.9,
-    "location_rating": 4.8,
-    "value_rating": 3.7,
-    "review_velocity": 12.2,
-    "rating_trend": "improving",
+    "room_count": 48,
+    "avg_nightly_rate": 121.0,
+    "cleanliness_rating": 1.5,
+    "service_rating": 1.6,
+    "location_rating": 2.5,
+    "value_rating": 1.6,
+    "review_velocity": 21.5,
+    "rating_trend": "flat",
+    "rating_30d_change": 0.08,
     "recent_reviews": [
       {
         "date": "2026-02-22",
-        "rating": 3.1,
-        "text": "Good location, average rooms. Would stay again if the price is right."
-      },
-      {
-        "date": "2026-02-07",
-        "rating": 3.2,
-        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
-      },
-      {
-        "date": "2026-01-09",
-        "rating": 4.3,
-        "text": "Good location, average rooms. Would stay again if the price is right."
-      }
-    ],
-    "last_updated": "2026-03-18T14:00:00Z",
-    "acquisition_score": 28,
-    "maps_url": "https://maps.google.com/?q=37.957756,23.749933"
-  },
-  {
-    "id": "fc8cf6cd-faa5-4626-a2e8-51a7de7e3489",
-    "name": "Piraeus Gate Hotel",
-    "city": "Athens",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Athinas 79, Athens 10593",
-    "lat": 37.977236,
-    "lng": 23.74655,
-    "rating": 2.6,
-    "review_count": 848,
-    "price_level": 3,
-    "room_count": 50,
-    "avg_nightly_rate": 118.0,
-    "cleanliness_rating": 2.9,
-    "service_rating": 2.3,
-    "location_rating": 3.3,
-    "value_rating": 2.7,
-    "review_velocity": 21.2,
-    "rating_trend": "declining",
-    "recent_reviews": [
-      {
-        "date": "2026-02-21",
-        "rating": 2.4,
-        "text": "Checked in at 3pm and the room still wasn't ready. No apology from front desk."
-      },
-      {
-        "date": "2026-02-07",
-        "rating": 2.3,
-        "text": "Rude reception staff. Asked for extra towels twice and never received them."
-      },
-      {
-        "date": "2026-01-15",
-        "rating": 2.0,
-        "text": "WiFi barely worked and there's no workspace in the rooms. Not suitable for business travel."
-      }
-    ],
-    "last_updated": "2026-03-19T10:00:00Z",
-    "acquisition_score": 68,
-    "maps_url": "https://maps.google.com/?q=37.977236,23.74655"
-  },
-  {
-    "id": "dba82baa-9e70-4a38-bfcc-c2b7c1494c27",
-    "name": "Hotel Nike",
-    "city": "Athens",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Adrianou 43, Athens 10526",
-    "lat": 37.983727,
-    "lng": 23.718137,
-    "rating": 2.6,
-    "review_count": 603,
-    "price_level": 3,
-    "room_count": 35,
-    "avg_nightly_rate": 144.0,
-    "cleanliness_rating": 2.0,
-    "service_rating": 2.1,
-    "location_rating": 3.3,
-    "value_rating": 2.9,
-    "review_velocity": 11.4,
-    "rating_trend": "declining",
-    "recent_reviews": [
-      {
-        "date": "2026-03-01",
-        "rating": 2.1,
-        "text": "Bed was uncomfortable and linens felt cheap. Expected more for the price."
-      },
-      {
-        "date": "2026-01-24",
-        "rating": 1.1,
-        "text": "Location is great but the hotel desperately needs renovation. Everything feels worn out."
-      },
-      {
-        "date": "2026-01-08",
-        "rating": 2.9,
-        "text": "Air conditioning leaked water onto the floor. Maintenance never came."
-      }
-    ],
-    "last_updated": "2026-03-19T11:00:00Z",
-    "acquisition_score": 68,
-    "maps_url": "https://maps.google.com/?q=37.983727,23.718137"
-  },
-  {
-    "id": "3a273e27-6b77-40d2-96be-e933d692c05d",
-    "name": "Acropolis Hill Hotel",
-    "city": "Athens",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Ermou 46, Athens 10581",
-    "lat": 37.998548,
-    "lng": 23.728246,
-    "rating": 4.0,
-    "review_count": 302,
-    "price_level": 3,
-    "room_count": 25,
-    "avg_nightly_rate": 184.0,
-    "cleanliness_rating": 4.3,
-    "service_rating": 4.4,
-    "location_rating": 4.6,
-    "value_rating": 4.3,
-    "review_velocity": 8.4,
-    "rating_trend": "flat",
-    "recent_reviews": [
-      {
-        "date": "2026-03-02",
-        "rating": 4.2,
-        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
-      },
-      {
-        "date": "2026-02-05",
-        "rating": 3.2,
-        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
-      },
-      {
-        "date": "2026-01-25",
-        "rating": 4.3,
-        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
-      }
-    ],
-    "last_updated": "2026-03-18T07:00:00Z",
-    "acquisition_score": 31,
-    "maps_url": "https://maps.google.com/?q=37.998548,23.728246"
-  },
-  {
-    "id": "968d82c5-c2ae-4385-acd1-54fad2d8ad65",
-    "name": "Hotel Apollo",
-    "city": "Athens",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Athinas 106, Athens 10539",
-    "lat": 37.958875,
-    "lng": 23.746002,
-    "rating": 3.1,
-    "review_count": 766,
-    "price_level": 2,
-    "room_count": 28,
-    "avg_nightly_rate": 70.0,
-    "cleanliness_rating": 3.3,
-    "service_rating": 2.9,
-    "location_rating": 3.5,
-    "value_rating": 3.2,
-    "review_velocity": 14.5,
-    "rating_trend": "declining",
-    "recent_reviews": [
-      {
-        "date": "2026-03-12",
-        "rating": 2.8,
-        "text": "Terrible experience. Dirty bathroom, noisy hallway, and breakfast was inedible."
-      },
-      {
-        "date": "2026-02-04",
-        "rating": 2.2,
-        "text": "Location is great but the hotel desperately needs renovation. Everything feels worn out."
-      },
-      {
-        "date": "2026-01-15",
-        "rating": 1.2,
-        "text": "Room was outdated and the AC didn't work properly. Staff seemed overwhelmed."
-      }
-    ],
-    "last_updated": "2026-03-18T10:00:00Z",
-    "acquisition_score": 56,
-    "maps_url": "https://maps.google.com/?q=37.958875,23.746002"
-  },
-  {
-    "id": "4c0937a0-42e6-4fb0-a8d9-0b335c2a469d",
-    "name": "Hotel Delphi",
-    "city": "Athens",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Kolonaki 15, Athens 10559",
-    "lat": 37.99947,
-    "lng": 23.713106,
-    "rating": 4.5,
-    "review_count": 462,
-    "price_level": 1,
-    "room_count": 32,
-    "avg_nightly_rate": 66.0,
-    "cleanliness_rating": 4.7,
-    "service_rating": 4.6,
-    "location_rating": 5.0,
-    "value_rating": 4.6,
-    "review_velocity": 11.0,
-    "rating_trend": "flat",
-    "recent_reviews": [
-      {
-        "date": "2026-03-10",
-        "rating": 3.9,
-        "text": "Central location makes up for the small room size. Good value."
-      },
-      {
-        "date": "2026-02-13",
-        "rating": 3.8,
-        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
-      },
-      {
-        "date": "2025-12-20",
-        "rating": 3.5,
-        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
-      }
-    ],
-    "last_updated": "2026-03-17T17:00:00Z",
-    "acquisition_score": 20,
-    "maps_url": "https://maps.google.com/?q=37.99947,23.713106"
-  },
-  {
-    "id": "d4fac4bc-dc8a-49b9-aa18-4aed9cd7bd9c",
-    "name": "Nefeli Hotel",
-    "city": "Athens",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Panepistimiou 87, Athens 10532",
-    "lat": 37.982431,
-    "lng": 23.720866,
-    "rating": 2.2,
-    "review_count": 728,
-    "price_level": 3,
-    "room_count": 15,
-    "avg_nightly_rate": 133.0,
-    "cleanliness_rating": 2.0,
-    "service_rating": 2.2,
-    "location_rating": 2.7,
-    "value_rating": 2.1,
-    "review_velocity": 14.6,
-    "rating_trend": "flat",
-    "recent_reviews": [
-      {
-        "date": "2026-02-24",
-        "rating": 2.6,
-        "text": "Found mold in the shower. Reported it and nothing was done."
-      },
-      {
-        "date": "2026-02-10",
-        "rating": 1.2,
-        "text": "Rude reception staff. Asked for extra towels twice and never received them."
-      },
-      {
-        "date": "2025-12-30",
-        "rating": 2.3,
-        "text": "Rude reception staff. Asked for extra towels twice and never received them."
-      }
-    ],
-    "last_updated": "2026-03-18T16:00:00Z",
-    "acquisition_score": 73,
-    "maps_url": "https://maps.google.com/?q=37.982431,23.720866"
-  },
-  {
-    "id": "ed04ba49-b461-402c-b671-6a2e1082e243",
-    "name": "Hotel Nestor",
-    "city": "Athens",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Athinas 29, Athens 10535",
-    "lat": 37.954341,
-    "lng": 23.703035,
-    "rating": 3.3,
-    "review_count": 567,
-    "price_level": 4,
-    "room_count": 37,
-    "avg_nightly_rate": 252.0,
-    "cleanliness_rating": 3.2,
-    "service_rating": 3.6,
-    "location_rating": 3.8,
-    "value_rating": 3.4,
-    "review_velocity": 11.8,
-    "rating_trend": "flat",
-    "recent_reviews": [
-      {
-        "date": "2026-03-05",
-        "rating": 2.3,
-        "text": "Location is great but the hotel desperately needs renovation. Everything feels worn out."
-      },
-      {
-        "date": "2026-02-20",
-        "rating": 2.5,
-        "text": "Air conditioning leaked water onto the floor. Maintenance never came."
-      },
-      {
-        "date": "2026-01-25",
-        "rating": 1.9,
-        "text": "Breakfast options were minimal and low quality. Stale bread, instant coffee."
-      }
-    ],
-    "last_updated": "2026-03-19T02:00:00Z",
-    "acquisition_score": 51,
-    "maps_url": "https://maps.google.com/?q=37.954341,23.703035"
-  },
-  {
-    "id": "591a3bab-b07b-42d1-93bc-a689d3844286",
-    "name": "Hotel Zeus",
-    "city": "Athens",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Kolonaki 32, Athens 10525",
-    "lat": 37.972888,
-    "lng": 23.755899,
-    "rating": 4.4,
-    "review_count": 488,
-    "price_level": 3,
-    "room_count": 55,
-    "avg_nightly_rate": 158.0,
-    "cleanliness_rating": 4.8,
-    "service_rating": 4.7,
-    "location_rating": 4.9,
-    "value_rating": 4.5,
-    "review_velocity": 9.4,
-    "rating_trend": "flat",
-    "recent_reviews": [
-      {
-        "date": "2026-02-23",
-        "rating": 4.3,
-        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
-      },
-      {
-        "date": "2026-01-21",
-        "rating": 3.4,
-        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
-      },
-      {
-        "date": "2026-01-16",
-        "rating": 4.1,
-        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
-      }
-    ],
-    "last_updated": "2026-03-18T04:00:00Z",
-    "acquisition_score": 18,
-    "maps_url": "https://maps.google.com/?q=37.972888,23.755899"
-  },
-  {
-    "id": "a212c9ed-27f1-4391-8356-67835096c069",
-    "name": "Syntagma Place",
-    "city": "Athens",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Nikis 37, Athens 10540",
-    "lat": 37.961803,
-    "lng": 23.72218,
-    "rating": 4.0,
-    "review_count": 465,
-    "price_level": 3,
-    "room_count": 24,
-    "avg_nightly_rate": 129.0,
-    "cleanliness_rating": 4.1,
-    "service_rating": 4.1,
-    "location_rating": 4.1,
-    "value_rating": 3.8,
-    "review_velocity": 8.8,
-    "rating_trend": "flat",
-    "recent_reviews": [
-      {
-        "date": "2026-03-11",
-        "rating": 4.2,
-        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
-      },
-      {
-        "date": "2026-01-27",
-        "rating": 4.3,
-        "text": "Decent hotel for the price. Nothing special but clean and functional."
-      },
-      {
-        "date": "2025-12-26",
-        "rating": 3.7,
-        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
-      }
-    ],
-    "last_updated": "2026-03-18T15:00:00Z",
-    "acquisition_score": 33,
-    "maps_url": "https://maps.google.com/?q=37.961803,23.72218"
-  },
-  {
-    "id": "831dc3a0-d378-4d93-9208-7247dc903815",
-    "name": "Hotel Thesseion",
-    "city": "Athens",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Apollonos 54, Athens 10578",
-    "lat": 37.990351,
-    "lng": 23.738029,
-    "rating": 2.5,
-    "review_count": 1336,
-    "price_level": 3,
-    "room_count": 27,
-    "avg_nightly_rate": 128.0,
-    "cleanliness_rating": 2.3,
-    "service_rating": 1.9,
-    "location_rating": 2.8,
-    "value_rating": 2.6,
-    "review_velocity": 27.8,
-    "rating_trend": "flat",
-    "recent_reviews": [
-      {
-        "date": "2026-02-26",
-        "rating": 1.3,
-        "text": "Air conditioning leaked water onto the floor. Maintenance never came."
-      },
-      {
-        "date": "2026-02-19",
-        "rating": 1.8,
-        "text": "Air conditioning leaked water onto the floor. Maintenance never came."
-      },
-      {
-        "date": "2025-12-26",
-        "rating": 1.1,
-        "text": "Rude reception staff. Asked for extra towels twice and never received them."
-      }
-    ],
-    "last_updated": "2026-03-17T20:00:00Z",
-    "acquisition_score": 70,
-    "maps_url": "https://maps.google.com/?q=37.990351,23.738029"
-  },
-  {
-    "id": "855de6f0-2859-496b-ab7e-e58efab933af",
-    "name": "Hotel Agamemnon",
-    "city": "Athens",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Athinas 49, Athens 10551",
-    "lat": 37.9582,
-    "lng": 23.722679,
-    "rating": 4.6,
-    "review_count": 249,
-    "price_level": 3,
-    "room_count": 31,
-    "avg_nightly_rate": 170.0,
-    "cleanliness_rating": 4.8,
-    "service_rating": 4.3,
-    "location_rating": 4.7,
-    "value_rating": 4.0,
-    "review_velocity": 4.7,
-    "rating_trend": "declining",
-    "recent_reviews": [
-      {
-        "date": "2026-03-01",
-        "rating": 4.0,
-        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
-      },
-      {
-        "date": "2026-02-18",
-        "rating": 4.4,
-        "text": "Decent hotel for the price. Nothing special but clean and functional."
-      },
-      {
-        "date": "2026-01-19",
-        "rating": 3.9,
-        "text": "Decent hotel for the price. Nothing special but clean and functional."
-      }
-    ],
-    "last_updated": "2026-03-18T22:00:00Z",
-    "acquisition_score": 17,
-    "maps_url": "https://maps.google.com/?q=37.9582,23.722679"
-  },
-  {
-    "id": "124fdb5d-4d34-47bf-8823-d9d95e0b43cf",
-    "name": "Hotel Pallas",
-    "city": "Athens",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Mitropoleos 60, Athens 10599",
-    "lat": 37.960875,
-    "lng": 23.725623,
-    "rating": 2.9,
-    "review_count": 870,
-    "price_level": 3,
-    "room_count": 53,
-    "avg_nightly_rate": 167.0,
-    "cleanliness_rating": 3.1,
-    "service_rating": 2.5,
-    "location_rating": 3.1,
-    "value_rating": 2.9,
-    "review_velocity": 19.3,
-    "rating_trend": "flat",
-    "recent_reviews": [
-      {
-        "date": "2026-02-28",
-        "rating": 2.9,
-        "text": "Elevator was broken during our entire stay. Had to carry luggage up 4 flights."
-      },
-      {
-        "date": "2026-02-08",
-        "rating": 2.2,
-        "text": "Terrible experience. Dirty bathroom, noisy hallway, and breakfast was inedible."
-      },
-      {
-        "date": "2025-12-22",
-        "rating": 1.2,
-        "text": "Checked in at 3pm and the room still wasn't ready. No apology from front desk."
-      }
-    ],
-    "last_updated": "2026-03-18T18:00:00Z",
-    "acquisition_score": 56,
-    "maps_url": "https://maps.google.com/?q=37.960875,23.725623"
-  },
-  {
-    "id": "d9d5c03b-97a5-4daf-aa58-d14ecfac5a56",
-    "name": "Hotel Ambrosia",
-    "city": "Athens",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Plaka 101, Athens 10515",
-    "lat": 37.966332,
-    "lng": 23.729786,
-    "rating": 4.3,
-    "review_count": 203,
-    "price_level": 2,
-    "room_count": 34,
-    "avg_nightly_rate": 87.0,
-    "cleanliness_rating": 4.5,
-    "service_rating": 4.5,
-    "location_rating": 4.4,
-    "value_rating": 4.7,
-    "review_velocity": 3.6,
-    "rating_trend": "improving",
-    "recent_reviews": [
-      {
-        "date": "2026-02-26",
-        "rating": 3.7,
-        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
-      },
-      {
-        "date": "2026-01-18",
-        "rating": 3.9,
-        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
-      },
-      {
-        "date": "2025-12-28",
-        "rating": 3.7,
-        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
-      }
-    ],
-    "last_updated": "2026-03-17T15:00:00Z",
-    "acquisition_score": 23,
-    "maps_url": "https://maps.google.com/?q=37.966332,23.729786"
-  },
-  {
-    "id": "cba3729d-389d-45a9-8e97-a23a7e3fd83b",
-    "name": "Monastiraki Square Hotel",
-    "city": "Athens",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Kidathineon 12, Athens 10545",
-    "lat": 37.998398,
-    "lng": 23.71687,
-    "rating": 4.1,
-    "review_count": 299,
-    "price_level": 2,
-    "room_count": 37,
-    "avg_nightly_rate": 90.0,
-    "cleanliness_rating": 3.5,
-    "service_rating": 4.4,
-    "location_rating": 4.2,
-    "value_rating": 3.7,
-    "review_velocity": 6.8,
-    "rating_trend": "flat",
-    "recent_reviews": [
-      {
-        "date": "2026-02-21",
-        "rating": 3.8,
-        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
-      },
-      {
-        "date": "2026-01-18",
-        "rating": 3.1,
-        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
-      },
-      {
-        "date": "2026-01-05",
-        "rating": 3.8,
-        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
-      }
-    ],
-    "last_updated": "2026-03-18T22:00:00Z",
-    "acquisition_score": 29,
-    "maps_url": "https://maps.google.com/?q=37.998398,23.71687"
-  },
-  {
-    "id": "11c03ba9-cf7b-45f2-8763-8dce8be0e01d",
-    "name": "Lycabettus View",
-    "city": "Athens",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Filellinon 3, Athens 10521",
-    "lat": 37.963154,
-    "lng": 23.728108,
-    "rating": 4.4,
-    "review_count": 513,
-    "price_level": 2,
-    "room_count": 38,
-    "avg_nightly_rate": 89.0,
-    "cleanliness_rating": 4.4,
-    "service_rating": 4.1,
-    "location_rating": 5.0,
-    "value_rating": 4.4,
-    "review_velocity": 10.9,
-    "rating_trend": "improving",
-    "recent_reviews": [
-      {
-        "date": "2026-03-04",
-        "rating": 3.4,
-        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
-      },
-      {
-        "date": "2026-02-13",
-        "rating": 3.5,
-        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
-      },
-      {
-        "date": "2025-12-28",
-        "rating": 3.3,
-        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
-      }
-    ],
-    "last_updated": "2026-03-17T14:00:00Z",
-    "acquisition_score": 23,
-    "maps_url": "https://maps.google.com/?q=37.963154,23.728108"
-  },
-  {
-    "id": "39bc090d-e947-45f0-ab42-49f4ed45af6c",
-    "name": "Hotel Aphrodite",
-    "city": "Athens",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Kolonaki 77, Athens 10546",
-    "lat": 38.004331,
-    "lng": 23.758084,
-    "rating": 4.5,
-    "review_count": 1288,
-    "price_level": 2,
-    "room_count": 30,
-    "avg_nightly_rate": 85.0,
-    "cleanliness_rating": 4.6,
-    "service_rating": 4.0,
-    "location_rating": 4.5,
-    "value_rating": 4.0,
-    "review_velocity": 28.6,
-    "rating_trend": "improving",
-    "recent_reviews": [
-      {
-        "date": "2026-03-08",
-        "rating": 3.2,
-        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
-      },
-      {
-        "date": "2026-02-20",
-        "rating": 3.7,
-        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
-      },
-      {
-        "date": "2026-01-03",
-        "rating": 3.3,
-        "text": "Central location makes up for the small room size. Good value."
-      }
-    ],
-    "last_updated": "2026-03-19T10:00:00Z",
-    "acquisition_score": 20,
-    "maps_url": "https://maps.google.com/?q=38.004331,23.758084"
-  },
-  {
-    "id": "a00cd323-7d87-4257-b5c9-b673fe676e17",
-    "name": "Omonia Hotel",
-    "city": "Athens",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Ermou 52, Athens 10572",
-    "lat": 37.949945,
-    "lng": 23.743861,
-    "rating": 3.2,
-    "review_count": 441,
-    "price_level": 2,
-    "room_count": 25,
-    "avg_nightly_rate": 102.0,
-    "cleanliness_rating": 2.9,
-    "service_rating": 3.6,
-    "location_rating": 3.3,
-    "value_rating": 3.4,
-    "review_velocity": 8.0,
-    "rating_trend": "flat",
-    "recent_reviews": [
-      {
-        "date": "2026-02-21",
-        "rating": 2.6,
-        "text": "Checked in at 3pm and the room still wasn't ready. No apology from front desk."
-      },
-      {
-        "date": "2026-01-27",
-        "rating": 2.8,
-        "text": "Found mold in the shower. Reported it and nothing was done."
-      },
-      {
-        "date": "2026-01-12",
-        "rating": 2.2,
-        "text": "Cockroach in the room. Management offered to move us but the other room was just as bad."
-      }
-    ],
-    "last_updated": "2026-03-18T10:00:00Z",
-    "acquisition_score": 52,
-    "maps_url": "https://maps.google.com/?q=37.949945,23.743861"
-  },
-  {
-    "id": "78016c9a-23ad-45bb-a466-8f3e1f16f58a",
-    "name": "Hotel Victoria",
-    "city": "Athens",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Nikis 13, Athens 10536",
-    "lat": 37.983031,
-    "lng": 23.718325,
-    "rating": 4.4,
-    "review_count": 636,
-    "price_level": 2,
-    "room_count": 27,
-    "avg_nightly_rate": 101.0,
-    "cleanliness_rating": 4.0,
-    "service_rating": 4.2,
-    "location_rating": 5.0,
-    "value_rating": 4.3,
-    "review_velocity": 17.2,
-    "rating_trend": "flat",
-    "recent_reviews": [
-      {
-        "date": "2026-02-18",
-        "rating": 4.1,
-        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
-      },
-      {
-        "date": "2026-01-22",
-        "rating": 4.0,
-        "text": "Good location, average rooms. Would stay again if the price is right."
-      },
-      {
-        "date": "2026-01-15",
-        "rating": 3.6,
-        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
-      }
-    ],
-    "last_updated": "2026-03-18T03:00:00Z",
-    "acquisition_score": 23,
-    "maps_url": "https://maps.google.com/?q=37.983031,23.718325"
-  },
-  {
-    "id": "b588ce11-6933-41a1-989b-f0e1f3c0a4d9",
-    "name": "Plaka Inn",
-    "city": "Athens",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Monastiraki 10, Athens 10517",
-    "lat": 37.955455,
-    "lng": 23.721333,
-    "rating": 2.2,
-    "review_count": 594,
-    "price_level": 3,
-    "room_count": 35,
-    "avg_nightly_rate": 133.0,
-    "cleanliness_rating": 1.7,
-    "service_rating": 2.3,
-    "location_rating": 2.8,
-    "value_rating": 2.5,
-    "review_velocity": 11.4,
-    "rating_trend": "flat",
-    "recent_reviews": [
-      {
-        "date": "2026-02-26",
-        "rating": 2.2,
-        "text": "Terrible experience. Dirty bathroom, noisy hallway, and breakfast was inedible."
-      },
-      {
-        "date": "2026-01-24",
-        "rating": 1.6,
-        "text": "Water pressure was almost nonexistent. Took 20 minutes to shower."
-      },
-      {
-        "date": "2026-01-15",
-        "rating": 1.2,
-        "text": "Room was outdated and the AC didn't work properly. Staff seemed overwhelmed."
-      }
-    ],
-    "last_updated": "2026-03-17T18:00:00Z",
-    "acquisition_score": 78,
-    "maps_url": "https://maps.google.com/?q=37.955455,23.721333"
-  },
-  {
-    "id": "205feafe-e1cd-4af2-a2cd-7f3e55e71b23",
-    "name": "Hotel Acropolis",
-    "city": "Athens",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Filellinon 87, Athens 10544",
-    "lat": 37.980075,
-    "lng": 23.753218,
-    "rating": 4.3,
-    "review_count": 1193,
-    "price_level": 2,
-    "room_count": 34,
-    "avg_nightly_rate": 94.0,
-    "cleanliness_rating": 4.0,
-    "service_rating": 4.7,
-    "location_rating": 4.6,
-    "value_rating": 4.5,
-    "review_velocity": 31.4,
-    "rating_trend": "flat",
-    "recent_reviews": [
-      {
-        "date": "2026-02-27",
-        "rating": 3.5,
-        "text": "Central location makes up for the small room size. Good value."
-      },
-      {
-        "date": "2026-02-14",
-        "rating": 3.5,
-        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
-      },
-      {
-        "date": "2025-12-31",
-        "rating": 4.0,
-        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
-      }
-    ],
-    "last_updated": "2026-03-18T12:00:00Z",
-    "acquisition_score": 26,
-    "maps_url": "https://maps.google.com/?q=37.980075,23.753218"
-  },
-  {
-    "id": "483eb67c-e100-439b-892b-c0443d93cc26",
-    "name": "Psiri District Hotel",
-    "city": "Athens",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Stadiou 33, Athens 10551",
-    "lat": 37.952455,
-    "lng": 23.753878,
-    "rating": 4.3,
-    "review_count": 479,
-    "price_level": 3,
-    "room_count": 44,
-    "avg_nightly_rate": 110.0,
-    "cleanliness_rating": 4.6,
-    "service_rating": 4.2,
-    "location_rating": 4.3,
-    "value_rating": 4.2,
-    "review_velocity": 8.7,
-    "rating_trend": "improving",
-    "recent_reviews": [
-      {
-        "date": "2026-02-20",
-        "rating": 4.1,
-        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
-      },
-      {
-        "date": "2026-02-07",
-        "rating": 3.8,
-        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
-      },
-      {
-        "date": "2026-01-13",
-        "rating": 4.3,
-        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
-      }
-    ],
-    "last_updated": "2026-03-18T06:00:00Z",
-    "acquisition_score": 25,
-    "maps_url": "https://maps.google.com/?q=37.952455,23.753878"
-  },
-  {
-    "id": "570109da-85a9-49ff-b837-7ba1ed56d11a",
-    "name": "Atrium Athens",
-    "city": "Athens",
-    "country": "GR",
-    "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Mitropoleos 91, Athens 10530",
-    "lat": 37.964145,
-    "lng": 23.700757,
-    "rating": 3.4,
-    "review_count": 919,
-    "price_level": 2,
-    "room_count": 27,
-    "avg_nightly_rate": 120.0,
-    "cleanliness_rating": 2.9,
-    "service_rating": 3.7,
-    "location_rating": 3.9,
-    "value_rating": 3.0,
-    "review_velocity": 15.8,
-    "rating_trend": "flat",
-    "recent_reviews": [
-      {
-        "date": "2026-02-18",
-        "rating": 1.8,
-        "text": "Walls are paper thin. Could hear everything from neighboring rooms all night."
-      },
-      {
-        "date": "2026-01-21",
         "rating": 1.5,
         "text": "Found mold in the shower. Reported it and nothing was done."
       },
       {
-        "date": "2025-12-27",
+        "date": "2026-01-21",
         "rating": 1.8,
-        "text": "Location is great but the hotel desperately needs renovation. Everything feels worn out."
+        "text": "Breakfast options were minimal and low quality. Stale bread, instant coffee."
+      },
+      {
+        "date": "2026-01-25",
+        "rating": 2.3,
+        "text": "Terrible experience. Dirty bathroom, noisy hallway, and breakfast was inedible."
       }
     ],
-    "last_updated": "2026-03-17T23:00:00Z",
-    "acquisition_score": 48,
-    "maps_url": "https://maps.google.com/?q=37.964145,23.700757"
+    "last_updated": "2026-03-18T15:00:00Z",
+    "acquisition_score": 83,
+    "maps_url": "https://maps.google.com/?q=37.94976,23.743977"
   },
   {
-    "id": "6cfac042-0977-412b-b747-b2885d4595f4",
-    "name": "Athens City Hotel",
+    "id": "663e2065-c707-4e29-a054-72b7ab6f3c14",
+    "name": "Ermou Hotel",
     "city": "Athens",
     "country": "GR",
     "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Athinas 99, Athens 10563",
-    "lat": 37.965893,
-    "lng": 23.75494,
-    "rating": 4.6,
-    "review_count": 990,
+    "address": "Voulis 84, Athens 10592",
+    "lat": 37.951405,
+    "lng": 23.727983,
+    "rating": 4.2,
+    "review_count": 780,
     "price_level": 2,
-    "room_count": 16,
-    "avg_nightly_rate": 112.0,
-    "cleanliness_rating": 4.8,
-    "service_rating": 4.6,
-    "location_rating": 5.0,
-    "value_rating": 4.9,
-    "review_velocity": 19.8,
+    "room_count": 46,
+    "avg_nightly_rate": 81.0,
+    "cleanliness_rating": 3.8,
+    "service_rating": 4.0,
+    "location_rating": 4.5,
+    "value_rating": 3.9,
+    "review_velocity": 18.1,
     "rating_trend": "improving",
+    "rating_30d_change": 0.08,
     "recent_reviews": [
       {
-        "date": "2026-03-01",
-        "rating": 3.8,
+        "date": "2026-02-23",
+        "rating": 3.1,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      },
+      {
+        "date": "2026-02-20",
+        "rating": 4.4,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      },
+      {
+        "date": "2026-01-16",
+        "rating": 3.6,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      }
+    ],
+    "last_updated": "2026-03-18T07:00:00Z",
+    "acquisition_score": 28,
+    "maps_url": "https://maps.google.com/?q=37.951405,23.727983"
+  },
+  {
+    "id": "686eab78-ac86-4523-b6e1-5ae00311518c",
+    "name": "Athens Panorama",
+    "city": "Athens",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Panepistimiou 1, Athens 10559",
+    "lat": 37.961412,
+    "lng": 23.754685,
+    "rating": 2.6,
+    "review_count": 358,
+    "price_level": 2,
+    "room_count": 32,
+    "avg_nightly_rate": 127.0,
+    "cleanliness_rating": 3.0,
+    "service_rating": 2.6,
+    "location_rating": 3.2,
+    "value_rating": 2.2,
+    "review_velocity": 8.0,
+    "rating_trend": "declining",
+    "rating_30d_change": -0.57,
+    "recent_reviews": [
+      {
+        "date": "2026-02-17",
+        "rating": 1.1,
+        "text": "WiFi barely worked and there's no workspace in the rooms. Not suitable for business travel."
+      },
+      {
+        "date": "2026-01-31",
+        "rating": 1.1,
+        "text": "Room was outdated and the AC didn't work properly. Staff seemed overwhelmed."
+      },
+      {
+        "date": "2026-01-01",
+        "rating": 2.8,
+        "text": "WiFi barely worked and there's no workspace in the rooms. Not suitable for business travel."
+      }
+    ],
+    "last_updated": "2026-03-18T04:00:00Z",
+    "acquisition_score": 65,
+    "maps_url": "https://maps.google.com/?q=37.961412,23.754685"
+  },
+  {
+    "id": "e3b8d9cb-1434-478c-ac1f-5ff1226eb67c",
+    "name": "Monastiraki Boutique",
+    "city": "Athens",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Monastiraki 9, Athens 10586",
+    "lat": 37.949578,
+    "lng": 23.760127,
+    "rating": 3.3,
+    "review_count": 393,
+    "price_level": 2,
+    "room_count": 51,
+    "avg_nightly_rate": 102.0,
+    "cleanliness_rating": 3.3,
+    "service_rating": 2.7,
+    "location_rating": 3.4,
+    "value_rating": 3.4,
+    "review_velocity": 7.3,
+    "rating_trend": "flat",
+    "rating_30d_change": 0.09,
+    "recent_reviews": [
+      {
+        "date": "2026-03-06",
+        "rating": 2.4,
+        "text": "Rude reception staff. Asked for extra towels twice and never received them."
+      },
+      {
+        "date": "2026-02-05",
+        "rating": 1.8,
+        "text": "Walls are paper thin. Could hear everything from neighboring rooms all night."
+      },
+      {
+        "date": "2025-12-20",
+        "rating": 1.6,
+        "text": "Rude reception staff. Asked for extra towels twice and never received them."
+      }
+    ],
+    "last_updated": "2026-03-18T17:00:00Z",
+    "acquisition_score": 44,
+    "maps_url": "https://maps.google.com/?q=37.949578,23.760127"
+  },
+  {
+    "id": "25ae4e50-cae7-4be2-9e4d-33d6a7f322b7",
+    "name": "Athens Dreams",
+    "city": "Athens",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Plaka 73, Athens 10522",
+    "lat": 37.949896,
+    "lng": 23.714721,
+    "rating": 4.6,
+    "review_count": 78,
+    "price_level": 2,
+    "room_count": 50,
+    "avg_nightly_rate": 122.0,
+    "cleanliness_rating": 4.9,
+    "service_rating": 4.4,
+    "location_rating": 4.7,
+    "value_rating": 4.8,
+    "review_velocity": 1.3,
+    "rating_trend": "flat",
+    "rating_30d_change": 0.1,
+    "recent_reviews": [
+      {
+        "date": "2026-02-20",
+        "rating": 4.0,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
+      },
+      {
+        "date": "2026-02-01",
+        "rating": 4.4,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      },
+      {
+        "date": "2026-01-23",
+        "rating": 3.2,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      }
+    ],
+    "last_updated": "2026-03-19T07:00:00Z",
+    "acquisition_score": 15,
+    "maps_url": "https://maps.google.com/?q=37.949896,23.714721"
+  },
+  {
+    "id": "82c05c38-5a90-4084-aebd-441cca3bf8df",
+    "name": "Piraeus Gate Hotel",
+    "city": "Athens",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Mitropoleos 92, Athens 10553",
+    "lat": 37.957716,
+    "lng": 23.744197,
+    "rating": 3.9,
+    "review_count": 328,
+    "price_level": 2,
+    "room_count": 33,
+    "avg_nightly_rate": 124.0,
+    "cleanliness_rating": 4.1,
+    "service_rating": 3.4,
+    "location_rating": 4.2,
+    "value_rating": 3.6,
+    "review_velocity": 9.1,
+    "rating_trend": "flat",
+    "rating_30d_change": -0.07,
+    "recent_reviews": [
+      {
+        "date": "2026-03-04",
+        "rating": 4.1,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      },
+      {
+        "date": "2026-01-24",
+        "rating": 3.2,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
+      },
+      {
+        "date": "2026-01-22",
+        "rating": 4.3,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
+      }
+    ],
+    "last_updated": "2026-03-18T00:00:00Z",
+    "acquisition_score": 34,
+    "maps_url": "https://maps.google.com/?q=37.957716,23.744197"
+  },
+  {
+    "id": "141b63eb-77a8-4537-af8f-598d9805a474",
+    "name": "Hotel Nike",
+    "city": "Athens",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Stadiou 116, Athens 10515",
+    "lat": 37.999435,
+    "lng": 23.714505,
+    "rating": 4.2,
+    "review_count": 132,
+    "price_level": 2,
+    "room_count": 23,
+    "avg_nightly_rate": 116.0,
+    "cleanliness_rating": 4.5,
+    "service_rating": 4.0,
+    "location_rating": 4.7,
+    "value_rating": 3.8,
+    "review_velocity": 3.1,
+    "rating_trend": "improving",
+    "rating_30d_change": 0.39,
+    "recent_reviews": [
+      {
+        "date": "2026-03-07",
+        "rating": 3.0,
+        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
+      },
+      {
+        "date": "2026-01-30",
+        "rating": 4.2,
+        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
+      },
+      {
+        "date": "2026-01-16",
+        "rating": 3.2,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      }
+    ],
+    "last_updated": "2026-03-17T17:00:00Z",
+    "acquisition_score": 24,
+    "maps_url": "https://maps.google.com/?q=37.999435,23.714505"
+  },
+  {
+    "id": "c7124b22-cfb9-40a1-b021-9cb028bf0bb4",
+    "name": "Acropolis Hill Hotel",
+    "city": "Athens",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Mitropoleos 26, Athens 10568",
+    "lat": 37.96648,
+    "lng": 23.757238,
+    "rating": 3.2,
+    "review_count": 1270,
+    "price_level": 3,
+    "room_count": 27,
+    "avg_nightly_rate": 163.0,
+    "cleanliness_rating": 3.0,
+    "service_rating": 2.9,
+    "location_rating": 3.3,
+    "value_rating": 3.4,
+    "review_velocity": 27.0,
+    "rating_trend": "flat",
+    "rating_30d_change": -0.02,
+    "recent_reviews": [
+      {
+        "date": "2026-02-23",
+        "rating": 2.9,
+        "text": "The photos online are completely misleading. Hotel looks nothing like the pictures."
+      },
+      {
+        "date": "2026-02-13",
+        "rating": 2.9,
+        "text": "Air conditioning leaked water onto the floor. Maintenance never came."
+      },
+      {
+        "date": "2026-01-20",
+        "rating": 2.9,
+        "text": "Bed was uncomfortable and linens felt cheap. Expected more for the price."
+      }
+    ],
+    "last_updated": "2026-03-18T21:00:00Z",
+    "acquisition_score": 53,
+    "maps_url": "https://maps.google.com/?q=37.96648,23.757238"
+  },
+  {
+    "id": "d406301e-d121-4e6f-823e-435cdebd7f13",
+    "name": "Hotel Apollo",
+    "city": "Athens",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Filellinon 41, Athens 10565",
+    "lat": 37.981873,
+    "lng": 23.7356,
+    "rating": 2.8,
+    "review_count": 661,
+    "price_level": 2,
+    "room_count": 36,
+    "avg_nightly_rate": 82.0,
+    "cleanliness_rating": 2.9,
+    "service_rating": 2.2,
+    "location_rating": 3.5,
+    "value_rating": 2.7,
+    "review_velocity": 11.2,
+    "rating_trend": "improving",
+    "rating_30d_change": 0.31,
+    "recent_reviews": [
+      {
+        "date": "2026-03-06",
+        "rating": 1.9,
+        "text": "The photos online are completely misleading. Hotel looks nothing like the pictures."
+      },
+      {
+        "date": "2026-01-30",
+        "rating": 1.6,
+        "text": "Bed was uncomfortable and linens felt cheap. Expected more for the price."
+      },
+      {
+        "date": "2026-01-24",
+        "rating": 2.8,
+        "text": "Water pressure was almost nonexistent. Took 20 minutes to shower."
+      }
+    ],
+    "last_updated": "2026-03-18T05:00:00Z",
+    "acquisition_score": 63,
+    "maps_url": "https://maps.google.com/?q=37.981873,23.7356"
+  },
+  {
+    "id": "fe0268ce-ba9a-43fc-a1b9-7e0faf75273a",
+    "name": "Hotel Delphi",
+    "city": "Athens",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Athinas 71, Athens 10526",
+    "lat": 37.95701,
+    "lng": 23.746345,
+    "rating": 4.2,
+    "review_count": 431,
+    "price_level": 2,
+    "room_count": 41,
+    "avg_nightly_rate": 76.0,
+    "cleanliness_rating": 4.2,
+    "service_rating": 4.0,
+    "location_rating": 4.9,
+    "value_rating": 3.9,
+    "review_velocity": 10.3,
+    "rating_trend": "flat",
+    "rating_30d_change": 0.02,
+    "recent_reviews": [
+      {
+        "date": "2026-02-20",
+        "rating": 3.7,
         "text": "Central location makes up for the small room size. Good value."
       },
       {
+        "date": "2026-01-23",
+        "rating": 3.8,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      },
+      {
+        "date": "2026-01-21",
+        "rating": 3.4,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      }
+    ],
+    "last_updated": "2026-03-17T19:00:00Z",
+    "acquisition_score": 28,
+    "maps_url": "https://maps.google.com/?q=37.95701,23.746345"
+  },
+  {
+    "id": "5e3b2db9-ef0e-42e3-88b4-32661a46b4ca",
+    "name": "Nefeli Hotel",
+    "city": "Athens",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Filellinon 31, Athens 10596",
+    "lat": 37.964125,
+    "lng": 23.756259,
+    "rating": 4.1,
+    "review_count": 910,
+    "price_level": 2,
+    "room_count": 20,
+    "avg_nightly_rate": 129.0,
+    "cleanliness_rating": 4.1,
+    "service_rating": 4.3,
+    "location_rating": 4.5,
+    "value_rating": 4.4,
+    "review_velocity": 16.9,
+    "rating_trend": "flat",
+    "rating_30d_change": 0.04,
+    "recent_reviews": [
+      {
+        "date": "2026-02-25",
+        "rating": 3.4,
+        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
+      },
+      {
+        "date": "2026-02-20",
+        "rating": 4.2,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      },
+      {
+        "date": "2026-01-17",
+        "rating": 4.2,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      }
+    ],
+    "last_updated": "2026-03-17T17:00:00Z",
+    "acquisition_score": 31,
+    "maps_url": "https://maps.google.com/?q=37.964125,23.756259"
+  },
+  {
+    "id": "bf9bfd4b-fb0b-408b-837f-6cbfcd363865",
+    "name": "Hotel Nestor",
+    "city": "Athens",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Apollonos 16, Athens 10568",
+    "lat": 37.9535,
+    "lng": 23.732325,
+    "rating": 3.8,
+    "review_count": 302,
+    "price_level": 3,
+    "room_count": 35,
+    "avg_nightly_rate": 135.0,
+    "cleanliness_rating": 4.0,
+    "service_rating": 3.6,
+    "location_rating": 4.5,
+    "value_rating": 4.1,
+    "review_velocity": 6.2,
+    "rating_trend": "improving",
+    "rating_30d_change": 0.24,
+    "recent_reviews": [
+      {
+        "date": "2026-03-07",
+        "rating": 3.7,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      },
+      {
+        "date": "2026-02-05",
+        "rating": 4.1,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      },
+      {
+        "date": "2025-12-29",
+        "rating": 3.9,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      }
+    ],
+    "last_updated": "2026-03-18T20:00:00Z",
+    "acquisition_score": 36,
+    "maps_url": "https://maps.google.com/?q=37.9535,23.732325"
+  },
+  {
+    "id": "71a82e47-73ff-4a2f-a110-552534401940",
+    "name": "Hotel Zeus",
+    "city": "Athens",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Stadiou 41, Athens 10579",
+    "lat": 37.950335,
+    "lng": 23.710358,
+    "rating": 4.4,
+    "review_count": 290,
+    "price_level": 2,
+    "room_count": 25,
+    "avg_nightly_rate": 79.0,
+    "cleanliness_rating": 4.2,
+    "service_rating": 4.1,
+    "location_rating": 4.8,
+    "value_rating": 3.9,
+    "review_velocity": 5.9,
+    "rating_trend": "flat",
+    "rating_30d_change": 0.05,
+    "recent_reviews": [
+      {
+        "date": "2026-02-18",
+        "rating": 4.3,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
+      },
+      {
         "date": "2026-01-27",
+        "rating": 3.0,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      },
+      {
+        "date": "2026-01-09",
+        "rating": 4.1,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      }
+    ],
+    "last_updated": "2026-03-18T11:00:00Z",
+    "acquisition_score": 22,
+    "maps_url": "https://maps.google.com/?q=37.950335,23.710358"
+  },
+  {
+    "id": "f0ef3325-c458-44ef-94e5-42ef4e51e1bb",
+    "name": "Syntagma Place",
+    "city": "Athens",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Kidathineon 29, Athens 10572",
+    "lat": 37.958665,
+    "lng": 23.730309,
+    "rating": 4.5,
+    "review_count": 881,
+    "price_level": 1,
+    "room_count": 30,
+    "avg_nightly_rate": 72.0,
+    "cleanliness_rating": 4.3,
+    "service_rating": 4.1,
+    "location_rating": 4.9,
+    "value_rating": 4.0,
+    "review_velocity": 16.0,
+    "rating_trend": "improving",
+    "rating_30d_change": 0.37,
+    "recent_reviews": [
+      {
+        "date": "2026-02-22",
+        "rating": 3.1,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
+      },
+      {
+        "date": "2026-01-24",
+        "rating": 4.3,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      },
+      {
+        "date": "2026-01-20",
+        "rating": 3.4,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
+      }
+    ],
+    "last_updated": "2026-03-18T17:00:00Z",
+    "acquisition_score": 20,
+    "maps_url": "https://maps.google.com/?q=37.958665,23.730309"
+  },
+  {
+    "id": "8953b3b6-5606-4263-ab32-b33f8fe9c125",
+    "name": "Hotel Thesseion",
+    "city": "Athens",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Panepistimiou 36, Athens 10563",
+    "lat": 37.960636,
+    "lng": 23.705533,
+    "rating": 2.5,
+    "review_count": 1112,
+    "price_level": 1,
+    "room_count": 35,
+    "avg_nightly_rate": 85.0,
+    "cleanliness_rating": 2.2,
+    "service_rating": 2.6,
+    "location_rating": 3.1,
+    "value_rating": 2.6,
+    "review_velocity": 18.5,
+    "rating_trend": "declining",
+    "rating_30d_change": -0.48,
+    "recent_reviews": [
+      {
+        "date": "2026-03-12",
+        "rating": 1.3,
+        "text": "Bed was uncomfortable and linens felt cheap. Expected more for the price."
+      },
+      {
+        "date": "2026-02-12",
+        "rating": 2.3,
+        "text": "Found mold in the shower. Reported it and nothing was done."
+      },
+      {
+        "date": "2025-12-26",
+        "rating": 1.9,
+        "text": "Checked in at 3pm and the room still wasn't ready. No apology from front desk."
+      }
+    ],
+    "last_updated": "2026-03-18T21:00:00Z",
+    "acquisition_score": 70,
+    "maps_url": "https://maps.google.com/?q=37.960636,23.705533"
+  },
+  {
+    "id": "40634143-ee97-4659-91f4-ce98c87ce9b4",
+    "name": "Hotel Agamemnon",
+    "city": "Athens",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Nikis 92, Athens 10524",
+    "lat": 37.992168,
+    "lng": 23.711264,
+    "rating": 4.0,
+    "review_count": 633,
+    "price_level": 2,
+    "room_count": 36,
+    "avg_nightly_rate": 125.0,
+    "cleanliness_rating": 4.0,
+    "service_rating": 4.3,
+    "location_rating": 4.3,
+    "value_rating": 4.3,
+    "review_velocity": 15.1,
+    "rating_trend": "declining",
+    "rating_30d_change": -0.25,
+    "recent_reviews": [
+      {
+        "date": "2026-02-20",
+        "rating": 3.2,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      },
+      {
+        "date": "2026-02-01",
+        "rating": 4.2,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      },
+      {
+        "date": "2025-12-26",
+        "rating": 3.5,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
+      }
+    ],
+    "last_updated": "2026-03-18T10:00:00Z",
+    "acquisition_score": 33,
+    "maps_url": "https://maps.google.com/?q=37.992168,23.711264"
+  },
+  {
+    "id": "9651757f-71a3-4fdd-b35e-5d96645fa4c0",
+    "name": "Hotel Pallas",
+    "city": "Athens",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Adrianou 109, Athens 10563",
+    "lat": 37.99484,
+    "lng": 23.707188,
+    "rating": 3.9,
+    "review_count": 679,
+    "price_level": 4,
+    "room_count": 37,
+    "avg_nightly_rate": 259.0,
+    "cleanliness_rating": 4.0,
+    "service_rating": 3.7,
+    "location_rating": 4.5,
+    "value_rating": 4.3,
+    "review_velocity": 15.4,
+    "rating_trend": "improving",
+    "rating_30d_change": 0.37,
+    "recent_reviews": [
+      {
+        "date": "2026-02-25",
+        "rating": 3.7,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      },
+      {
+        "date": "2026-02-03",
+        "rating": 4.3,
+        "text": "Central location makes up for the small room size. Good value."
+      },
+      {
+        "date": "2026-01-26",
+        "rating": 4.3,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      }
+    ],
+    "last_updated": "2026-03-18T22:00:00Z",
+    "acquisition_score": 36,
+    "maps_url": "https://maps.google.com/?q=37.99484,23.707188"
+  },
+  {
+    "id": "80591346-b771-4817-bbd1-b6b678097b10",
+    "name": "Hotel Ambrosia",
+    "city": "Athens",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Stadiou 4, Athens 10573",
+    "lat": 37.996557,
+    "lng": 23.712529,
+    "rating": 4.3,
+    "review_count": 703,
+    "price_level": 2,
+    "room_count": 43,
+    "avg_nightly_rate": 87.0,
+    "cleanliness_rating": 4.6,
+    "service_rating": 4.4,
+    "location_rating": 4.5,
+    "value_rating": 3.7,
+    "review_velocity": 16.7,
+    "rating_trend": "declining",
+    "rating_30d_change": -0.24,
+    "recent_reviews": [
+      {
+        "date": "2026-02-25",
+        "rating": 4.0,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      },
+      {
+        "date": "2026-01-20",
+        "rating": 4.2,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      },
+      {
+        "date": "2026-01-26",
+        "rating": 3.3,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      }
+    ],
+    "last_updated": "2026-03-17T17:00:00Z",
+    "acquisition_score": 26,
+    "maps_url": "https://maps.google.com/?q=37.996557,23.712529"
+  },
+  {
+    "id": "537b6ef8-8f2e-490e-9d9f-8f3fed3d15c6",
+    "name": "Monastiraki Square Hotel",
+    "city": "Athens",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Kolonaki 68, Athens 10554",
+    "lat": 37.97103,
+    "lng": 23.752015,
+    "rating": 2.9,
+    "review_count": 682,
+    "price_level": 2,
+    "room_count": 39,
+    "avg_nightly_rate": 83.0,
+    "cleanliness_rating": 2.6,
+    "service_rating": 2.4,
+    "location_rating": 3.1,
+    "value_rating": 2.4,
+    "review_velocity": 12.9,
+    "rating_trend": "improving",
+    "rating_30d_change": 0.29,
+    "recent_reviews": [
+      {
+        "date": "2026-03-06",
+        "rating": 2.5,
+        "text": "Checked in at 3pm and the room still wasn't ready. No apology from front desk."
+      },
+      {
+        "date": "2026-02-03",
+        "rating": 2.2,
+        "text": "Water pressure was almost nonexistent. Took 20 minutes to shower."
+      },
+      {
+        "date": "2025-12-29",
+        "rating": 1.6,
+        "text": "Bed was uncomfortable and linens felt cheap. Expected more for the price."
+      }
+    ],
+    "last_updated": "2026-03-19T07:00:00Z",
+    "acquisition_score": 60,
+    "maps_url": "https://maps.google.com/?q=37.97103,23.752015"
+  },
+  {
+    "id": "13c4c704-a214-4aa0-aee5-85000d640c3e",
+    "name": "Lycabettus View",
+    "city": "Athens",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Athinas 2, Athens 10578",
+    "lat": 37.953095,
+    "lng": 23.702986,
+    "rating": 4.1,
+    "review_count": 394,
+    "price_level": 2,
+    "room_count": 29,
+    "avg_nightly_rate": 126.0,
+    "cleanliness_rating": 4.1,
+    "service_rating": 4.3,
+    "location_rating": 4.2,
+    "value_rating": 3.5,
+    "review_velocity": 8.8,
+    "rating_trend": "flat",
+    "rating_30d_change": -0.01,
+    "recent_reviews": [
+      {
+        "date": "2026-03-07",
+        "rating": 3.4,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
+      },
+      {
+        "date": "2026-01-21",
+        "rating": 4.2,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      },
+      {
+        "date": "2026-01-06",
+        "rating": 3.1,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      }
+    ],
+    "last_updated": "2026-03-17T21:00:00Z",
+    "acquisition_score": 30,
+    "maps_url": "https://maps.google.com/?q=37.953095,23.702986"
+  },
+  {
+    "id": "9815e00f-2414-449b-909e-fe57c3d13ad1",
+    "name": "Hotel Aphrodite",
+    "city": "Athens",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Athinas 11, Athens 10541",
+    "lat": 37.952607,
+    "lng": 23.753311,
+    "rating": 3.9,
+    "review_count": 899,
+    "price_level": 3,
+    "room_count": 43,
+    "avg_nightly_rate": 128.0,
+    "cleanliness_rating": 3.8,
+    "service_rating": 3.8,
+    "location_rating": 4.3,
+    "value_rating": 4.2,
+    "review_velocity": 18.3,
+    "rating_trend": "flat",
+    "rating_30d_change": 0.02,
+    "recent_reviews": [
+      {
+        "date": "2026-02-21",
         "rating": 4.4,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      },
+      {
+        "date": "2026-02-07",
+        "rating": 3.4,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      },
+      {
+        "date": "2026-01-26",
+        "rating": 3.4,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      }
+    ],
+    "last_updated": "2026-03-18T02:00:00Z",
+    "acquisition_score": 36,
+    "maps_url": "https://maps.google.com/?q=37.952607,23.753311"
+  },
+  {
+    "id": "40794fa5-af89-477a-86d2-15575aacdbb9",
+    "name": "Omonia Hotel",
+    "city": "Athens",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Plaka 61, Athens 10547",
+    "lat": 37.947458,
+    "lng": 23.719967,
+    "rating": 2.0,
+    "review_count": 756,
+    "price_level": 2,
+    "room_count": 46,
+    "avg_nightly_rate": 70.0,
+    "cleanliness_rating": 1.6,
+    "service_rating": 1.7,
+    "location_rating": 2.6,
+    "value_rating": 2.0,
+    "review_velocity": 18.0,
+    "rating_trend": "declining",
+    "rating_30d_change": -0.33,
+    "recent_reviews": [
+      {
+        "date": "2026-02-20",
+        "rating": 2.8,
+        "text": "Location is great but the hotel desperately needs renovation. Everything feels worn out."
+      },
+      {
+        "date": "2026-02-11",
+        "rating": 1.1,
+        "text": "Terrible experience. Dirty bathroom, noisy hallway, and breakfast was inedible."
+      },
+      {
+        "date": "2026-01-12",
+        "rating": 2.5,
+        "text": "Bed was uncomfortable and linens felt cheap. Expected more for the price."
+      }
+    ],
+    "last_updated": "2026-03-18T01:00:00Z",
+    "acquisition_score": 83,
+    "maps_url": "https://maps.google.com/?q=37.947458,23.719967"
+  },
+  {
+    "id": "2a786333-c3a1-4efe-8343-8c1ce27ebc8b",
+    "name": "Hotel Victoria",
+    "city": "Athens",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Athinas 90, Athens 10561",
+    "lat": 38.002061,
+    "lng": 23.734833,
+    "rating": 4.2,
+    "review_count": 492,
+    "price_level": 2,
+    "room_count": 22,
+    "avg_nightly_rate": 68.0,
+    "cleanliness_rating": 4.0,
+    "service_rating": 3.9,
+    "location_rating": 4.4,
+    "value_rating": 3.7,
+    "review_velocity": 8.6,
+    "rating_trend": "improving",
+    "rating_30d_change": 0.25,
+    "recent_reviews": [
+      {
+        "date": "2026-03-12",
+        "rating": 3.9,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      },
+      {
+        "date": "2026-02-09",
+        "rating": 3.8,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      },
+      {
+        "date": "2026-01-03",
+        "rating": 3.3,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      }
+    ],
+    "last_updated": "2026-03-18T00:00:00Z",
+    "acquisition_score": 28,
+    "maps_url": "https://maps.google.com/?q=38.002061,23.734833"
+  },
+  {
+    "id": "b6e33a68-b6b1-44f6-8d0a-865ec7cf51e8",
+    "name": "Plaka Inn",
+    "city": "Athens",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Syntagma 45, Athens 10562",
+    "lat": 37.965499,
+    "lng": 23.746709,
+    "rating": 4.5,
+    "review_count": 1256,
+    "price_level": 3,
+    "room_count": 29,
+    "avg_nightly_rate": 165.0,
+    "cleanliness_rating": 4.2,
+    "service_rating": 4.8,
+    "location_rating": 5.0,
+    "value_rating": 4.5,
+    "review_velocity": 25.1,
+    "rating_trend": "declining",
+    "rating_30d_change": -0.47,
+    "recent_reviews": [
+      {
+        "date": "2026-03-09",
+        "rating": 4.3,
+        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
+      },
+      {
+        "date": "2026-02-20",
+        "rating": 3.6,
         "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
       },
       {
         "date": "2026-01-19",
         "rating": 3.9,
-        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+        "text": "Central location makes up for the small room size. Good value."
       }
     ],
-    "last_updated": "2026-03-18T23:00:00Z",
-    "acquisition_score": 13,
-    "maps_url": "https://maps.google.com/?q=37.965893,23.75494"
+    "last_updated": "2026-03-18T06:00:00Z",
+    "acquisition_score": 20,
+    "maps_url": "https://maps.google.com/?q=37.965499,23.746709"
   },
   {
-    "id": "34df985e-e6ae-4ddf-956e-a2fa5e044b88",
+    "id": "0d0b4edf-5f90-45f0-b273-fb5ae55c6ea7",
+    "name": "Hotel Acropolis",
+    "city": "Athens",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Kolonaki 17, Athens 10546",
+    "lat": 37.971787,
+    "lng": 23.748678,
+    "rating": 4.5,
+    "review_count": 266,
+    "price_level": 2,
+    "room_count": 53,
+    "avg_nightly_rate": 105.0,
+    "cleanliness_rating": 4.1,
+    "service_rating": 4.1,
+    "location_rating": 4.9,
+    "value_rating": 4.5,
+    "review_velocity": 7.0,
+    "rating_trend": "flat",
+    "rating_30d_change": 0.07,
+    "recent_reviews": [
+      {
+        "date": "2026-03-09",
+        "rating": 4.4,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      },
+      {
+        "date": "2026-02-11",
+        "rating": 4.4,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      },
+      {
+        "date": "2026-01-13",
+        "rating": 3.6,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      }
+    ],
+    "last_updated": "2026-03-18T07:00:00Z",
+    "acquisition_score": 14,
+    "maps_url": "https://maps.google.com/?q=37.971787,23.748678"
+  },
+  {
+    "id": "931c02db-3e69-4840-bf6f-0f76234412a1",
+    "name": "Psiri District Hotel",
+    "city": "Athens",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Panepistimiou 25, Athens 10586",
+    "lat": 37.975994,
+    "lng": 23.761353,
+    "rating": 4.0,
+    "review_count": 573,
+    "price_level": 3,
+    "room_count": 28,
+    "avg_nightly_rate": 173.0,
+    "cleanliness_rating": 3.8,
+    "service_rating": 4.3,
+    "location_rating": 4.4,
+    "value_rating": 4.2,
+    "review_velocity": 12.7,
+    "rating_trend": "improving",
+    "rating_30d_change": 0.34,
+    "recent_reviews": [
+      {
+        "date": "2026-02-22",
+        "rating": 4.3,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      },
+      {
+        "date": "2026-01-23",
+        "rating": 3.5,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      },
+      {
+        "date": "2025-12-27",
+        "rating": 3.7,
+        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
+      }
+    ],
+    "last_updated": "2026-03-18T17:00:00Z",
+    "acquisition_score": 33,
+    "maps_url": "https://maps.google.com/?q=37.975994,23.761353"
+  },
+  {
+    "id": "7d0fcbe0-1b15-4d9d-b930-d23ff8c4d303",
+    "name": "Atrium Athens",
+    "city": "Athens",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Panepistimiou 30, Athens 10562",
+    "lat": 37.948119,
+    "lng": 23.751929,
+    "rating": 4.7,
+    "review_count": 293,
+    "price_level": 3,
+    "room_count": 44,
+    "avg_nightly_rate": 141.0,
+    "cleanliness_rating": 4.8,
+    "service_rating": 4.9,
+    "location_rating": 5.0,
+    "value_rating": 4.6,
+    "review_velocity": 7.9,
+    "rating_trend": "flat",
+    "rating_30d_change": 0.09,
+    "recent_reviews": [
+      {
+        "date": "2026-03-02",
+        "rating": 4.3,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      },
+      {
+        "date": "2026-01-23",
+        "rating": 3.8,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      },
+      {
+        "date": "2026-01-02",
+        "rating": 4.1,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
+      }
+    ],
+    "last_updated": "2026-03-18T11:00:00Z",
+    "acquisition_score": 15,
+    "maps_url": "https://maps.google.com/?q=37.948119,23.751929"
+  },
+  {
+    "id": "0d5e410b-a7df-4142-ac0d-29ddb3978d04",
+    "name": "Athens City Hotel",
+    "city": "Athens",
+    "country": "GR",
+    "flag": "\ud83c\uddec\ud83c\uddf7",
+    "address": "Filellinon 34, Athens 10553",
+    "lat": 37.982896,
+    "lng": 23.727624,
+    "rating": 4.7,
+    "review_count": 166,
+    "price_level": 2,
+    "room_count": 29,
+    "avg_nightly_rate": 109.0,
+    "cleanliness_rating": 4.6,
+    "service_rating": 5.0,
+    "location_rating": 5.0,
+    "value_rating": 5.0,
+    "review_velocity": 3.3,
+    "rating_trend": "improving",
+    "rating_30d_change": 0.06,
+    "recent_reviews": [
+      {
+        "date": "2026-03-10",
+        "rating": 3.9,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      },
+      {
+        "date": "2026-02-02",
+        "rating": 4.1,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      },
+      {
+        "date": "2026-01-04",
+        "rating": 4.1,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      }
+    ],
+    "last_updated": "2026-03-17T16:00:00Z",
+    "acquisition_score": 14,
+    "maps_url": "https://maps.google.com/?q=37.982896,23.727624"
+  },
+  {
+    "id": "d02b3dca-658f-4d27-b810-dbecce436da7",
     "name": "Hotel Dionysos",
     "city": "Athens",
     "country": "GR",
     "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Syntagma 91, Athens 10558",
-    "lat": 37.968665,
-    "lng": 23.746258,
+    "address": "Kidathineon 4, Athens 10515",
+    "lat": 37.964962,
+    "lng": 23.703728,
     "rating": 4.2,
-    "review_count": 358,
-    "price_level": 3,
-    "room_count": 54,
-    "avg_nightly_rate": 150.0,
-    "cleanliness_rating": 3.6,
-    "service_rating": 4.1,
-    "location_rating": 4.7,
-    "value_rating": 4.5,
-    "review_velocity": 7.2,
-    "rating_trend": "declining",
+    "review_count": 735,
+    "price_level": 2,
+    "room_count": 32,
+    "avg_nightly_rate": 81.0,
+    "cleanliness_rating": 4.0,
+    "service_rating": 4.3,
+    "location_rating": 4.3,
+    "value_rating": 3.8,
+    "review_velocity": 13.4,
+    "rating_trend": "improving",
+    "rating_30d_change": 0.27,
     "recent_reviews": [
       {
-        "date": "2026-02-26",
-        "rating": 4.1,
-        "text": "Decent hotel for the price. Nothing special but clean and functional."
+        "date": "2026-03-05",
+        "rating": 4.4,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
       },
       {
-        "date": "2026-01-25",
-        "rating": 3.1,
-        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+        "date": "2026-02-11",
+        "rating": 3.7,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
       },
       {
         "date": "2026-01-15",
-        "rating": 3.9,
-        "text": "Central location makes up for the small room size. Good value."
+        "rating": 3.4,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
       }
     ],
-    "last_updated": "2026-03-18T12:00:00Z",
-    "acquisition_score": 22,
-    "maps_url": "https://maps.google.com/?q=37.968665,23.746258"
+    "last_updated": "2026-03-19T13:00:00Z",
+    "acquisition_score": 28,
+    "maps_url": "https://maps.google.com/?q=37.964962,23.703728"
   },
   {
-    "id": "4adb594e-f9a2-4c96-8dcf-f08c21e9b62d",
+    "id": "7316dcfe-7678-412c-970f-8212eed584a7",
     "name": "Hotel Olympia",
     "city": "Athens",
     "country": "GR",
     "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Apollonos 69, Athens 10558",
-    "lat": 38.002748,
-    "lng": 23.743676,
-    "rating": 4.6,
-    "review_count": 968,
+    "address": "Kolonaki 21, Athens 10519",
+    "lat": 37.972004,
+    "lng": 23.72399,
+    "rating": 4.2,
+    "review_count": 333,
     "price_level": 3,
-    "room_count": 33,
-    "avg_nightly_rate": 153.0,
-    "cleanliness_rating": 4.6,
-    "service_rating": 4.2,
-    "location_rating": 5.0,
-    "value_rating": 4.3,
-    "review_velocity": 22.5,
-    "rating_trend": "improving",
+    "room_count": 37,
+    "avg_nightly_rate": 144.0,
+    "cleanliness_rating": 3.9,
+    "service_rating": 4.4,
+    "location_rating": 4.4,
+    "value_rating": 4.0,
+    "review_velocity": 6.5,
+    "rating_trend": "flat",
+    "rating_30d_change": -0.02,
     "recent_reviews": [
       {
-        "date": "2026-02-27",
-        "rating": 4.1,
-        "text": "Good location, average rooms. Would stay again if the price is right."
+        "date": "2026-03-01",
+        "rating": 4.5,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
       },
       {
-        "date": "2026-02-14",
-        "rating": 3.2,
-        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
-      },
-      {
-        "date": "2026-01-12",
-        "rating": 3.1,
+        "date": "2026-02-02",
+        "rating": 4.5,
         "text": "Decent hotel for the price. Nothing special but clean and functional."
+      },
+      {
+        "date": "2025-12-20",
+        "rating": 3.4,
+        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
       }
     ],
-    "last_updated": "2026-03-19T10:00:00Z",
-    "acquisition_score": 18,
-    "maps_url": "https://maps.google.com/?q=38.002748,23.743676"
+    "last_updated": "2026-03-18T01:00:00Z",
+    "acquisition_score": 27,
+    "maps_url": "https://maps.google.com/?q=37.972004,23.72399"
   },
   {
-    "id": "8dbe40e4-ad07-4b99-9626-19decbb33c9b",
+    "id": "98c34af7-c99a-4798-b295-3a00eac066c0",
     "name": "Hotel Electra",
     "city": "Athens",
     "country": "GR",
     "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Kolonaki 53, Athens 10582",
-    "lat": 37.986408,
-    "lng": 23.712404,
-    "rating": 2.5,
-    "review_count": 478,
-    "price_level": 2,
-    "room_count": 37,
-    "avg_nightly_rate": 90.0,
-    "cleanliness_rating": 2.6,
-    "service_rating": 2.4,
-    "location_rating": 3.0,
-    "value_rating": 2.1,
-    "review_velocity": 8.5,
-    "rating_trend": "declining",
+    "address": "Kidathineon 78, Athens 10573",
+    "lat": 37.99547,
+    "lng": 23.763005,
+    "rating": 4.5,
+    "review_count": 1275,
+    "price_level": 3,
+    "room_count": 27,
+    "avg_nightly_rate": 174.0,
+    "cleanliness_rating": 4.1,
+    "service_rating": 4.1,
+    "location_rating": 4.7,
+    "value_rating": 4.7,
+    "review_velocity": 21.2,
+    "rating_trend": "improving",
+    "rating_30d_change": 0.34,
     "recent_reviews": [
       {
-        "date": "2026-03-04",
-        "rating": 1.0,
-        "text": "Rude reception staff. Asked for extra towels twice and never received them."
+        "date": "2026-02-20",
+        "rating": 4.4,
+        "text": "Good location, average rooms. Would stay again if the price is right."
       },
       {
-        "date": "2026-01-22",
-        "rating": 1.6,
-        "text": "Air conditioning leaked water onto the floor. Maintenance never came."
+        "date": "2026-02-18",
+        "rating": 4.2,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
       },
       {
-        "date": "2025-12-28",
-        "rating": 1.1,
-        "text": "Location is great but the hotel desperately needs renovation. Everything feels worn out."
+        "date": "2026-01-29",
+        "rating": 4.1,
+        "text": "Central location makes up for the small room size. Good value."
       }
     ],
-    "last_updated": "2026-03-18T15:00:00Z",
-    "acquisition_score": 70,
-    "maps_url": "https://maps.google.com/?q=37.986408,23.712404"
+    "last_updated": "2026-03-19T08:00:00Z",
+    "acquisition_score": 20,
+    "maps_url": "https://maps.google.com/?q=37.99547,23.763005"
   },
   {
-    "id": "e5f45f37-030f-490e-98b6-39d10142e4e4",
+    "id": "b08fb194-6817-4d28-8e5c-b06561cce516",
     "name": "Poseidon Hotel",
     "city": "Athens",
     "country": "GR",
     "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Nikis 33, Athens 10568",
-    "lat": 37.996218,
-    "lng": 23.713745,
+    "address": "Mitropoleos 17, Athens 10579",
+    "lat": 37.998088,
+    "lng": 23.72541,
     "rating": 4.1,
-    "review_count": 1230,
-    "price_level": 2,
-    "room_count": 33,
-    "avg_nightly_rate": 80.0,
-    "cleanliness_rating": 4.1,
-    "service_rating": 4.1,
+    "review_count": 443,
+    "price_level": 3,
+    "room_count": 28,
+    "avg_nightly_rate": 123.0,
+    "cleanliness_rating": 4.4,
+    "service_rating": 4.4,
     "location_rating": 4.9,
     "value_rating": 3.8,
-    "review_velocity": 21.6,
-    "rating_trend": "flat",
+    "review_velocity": 9.6,
+    "rating_trend": "improving",
+    "rating_30d_change": 0.21,
     "recent_reviews": [
       {
-        "date": "2026-03-12",
-        "rating": 4.4,
-        "text": "Decent hotel for the price. Nothing special but clean and functional."
+        "date": "2026-03-10",
+        "rating": 4.1,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
       },
       {
-        "date": "2026-01-20",
-        "rating": 4.2,
-        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+        "date": "2026-02-06",
+        "rating": 4.5,
+        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
       },
       {
-        "date": "2026-01-17",
-        "rating": 3.3,
+        "date": "2025-12-27",
+        "rating": 3.1,
         "text": "Central location makes up for the small room size. Good value."
       }
     ],
-    "last_updated": "2026-03-19T01:00:00Z",
-    "acquisition_score": 31,
-    "maps_url": "https://maps.google.com/?q=37.996218,23.713745"
+    "last_updated": "2026-03-18T12:00:00Z",
+    "acquisition_score": 30,
+    "maps_url": "https://maps.google.com/?q=37.998088,23.72541"
   },
   {
-    "id": "5aeeb503-89c1-41de-824e-15280f882e1b",
+    "id": "8cb16df8-efd1-479f-9309-ccd8de214bc4",
     "name": "Athens Central",
     "city": "Athens",
     "country": "GR",
     "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Voulis 88, Athens 10527",
-    "lat": 37.983195,
-    "lng": 23.763038,
-    "rating": 4.4,
-    "review_count": 769,
+    "address": "Voulis 96, Athens 10596",
+    "lat": 37.96123,
+    "lng": 23.726472,
+    "rating": 2.8,
+    "review_count": 760,
     "price_level": 3,
-    "room_count": 29,
-    "avg_nightly_rate": 145.0,
-    "cleanliness_rating": 4.4,
-    "service_rating": 4.5,
-    "location_rating": 4.5,
-    "value_rating": 4.1,
-    "review_velocity": 13.0,
-    "rating_trend": "flat",
+    "room_count": 30,
+    "avg_nightly_rate": 164.0,
+    "cleanliness_rating": 2.7,
+    "service_rating": 2.8,
+    "location_rating": 3.6,
+    "value_rating": 2.5,
+    "review_velocity": 13.8,
+    "rating_trend": "declining",
+    "rating_30d_change": -0.57,
     "recent_reviews": [
       {
-        "date": "2026-03-06",
-        "rating": 4.2,
-        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+        "date": "2026-02-26",
+        "rating": 2.4,
+        "text": "Air conditioning leaked water onto the floor. Maintenance never came."
       },
       {
-        "date": "2026-01-28",
-        "rating": 4.2,
-        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+        "date": "2026-01-25",
+        "rating": 1.3,
+        "text": "Terrible experience. Dirty bathroom, noisy hallway, and breakfast was inedible."
       },
       {
-        "date": "2026-01-15",
-        "rating": 4.5,
-        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+        "date": "2026-01-29",
+        "rating": 3.0,
+        "text": "Walls are paper thin. Could hear everything from neighboring rooms all night."
       }
     ],
-    "last_updated": "2026-03-18T19:00:00Z",
-    "acquisition_score": 23,
-    "maps_url": "https://maps.google.com/?q=37.983195,23.763038"
+    "last_updated": "2026-03-19T06:00:00Z",
+    "acquisition_score": 63,
+    "maps_url": "https://maps.google.com/?q=37.96123,23.726472"
   },
   {
-    "id": "8c094fe0-ad54-44c9-a56b-f81d4d6b14e8",
+    "id": "d8cbb969-6d8b-4964-8b3b-fd0e5720a2aa",
     "name": "Athens Classic Hotel",
     "city": "Athens",
     "country": "GR",
     "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Ermou 19, Athens 10538",
-    "lat": 37.997108,
-    "lng": 23.750495,
-    "rating": 4.1,
-    "review_count": 199,
-    "price_level": 4,
-    "room_count": 53,
-    "avg_nightly_rate": 257.0,
-    "cleanliness_rating": 3.9,
-    "service_rating": 4.3,
-    "location_rating": 4.1,
-    "value_rating": 4.0,
-    "review_velocity": 4.0,
-    "rating_trend": "flat",
+    "address": "Syntagma 48, Athens 10595",
+    "lat": 38.002463,
+    "lng": 23.748554,
+    "rating": 3.2,
+    "review_count": 467,
+    "price_level": 3,
+    "room_count": 36,
+    "avg_nightly_rate": 168.0,
+    "cleanliness_rating": 3.5,
+    "service_rating": 3.3,
+    "location_rating": 3.9,
+    "value_rating": 3.2,
+    "review_velocity": 10.6,
+    "rating_trend": "declining",
+    "rating_30d_change": -0.41,
     "recent_reviews": [
       {
-        "date": "2026-02-17",
-        "rating": 3.9,
-        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+        "date": "2026-02-26",
+        "rating": 2.9,
+        "text": "Found mold in the shower. Reported it and nothing was done."
       },
       {
         "date": "2026-01-28",
-        "rating": 4.0,
-        "text": "Good location, average rooms. Would stay again if the price is right."
+        "rating": 3.0,
+        "text": "Terrible experience. Dirty bathroom, noisy hallway, and breakfast was inedible."
       },
       {
-        "date": "2026-01-01",
-        "rating": 3.9,
-        "text": "Decent hotel for the price. Nothing special but clean and functional."
+        "date": "2026-01-08",
+        "rating": 2.8,
+        "text": "WiFi barely worked and there's no workspace in the rooms. Not suitable for business travel."
       }
     ],
-    "last_updated": "2026-03-18T02:00:00Z",
-    "acquisition_score": 22,
-    "maps_url": "https://maps.google.com/?q=37.997108,23.750495"
+    "last_updated": "2026-03-17T20:00:00Z",
+    "acquisition_score": 53,
+    "maps_url": "https://maps.google.com/?q=38.002463,23.748554"
   },
   {
-    "id": "eef6a3b6-f712-4520-a11f-1bf4b14c24a6",
+    "id": "4dbab1a2-0384-482d-b535-47ae95e94d90",
     "name": "Athen's Grand",
     "city": "Athens",
     "country": "GR",
     "flag": "\ud83c\uddec\ud83c\uddf7",
-    "address": "Voulis 106, Athens 10569",
-    "lat": 38.000063,
-    "lng": 23.720953,
-    "rating": 4.3,
-    "review_count": 679,
-    "price_level": 2,
-    "room_count": 24,
-    "avg_nightly_rate": 127.0,
-    "cleanliness_rating": 4.0,
-    "service_rating": 4.2,
-    "location_rating": 4.4,
-    "value_rating": 4.6,
-    "review_velocity": 17.0,
-    "rating_trend": "flat",
+    "address": "Ermou 109, Athens 10568",
+    "lat": 37.951,
+    "lng": 23.714647,
+    "rating": 4.2,
+    "review_count": 255,
+    "price_level": 3,
+    "room_count": 53,
+    "avg_nightly_rate": 114.0,
+    "cleanliness_rating": 3.9,
+    "service_rating": 4.6,
+    "location_rating": 4.8,
+    "value_rating": 3.8,
+    "review_velocity": 4.2,
+    "rating_trend": "improving",
+    "rating_30d_change": 0.26,
     "recent_reviews": [
       {
-        "date": "2026-03-01",
-        "rating": 3.9,
-        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
+        "date": "2026-03-05",
+        "rating": 4.2,
+        "text": "Central location makes up for the small room size. Good value."
       },
       {
-        "date": "2026-02-11",
-        "rating": 4.0,
-        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
+        "date": "2026-02-20",
+        "rating": 4.3,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
       },
       {
-        "date": "2025-12-31",
-        "rating": 4.4,
-        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
+        "date": "2026-01-22",
+        "rating": 3.8,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
       }
     ],
-    "last_updated": "2026-03-18T20:00:00Z",
-    "acquisition_score": 26,
-    "maps_url": "https://maps.google.com/?q=38.000063,23.720953"
+    "last_updated": "2026-03-19T02:00:00Z",
+    "acquisition_score": 21,
+    "maps_url": "https://maps.google.com/?q=37.951,23.714647"
   }
 ]

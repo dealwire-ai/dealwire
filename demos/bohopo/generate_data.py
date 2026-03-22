@@ -294,6 +294,14 @@ def generate_city_hotels(city_name: str, city_data: dict, count: int = 40) -> li
         else:
             rating_trend = random.choices(["declining", "flat", "improving"], weights=[10, 40, 50])[0]
 
+        # Rating change in last 30 days (correlated with trend)
+        if rating_trend == "declining":
+            rating_30d_change = round(random.uniform(-0.6, -0.1), 2)
+        elif rating_trend == "improving":
+            rating_30d_change = round(random.uniform(0.05, 0.4), 2)
+        else:
+            rating_30d_change = round(random.uniform(-0.1, 0.1), 2)
+
         # Recent reviews
         recent_reviews = generate_recent_reviews(rating)
 
@@ -324,6 +332,7 @@ def generate_city_hotels(city_name: str, city_data: dict, count: int = 40) -> li
             "value_rating": value_rating,
             "review_velocity": review_velocity,
             "rating_trend": rating_trend,
+            "rating_30d_change": rating_30d_change,
             "recent_reviews": recent_reviews,
             "last_updated": last_updated,
             "acquisition_score": score,
