@@ -1,567 +1,413 @@
 [
   {
-    "id": "cb599022-8e39-408d-950d-d3b5eefeffee",
-    "name": "H\u00f4tel Lacydon",
+    "id": "0c55f835-f479-4338-8551-09c38cf2b82d",
+    "name": "H\u00f4tel Libertel",
     "city": "Marseille",
     "country": "FR",
     "flag": "\ud83c\uddeb\ud83c\uddf7",
-    "address": "Rue d'Aubagne 61, Marseille 13040",
-    "lat": 43.31746,
-    "lng": 5.355852,
-    "rating": 4.1,
-    "review_count": 251,
+    "address": "Boulevard Charles Livon 114, Marseille 13079",
+    "lat": 43.325919,
+    "lng": 5.401807,
+    "rating": 3.0,
+    "review_count": 793,
     "price_level": 3,
-    "room_count": 43,
-    "avg_nightly_rate": 183.0,
-    "cleanliness_rating": 4.1,
-    "service_rating": 4.5,
-    "location_rating": 4.5,
-    "value_rating": 3.6,
-    "review_velocity": 5.8,
-    "rating_trend": "flat",
+    "room_count": 45,
+    "avg_nightly_rate": 116.0,
+    "cleanliness_rating": 3.2,
+    "service_rating": 2.4,
+    "location_rating": 3.0,
+    "value_rating": 2.5,
+    "review_velocity": 14.2,
+    "rating_trend": "declining",
+    "rating_30d_change": -0.25,
     "recent_reviews": [
       {
-        "date": "2026-03-02",
-        "rating": 4.4,
-        "text": "Good location, average rooms. Would stay again if the price is right."
+        "date": "2026-03-12",
+        "rating": 2.0,
+        "text": "Checked in at 3pm and the room still wasn't ready. No apology from front desk."
       },
       {
         "date": "2026-01-28",
-        "rating": 3.8,
-        "text": "Good location, average rooms. Would stay again if the price is right."
+        "rating": 2.2,
+        "text": "Room was outdated and the AC didn't work properly. Staff seemed overwhelmed."
       },
       {
-        "date": "2026-01-19",
-        "rating": 3.4,
-        "text": "Decent hotel for the price. Nothing special but clean and functional."
+        "date": "2025-12-20",
+        "rating": 2.2,
+        "text": "Air conditioning leaked water onto the floor. Maintenance never came."
       }
     ],
-    "last_updated": "2026-03-17T18:00:00Z",
-    "acquisition_score": 28,
-    "maps_url": "https://maps.google.com/?q=43.31746,5.355852"
+    "last_updated": "2026-03-18T07:00:00Z",
+    "acquisition_score": 58,
+    "maps_url": "https://maps.google.com/?q=43.325919,5.401807"
   },
   {
-    "id": "c3078f93-667f-4bc2-8141-17078c964760",
-    "name": "Hotel de la Pr\u00e9fecture",
+    "id": "d3e9d6a3-1cc4-4a11-b8e4-e4a01b7c6ba1",
+    "name": "Hotel Relax",
     "city": "Marseille",
     "country": "FR",
     "flag": "\ud83c\uddeb\ud83c\uddf7",
-    "address": "Place Castellane 98, Marseille 13085",
-    "lat": 43.309958,
-    "lng": 5.37392,
+    "address": "Avenue du Prado 2, Marseille 13012",
+    "lat": 43.298265,
+    "lng": 5.354032,
     "rating": 3.8,
-    "review_count": 164,
-    "price_level": 2,
-    "room_count": 46,
-    "avg_nightly_rate": 87.0,
-    "cleanliness_rating": 4.2,
-    "service_rating": 3.2,
-    "location_rating": 4.5,
-    "value_rating": 4.2,
-    "review_velocity": 4.2,
-    "rating_trend": "improving",
-    "recent_reviews": [
-      {
-        "date": "2026-02-25",
-        "rating": 4.0,
-        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
-      },
-      {
-        "date": "2026-02-07",
-        "rating": 4.4,
-        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
-      },
-      {
-        "date": "2025-12-27",
-        "rating": 4.2,
-        "text": "Central location makes up for the small room size. Good value."
-      }
-    ],
-    "last_updated": "2026-03-18T13:00:00Z",
-    "acquisition_score": 33,
-    "maps_url": "https://maps.google.com/?q=43.309958,5.37392"
-  },
-  {
-    "id": "7f84c0b2-fa31-4458-be02-789013ac18d1",
-    "name": "H\u00f4tel du Chapitre",
-    "city": "Marseille",
-    "country": "FR",
-    "flag": "\ud83c\uddeb\ud83c\uddf7",
-    "address": "Rue Saint-Ferr\u00e9ol 66, Marseille 13073",
-    "lat": 43.29446,
-    "lng": 5.390997,
-    "rating": 4.4,
-    "review_count": 350,
-    "price_level": 3,
-    "room_count": 42,
-    "avg_nightly_rate": 136.0,
-    "cleanliness_rating": 4.0,
-    "service_rating": 4.1,
-    "location_rating": 4.4,
-    "value_rating": 4.7,
-    "review_velocity": 5.9,
-    "rating_trend": "flat",
-    "recent_reviews": [
-      {
-        "date": "2026-03-04",
-        "rating": 3.4,
-        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
-      },
-      {
-        "date": "2026-02-08",
-        "rating": 3.3,
-        "text": "Central location makes up for the small room size. Good value."
-      },
-      {
-        "date": "2025-12-26",
-        "rating": 3.7,
-        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
-      }
-    ],
-    "last_updated": "2026-03-17T20:00:00Z",
-    "acquisition_score": 22,
-    "maps_url": "https://maps.google.com/?q=43.29446,5.390997"
-  },
-  {
-    "id": "c1663732-ded3-4fa5-82e2-e5745a14af78",
-    "name": "H\u00f4tel Saint-Louis",
-    "city": "Marseille",
-    "country": "FR",
-    "flag": "\ud83c\uddeb\ud83c\uddf7",
-    "address": "Rue Sainte 93, Marseille 13092",
-    "lat": 43.310876,
-    "lng": 5.367058,
-    "rating": 4.1,
-    "review_count": 827,
-    "price_level": 3,
-    "room_count": 30,
-    "avg_nightly_rate": 121.0,
-    "cleanliness_rating": 4.0,
-    "service_rating": 3.7,
-    "location_rating": 4.8,
-    "value_rating": 4.5,
-    "review_velocity": 22.4,
-    "rating_trend": "improving",
-    "recent_reviews": [
-      {
-        "date": "2026-03-10",
-        "rating": 4.1,
-        "text": "Decent hotel for the price. Nothing special but clean and functional."
-      },
-      {
-        "date": "2026-01-25",
-        "rating": 4.3,
-        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
-      },
-      {
-        "date": "2026-01-17",
-        "rating": 4.1,
-        "text": "Good location, average rooms. Would stay again if the price is right."
-      }
-    ],
-    "last_updated": "2026-03-19T13:00:00Z",
-    "acquisition_score": 31,
-    "maps_url": "https://maps.google.com/?q=43.310876,5.367058"
-  },
-  {
-    "id": "c5842e46-ea80-4f57-96ef-13ac7bf031ac",
-    "name": "Hotel Lutetia",
-    "city": "Marseille",
-    "country": "FR",
-    "flag": "\ud83c\uddeb\ud83c\uddf7",
-    "address": "Rue Noailles 86, Marseille 13088",
-    "lat": 43.321265,
-    "lng": 5.38095,
-    "rating": 2.6,
-    "review_count": 361,
-    "price_level": 1,
-    "room_count": 34,
-    "avg_nightly_rate": 61.0,
-    "cleanliness_rating": 2.0,
-    "service_rating": 2.7,
-    "location_rating": 3.0,
-    "value_rating": 2.3,
-    "review_velocity": 6.9,
-    "rating_trend": "flat",
-    "recent_reviews": [
-      {
-        "date": "2026-02-19",
-        "rating": 2.6,
-        "text": "Elevator was broken during our entire stay. Had to carry luggage up 4 flights."
-      },
-      {
-        "date": "2026-02-09",
-        "rating": 2.8,
-        "text": "Terrible experience. Dirty bathroom, noisy hallway, and breakfast was inedible."
-      },
-      {
-        "date": "2025-12-29",
-        "rating": 1.5,
-        "text": "Location is great but the hotel desperately needs renovation. Everything feels worn out."
-      }
-    ],
-    "last_updated": "2026-03-17T22:00:00Z",
-    "acquisition_score": 65,
-    "maps_url": "https://maps.google.com/?q=43.321265,5.38095"
-  },
-  {
-    "id": "50223378-748f-4d8d-8dbd-23787cc9890e",
-    "name": "H\u00f4tel Alize",
-    "city": "Marseille",
-    "country": "FR",
-    "flag": "\ud83c\uddeb\ud83c\uddf7",
-    "address": "Avenue du Prado 11, Marseille 13057",
-    "lat": 43.324058,
-    "lng": 5.36693,
-    "rating": 4.5,
-    "review_count": 316,
-    "price_level": 2,
-    "room_count": 39,
-    "avg_nightly_rate": 84.0,
-    "cleanliness_rating": 4.7,
-    "service_rating": 4.0,
-    "location_rating": 5.0,
-    "value_rating": 4.5,
-    "review_velocity": 8.5,
-    "rating_trend": "declining",
-    "recent_reviews": [
-      {
-        "date": "2026-02-28",
-        "rating": 3.8,
-        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
-      },
-      {
-        "date": "2026-02-17",
-        "rating": 4.1,
-        "text": "Decent hotel for the price. Nothing special but clean and functional."
-      },
-      {
-        "date": "2026-01-26",
-        "rating": 4.3,
-        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
-      }
-    ],
-    "last_updated": "2026-03-17T20:00:00Z",
-    "acquisition_score": 20,
-    "maps_url": "https://maps.google.com/?q=43.324058,5.36693"
-  },
-  {
-    "id": "3085e368-5b5b-46fd-b41a-3119a32c91e7",
-    "name": "H\u00f4tel Pass\u00e9dat",
-    "city": "Marseille",
-    "country": "FR",
-    "flag": "\ud83c\uddeb\ud83c\uddf7",
-    "address": "Canebi\u00e8re 115, Marseille 13077",
-    "lat": 43.321649,
-    "lng": 5.350884,
-    "rating": 4.3,
-    "review_count": 979,
+    "review_count": 554,
     "price_level": 4,
-    "room_count": 39,
-    "avg_nightly_rate": 228.0,
-    "cleanliness_rating": 4.0,
-    "service_rating": 4.6,
-    "location_rating": 4.8,
-    "value_rating": 4.0,
-    "review_velocity": 18.5,
+    "room_count": 18,
+    "avg_nightly_rate": 258.0,
+    "cleanliness_rating": 3.9,
+    "service_rating": 4.0,
+    "location_rating": 4.5,
+    "value_rating": 3.3,
+    "review_velocity": 14.2,
     "rating_trend": "improving",
+    "rating_30d_change": 0.13,
     "recent_reviews": [
       {
-        "date": "2026-03-11",
-        "rating": 4.4,
-        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
-      },
-      {
-        "date": "2026-01-31",
-        "rating": 4.4,
-        "text": "Decent hotel for the price. Nothing special but clean and functional."
-      },
-      {
-        "date": "2025-12-25",
-        "rating": 4.1,
-        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
-      }
-    ],
-    "last_updated": "2026-03-17T16:00:00Z",
-    "acquisition_score": 26,
-    "maps_url": "https://maps.google.com/?q=43.321649,5.350884"
-  },
-  {
-    "id": "1884264b-6e45-4413-86cf-e176349d2d04",
-    "name": "H\u00f4tel Edmond Rostand",
-    "city": "Marseille",
-    "country": "FR",
-    "flag": "\ud83c\uddeb\ud83c\uddf7",
-    "address": "Boulevard Longchamp 31, Marseille 13082",
-    "lat": 43.316579,
-    "lng": 5.362041,
-    "rating": 4.6,
-    "review_count": 342,
-    "price_level": 3,
-    "room_count": 29,
-    "avg_nightly_rate": 170.0,
-    "cleanliness_rating": 4.1,
-    "service_rating": 5.0,
-    "location_rating": 5.0,
-    "value_rating": 4.5,
-    "review_velocity": 7.3,
-    "rating_trend": "declining",
-    "recent_reviews": [
-      {
-        "date": "2026-02-27",
-        "rating": 4.3,
-        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
-      },
-      {
-        "date": "2026-01-30",
-        "rating": 4.5,
-        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
-      },
-      {
-        "date": "2026-01-11",
-        "rating": 4.0,
-        "text": "Decent hotel for the price. Nothing special but clean and functional."
-      }
-    ],
-    "last_updated": "2026-03-18T09:00:00Z",
-    "acquisition_score": 17,
-    "maps_url": "https://maps.google.com/?q=43.316579,5.362041"
-  },
-  {
-    "id": "48418290-6e4c-4bfb-8159-3b967261187d",
-    "name": "Hotel Novotel",
-    "city": "Marseille",
-    "country": "FR",
-    "flag": "\ud83c\uddeb\ud83c\uddf7",
-    "address": "Avenue du Prado 24, Marseille 13097",
-    "lat": 43.301653,
-    "lng": 5.361405,
-    "rating": 4.1,
-    "review_count": 1164,
-    "price_level": 3,
-    "room_count": 29,
-    "avg_nightly_rate": 130.0,
-    "cleanliness_rating": 3.6,
-    "service_rating": 3.8,
-    "location_rating": 4.4,
-    "value_rating": 4.3,
-    "review_velocity": 29.1,
-    "rating_trend": "improving",
-    "recent_reviews": [
-      {
-        "date": "2026-03-02",
-        "rating": 3.2,
-        "text": "Central location makes up for the small room size. Good value."
-      },
-      {
-        "date": "2026-02-20",
-        "rating": 3.7,
+        "date": "2026-02-21",
+        "rating": 4.2,
         "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
-      },
-      {
-        "date": "2026-01-14",
-        "rating": 3.2,
-        "text": "Good location, average rooms. Would stay again if the price is right."
-      }
-    ],
-    "last_updated": "2026-03-19T02:00:00Z",
-    "acquisition_score": 31,
-    "maps_url": "https://maps.google.com/?q=43.301653,5.361405"
-  },
-  {
-    "id": "143e2791-1b23-4ad8-82f2-b2ebcf57bc7e",
-    "name": "Best Western Marseille",
-    "city": "Marseille",
-    "country": "FR",
-    "flag": "\ud83c\uddeb\ud83c\uddf7",
-    "address": "Canebi\u00e8re 4, Marseille 13021",
-    "lat": 43.287735,
-    "lng": 5.341314,
-    "rating": 4.3,
-    "review_count": 534,
-    "price_level": 3,
-    "room_count": 29,
-    "avg_nightly_rate": 141.0,
-    "cleanliness_rating": 4.0,
-    "service_rating": 4.1,
-    "location_rating": 4.4,
-    "value_rating": 4.6,
-    "review_velocity": 12.4,
-    "rating_trend": "improving",
-    "recent_reviews": [
-      {
-        "date": "2026-03-07",
-        "rating": 3.3,
-        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
       },
       {
         "date": "2026-02-03",
-        "rating": 3.4,
-        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
-      },
-      {
-        "date": "2026-01-22",
-        "rating": 3.3,
-        "text": "Good location, average rooms. Would stay again if the price is right."
-      }
-    ],
-    "last_updated": "2026-03-18T20:00:00Z",
-    "acquisition_score": 26,
-    "maps_url": "https://maps.google.com/?q=43.287735,5.341314"
-  },
-  {
-    "id": "193b0517-bb0f-4726-8183-7ac201a8f818",
-    "name": "H\u00f4tel Herm\u00e8s",
-    "city": "Marseille",
-    "country": "FR",
-    "flag": "\ud83c\uddeb\ud83c\uddf7",
-    "address": "Boulevard Garibaldi 32, Marseille 13090",
-    "lat": 43.296248,
-    "lng": 5.377967,
-    "rating": 4.2,
-    "review_count": 168,
-    "price_level": 2,
-    "room_count": 24,
-    "avg_nightly_rate": 65.0,
-    "cleanliness_rating": 4.0,
-    "service_rating": 4.4,
-    "location_rating": 4.5,
-    "value_rating": 4.5,
-    "review_velocity": 3.4,
-    "rating_trend": "flat",
-    "recent_reviews": [
-      {
-        "date": "2026-02-20",
-        "rating": 3.5,
-        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
-      },
-      {
-        "date": "2026-02-08",
-        "rating": 3.5,
-        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+        "rating": 3.1,
+        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
       },
       {
         "date": "2026-01-06",
-        "rating": 3.4,
-        "text": "Central location makes up for the small room size. Good value."
+        "rating": 3.8,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
       }
     ],
     "last_updated": "2026-03-17T17:00:00Z",
-    "acquisition_score": 25,
-    "maps_url": "https://maps.google.com/?q=43.296248,5.377967"
+    "acquisition_score": 33,
+    "maps_url": "https://maps.google.com/?q=43.298265,5.354032"
   },
   {
-    "id": "34b4e923-1760-45e5-a7f4-f751717ba529",
+    "id": "270d6a3b-9f2f-4940-9c19-cf0e9f4b2b10",
+    "name": "Grand Hotel Beauvau",
+    "city": "Marseille",
+    "country": "FR",
+    "flag": "\ud83c\uddeb\ud83c\uddf7",
+    "address": "Rue Noailles 110, Marseille 13093",
+    "lat": 43.312075,
+    "lng": 5.341345,
+    "rating": 3.0,
+    "review_count": 1251,
+    "price_level": 2,
+    "room_count": 35,
+    "avg_nightly_rate": 69.0,
+    "cleanliness_rating": 2.4,
+    "service_rating": 2.6,
+    "location_rating": 3.4,
+    "value_rating": 2.8,
+    "review_velocity": 27.2,
+    "rating_trend": "flat",
+    "rating_30d_change": 0.07,
+    "recent_reviews": [
+      {
+        "date": "2026-03-09",
+        "rating": 2.1,
+        "text": "Air conditioning leaked water onto the floor. Maintenance never came."
+      },
+      {
+        "date": "2026-02-18",
+        "rating": 1.4,
+        "text": "Checked in at 3pm and the room still wasn't ready. No apology from front desk."
+      },
+      {
+        "date": "2025-12-26",
+        "rating": 1.5,
+        "text": "Found mold in the shower. Reported it and nothing was done."
+      }
+    ],
+    "last_updated": "2026-03-19T09:00:00Z",
+    "acquisition_score": 58,
+    "maps_url": "https://maps.google.com/?q=43.312075,5.341345"
+  },
+  {
+    "id": "b8026645-5c60-4738-9ba8-8de28e67abdd",
     "name": "H\u00f4tel Monteux",
     "city": "Marseille",
     "country": "FR",
     "flag": "\ud83c\uddeb\ud83c\uddf7",
-    "address": "Rue Saint-Ferr\u00e9ol 49, Marseille 13045",
-    "lat": 43.31549,
-    "lng": 5.362305,
-    "rating": 4.7,
-    "review_count": 854,
-    "price_level": 2,
-    "room_count": 35,
-    "avg_nightly_rate": 103.0,
-    "cleanliness_rating": 4.6,
-    "service_rating": 4.8,
-    "location_rating": 5.0,
-    "value_rating": 5.0,
-    "review_velocity": 17.1,
+    "address": "Rue Noailles 5, Marseille 13032",
+    "lat": 43.322226,
+    "lng": 5.356814,
+    "rating": 4.1,
+    "review_count": 565,
+    "price_level": 4,
+    "room_count": 36,
+    "avg_nightly_rate": 250.0,
+    "cleanliness_rating": 4.2,
+    "service_rating": 3.9,
+    "location_rating": 4.2,
+    "value_rating": 3.7,
+    "review_velocity": 13.1,
     "rating_trend": "improving",
+    "rating_30d_change": 0.35,
     "recent_reviews": [
       {
-        "date": "2026-03-06",
-        "rating": 4.2,
-        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+        "date": "2026-02-19",
+        "rating": 3.6,
+        "text": "Central location makes up for the small room size. Good value."
       },
       {
-        "date": "2026-02-16",
-        "rating": 4.0,
+        "date": "2026-02-12",
+        "rating": 3.8,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      },
+      {
+        "date": "2026-01-09",
+        "rating": 3.1,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
+      }
+    ],
+    "last_updated": "2026-03-18T23:00:00Z",
+    "acquisition_score": 31,
+    "maps_url": "https://maps.google.com/?q=43.322226,5.356814"
+  },
+  {
+    "id": "ffcc6627-e561-4d3a-8bd5-e83bf056b8d5",
+    "name": "H\u00f4tel La Plaine",
+    "city": "Marseille",
+    "country": "FR",
+    "flag": "\ud83c\uddeb\ud83c\uddf7",
+    "address": "Boulevard Longchamp 51, Marseille 13051",
+    "lat": 43.268278,
+    "lng": 5.353933,
+    "rating": 4.1,
+    "review_count": 835,
+    "price_level": 4,
+    "room_count": 33,
+    "avg_nightly_rate": 203.0,
+    "cleanliness_rating": 4.4,
+    "service_rating": 3.9,
+    "location_rating": 4.6,
+    "value_rating": 4.2,
+    "review_velocity": 22.0,
+    "rating_trend": "improving",
+    "rating_30d_change": 0.15,
+    "recent_reviews": [
+      {
+        "date": "2026-03-05",
+        "rating": 3.1,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      },
+      {
+        "date": "2026-02-11",
+        "rating": 4.1,
         "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
       },
       {
-        "date": "2026-01-23",
-        "rating": 3.4,
-        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+        "date": "2025-12-22",
+        "rating": 4.1,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
       }
     ],
-    "last_updated": "2026-03-17T19:00:00Z",
-    "acquisition_score": 15,
-    "maps_url": "https://maps.google.com/?q=43.31549,5.362305"
+    "last_updated": "2026-03-18T17:00:00Z",
+    "acquisition_score": 31,
+    "maps_url": "https://maps.google.com/?q=43.268278,5.353933"
   },
   {
-    "id": "75e76723-ee5b-4baf-9645-3d0a0a5875f0",
-    "name": "Hotel Joliette",
+    "id": "d051e36a-6e13-4666-b45c-13f93c491634",
+    "name": "Le Comptoir Hotel",
     "city": "Marseille",
     "country": "FR",
     "flag": "\ud83c\uddeb\ud83c\uddf7",
-    "address": "Rue Sainte 77, Marseille 13071",
-    "lat": 43.301435,
-    "lng": 5.372206,
-    "rating": 2.6,
-    "review_count": 689,
-    "price_level": 4,
-    "room_count": 46,
-    "avg_nightly_rate": 210.0,
-    "cleanliness_rating": 2.0,
-    "service_rating": 3.0,
-    "location_rating": 3.2,
-    "value_rating": 2.8,
-    "review_velocity": 12.5,
-    "rating_trend": "flat",
-    "recent_reviews": [
-      {
-        "date": "2026-03-10",
-        "rating": 2.5,
-        "text": "Terrible experience. Dirty bathroom, noisy hallway, and breakfast was inedible."
-      },
-      {
-        "date": "2026-01-29",
-        "rating": 2.3,
-        "text": "Location is great but the hotel desperately needs renovation. Everything feels worn out."
-      },
-      {
-        "date": "2026-01-29",
-        "rating": 3.0,
-        "text": "Bed was uncomfortable and linens felt cheap. Expected more for the price."
-      }
-    ],
-    "last_updated": "2026-03-17T18:00:00Z",
-    "acquisition_score": 68,
-    "maps_url": "https://maps.google.com/?q=43.301435,5.372206"
-  },
-  {
-    "id": "42e2faaa-9df3-451f-bbfd-12567efae211",
-    "name": "Le Vieux Port Hotel",
-    "city": "Marseille",
-    "country": "FR",
-    "flag": "\ud83c\uddeb\ud83c\uddf7",
-    "address": "Place Castellane 56, Marseille 13023",
-    "lat": 43.267133,
-    "lng": 5.352912,
-    "rating": 4.7,
-    "review_count": 369,
-    "price_level": 3,
-    "room_count": 34,
-    "avg_nightly_rate": 156.0,
-    "cleanliness_rating": 4.7,
-    "service_rating": 4.5,
-    "location_rating": 5.0,
-    "value_rating": 4.9,
-    "review_velocity": 6.8,
+    "address": "Rue Sainte 47, Marseille 13044",
+    "lat": 43.272634,
+    "lng": 5.340911,
+    "rating": 3.9,
+    "review_count": 1169,
+    "price_level": 2,
+    "room_count": 35,
+    "avg_nightly_rate": 98.0,
+    "cleanliness_rating": 3.4,
+    "service_rating": 3.4,
+    "location_rating": 4.3,
+    "value_rating": 3.9,
+    "review_velocity": 25.4,
     "rating_trend": "improving",
+    "rating_30d_change": 0.05,
     "recent_reviews": [
       {
-        "date": "2026-03-08",
-        "rating": 4.5,
-        "text": "Central location makes up for the small room size. Good value."
+        "date": "2026-02-27",
+        "rating": 4.2,
+        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
+      },
+      {
+        "date": "2026-02-05",
+        "rating": 4.0,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
       },
       {
         "date": "2026-01-21",
         "rating": 3.4,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      }
+    ],
+    "last_updated": "2026-03-18T20:00:00Z",
+    "acquisition_score": 36,
+    "maps_url": "https://maps.google.com/?q=43.272634,5.340911"
+  },
+  {
+    "id": "199966be-c5cd-4a9d-b6fb-70cded7c6929",
+    "name": "H\u00f4tel Herm\u00e8s",
+    "city": "Marseille",
+    "country": "FR",
+    "flag": "\ud83c\uddeb\ud83c\uddf7",
+    "address": "Avenue du Prado 39, Marseille 13071",
+    "lat": 43.31346,
+    "lng": 5.360079,
+    "rating": 3.9,
+    "review_count": 460,
+    "price_level": 4,
+    "room_count": 40,
+    "avg_nightly_rate": 219.0,
+    "cleanliness_rating": 3.9,
+    "service_rating": 3.8,
+    "location_rating": 4.0,
+    "value_rating": 3.3,
+    "review_velocity": 9.6,
+    "rating_trend": "flat",
+    "rating_30d_change": 0.02,
+    "recent_reviews": [
+      {
+        "date": "2026-03-02",
+        "rating": 3.5,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      },
+      {
+        "date": "2026-02-12",
+        "rating": 3.5,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      },
+      {
+        "date": "2026-01-19",
+        "rating": 3.5,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      }
+    ],
+    "last_updated": "2026-03-18T12:00:00Z",
+    "acquisition_score": 35,
+    "maps_url": "https://maps.google.com/?q=43.31346,5.360079"
+  },
+  {
+    "id": "27ed9eb6-596a-44c4-a496-ed67595245ef",
+    "name": "H\u00f4tel Pass\u00e9dat",
+    "city": "Marseille",
+    "country": "FR",
+    "flag": "\ud83c\uddeb\ud83c\uddf7",
+    "address": "Rue Sainte 74, Marseille 13041",
+    "lat": 43.286053,
+    "lng": 5.354421,
+    "rating": 4.1,
+    "review_count": 736,
+    "price_level": 3,
+    "room_count": 30,
+    "avg_nightly_rate": 185.0,
+    "cleanliness_rating": 3.7,
+    "service_rating": 4.5,
+    "location_rating": 4.2,
+    "value_rating": 4.3,
+    "review_velocity": 20.4,
+    "rating_trend": "improving",
+    "rating_30d_change": 0.21,
+    "recent_reviews": [
+      {
+        "date": "2026-02-18",
+        "rating": 3.7,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      },
+      {
+        "date": "2026-02-02",
+        "rating": 4.2,
         "text": "Good location, average rooms. Would stay again if the price is right."
+      },
+      {
+        "date": "2026-01-05",
+        "rating": 3.2,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      }
+    ],
+    "last_updated": "2026-03-18T18:00:00Z",
+    "acquisition_score": 31,
+    "maps_url": "https://maps.google.com/?q=43.286053,5.354421"
+  },
+  {
+    "id": "9c582993-2c7f-4ac4-af96-f27dcd82299b",
+    "name": "H\u00f4tel du Chapitre",
+    "city": "Marseille",
+    "country": "FR",
+    "flag": "\ud83c\uddeb\ud83c\uddf7",
+    "address": "Place Castellane 49, Marseille 13019",
+    "lat": 43.293444,
+    "lng": 5.376655,
+    "rating": 2.9,
+    "review_count": 1049,
+    "price_level": 3,
+    "room_count": 34,
+    "avg_nightly_rate": 184.0,
+    "cleanliness_rating": 3.2,
+    "service_rating": 2.7,
+    "location_rating": 2.9,
+    "value_rating": 3.3,
+    "review_velocity": 18.1,
+    "rating_trend": "improving",
+    "rating_30d_change": 0.24,
+    "recent_reviews": [
+      {
+        "date": "2026-02-20",
+        "rating": 1.2,
+        "text": "Air conditioning leaked water onto the floor. Maintenance never came."
+      },
+      {
+        "date": "2026-02-05",
+        "rating": 2.3,
+        "text": "Rude reception staff. Asked for extra towels twice and never received them."
+      },
+      {
+        "date": "2026-01-21",
+        "rating": 2.2,
+        "text": "Rude reception staff. Asked for extra towels twice and never received them."
+      }
+    ],
+    "last_updated": "2026-03-18T01:00:00Z",
+    "acquisition_score": 60,
+    "maps_url": "https://maps.google.com/?q=43.293444,5.376655"
+  },
+  {
+    "id": "c691b0fc-1a88-402d-a59f-a5e888f7e932",
+    "name": "Hotel Novotel",
+    "city": "Marseille",
+    "country": "FR",
+    "flag": "\ud83c\uddeb\ud83c\uddf7",
+    "address": "Place Castellane 43, Marseille 13065",
+    "lat": 43.272857,
+    "lng": 5.341702,
+    "rating": 4.4,
+    "review_count": 428,
+    "price_level": 2,
+    "room_count": 41,
+    "avg_nightly_rate": 101.0,
+    "cleanliness_rating": 4.5,
+    "service_rating": 4.0,
+    "location_rating": 4.7,
+    "value_rating": 4.3,
+    "review_velocity": 7.5,
+    "rating_trend": "improving",
+    "rating_30d_change": 0.23,
+    "recent_reviews": [
+      {
+        "date": "2026-03-01",
+        "rating": 3.7,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
+      },
+      {
+        "date": "2026-02-02",
+        "rating": 4.4,
+        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
       },
       {
         "date": "2026-01-26",
@@ -570,12 +416,12 @@
       }
     ],
     "last_updated": "2026-03-17T15:00:00Z",
-    "acquisition_score": 15,
-    "maps_url": "https://maps.google.com/?q=43.267133,5.352912"
+    "acquisition_score": 23,
+    "maps_url": "https://maps.google.com/?q=43.272857,5.341702"
   },
   {
-    "id": "4b904767-6e2f-4b71-bd1f-58b45008ad8c",
-    "name": "H\u00f4tel Saint Charles",
+    "id": "af5f391d-f2b3-463b-8585-ba88277e7959",
+    "name": "H\u00f4tel National",
     "city": "Marseille",
     "country": "FR",
     "flag": "\ud83c\uddeb\ud83c\uddf7",
@@ -593,1050 +439,1244 @@
     "value_rating": 2.1,
     "review_velocity": 19.5,
     "rating_trend": "flat",
+    "rating_30d_change": -0.07,
     "recent_reviews": [
       {
-        "date": "2026-03-07",
-        "rating": 3.0,
-        "text": "Air conditioning leaked water onto the floor. Maintenance never came."
+        "date": "2026-02-17",
+        "rating": 2.0,
+        "text": "Checked in at 3pm and the room still wasn't ready. No apology from front desk."
       },
       {
-        "date": "2026-02-05",
-        "rating": 1.3,
-        "text": "WiFi barely worked and there's no workspace in the rooms. Not suitable for business travel."
-      },
-      {
-        "date": "2026-01-21",
+        "date": "2026-02-10",
         "rating": 2.1,
         "text": "The photos online are completely misleading. Hotel looks nothing like the pictures."
+      },
+      {
+        "date": "2026-01-02",
+        "rating": 2.6,
+        "text": "Checked in at 3pm and the room still wasn't ready. No apology from front desk."
       }
     ],
-    "last_updated": "2026-03-18T08:00:00Z",
+    "last_updated": "2026-03-17T21:00:00Z",
     "acquisition_score": 73,
     "maps_url": "https://maps.google.com/?q=43.287398,5.341634"
   },
   {
-    "id": "7a2ac8c6-adeb-4b9e-8503-bdb5fb2209f2",
-    "name": "H\u00f4tel Windsor",
+    "id": "67358e71-55c3-4731-9bfd-06dacb00ed97",
+    "name": "Hotel Lutetia",
     "city": "Marseille",
     "country": "FR",
     "flag": "\ud83c\uddeb\ud83c\uddf7",
-    "address": "Rue Noailles 85, Marseille 13065",
-    "lat": 43.290235,
-    "lng": 5.386417,
-    "rating": 2.6,
-    "review_count": 520,
-    "price_level": 3,
-    "room_count": 32,
-    "avg_nightly_rate": 144.0,
-    "cleanliness_rating": 2.0,
-    "service_rating": 2.2,
-    "location_rating": 2.8,
-    "value_rating": 2.7,
-    "review_velocity": 13.7,
-    "rating_trend": "flat",
-    "recent_reviews": [
-      {
-        "date": "2026-02-23",
-        "rating": 1.7,
-        "text": "Location is great but the hotel desperately needs renovation. Everything feels worn out."
-      },
-      {
-        "date": "2026-02-08",
-        "rating": 1.2,
-        "text": "Found mold in the shower. Reported it and nothing was done."
-      },
-      {
-        "date": "2025-12-20",
-        "rating": 2.0,
-        "text": "Cockroach in the room. Management offered to move us but the other room was just as bad."
-      }
-    ],
-    "last_updated": "2026-03-17T21:00:00Z",
-    "acquisition_score": 68,
-    "maps_url": "https://maps.google.com/?q=43.290235,5.386417"
-  },
-  {
-    "id": "ba7cb92b-b7e9-4d65-b936-53adc4df4408",
-    "name": "H\u00f4tel La Plaine",
-    "city": "Marseille",
-    "country": "FR",
-    "flag": "\ud83c\uddeb\ud83c\uddf7",
-    "address": "Canebi\u00e8re 45, Marseille 13055",
-    "lat": 43.317231,
-    "lng": 5.378015,
-    "rating": 4.1,
-    "review_count": 422,
-    "price_level": 3,
-    "room_count": 40,
-    "avg_nightly_rate": 134.0,
-    "cleanliness_rating": 4.1,
-    "service_rating": 3.6,
-    "location_rating": 4.2,
-    "value_rating": 3.6,
-    "review_velocity": 9.4,
-    "rating_trend": "flat",
-    "recent_reviews": [
-      {
-        "date": "2026-03-01",
-        "rating": 3.8,
-        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
-      },
-      {
-        "date": "2026-01-25",
-        "rating": 3.9,
-        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
-      },
-      {
-        "date": "2026-01-04",
-        "rating": 3.7,
-        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
-      }
-    ],
-    "last_updated": "2026-03-18T03:00:00Z",
-    "acquisition_score": 30,
-    "maps_url": "https://maps.google.com/?q=43.317231,5.378015"
-  },
-  {
-    "id": "2674d4aa-9d1f-4c16-849a-3bcc230eebeb",
-    "name": "H\u00f4tel National",
-    "city": "Marseille",
-    "country": "FR",
-    "flag": "\ud83c\uddeb\ud83c\uddf7",
-    "address": "Rue d'Aubagne 22, Marseille 13072",
-    "lat": 43.28383,
-    "lng": 5.347897,
-    "rating": 4.4,
-    "review_count": 1486,
-    "price_level": 3,
-    "room_count": 37,
-    "avg_nightly_rate": 179.0,
-    "cleanliness_rating": 4.8,
-    "service_rating": 4.3,
-    "location_rating": 4.6,
-    "value_rating": 4.2,
-    "review_velocity": 28.0,
-    "rating_trend": "improving",
-    "recent_reviews": [
-      {
-        "date": "2026-02-25",
-        "rating": 4.0,
-        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
-      },
-      {
-        "date": "2026-01-25",
-        "rating": 3.7,
-        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
-      },
-      {
-        "date": "2026-01-26",
-        "rating": 4.2,
-        "text": "Decent hotel for the price. Nothing special but clean and functional."
-      }
-    ],
-    "last_updated": "2026-03-18T23:00:00Z",
-    "acquisition_score": 23,
-    "maps_url": "https://maps.google.com/?q=43.28383,5.347897"
-  },
-  {
-    "id": "454129fe-a213-4606-891d-a5e4bb1c7b4a",
-    "name": "Le Miramar Hotel",
-    "city": "Marseille",
-    "country": "FR",
-    "flag": "\ud83c\uddeb\ud83c\uddf7",
-    "address": "Rue Paradis 100, Marseille 13068",
-    "lat": 43.300439,
-    "lng": 5.388878,
-    "rating": 2.4,
-    "review_count": 843,
-    "price_level": 2,
-    "room_count": 34,
-    "avg_nightly_rate": 102.0,
-    "cleanliness_rating": 2.1,
-    "service_rating": 2.3,
-    "location_rating": 3.2,
-    "value_rating": 2.3,
-    "review_velocity": 14.1,
-    "rating_trend": "declining",
-    "recent_reviews": [
-      {
-        "date": "2026-02-17",
-        "rating": 2.1,
-        "text": "Found mold in the shower. Reported it and nothing was done."
-      },
-      {
-        "date": "2026-01-24",
-        "rating": 2.5,
-        "text": "Terrible experience. Dirty bathroom, noisy hallway, and breakfast was inedible."
-      },
-      {
-        "date": "2025-12-21",
-        "rating": 1.5,
-        "text": "Breakfast options were minimal and low quality. Stale bread, instant coffee."
-      }
-    ],
-    "last_updated": "2026-03-19T11:00:00Z",
-    "acquisition_score": 73,
-    "maps_url": "https://maps.google.com/?q=43.300439,5.388878"
-  },
-  {
-    "id": "3b90a5fc-7384-4d23-941c-0c13f7924ba8",
-    "name": "Hotel Kyriad",
-    "city": "Marseille",
-    "country": "FR",
-    "flag": "\ud83c\uddeb\ud83c\uddf7",
-    "address": "Rue Sainte 111, Marseille 13025",
-    "lat": 43.313038,
-    "lng": 5.351386,
-    "rating": 4.1,
-    "review_count": 908,
-    "price_level": 3,
-    "room_count": 36,
-    "avg_nightly_rate": 138.0,
-    "cleanliness_rating": 4.2,
-    "service_rating": 4.1,
-    "location_rating": 4.2,
-    "value_rating": 3.6,
-    "review_velocity": 21.6,
-    "rating_trend": "improving",
-    "recent_reviews": [
-      {
-        "date": "2026-03-11",
-        "rating": 3.8,
-        "text": "Central location makes up for the small room size. Good value."
-      },
-      {
-        "date": "2026-02-10",
-        "rating": 4.5,
-        "text": "Central location makes up for the small room size. Good value."
-      },
-      {
-        "date": "2026-01-13",
-        "rating": 3.9,
-        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
-      }
-    ],
-    "last_updated": "2026-03-18T05:00:00Z",
-    "acquisition_score": 31,
-    "maps_url": "https://maps.google.com/?q=43.313038,5.351386"
-  },
-  {
-    "id": "d32cfbf8-f091-4296-8295-42be79c2616b",
-    "name": "Hotel Sofitel Marseille",
-    "city": "Marseille",
-    "country": "FR",
-    "flag": "\ud83c\uddeb\ud83c\uddf7",
-    "address": "Place Castellane 101, Marseille 13062",
-    "lat": 43.321626,
-    "lng": 5.404274,
-    "rating": 4.4,
-    "review_count": 184,
-    "price_level": 3,
-    "room_count": 24,
-    "avg_nightly_rate": 179.0,
-    "cleanliness_rating": 4.0,
-    "service_rating": 4.5,
-    "location_rating": 5.0,
-    "value_rating": 4.6,
-    "review_velocity": 3.2,
-    "rating_trend": "flat",
-    "recent_reviews": [
-      {
-        "date": "2026-03-08",
-        "rating": 3.9,
-        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
-      },
-      {
-        "date": "2026-01-27",
-        "rating": 3.1,
-        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
-      },
-      {
-        "date": "2026-01-26",
-        "rating": 3.8,
-        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
-      }
-    ],
-    "last_updated": "2026-03-18T20:00:00Z",
-    "acquisition_score": 21,
-    "maps_url": "https://maps.google.com/?q=43.321626,5.404274"
-  },
-  {
-    "id": "198d6b66-f364-4f29-9fc1-5b03df93b111",
-    "name": "H\u00f4tel Bellevue",
-    "city": "Marseille",
-    "country": "FR",
-    "flag": "\ud83c\uddeb\ud83c\uddf7",
-    "address": "Rue Sainte 42, Marseille 13084",
-    "lat": 43.266648,
-    "lng": 5.388989,
-    "rating": 4.6,
-    "review_count": 479,
-    "price_level": 3,
-    "room_count": 40,
-    "avg_nightly_rate": 147.0,
-    "cleanliness_rating": 4.7,
-    "service_rating": 4.4,
-    "location_rating": 4.7,
-    "value_rating": 4.5,
-    "review_velocity": 11.4,
-    "rating_trend": "improving",
-    "recent_reviews": [
-      {
-        "date": "2026-03-06",
-        "rating": 3.4,
-        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
-      },
-      {
-        "date": "2026-02-02",
-        "rating": 3.8,
-        "text": "Central location makes up for the small room size. Good value."
-      },
-      {
-        "date": "2026-01-23",
-        "rating": 4.2,
-        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
-      }
-    ],
-    "last_updated": "2026-03-17T18:00:00Z",
-    "acquisition_score": 18,
-    "maps_url": "https://maps.google.com/?q=43.266648,5.388989"
-  },
-  {
-    "id": "1958aec2-6881-45f7-a310-6482085e8f9b",
-    "name": "Hotel Carr\u00e9 Vieux Port",
-    "city": "Marseille",
-    "country": "FR",
-    "flag": "\ud83c\uddeb\ud83c\uddf7",
-    "address": "Rue de Rome 59, Marseille 13012",
-    "lat": 43.273954,
-    "lng": 5.394836,
-    "rating": 3.8,
-    "review_count": 654,
-    "price_level": 2,
-    "room_count": 15,
-    "avg_nightly_rate": 127.0,
-    "cleanliness_rating": 3.4,
-    "service_rating": 3.9,
-    "location_rating": 3.9,
-    "value_rating": 3.8,
-    "review_velocity": 16.0,
-    "rating_trend": "improving",
-    "recent_reviews": [
-      {
-        "date": "2026-03-04",
-        "rating": 4.0,
-        "text": "Good location, average rooms. Would stay again if the price is right."
-      },
-      {
-        "date": "2026-02-04",
-        "rating": 3.6,
-        "text": "Good location, average rooms. Would stay again if the price is right."
-      },
-      {
-        "date": "2025-12-21",
-        "rating": 3.1,
-        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
-      }
-    ],
-    "last_updated": "2026-03-17T21:00:00Z",
-    "acquisition_score": 33,
-    "maps_url": "https://maps.google.com/?q=43.273954,5.394836"
-  },
-  {
-    "id": "f6c75209-a2dc-4dee-9d59-0ba46545c528",
-    "name": "Grand Hotel Beauvau",
-    "city": "Marseille",
-    "country": "FR",
-    "flag": "\ud83c\uddeb\ud83c\uddf7",
-    "address": "Rue Noailles 12, Marseille 13022",
-    "lat": 43.266565,
-    "lng": 5.368176,
-    "rating": 4.4,
-    "review_count": 290,
-    "price_level": 2,
-    "room_count": 27,
-    "avg_nightly_rate": 109.0,
-    "cleanliness_rating": 3.8,
-    "service_rating": 4.5,
-    "location_rating": 5.0,
-    "value_rating": 4.8,
-    "review_velocity": 5.9,
-    "rating_trend": "improving",
-    "recent_reviews": [
-      {
-        "date": "2026-02-25",
-        "rating": 3.3,
-        "text": "Good location, average rooms. Would stay again if the price is right."
-      },
-      {
-        "date": "2026-02-15",
-        "rating": 3.2,
-        "text": "Good location, average rooms. Would stay again if the price is right."
-      },
-      {
-        "date": "2026-01-08",
-        "rating": 3.2,
-        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
-      }
-    ],
-    "last_updated": "2026-03-19T05:00:00Z",
-    "acquisition_score": 22,
-    "maps_url": "https://maps.google.com/?q=43.266565,5.368176"
-  },
-  {
-    "id": "ae6197f4-aabd-4108-a7e8-c115002b064a",
-    "name": "H\u00f4tel Le Corbusier",
-    "city": "Marseille",
-    "country": "FR",
-    "flag": "\ud83c\uddeb\ud83c\uddf7",
-    "address": "Boulevard Longchamp 2, Marseille 13088",
-    "lat": 43.305501,
-    "lng": 5.365607,
-    "rating": 4.4,
-    "review_count": 160,
-    "price_level": 3,
-    "room_count": 37,
-    "avg_nightly_rate": 122.0,
-    "cleanliness_rating": 4.2,
-    "service_rating": 4.5,
-    "location_rating": 5.0,
-    "value_rating": 3.9,
-    "review_velocity": 4.1,
-    "rating_trend": "flat",
-    "recent_reviews": [
-      {
-        "date": "2026-03-09",
-        "rating": 3.5,
-        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
-      },
-      {
-        "date": "2026-01-24",
-        "rating": 4.2,
-        "text": "Central location makes up for the small room size. Good value."
-      },
-      {
-        "date": "2026-01-16",
-        "rating": 4.0,
-        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
-      }
-    ],
-    "last_updated": "2026-03-18T22:00:00Z",
-    "acquisition_score": 20,
-    "maps_url": "https://maps.google.com/?q=43.305501,5.365607"
-  },
-  {
-    "id": "db451e28-cb2c-41e7-884b-3fec24e2bb86",
-    "name": "Le Comptoir Hotel",
-    "city": "Marseille",
-    "country": "FR",
-    "flag": "\ud83c\uddeb\ud83c\uddf7",
-    "address": "Place Castellane 89, Marseille 13013",
-    "lat": 43.317374,
-    "lng": 5.380888,
-    "rating": 4.3,
-    "review_count": 634,
-    "price_level": 2,
-    "room_count": 34,
-    "avg_nightly_rate": 98.0,
-    "cleanliness_rating": 4.4,
-    "service_rating": 4.0,
-    "location_rating": 4.3,
-    "value_rating": 4.6,
-    "review_velocity": 14.7,
-    "rating_trend": "flat",
-    "recent_reviews": [
-      {
-        "date": "2026-03-09",
-        "rating": 3.7,
-        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
-      },
-      {
-        "date": "2026-02-16",
-        "rating": 4.5,
-        "text": "Decent hotel for the price. Nothing special but clean and functional."
-      },
-      {
-        "date": "2026-01-11",
-        "rating": 3.6,
-        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
-      }
-    ],
-    "last_updated": "2026-03-18T01:00:00Z",
-    "acquisition_score": 26,
-    "maps_url": "https://maps.google.com/?q=43.317374,5.380888"
-  },
-  {
-    "id": "fb70f252-3439-4b62-ad26-e14a42066ee5",
-    "name": "H\u00f4tel Vertigo",
-    "city": "Marseille",
-    "country": "FR",
-    "flag": "\ud83c\uddeb\ud83c\uddf7",
-    "address": "Rue Sainte 99, Marseille 13019",
-    "lat": 43.267501,
-    "lng": 5.339527,
-    "rating": 4.3,
-    "review_count": 242,
-    "price_level": 2,
-    "room_count": 20,
-    "avg_nightly_rate": 69.0,
-    "cleanliness_rating": 4.5,
-    "service_rating": 4.2,
-    "location_rating": 4.8,
-    "value_rating": 4.2,
-    "review_velocity": 4.9,
-    "rating_trend": "flat",
-    "recent_reviews": [
-      {
-        "date": "2026-02-28",
-        "rating": 4.0,
-        "text": "Good location, average rooms. Would stay again if the price is right."
-      },
-      {
-        "date": "2026-02-11",
-        "rating": 3.1,
-        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
-      },
-      {
-        "date": "2026-01-26",
-        "rating": 4.5,
-        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
-      }
-    ],
-    "last_updated": "2026-03-19T04:00:00Z",
-    "acquisition_score": 23,
-    "maps_url": "https://maps.google.com/?q=43.267501,5.339527"
-  },
-  {
-    "id": "3be56a80-0dab-419d-a946-582747d4c931",
-    "name": "H\u00f4tel Continental",
-    "city": "Marseille",
-    "country": "FR",
-    "flag": "\ud83c\uddeb\ud83c\uddf7",
-    "address": "Rue de Rome 84, Marseille 13097",
-    "lat": 43.305089,
-    "lng": 5.356512,
-    "rating": 4.2,
-    "review_count": 664,
-    "price_level": 2,
-    "room_count": 52,
-    "avg_nightly_rate": 81.0,
-    "cleanliness_rating": 3.8,
-    "service_rating": 4.5,
-    "location_rating": 4.3,
-    "value_rating": 4.2,
-    "review_velocity": 17.9,
-    "rating_trend": "flat",
-    "recent_reviews": [
-      {
-        "date": "2026-02-17",
-        "rating": 3.2,
-        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
-      },
-      {
-        "date": "2026-02-12",
-        "rating": 3.2,
-        "text": "Decent hotel for the price. Nothing special but clean and functional."
-      },
-      {
-        "date": "2026-01-09",
-        "rating": 3.3,
-        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
-      }
-    ],
-    "last_updated": "2026-03-19T05:00:00Z",
-    "acquisition_score": 23,
-    "maps_url": "https://maps.google.com/?q=43.305089,5.356512"
-  },
-  {
-    "id": "b4347b72-3395-4db4-bd07-1fc74484ccd3",
-    "name": "Hotel New Astoria",
-    "city": "Marseille",
-    "country": "FR",
-    "flag": "\ud83c\uddeb\ud83c\uddf7",
-    "address": "Canebi\u00e8re 99, Marseille 13013",
-    "lat": 43.286601,
-    "lng": 5.364853,
-    "rating": 4.6,
-    "review_count": 785,
-    "price_level": 3,
-    "room_count": 28,
-    "avg_nightly_rate": 188.0,
-    "cleanliness_rating": 4.6,
-    "service_rating": 4.5,
-    "location_rating": 5.0,
-    "value_rating": 4.1,
-    "review_velocity": 14.5,
-    "rating_trend": "flat",
-    "recent_reviews": [
-      {
-        "date": "2026-03-07",
-        "rating": 4.2,
-        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
-      },
-      {
-        "date": "2026-02-13",
-        "rating": 4.1,
-        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
-      },
-      {
-        "date": "2026-01-31",
-        "rating": 4.3,
-        "text": "Decent hotel for the price. Nothing special but clean and functional."
-      }
-    ],
-    "last_updated": "2026-03-19T13:00:00Z",
-    "acquisition_score": 18,
-    "maps_url": "https://maps.google.com/?q=43.286601,5.364853"
-  },
-  {
-    "id": "842d8f1b-241e-4865-879b-5b05b8839e1f",
-    "name": "H\u00f4tel Massalia",
-    "city": "Marseille",
-    "country": "FR",
-    "flag": "\ud83c\uddeb\ud83c\uddf7",
-    "address": "Rue Paradis 23, Marseille 13014",
-    "lat": 43.299672,
-    "lng": 5.398776,
-    "rating": 2.7,
-    "review_count": 694,
-    "price_level": 3,
-    "room_count": 32,
-    "avg_nightly_rate": 136.0,
-    "cleanliness_rating": 2.5,
-    "service_rating": 2.8,
-    "location_rating": 2.9,
-    "value_rating": 2.2,
-    "review_velocity": 14.8,
-    "rating_trend": "declining",
-    "recent_reviews": [
-      {
-        "date": "2026-02-19",
-        "rating": 1.1,
-        "text": "Air conditioning leaked water onto the floor. Maintenance never came."
-      },
-      {
-        "date": "2026-02-06",
-        "rating": 2.0,
-        "text": "Breakfast options were minimal and low quality. Stale bread, instant coffee."
-      },
-      {
-        "date": "2026-01-29",
-        "rating": 1.1,
-        "text": "Elevator was broken during our entire stay. Had to carry luggage up 4 flights."
-      }
-    ],
-    "last_updated": "2026-03-18T08:00:00Z",
-    "acquisition_score": 66,
-    "maps_url": "https://maps.google.com/?q=43.299672,5.398776"
-  },
-  {
-    "id": "82120d5e-73e6-4c13-922d-247b1d969e76",
-    "name": "H\u00f4tel La R\u00e9sidence",
-    "city": "Marseille",
-    "country": "FR",
-    "flag": "\ud83c\uddeb\ud83c\uddf7",
-    "address": "Canebi\u00e8re 71, Marseille 13068",
-    "lat": 43.266978,
-    "lng": 5.348847,
-    "rating": 4.5,
-    "review_count": 352,
-    "price_level": 3,
-    "room_count": 29,
-    "avg_nightly_rate": 160.0,
-    "cleanliness_rating": 4.4,
-    "service_rating": 4.5,
-    "location_rating": 4.9,
-    "value_rating": 4.7,
-    "review_velocity": 8.4,
-    "rating_trend": "improving",
-    "recent_reviews": [
-      {
-        "date": "2026-02-23",
-        "rating": 3.2,
-        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
-      },
-      {
-        "date": "2026-01-25",
-        "rating": 3.3,
-        "text": "Decent hotel for the price. Nothing special but clean and functional."
-      },
-      {
-        "date": "2026-01-09",
-        "rating": 4.4,
-        "text": "Decent hotel for the price. Nothing special but clean and functional."
-      }
-    ],
-    "last_updated": "2026-03-19T13:00:00Z",
-    "acquisition_score": 20,
-    "maps_url": "https://maps.google.com/?q=43.266978,5.348847"
-  },
-  {
-    "id": "0e1a15b6-cbd4-47d6-bca5-063c1e68d863",
-    "name": "Hotel Ibis Vieux Port",
-    "city": "Marseille",
-    "country": "FR",
-    "flag": "\ud83c\uddeb\ud83c\uddf7",
-    "address": "Boulevard Garibaldi 14, Marseille 13036",
-    "lat": 43.298289,
-    "lng": 5.351472,
-    "rating": 4.1,
-    "review_count": 792,
-    "price_level": 2,
-    "room_count": 21,
-    "avg_nightly_rate": 130.0,
-    "cleanliness_rating": 4.2,
-    "service_rating": 3.6,
-    "location_rating": 4.8,
-    "value_rating": 4.4,
-    "review_velocity": 15.2,
-    "rating_trend": "flat",
-    "recent_reviews": [
-      {
-        "date": "2026-03-01",
-        "rating": 4.5,
-        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
-      },
-      {
-        "date": "2026-02-15",
-        "rating": 3.8,
-        "text": "Good location, average rooms. Would stay again if the price is right."
-      },
-      {
-        "date": "2025-12-22",
-        "rating": 3.1,
-        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
-      }
-    ],
-    "last_updated": "2026-03-18T01:00:00Z",
-    "acquisition_score": 31,
-    "maps_url": "https://maps.google.com/?q=43.298289,5.351472"
-  },
-  {
-    "id": "866c5602-32ac-4a16-8bca-dd7989c2f201",
-    "name": "H\u00f4tel Estanque",
-    "city": "Marseille",
-    "country": "FR",
-    "flag": "\ud83c\uddeb\ud83c\uddf7",
-    "address": "Boulevard Garibaldi 34, Marseille 13050",
-    "lat": 43.322063,
-    "lng": 5.362307,
+    "address": "Rue de la R\u00e9publique 95, Marseille 13088",
+    "lat": 43.319486,
+    "lng": 5.36627,
     "rating": 2.9,
-    "review_count": 461,
-    "price_level": 3,
-    "room_count": 29,
-    "avg_nightly_rate": 146.0,
-    "cleanliness_rating": 2.5,
-    "service_rating": 3.2,
-    "location_rating": 3.0,
-    "value_rating": 3.1,
-    "review_velocity": 11.8,
-    "rating_trend": "declining",
-    "recent_reviews": [
-      {
-        "date": "2026-03-07",
-        "rating": 1.9,
-        "text": "Found mold in the shower. Reported it and nothing was done."
-      },
-      {
-        "date": "2026-01-25",
-        "rating": 2.1,
-        "text": "Terrible experience. Dirty bathroom, noisy hallway, and breakfast was inedible."
-      },
-      {
-        "date": "2026-01-18",
-        "rating": 1.6,
-        "text": "Found mold in the shower. Reported it and nothing was done."
-      }
-    ],
-    "last_updated": "2026-03-18T21:00:00Z",
-    "acquisition_score": 60,
-    "maps_url": "https://maps.google.com/?q=43.322063,5.362307"
-  },
-  {
-    "id": "e06b23e8-bcf8-49f7-8490-4727ded8ef66",
-    "name": "H\u00f4tel Escale Oceania",
-    "city": "Marseille",
-    "country": "FR",
-    "flag": "\ud83c\uddeb\ud83c\uddf7",
-    "address": "Boulevard Garibaldi 106, Marseille 13099",
-    "lat": 43.302698,
-    "lng": 5.349851,
-    "rating": 3.9,
-    "review_count": 893,
-    "price_level": 3,
-    "room_count": 25,
-    "avg_nightly_rate": 167.0,
-    "cleanliness_rating": 4.3,
-    "service_rating": 3.7,
-    "location_rating": 3.9,
-    "value_rating": 3.6,
-    "review_velocity": 21.8,
-    "rating_trend": "declining",
-    "recent_reviews": [
-      {
-        "date": "2026-02-28",
-        "rating": 3.8,
-        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
-      },
-      {
-        "date": "2026-02-05",
-        "rating": 3.7,
-        "text": "Good location, average rooms. Would stay again if the price is right."
-      },
-      {
-        "date": "2026-01-23",
-        "rating": 3.0,
-        "text": "Good location, average rooms. Would stay again if the price is right."
-      }
-    ],
-    "last_updated": "2026-03-18T23:00:00Z",
-    "acquisition_score": 36,
-    "maps_url": "https://maps.google.com/?q=43.302698,5.349851"
-  },
-  {
-    "id": "10757393-8fb4-45f8-991e-23f3dc0b909f",
-    "name": "Le Petit Nice",
-    "city": "Marseille",
-    "country": "FR",
-    "flag": "\ud83c\uddeb\ud83c\uddf7",
-    "address": "Rue Noailles 83, Marseille 13020",
-    "lat": 43.301439,
-    "lng": 5.352917,
-    "rating": 3.2,
-    "review_count": 685,
-    "price_level": 3,
-    "room_count": 18,
-    "avg_nightly_rate": 115.0,
-    "cleanliness_rating": 3.5,
+    "review_count": 739,
+    "price_level": 2,
+    "room_count": 16,
+    "avg_nightly_rate": 79.0,
+    "cleanliness_rating": 2.6,
     "service_rating": 3.0,
-    "location_rating": 3.3,
-    "value_rating": 3.5,
-    "review_velocity": 14.9,
+    "location_rating": 3.5,
+    "value_rating": 2.9,
+    "review_velocity": 13.9,
     "rating_trend": "declining",
+    "rating_30d_change": -0.44,
     "recent_reviews": [
       {
         "date": "2026-02-26",
-        "rating": 1.3,
-        "text": "Room was outdated and the AC didn't work properly. Staff seemed overwhelmed."
+        "rating": 1.5,
+        "text": "Terrible experience. Dirty bathroom, noisy hallway, and breakfast was inedible."
       },
       {
-        "date": "2026-01-24",
-        "rating": 2.4,
-        "text": "Cockroach in the room. Management offered to move us but the other room was just as bad."
+        "date": "2026-01-20",
+        "rating": 2.9,
+        "text": "WiFi barely worked and there's no workspace in the rooms. Not suitable for business travel."
       },
       {
-        "date": "2025-12-31",
+        "date": "2026-01-11",
         "rating": 1.8,
-        "text": "Room was outdated and the AC didn't work properly. Staff seemed overwhelmed."
+        "text": "Bed was uncomfortable and linens felt cheap. Expected more for the price."
       }
     ],
-    "last_updated": "2026-03-18T10:00:00Z",
-    "acquisition_score": 48,
-    "maps_url": "https://maps.google.com/?q=43.301439,5.352917"
+    "last_updated": "2026-03-18T12:00:00Z",
+    "acquisition_score": 56,
+    "maps_url": "https://maps.google.com/?q=43.319486,5.36627"
   },
   {
-    "id": "396b46b0-9ea0-4e05-a89b-55b1c3d7785b",
-    "name": "H\u00f4tel du Palais",
-    "city": "Marseille",
-    "country": "FR",
-    "flag": "\ud83c\uddeb\ud83c\uddf7",
-    "address": "Boulevard Garibaldi 58, Marseille 13029",
-    "lat": 43.268579,
-    "lng": 5.378142,
-    "rating": 2.3,
-    "review_count": 522,
-    "price_level": 2,
-    "room_count": 29,
-    "avg_nightly_rate": 92.0,
-    "cleanliness_rating": 2.3,
-    "service_rating": 1.8,
-    "location_rating": 2.5,
-    "value_rating": 1.8,
-    "review_velocity": 12.4,
-    "rating_trend": "flat",
-    "recent_reviews": [
-      {
-        "date": "2026-02-24",
-        "rating": 2.3,
-        "text": "Checked in at 3pm and the room still wasn't ready. No apology from front desk."
-      },
-      {
-        "date": "2026-02-19",
-        "rating": 2.6,
-        "text": "Elevator was broken during our entire stay. Had to carry luggage up 4 flights."
-      },
-      {
-        "date": "2026-01-09",
-        "rating": 2.1,
-        "text": "Found mold in the shower. Reported it and nothing was done."
-      }
-    ],
-    "last_updated": "2026-03-18T06:00:00Z",
-    "acquisition_score": 76,
-    "maps_url": "https://maps.google.com/?q=43.268579,5.378142"
-  },
-  {
-    "id": "0e88077c-e238-480e-b7f8-e225e1199ba1",
-    "name": "H\u00f4tel des Augustins",
-    "city": "Marseille",
-    "country": "FR",
-    "flag": "\ud83c\uddeb\ud83c\uddf7",
-    "address": "Boulevard Garibaldi 24, Marseille 13013",
-    "lat": 43.285633,
-    "lng": 5.350131,
-    "rating": 4.3,
-    "review_count": 361,
-    "price_level": 3,
-    "room_count": 42,
-    "avg_nightly_rate": 115.0,
-    "cleanliness_rating": 4.7,
-    "service_rating": 4.2,
-    "location_rating": 4.9,
-    "value_rating": 4.7,
-    "review_velocity": 8.8,
-    "rating_trend": "flat",
-    "recent_reviews": [
-      {
-        "date": "2026-02-19",
-        "rating": 3.4,
-        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
-      },
-      {
-        "date": "2026-02-17",
-        "rating": 3.9,
-        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
-      },
-      {
-        "date": "2026-01-07",
-        "rating": 4.4,
-        "text": "Central location makes up for the small room size. Good value."
-      }
-    ],
-    "last_updated": "2026-03-19T02:00:00Z",
-    "acquisition_score": 25,
-    "maps_url": "https://maps.google.com/?q=43.285633,5.350131"
-  },
-  {
-    "id": "e51460ef-c2b0-4588-9d9a-45b00e1c93ea",
+    "id": "87d935d7-3dc7-4acf-a827-df440962c273",
     "name": "Hotel Mercure",
     "city": "Marseille",
     "country": "FR",
     "flag": "\ud83c\uddeb\ud83c\uddf7",
-    "address": "Quai du Port 46, Marseille 13085",
-    "lat": 43.268192,
-    "lng": 5.383839,
-    "rating": 2.8,
-    "review_count": 1180,
-    "price_level": 4,
-    "room_count": 35,
-    "avg_nightly_rate": 228.0,
-    "cleanliness_rating": 2.4,
-    "service_rating": 3.2,
-    "location_rating": 3.5,
-    "value_rating": 2.7,
-    "review_velocity": 26.2,
+    "address": "Boulevard Longchamp 23, Marseille 13096",
+    "lat": 43.308859,
+    "lng": 5.355621,
+    "rating": 4.1,
+    "review_count": 956,
+    "price_level": 3,
+    "room_count": 22,
+    "avg_nightly_rate": 121.0,
+    "cleanliness_rating": 3.6,
+    "service_rating": 3.8,
+    "location_rating": 4.2,
+    "value_rating": 4.2,
+    "review_velocity": 18.4,
+    "rating_trend": "flat",
+    "rating_30d_change": 0.02,
+    "recent_reviews": [
+      {
+        "date": "2026-02-22",
+        "rating": 3.6,
+        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
+      },
+      {
+        "date": "2026-01-20",
+        "rating": 3.8,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      },
+      {
+        "date": "2025-12-31",
+        "rating": 3.2,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      }
+    ],
+    "last_updated": "2026-03-18T17:00:00Z",
+    "acquisition_score": 31,
+    "maps_url": "https://maps.google.com/?q=43.308859,5.355621"
+  },
+  {
+    "id": "e713f713-2068-47f0-b144-ae9cb4e55824",
+    "name": "H\u00f4tel Saint-Louis",
+    "city": "Marseille",
+    "country": "FR",
+    "flag": "\ud83c\uddeb\ud83c\uddf7",
+    "address": "Rue de la R\u00e9publique 63, Marseille 13027",
+    "lat": 43.278208,
+    "lng": 5.361676,
+    "rating": 4.4,
+    "review_count": 993,
+    "price_level": 3,
+    "room_count": 38,
+    "avg_nightly_rate": 143.0,
+    "cleanliness_rating": 4.3,
+    "service_rating": 4.5,
+    "location_rating": 4.8,
+    "value_rating": 4.0,
+    "review_velocity": 18.4,
     "rating_trend": "declining",
+    "rating_30d_change": -0.22,
+    "recent_reviews": [
+      {
+        "date": "2026-03-03",
+        "rating": 3.4,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
+      },
+      {
+        "date": "2026-02-02",
+        "rating": 4.2,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      },
+      {
+        "date": "2025-12-26",
+        "rating": 3.8,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      }
+    ],
+    "last_updated": "2026-03-19T06:00:00Z",
+    "acquisition_score": 23,
+    "maps_url": "https://maps.google.com/?q=43.278208,5.361676"
+  },
+  {
+    "id": "bedba81d-85a2-42ee-8175-fafd2336006b",
+    "name": "Le Petit Nice",
+    "city": "Marseille",
+    "country": "FR",
+    "flag": "\ud83c\uddeb\ud83c\uddf7",
+    "address": "Rue Saint-Ferr\u00e9ol 70, Marseille 13015",
+    "lat": 43.3121,
+    "lng": 5.365696,
+    "rating": 4.0,
+    "review_count": 565,
+    "price_level": 2,
+    "room_count": 32,
+    "avg_nightly_rate": 113.0,
+    "cleanliness_rating": 4.1,
+    "service_rating": 3.6,
+    "location_rating": 4.7,
+    "value_rating": 3.4,
+    "review_velocity": 12.8,
+    "rating_trend": "flat",
+    "rating_30d_change": 0.06,
+    "recent_reviews": [
+      {
+        "date": "2026-02-26",
+        "rating": 4.2,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      },
+      {
+        "date": "2026-02-05",
+        "rating": 4.2,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      },
+      {
+        "date": "2025-12-25",
+        "rating": 4.3,
+        "text": "Central location makes up for the small room size. Good value."
+      }
+    ],
+    "last_updated": "2026-03-17T22:00:00Z",
+    "acquisition_score": 33,
+    "maps_url": "https://maps.google.com/?q=43.3121,5.365696"
+  },
+  {
+    "id": "3c36a5ea-6f00-4724-ac38-ff430601ffa0",
+    "name": "H\u00f4tel Alize",
+    "city": "Marseille",
+    "country": "FR",
+    "flag": "\ud83c\uddeb\ud83c\uddf7",
+    "address": "Cours Belsunce 105, Marseille 13036",
+    "lat": 43.314826,
+    "lng": 5.374705,
+    "rating": 3.9,
+    "review_count": 217,
+    "price_level": 3,
+    "room_count": 36,
+    "avg_nightly_rate": 123.0,
+    "cleanliness_rating": 4.3,
+    "service_rating": 3.6,
+    "location_rating": 4.4,
+    "value_rating": 4.3,
+    "review_velocity": 4.2,
+    "rating_trend": "improving",
+    "rating_30d_change": 0.29,
+    "recent_reviews": [
+      {
+        "date": "2026-03-09",
+        "rating": 4.4,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      },
+      {
+        "date": "2026-01-25",
+        "rating": 4.5,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
+      },
+      {
+        "date": "2025-12-21",
+        "rating": 4.1,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      }
+    ],
+    "last_updated": "2026-03-19T05:00:00Z",
+    "acquisition_score": 32,
+    "maps_url": "https://maps.google.com/?q=43.314826,5.374705"
+  },
+  {
+    "id": "7475d564-d0f6-4498-bd13-d6abb0fa9d12",
+    "name": "Hotel Sofitel Marseille",
+    "city": "Marseille",
+    "country": "FR",
+    "flag": "\ud83c\uddeb\ud83c\uddf7",
+    "address": "Place Castellane 108, Marseille 13096",
+    "lat": 43.290062,
+    "lng": 5.344752,
+    "rating": 3.0,
+    "review_count": 1217,
+    "price_level": 3,
+    "room_count": 37,
+    "avg_nightly_rate": 140.0,
+    "cleanliness_rating": 2.5,
+    "service_rating": 3.2,
+    "location_rating": 3.6,
+    "value_rating": 2.8,
+    "review_velocity": 20.6,
+    "rating_trend": "declining",
+    "rating_30d_change": -0.13,
+    "recent_reviews": [
+      {
+        "date": "2026-03-01",
+        "rating": 2.9,
+        "text": "Found mold in the shower. Reported it and nothing was done."
+      },
+      {
+        "date": "2026-01-31",
+        "rating": 1.0,
+        "text": "Bed was uncomfortable and linens felt cheap. Expected more for the price."
+      },
+      {
+        "date": "2026-01-26",
+        "rating": 2.9,
+        "text": "Water pressure was almost nonexistent. Took 20 minutes to shower."
+      }
+    ],
+    "last_updated": "2026-03-17T21:00:00Z",
+    "acquisition_score": 58,
+    "maps_url": "https://maps.google.com/?q=43.290062,5.344752"
+  },
+  {
+    "id": "a6ad4d57-336c-4ee7-9c70-fb545be3ae5c",
+    "name": "H\u00f4tel Massalia",
+    "city": "Marseille",
+    "country": "FR",
+    "flag": "\ud83c\uddeb\ud83c\uddf7",
+    "address": "Rue d'Aubagne 51, Marseille 13037",
+    "lat": 43.324588,
+    "lng": 5.392539,
+    "rating": 4.1,
+    "review_count": 155,
+    "price_level": 2,
+    "room_count": 29,
+    "avg_nightly_rate": 83.0,
+    "cleanliness_rating": 4.0,
+    "service_rating": 3.6,
+    "location_rating": 4.8,
+    "value_rating": 4.3,
+    "review_velocity": 2.7,
+    "rating_trend": "improving",
+    "rating_30d_change": 0.07,
+    "recent_reviews": [
+      {
+        "date": "2026-02-20",
+        "rating": 3.0,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      },
+      {
+        "date": "2026-02-10",
+        "rating": 3.7,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      },
+      {
+        "date": "2026-01-04",
+        "rating": 4.5,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      }
+    ],
+    "last_updated": "2026-03-19T05:00:00Z",
+    "acquisition_score": 26,
+    "maps_url": "https://maps.google.com/?q=43.324588,5.392539"
+  },
+  {
+    "id": "1f771d98-317e-4173-b1eb-09e8e420089b",
+    "name": "H\u00f4tel Saint Charles",
+    "city": "Marseille",
+    "country": "FR",
+    "flag": "\ud83c\uddeb\ud83c\uddf7",
+    "address": "Boulevard Charles Livon 36, Marseille 13021",
+    "lat": 43.305775,
+    "lng": 5.352327,
+    "rating": 4.1,
+    "review_count": 1010,
+    "price_level": 2,
+    "room_count": 48,
+    "avg_nightly_rate": 76.0,
+    "cleanliness_rating": 3.9,
+    "service_rating": 3.8,
+    "location_rating": 4.7,
+    "value_rating": 3.7,
+    "review_velocity": 18.0,
+    "rating_trend": "declining",
+    "rating_30d_change": -0.55,
+    "recent_reviews": [
+      {
+        "date": "2026-03-06",
+        "rating": 3.1,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      },
+      {
+        "date": "2026-02-06",
+        "rating": 3.0,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      },
+      {
+        "date": "2026-01-10",
+        "rating": 4.5,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      }
+    ],
+    "last_updated": "2026-03-18T10:00:00Z",
+    "acquisition_score": 31,
+    "maps_url": "https://maps.google.com/?q=43.305775,5.352327"
+  },
+  {
+    "id": "469f29a2-2e27-4aea-a8bd-bd8b7cb55365",
+    "name": "H\u00f4tel Edmond Rostand",
+    "city": "Marseille",
+    "country": "FR",
+    "flag": "\ud83c\uddeb\ud83c\uddf7",
+    "address": "Canebi\u00e8re 94, Marseille 13023",
+    "lat": 43.272692,
+    "lng": 5.360529,
+    "rating": 4.2,
+    "review_count": 286,
+    "price_level": 2,
+    "room_count": 31,
+    "avg_nightly_rate": 118.0,
+    "cleanliness_rating": 4.5,
+    "service_rating": 4.2,
+    "location_rating": 4.7,
+    "value_rating": 3.7,
+    "review_velocity": 5.3,
+    "rating_trend": "declining",
+    "rating_30d_change": -0.27,
+    "recent_reviews": [
+      {
+        "date": "2026-02-26",
+        "rating": 4.1,
+        "text": "Central location makes up for the small room size. Good value."
+      },
+      {
+        "date": "2026-02-11",
+        "rating": 3.9,
+        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
+      },
+      {
+        "date": "2026-01-03",
+        "rating": 3.1,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      }
+    ],
+    "last_updated": "2026-03-19T07:00:00Z",
+    "acquisition_score": 26,
+    "maps_url": "https://maps.google.com/?q=43.272692,5.360529"
+  },
+  {
+    "id": "6d446e83-3963-481f-947c-9f9f51f3077b",
+    "name": "H\u00f4tel Escale Oceania",
+    "city": "Marseille",
+    "country": "FR",
+    "flag": "\ud83c\uddeb\ud83c\uddf7",
+    "address": "Rue Saint-Ferr\u00e9ol 55, Marseille 13050",
+    "lat": 43.313965,
+    "lng": 5.352145,
+    "rating": 2.2,
+    "review_count": 1068,
+    "price_level": 3,
+    "room_count": 27,
+    "avg_nightly_rate": 158.0,
+    "cleanliness_rating": 2.3,
+    "service_rating": 1.9,
+    "location_rating": 3.0,
+    "value_rating": 1.6,
+    "review_velocity": 18.7,
+    "rating_trend": "improving",
+    "rating_30d_change": 0.12,
+    "recent_reviews": [
+      {
+        "date": "2026-02-21",
+        "rating": 1.4,
+        "text": "WiFi barely worked and there's no workspace in the rooms. Not suitable for business travel."
+      },
+      {
+        "date": "2026-01-26",
+        "rating": 2.3,
+        "text": "Walls are paper thin. Could hear everything from neighboring rooms all night."
+      },
+      {
+        "date": "2026-01-16",
+        "rating": 1.8,
+        "text": "Found mold in the shower. Reported it and nothing was done."
+      }
+    ],
+    "last_updated": "2026-03-18T22:00:00Z",
+    "acquisition_score": 78,
+    "maps_url": "https://maps.google.com/?q=43.313965,5.352145"
+  },
+  {
+    "id": "8704d319-0a0a-4d64-a043-b731ca0af610",
+    "name": "Le Vieux Port Hotel",
+    "city": "Marseille",
+    "country": "FR",
+    "flag": "\ud83c\uddeb\ud83c\uddf7",
+    "address": "Rue de la R\u00e9publique 47, Marseille 13050",
+    "lat": 43.274419,
+    "lng": 5.395057,
+    "rating": 4.3,
+    "review_count": 550,
+    "price_level": 3,
+    "room_count": 30,
+    "avg_nightly_rate": 165.0,
+    "cleanliness_rating": 4.5,
+    "service_rating": 4.7,
+    "location_rating": 4.9,
+    "value_rating": 3.7,
+    "review_velocity": 14.5,
+    "rating_trend": "declining",
+    "rating_30d_change": -0.49,
     "recent_reviews": [
       {
         "date": "2026-03-11",
+        "rating": 3.8,
+        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
+      },
+      {
+        "date": "2026-01-19",
+        "rating": 3.6,
+        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
+      },
+      {
+        "date": "2026-01-06",
+        "rating": 4.0,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      }
+    ],
+    "last_updated": "2026-03-18T03:00:00Z",
+    "acquisition_score": 26,
+    "maps_url": "https://maps.google.com/?q=43.274419,5.395057"
+  },
+  {
+    "id": "a629ac3d-dffd-4f08-92b4-1ceaee49e712",
+    "name": "Hotel Kyriad",
+    "city": "Marseille",
+    "country": "FR",
+    "flag": "\ud83c\uddeb\ud83c\uddf7",
+    "address": "Rue d'Aubagne 118, Marseille 13036",
+    "lat": 43.324959,
+    "lng": 5.345676,
+    "rating": 4.0,
+    "review_count": 351,
+    "price_level": 2,
+    "room_count": 36,
+    "avg_nightly_rate": 115.0,
+    "cleanliness_rating": 4.0,
+    "service_rating": 4.0,
+    "location_rating": 4.2,
+    "value_rating": 3.8,
+    "review_velocity": 8.2,
+    "rating_trend": "declining",
+    "rating_30d_change": -0.56,
+    "recent_reviews": [
+      {
+        "date": "2026-02-27",
+        "rating": 3.7,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      },
+      {
+        "date": "2026-02-17",
+        "rating": 4.0,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      },
+      {
+        "date": "2025-12-20",
+        "rating": 3.2,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      }
+    ],
+    "last_updated": "2026-03-17T16:00:00Z",
+    "acquisition_score": 32,
+    "maps_url": "https://maps.google.com/?q=43.324959,5.345676"
+  },
+  {
+    "id": "6a7ca8ca-3574-426f-b28b-40616146dc20",
+    "name": "H\u00f4tel La R\u00e9sidence",
+    "city": "Marseille",
+    "country": "FR",
+    "flag": "\ud83c\uddeb\ud83c\uddf7",
+    "address": "Rue Saint-Ferr\u00e9ol 67, Marseille 13076",
+    "lat": 43.313479,
+    "lng": 5.385254,
+    "rating": 2.0,
+    "review_count": 801,
+    "price_level": 2,
+    "room_count": 24,
+    "avg_nightly_rate": 116.0,
+    "cleanliness_rating": 1.7,
+    "service_rating": 2.3,
+    "location_rating": 2.6,
+    "value_rating": 1.4,
+    "review_velocity": 16.3,
+    "rating_trend": "declining",
+    "rating_30d_change": -0.57,
+    "recent_reviews": [
+      {
+        "date": "2026-02-18",
+        "rating": 2.3,
+        "text": "Bed was uncomfortable and linens felt cheap. Expected more for the price."
+      },
+      {
+        "date": "2026-01-20",
+        "rating": 2.0,
+        "text": "Found mold in the shower. Reported it and nothing was done."
+      },
+      {
+        "date": "2026-01-28",
+        "rating": 2.7,
+        "text": "Found mold in the shower. Reported it and nothing was done."
+      }
+    ],
+    "last_updated": "2026-03-19T03:00:00Z",
+    "acquisition_score": 83,
+    "maps_url": "https://maps.google.com/?q=43.313479,5.385254"
+  },
+  {
+    "id": "23ace30b-8505-45a6-bca1-f8e6b3a3a558",
+    "name": "Hotel Ibis Vieux Port",
+    "city": "Marseille",
+    "country": "FR",
+    "flag": "\ud83c\uddeb\ud83c\uddf7",
+    "address": "Boulevard Longchamp 87, Marseille 13024",
+    "lat": 43.280204,
+    "lng": 5.370418,
+    "rating": 4.0,
+    "review_count": 190,
+    "price_level": 1,
+    "room_count": 46,
+    "avg_nightly_rate": 55.0,
+    "cleanliness_rating": 3.9,
+    "service_rating": 3.8,
+    "location_rating": 4.1,
+    "value_rating": 4.3,
+    "review_velocity": 5.1,
+    "rating_trend": "improving",
+    "rating_30d_change": 0.37,
+    "recent_reviews": [
+      {
+        "date": "2026-02-17",
+        "rating": 3.3,
+        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
+      },
+      {
+        "date": "2026-02-05",
+        "rating": 4.4,
+        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
+      },
+      {
+        "date": "2026-01-11",
+        "rating": 4.2,
+        "text": "Clean rooms, good WiFi. The building could use some updates but overall fine."
+      }
+    ],
+    "last_updated": "2026-03-18T01:00:00Z",
+    "acquisition_score": 29,
+    "maps_url": "https://maps.google.com/?q=43.280204,5.370418"
+  },
+  {
+    "id": "6c735359-bd99-4ce0-bdd2-e3806022e214",
+    "name": "Hotel de la Pr\u00e9fecture",
+    "city": "Marseille",
+    "country": "FR",
+    "flag": "\ud83c\uddeb\ud83c\uddf7",
+    "address": "Rue Paradis 29, Marseille 13076",
+    "lat": 43.325385,
+    "lng": 5.401586,
+    "rating": 4.3,
+    "review_count": 1067,
+    "price_level": 2,
+    "room_count": 33,
+    "avg_nightly_rate": 83.0,
+    "cleanliness_rating": 4.5,
+    "service_rating": 4.0,
+    "location_rating": 4.7,
+    "value_rating": 3.7,
+    "review_velocity": 25.4,
+    "rating_trend": "flat",
+    "rating_30d_change": 0.06,
+    "recent_reviews": [
+      {
+        "date": "2026-02-17",
+        "rating": 3.7,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      },
+      {
+        "date": "2026-01-20",
+        "rating": 4.1,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      },
+      {
+        "date": "2025-12-28",
+        "rating": 3.2,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      }
+    ],
+    "last_updated": "2026-03-18T11:00:00Z",
+    "acquisition_score": 26,
+    "maps_url": "https://maps.google.com/?q=43.325385,5.401586"
+  },
+  {
+    "id": "75e08e5c-c4f2-434f-b67f-b25dc4a6b459",
+    "name": "H\u00f4tel du Palais",
+    "city": "Marseille",
+    "country": "FR",
+    "flag": "\ud83c\uddeb\ud83c\uddf7",
+    "address": "Quai du Port 113, Marseille 13011",
+    "lat": 43.323559,
+    "lng": 5.334902,
+    "rating": 2.8,
+    "review_count": 950,
+    "price_level": 3,
+    "room_count": 45,
+    "avg_nightly_rate": 168.0,
+    "cleanliness_rating": 2.3,
+    "service_rating": 2.7,
+    "location_rating": 3.0,
+    "value_rating": 2.7,
+    "review_velocity": 25.7,
+    "rating_trend": "improving",
+    "rating_30d_change": 0.1,
+    "recent_reviews": [
+      {
+        "date": "2026-03-04",
         "rating": 1.1,
         "text": "Terrible experience. Dirty bathroom, noisy hallway, and breakfast was inedible."
       },
       {
         "date": "2026-02-06",
-        "rating": 2.1,
-        "text": "Room was outdated and the AC didn't work properly. Staff seemed overwhelmed."
+        "rating": 2.7,
+        "text": "Air conditioning leaked water onto the floor. Maintenance never came."
       },
       {
-        "date": "2026-01-31",
+        "date": "2026-01-05",
         "rating": 2.8,
-        "text": "The photos online are completely misleading. Hotel looks nothing like the pictures."
+        "text": "Water pressure was almost nonexistent. Took 20 minutes to shower."
       }
     ],
-    "last_updated": "2026-03-19T01:00:00Z",
+    "last_updated": "2026-03-18T08:00:00Z",
     "acquisition_score": 63,
-    "maps_url": "https://maps.google.com/?q=43.268192,5.383839"
+    "maps_url": "https://maps.google.com/?q=43.323559,5.334902"
   },
   {
-    "id": "a047b130-c087-4c42-a9f2-e86e74b2bea9",
-    "name": "H\u00f4tel Libertel",
+    "id": "864f151d-518d-4683-bc74-cfcda5a2a7a3",
+    "name": "H\u00f4tel Vertigo",
     "city": "Marseille",
     "country": "FR",
     "flag": "\ud83c\uddeb\ud83c\uddf7",
-    "address": "Place Castellane 109, Marseille 13051",
-    "lat": 43.270073,
-    "lng": 5.34514,
-    "rating": 4.1,
-    "review_count": 246,
-    "price_level": 3,
-    "room_count": 24,
-    "avg_nightly_rate": 119.0,
-    "cleanliness_rating": 4.0,
-    "service_rating": 3.9,
-    "location_rating": 4.2,
-    "value_rating": 4.2,
-    "review_velocity": 4.3,
+    "address": "Rue Paradis 82, Marseille 13060",
+    "lat": 43.27099,
+    "lng": 5.374547,
+    "rating": 3.9,
+    "review_count": 184,
+    "price_level": 2,
+    "room_count": 53,
+    "avg_nightly_rate": 80.0,
+    "cleanliness_rating": 3.6,
+    "service_rating": 3.6,
+    "location_rating": 4.5,
+    "value_rating": 4.0,
+    "review_velocity": 3.1,
     "rating_trend": "flat",
+    "rating_30d_change": -0.01,
     "recent_reviews": [
       {
-        "date": "2026-03-09",
-        "rating": 3.5,
-        "text": "Central location makes up for the small room size. Good value."
+        "date": "2026-03-05",
+        "rating": 4.4,
+        "text": "Good location, average rooms. Would stay again if the price is right."
       },
       {
         "date": "2026-02-12",
-        "rating": 4.1,
-        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+        "rating": 3.2,
+        "text": "Good location, average rooms. Would stay again if the price is right."
       },
       {
-        "date": "2026-01-04",
-        "rating": 4.0,
+        "date": "2026-01-21",
+        "rating": 3.7,
         "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
       }
     ],
-    "last_updated": "2026-03-19T02:00:00Z",
-    "acquisition_score": 28,
-    "maps_url": "https://maps.google.com/?q=43.270073,5.34514"
+    "last_updated": "2026-03-18T11:00:00Z",
+    "acquisition_score": 26,
+    "maps_url": "https://maps.google.com/?q=43.27099,5.374547"
   },
   {
-    "id": "3cc1bee6-bcda-4135-aad6-3ac0932ffc9c",
-    "name": "Hotel Relax",
+    "id": "1960a912-6d62-4992-b417-9eeefae83804",
+    "name": "H\u00f4tel Lacydon",
     "city": "Marseille",
     "country": "FR",
     "flag": "\ud83c\uddeb\ud83c\uddf7",
-    "address": "Boulevard Longchamp 101, Marseille 13055",
-    "lat": 43.279894,
-    "lng": 5.376027,
-    "rating": 4.3,
-    "review_count": 1040,
+    "address": "Rue Sainte 40, Marseille 13069",
+    "lat": 43.2824,
+    "lng": 5.343194,
+    "rating": 2.5,
+    "review_count": 1125,
     "price_level": 2,
-    "room_count": 29,
-    "avg_nightly_rate": 110.0,
-    "cleanliness_rating": 3.8,
-    "service_rating": 4.4,
-    "location_rating": 5.0,
-    "value_rating": 4.6,
-    "review_velocity": 21.7,
-    "rating_trend": "improving",
+    "room_count": 39,
+    "avg_nightly_rate": 119.0,
+    "cleanliness_rating": 2.6,
+    "service_rating": 1.9,
+    "location_rating": 3.2,
+    "value_rating": 2.2,
+    "review_velocity": 29.6,
+    "rating_trend": "flat",
+    "rating_30d_change": 0.09,
     "recent_reviews": [
       {
-        "date": "2026-02-22",
+        "date": "2026-02-28",
+        "rating": 1.1,
+        "text": "WiFi barely worked and there's no workspace in the rooms. Not suitable for business travel."
+      },
+      {
+        "date": "2026-02-01",
+        "rating": 2.6,
+        "text": "Walls are paper thin. Could hear everything from neighboring rooms all night."
+      },
+      {
+        "date": "2026-01-20",
+        "rating": 2.9,
+        "text": "Room was outdated and the AC didn't work properly. Staff seemed overwhelmed."
+      }
+    ],
+    "last_updated": "2026-03-18T09:00:00Z",
+    "acquisition_score": 70,
+    "maps_url": "https://maps.google.com/?q=43.2824,5.343194"
+  },
+  {
+    "id": "fb6429ee-4514-4de3-abe5-aea431ea2d8a",
+    "name": "Hotel Joliette",
+    "city": "Marseille",
+    "country": "FR",
+    "flag": "\ud83c\uddeb\ud83c\uddf7",
+    "address": "Canebi\u00e8re 103, Marseille 13027",
+    "lat": 43.273787,
+    "lng": 5.339117,
+    "rating": 4.3,
+    "review_count": 183,
+    "price_level": 3,
+    "room_count": 27,
+    "avg_nightly_rate": 126.0,
+    "cleanliness_rating": 4.1,
+    "service_rating": 4.4,
+    "location_rating": 5.0,
+    "value_rating": 3.8,
+    "review_velocity": 3.4,
+    "rating_trend": "flat",
+    "rating_30d_change": 0.06,
+    "recent_reviews": [
+      {
+        "date": "2026-03-12",
         "rating": 3.3,
-        "text": "Decent hotel for the price. Nothing special but clean and functional."
+        "text": "Good location, average rooms. Would stay again if the price is right."
       },
       {
-        "date": "2026-01-31",
-        "rating": 4.0,
-        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+        "date": "2026-01-23",
+        "rating": 3.1,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
       },
       {
-        "date": "2026-01-25",
-        "rating": 3.2,
-        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+        "date": "2026-01-10",
+        "rating": 3.1,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      }
+    ],
+    "last_updated": "2026-03-18T08:00:00Z",
+    "acquisition_score": 23,
+    "maps_url": "https://maps.google.com/?q=43.273787,5.339117"
+  },
+  {
+    "id": "5fecc766-f6d5-4cf0-9874-6ecbddb7c137",
+    "name": "H\u00f4tel des Augustins",
+    "city": "Marseille",
+    "country": "FR",
+    "flag": "\ud83c\uddeb\ud83c\uddf7",
+    "address": "Quai du Port 51, Marseille 13073",
+    "lat": 43.268269,
+    "lng": 5.382625,
+    "rating": 3.3,
+    "review_count": 740,
+    "price_level": 2,
+    "room_count": 27,
+    "avg_nightly_rate": 77.0,
+    "cleanliness_rating": 3.0,
+    "service_rating": 3.6,
+    "location_rating": 3.3,
+    "value_rating": 3.3,
+    "review_velocity": 17.2,
+    "rating_trend": "flat",
+    "rating_30d_change": -0.0,
+    "recent_reviews": [
+      {
+        "date": "2026-02-23",
+        "rating": 1.1,
+        "text": "Found mold in the shower. Reported it and nothing was done."
+      },
+      {
+        "date": "2026-02-03",
+        "rating": 1.3,
+        "text": "Elevator was broken during our entire stay. Had to carry luggage up 4 flights."
+      },
+      {
+        "date": "2026-01-19",
+        "rating": 2.8,
+        "text": "Rude reception staff. Asked for extra towels twice and never received them."
+      }
+    ],
+    "last_updated": "2026-03-18T04:00:00Z",
+    "acquisition_score": 51,
+    "maps_url": "https://maps.google.com/?q=43.268269,5.382625"
+  },
+  {
+    "id": "2ec30675-1a9a-4538-a813-4f6a1aa050d7",
+    "name": "H\u00f4tel Windsor",
+    "city": "Marseille",
+    "country": "FR",
+    "flag": "\ud83c\uddeb\ud83c\uddf7",
+    "address": "Rue de la R\u00e9publique 49, Marseille 13055",
+    "lat": 43.295281,
+    "lng": 5.3895,
+    "rating": 3.4,
+    "review_count": 849,
+    "price_level": 2,
+    "room_count": 35,
+    "avg_nightly_rate": 86.0,
+    "cleanliness_rating": 3.1,
+    "service_rating": 2.8,
+    "location_rating": 3.9,
+    "value_rating": 2.8,
+    "review_velocity": 14.2,
+    "rating_trend": "flat",
+    "rating_30d_change": 0.06,
+    "recent_reviews": [
+      {
+        "date": "2026-02-25",
+        "rating": 1.7,
+        "text": "WiFi barely worked and there's no workspace in the rooms. Not suitable for business travel."
+      },
+      {
+        "date": "2026-02-06",
+        "rating": 1.2,
+        "text": "Location is great but the hotel desperately needs renovation. Everything feels worn out."
+      },
+      {
+        "date": "2025-12-20",
+        "rating": 1.5,
+        "text": "Checked in at 3pm and the room still wasn't ready. No apology from front desk."
       }
     ],
     "last_updated": "2026-03-17T14:00:00Z",
-    "acquisition_score": 26,
-    "maps_url": "https://maps.google.com/?q=43.279894,5.376027"
+    "acquisition_score": 48,
+    "maps_url": "https://maps.google.com/?q=43.295281,5.3895"
+  },
+  {
+    "id": "5398f857-b007-4592-89bd-585bd047a2d3",
+    "name": "H\u00f4tel Bellevue",
+    "city": "Marseille",
+    "country": "FR",
+    "flag": "\ud83c\uddeb\ud83c\uddf7",
+    "address": "Rue de Rome 103, Marseille 13059",
+    "lat": 43.287788,
+    "lng": 5.393546,
+    "rating": 3.4,
+    "review_count": 553,
+    "price_level": 3,
+    "room_count": 25,
+    "avg_nightly_rate": 157.0,
+    "cleanliness_rating": 3.6,
+    "service_rating": 3.5,
+    "location_rating": 4.1,
+    "value_rating": 2.8,
+    "review_velocity": 9.5,
+    "rating_trend": "flat",
+    "rating_30d_change": 0.01,
+    "recent_reviews": [
+      {
+        "date": "2026-03-08",
+        "rating": 2.9,
+        "text": "Bed was uncomfortable and linens felt cheap. Expected more for the price."
+      },
+      {
+        "date": "2026-01-20",
+        "rating": 1.6,
+        "text": "WiFi barely worked and there's no workspace in the rooms. Not suitable for business travel."
+      },
+      {
+        "date": "2025-12-31",
+        "rating": 1.2,
+        "text": "Room was outdated and the AC didn't work properly. Staff seemed overwhelmed."
+      }
+    ],
+    "last_updated": "2026-03-18T23:00:00Z",
+    "acquisition_score": 48,
+    "maps_url": "https://maps.google.com/?q=43.287788,5.393546"
+  },
+  {
+    "id": "38989ddc-a5c7-4b5c-bf87-cbc8ea8968a3",
+    "name": "Best Western Marseille",
+    "city": "Marseille",
+    "country": "FR",
+    "flag": "\ud83c\uddeb\ud83c\uddf7",
+    "address": "Rue Saint-Ferr\u00e9ol 118, Marseille 13088",
+    "lat": 43.278588,
+    "lng": 5.343934,
+    "rating": 3.8,
+    "review_count": 501,
+    "price_level": 3,
+    "room_count": 49,
+    "avg_nightly_rate": 178.0,
+    "cleanliness_rating": 3.5,
+    "service_rating": 3.2,
+    "location_rating": 4.3,
+    "value_rating": 4.1,
+    "review_velocity": 8.3,
+    "rating_trend": "flat",
+    "rating_30d_change": 0.01,
+    "recent_reviews": [
+      {
+        "date": "2026-03-01",
+        "rating": 3.6,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      },
+      {
+        "date": "2026-01-26",
+        "rating": 3.5,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      },
+      {
+        "date": "2026-01-11",
+        "rating": 4.5,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      }
+    ],
+    "last_updated": "2026-03-17T15:00:00Z",
+    "acquisition_score": 38,
+    "maps_url": "https://maps.google.com/?q=43.278588,5.343934"
+  },
+  {
+    "id": "0c0ef3e3-310e-4f10-bee4-c21eae320080",
+    "name": "Hotel Carr\u00e9 Vieux Port",
+    "city": "Marseille",
+    "country": "FR",
+    "flag": "\ud83c\uddeb\ud83c\uddf7",
+    "address": "Rue Noailles 41, Marseille 13032",
+    "lat": 43.308931,
+    "lng": 5.374138,
+    "rating": 4.5,
+    "review_count": 1225,
+    "price_level": 3,
+    "room_count": 37,
+    "avg_nightly_rate": 139.0,
+    "cleanliness_rating": 4.6,
+    "service_rating": 4.7,
+    "location_rating": 4.8,
+    "value_rating": 4.6,
+    "review_velocity": 27.2,
+    "rating_trend": "flat",
+    "rating_30d_change": 0.05,
+    "recent_reviews": [
+      {
+        "date": "2026-02-18",
+        "rating": 4.3,
+        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
+      },
+      {
+        "date": "2026-02-18",
+        "rating": 3.9,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      },
+      {
+        "date": "2025-12-23",
+        "rating": 4.0,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      }
+    ],
+    "last_updated": "2026-03-19T07:00:00Z",
+    "acquisition_score": 20,
+    "maps_url": "https://maps.google.com/?q=43.308931,5.374138"
+  },
+  {
+    "id": "01ec7a99-ec3f-4b34-92fc-353ebb2c9fcc",
+    "name": "H\u00f4tel Continental",
+    "city": "Marseille",
+    "country": "FR",
+    "flag": "\ud83c\uddeb\ud83c\uddf7",
+    "address": "Cours Belsunce 45, Marseille 13050",
+    "lat": 43.276573,
+    "lng": 5.396772,
+    "rating": 3.9,
+    "review_count": 802,
+    "price_level": 2,
+    "room_count": 40,
+    "avg_nightly_rate": 107.0,
+    "cleanliness_rating": 4.2,
+    "service_rating": 3.7,
+    "location_rating": 4.1,
+    "value_rating": 3.5,
+    "review_velocity": 21.1,
+    "rating_trend": "flat",
+    "rating_30d_change": 0.06,
+    "recent_reviews": [
+      {
+        "date": "2026-02-17",
+        "rating": 3.1,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
+      },
+      {
+        "date": "2026-01-23",
+        "rating": 4.5,
+        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
+      },
+      {
+        "date": "2026-01-05",
+        "rating": 4.3,
+        "text": "Check-in was smooth. Room was clean. No complaints but nothing memorable."
+      }
+    ],
+    "last_updated": "2026-03-18T15:00:00Z",
+    "acquisition_score": 36,
+    "maps_url": "https://maps.google.com/?q=43.276573,5.396772"
+  },
+  {
+    "id": "d4af7f8d-5fbf-4aca-8640-7ac894e7481b",
+    "name": "H\u00f4tel Estanque",
+    "city": "Marseille",
+    "country": "FR",
+    "flag": "\ud83c\uddeb\ud83c\uddf7",
+    "address": "Rue de Rome 74, Marseille 13093",
+    "lat": 43.311995,
+    "lng": 5.350591,
+    "rating": 3.9,
+    "review_count": 502,
+    "price_level": 2,
+    "room_count": 43,
+    "avg_nightly_rate": 67.0,
+    "cleanliness_rating": 3.3,
+    "service_rating": 3.6,
+    "location_rating": 4.0,
+    "value_rating": 3.6,
+    "review_velocity": 10.5,
+    "rating_trend": "flat",
+    "rating_30d_change": -0.08,
+    "recent_reviews": [
+      {
+        "date": "2026-03-10",
+        "rating": 3.9,
+        "text": "Central location makes up for the small room size. Good value."
+      },
+      {
+        "date": "2026-01-21",
+        "rating": 3.6,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
+      },
+      {
+        "date": "2025-12-21",
+        "rating": 3.9,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      }
+    ],
+    "last_updated": "2026-03-18T10:00:00Z",
+    "acquisition_score": 36,
+    "maps_url": "https://maps.google.com/?q=43.311995,5.350591"
+  },
+  {
+    "id": "728e65d2-f3a2-4802-839b-fab4706d3d1d",
+    "name": "Hotel New Astoria",
+    "city": "Marseille",
+    "country": "FR",
+    "flag": "\ud83c\uddeb\ud83c\uddf7",
+    "address": "Cours Belsunce 53, Marseille 13099",
+    "lat": 43.299747,
+    "lng": 5.39959,
+    "rating": 2.1,
+    "review_count": 540,
+    "price_level": 3,
+    "room_count": 38,
+    "avg_nightly_rate": 134.0,
+    "cleanliness_rating": 1.6,
+    "service_rating": 1.9,
+    "location_rating": 2.5,
+    "value_rating": 2.0,
+    "review_velocity": 14.6,
+    "rating_trend": "declining",
+    "rating_30d_change": -0.39,
+    "recent_reviews": [
+      {
+        "date": "2026-03-03",
+        "rating": 2.3,
+        "text": "Cockroach in the room. Management offered to move us but the other room was just as bad."
+      },
+      {
+        "date": "2026-01-21",
+        "rating": 1.2,
+        "text": "Checked in at 3pm and the room still wasn't ready. No apology from front desk."
+      },
+      {
+        "date": "2026-01-18",
+        "rating": 2.3,
+        "text": "Location is great but the hotel desperately needs renovation. Everything feels worn out."
+      }
+    ],
+    "last_updated": "2026-03-19T08:00:00Z",
+    "acquisition_score": 80,
+    "maps_url": "https://maps.google.com/?q=43.299747,5.39959"
+  },
+  {
+    "id": "96088b7a-3fbb-458f-967f-f249e52709e5",
+    "name": "Le Miramar Hotel",
+    "city": "Marseille",
+    "country": "FR",
+    "flag": "\ud83c\uddeb\ud83c\uddf7",
+    "address": "Rue Sainte 63, Marseille 13094",
+    "lat": 43.2824,
+    "lng": 5.379731,
+    "rating": 3.9,
+    "review_count": 858,
+    "price_level": 2,
+    "room_count": 30,
+    "avg_nightly_rate": 90.0,
+    "cleanliness_rating": 3.5,
+    "service_rating": 3.3,
+    "location_rating": 4.3,
+    "value_rating": 3.6,
+    "review_velocity": 19.5,
+    "rating_trend": "improving",
+    "rating_30d_change": 0.1,
+    "recent_reviews": [
+      {
+        "date": "2026-02-18",
+        "rating": 3.1,
+        "text": "Good location, average rooms. Would stay again if the price is right."
+      },
+      {
+        "date": "2026-01-29",
+        "rating": 4.5,
+        "text": "Nice rooftop terrace with city views. Rooms are standard but well-maintained."
+      },
+      {
+        "date": "2025-12-25",
+        "rating": 3.8,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      }
+    ],
+    "last_updated": "2026-03-18T13:00:00Z",
+    "acquisition_score": 36,
+    "maps_url": "https://maps.google.com/?q=43.2824,5.379731"
+  },
+  {
+    "id": "cc00f662-1691-47cf-a2f2-470c678ffb86",
+    "name": "H\u00f4tel Le Corbusier",
+    "city": "Marseille",
+    "country": "FR",
+    "flag": "\ud83c\uddeb\ud83c\uddf7",
+    "address": "Rue de Rome 120, Marseille 13070",
+    "lat": 43.300863,
+    "lng": 5.351295,
+    "rating": 4.2,
+    "review_count": 557,
+    "price_level": 2,
+    "room_count": 31,
+    "avg_nightly_rate": 121.0,
+    "cleanliness_rating": 3.6,
+    "service_rating": 4.2,
+    "location_rating": 4.6,
+    "value_rating": 4.2,
+    "review_velocity": 10.1,
+    "rating_trend": "flat",
+    "rating_30d_change": 0.09,
+    "recent_reviews": [
+      {
+        "date": "2026-02-26",
+        "rating": 4.4,
+        "text": "Staff was friendly. Rooms are a bit dated but comfortable enough."
+      },
+      {
+        "date": "2026-02-10",
+        "rating": 4.2,
+        "text": "Solid 3-star experience. Breakfast was basic but acceptable."
+      },
+      {
+        "date": "2026-01-23",
+        "rating": 3.6,
+        "text": "Decent hotel for the price. Nothing special but clean and functional."
+      }
+    ],
+    "last_updated": "2026-03-17T18:00:00Z",
+    "acquisition_score": 28,
+    "maps_url": "https://maps.google.com/?q=43.300863,5.351295"
   }
 ]
