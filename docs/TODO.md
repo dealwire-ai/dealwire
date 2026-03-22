@@ -3,6 +3,7 @@
 ## General Ops
    - (noah) gsuite + related accounts
    - make a really strong, energetic e2e demo (deal screening, underwriting, (and optionally) IC report generation)
+   - Update Rho
 
 ## Biz Dev
    -  Send custom deal screener demo to Quinn Breslin
