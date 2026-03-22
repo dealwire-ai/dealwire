@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useInView } from "framer-motion";
 
-const TARGET = 6.4;
+const TARGET = 3.2;
 const DURATION_MS = 2000;
 
 export function DealFlowTicker() {
