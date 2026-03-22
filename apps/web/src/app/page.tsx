@@ -341,6 +341,7 @@ export default function Home() {
               { file: "hildreth.png", alt: "Hildreth Real Estate Advisors" },
               { file: "jke.svg", alt: "JK Equities" },
               { file: "dg-development.svg", alt: "DG Development Partners" },
+              { file: "rm.png", alt: "R&M Capital Property Management" },
             ].map(({ file, alt }) => (
               <div
                 key={file}
@@ -352,7 +353,7 @@ export default function Home() {
                   alt={alt}
                   width={140}
                   height={40}
-                  className="object-contain h-8 w-auto"
+                  className="object-contain h-[42px] w-auto"
                 />
               </div>
             ))}
