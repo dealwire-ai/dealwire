@@ -208,7 +208,9 @@ All task tracking lives in GitHub Issues on the project board. Do not track work
 
 ### Creating issues
 
-Always assign issues to the project board and apply relevant labels (at minimum: one domain label, one client label if client-specific). Keep issue titles and bodies concise — a few bullet points, not essays. If context exists in a doc or Drive file, link to it instead of duplicating it.
+Always assign issues to the project board and apply relevant labels (at minimum: one domain label, one client label if client-specific). If context exists in a doc or Drive file, link to it instead of duplicating it.
+
+**Conciseness is critical.** Issue titles should be short and scannable. Issue bodies should be a few tight bullet points at most — no paragraphs, no preamble, no restating the title. If the context is already in a linked doc, don't summarize it in the issue. Prefer 3 bullets over 3 sentences. Less is more.
 
 ```bash
 # Standard issue
