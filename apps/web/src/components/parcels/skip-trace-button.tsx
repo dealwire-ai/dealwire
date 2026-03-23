@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Clipboard, Check, RefreshCw } from "lucide-react";
+import { RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useApi } from "@/hooks/use-api";
+import { PhoneContactPanel } from "./phone-contact-panel";
 import type { Parcel } from "./parcel-table";
 
 interface SkipTraceButtonProps {
@@ -14,7 +15,6 @@ interface SkipTraceButtonProps {
 export function SkipTraceButton({ parcel, onUpdated }: SkipTraceButtonProps) {
   const { apiCall } = useApi();
   const [loading, setLoading] = useState(false);
-  const [copiedNumber, setCopiedNumber] = useState<string | null>(null);
 
   const status = parcel.skipTraceStatus;
 
@@ -34,12 +34,6 @@ export function SkipTraceButton({ parcel, onUpdated }: SkipTraceButtonProps) {
     }
   }
 
-  async function copyToClipboard(text: string) {
-    await navigator.clipboard.writeText(text);
-    setCopiedNumber(text);
-    setTimeout(() => setCopiedNumber(null), 2000);
-  }
-
   if (loading || status === "pending") {
     return (
       <div className="flex items-center gap-2 text-xs text-zinc-400">
@@ -53,50 +47,15 @@ export function SkipTraceButton({ parcel, onUpdated }: SkipTraceButtonProps) {
     const phones = parcel.ownerPhones ?? [];
     const emails = parcel.ownerEmails ?? [];
     return (
-      <div className="space-y-1.5">
-        {phones.map((p) => (
-          <div key={p.number} className="flex items-center gap-2 text-xs">
-            <a
-              href={`tel:${p.number}`}
-              className="text-[#C8A96E] hover:underline"
-            >
-              {p.number}
-            </a>
-            <span className="text-zinc-600 capitalize">{p.type}</span>
-            <button
-              onClick={() => copyToClipboard(p.number)}
-              className="text-zinc-500 hover:text-zinc-300 transition-colors"
-              title="Copy number"
-            >
-              {copiedNumber === p.number ? (
-                <Check className="w-3 h-3 text-green-500" />
-              ) : (
-                <Clipboard className="w-3 h-3" />
-              )}
-            </button>
-          </div>
-        ))}
-        {emails.map((email) => (
-          <div key={email} className="flex items-center gap-2 text-xs">
-            <a
-              href={`mailto:${email}`}
-              className="text-zinc-300 hover:underline"
-            >
-              {email}
-            </a>
-            <button
-              onClick={() => copyToClipboard(email)}
-              className="text-zinc-500 hover:text-zinc-300 transition-colors"
-              title="Copy email"
-            >
-              {copiedNumber === email ? (
-                <Check className="w-3 h-3 text-green-500" />
-              ) : (
-                <Clipboard className="w-3 h-3" />
-              )}
-            </button>
-          </div>
-        ))}
+      <div className="space-y-2">
+        <PhoneContactPanel
+          bbl={parcel.bbl}
+          phones={phones}
+          emails={emails}
+          onVerifiedPhoneChange={(phone) =>
+            onUpdated?.({ _verifiedPhone: phone })
+          }
+        />
         <button
           onClick={() => handleLookup(true)}
           className="text-xs text-zinc-500 hover:text-zinc-400 underline"

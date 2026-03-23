@@ -86,6 +86,8 @@ export interface Parcel {
   ownerEmails: string[] | null;
   skipTracedAt: string | null;
   skipTraceStatus: "pending" | "found" | "not_found" | "error" | null;
+  // Transient: set client-side when a phone is marked GOOD via contact tracking
+  _verifiedPhone?: string | null;
 }
 
 export interface ColumnDef {
@@ -553,6 +555,13 @@ export function ParcelTable({
                             <DetailRow label="Address" value={parcel.address} />
                             <DetailRow label="Zip" value={parcel.zipCode} />
                             <DetailRow label="Owner" value={parcel.ownerName} />
+                            {parcel._verifiedPhone && (
+                              <DetailRow
+                                label="Verified Phone"
+                                value={parcel._verifiedPhone}
+                                highlight
+                              />
+                            )}
                             <div className="mt-2">
                               <SkipTraceButton
                                 parcel={parcel}
@@ -763,15 +772,27 @@ function PhoneCell({ parcel }: { parcel: Parcel }) {
     parcel.ownerPhones &&
     parcel.ownerPhones.length > 0
   ) {
-    const primary = parcel.ownerPhones[0];
+    const verified = parcel._verifiedPhone;
+    const primary = verified
+      ? (parcel.ownerPhones.find((p) => p.number === verified) ??
+        parcel.ownerPhones[0])
+      : parcel.ownerPhones[0];
     return (
-      <a
-        href={`tel:${primary.number}`}
-        className="text-xs text-[#C8A96E] hover:underline"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {primary.number}
-      </a>
+      <span className="inline-flex items-center gap-1">
+        <a
+          href={`tel:${primary.number}`}
+          className="text-xs text-[#C8A96E] hover:underline"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {primary.number}
+        </a>
+        {verified && (
+          <span
+            className="h-2 w-2 rounded-full bg-green-500 inline-block"
+            title="Verified number"
+          />
+        )}
+      </span>
     );
   }
 
