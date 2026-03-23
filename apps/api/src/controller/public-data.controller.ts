@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  Put,
   Post,
   Query,
   Param,
@@ -22,8 +23,10 @@ import { NyctlQuarterlyService } from '../service/public-data/nyctl-quarterly.se
 import { CareScraperService } from '../service/public-data/care-scraper.service';
 import { ParcelQueryService } from '../service/public-data/parcel-query.service';
 import { SkipTraceService } from '../service/public-data/skip-trace.service';
+import { PhoneNoteService } from '../service/public-data/phone-note.service';
 import { BOROUGH_NAMES } from '../service/public-data/nyc-utils';
 import { resolveFeatureFlags } from '../util/feature-flags';
+import { PhoneStatus } from '@prisma/client';
 
 @Controller('public-data')
 @UseGuards(ClerkAuthGuard)
@@ -37,6 +40,7 @@ export class PublicDataController {
     private readonly careScraper: CareScraperService,
     private readonly parcelQuery: ParcelQueryService,
     private readonly skipTrace: SkipTraceService,
+    private readonly phoneNote: PhoneNoteService,
   ) {}
 
   private async assertParcelsEnabled(organizationId: string | null) {
@@ -513,5 +517,66 @@ export class PublicDataController {
       queueId: result.queueId,
       estimatedCostUsd: +(result.queued.length * 0.02).toFixed(2),
     };
+  }
+
+  @Get('parcels/:bbl/phone-notes')
+  async getPhoneNotes(
+    @AuthUser('organizationId') organizationId: string | null,
+    @AuthUser('userId') userId: string | null,
+    @Param('bbl') bbl: string,
+  ) {
+    await this.assertParcelsEnabled(organizationId);
+
+    const parcel = await this.parcelQuery.getParcelByBbl(bbl);
+    if (!parcel) {
+      throw new HttpException('Parcel not found', HttpStatus.NOT_FOUND);
+    }
+
+    const notes = await this.phoneNote.getNotesForParcel(
+      parcel.id,
+      organizationId!,
+    );
+    return { notes };
+  }
+
+  @Put('parcels/:bbl/phone-notes')
+  async upsertPhoneNote(
+    @AuthUser('organizationId') organizationId: string | null,
+    @AuthUser('userId') userId: string | null,
+    @Param('bbl') bbl: string,
+    @Body()
+    body: {
+      phoneNumber: string;
+      status?: 'GOOD' | 'BAD' | 'UNKNOWN';
+      note?: string;
+    },
+  ) {
+    await this.assertParcelsEnabled(organizationId);
+
+    if (!body.phoneNumber) {
+      throw new HttpException(
+        'phoneNumber is required',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    try {
+      return await this.phoneNote.upsertNote({
+        bbl,
+        phoneNumber: body.phoneNumber,
+        organizationId: organizationId!,
+        userId: userId!,
+        status: body.status
+          ? PhoneStatus[body.status as keyof typeof PhoneStatus]
+          : undefined,
+        note: body.note,
+      });
+    } catch (err) {
+      const message = (err as Error).message;
+      if (message.includes('not found')) {
+        throw new HttpException(message, HttpStatus.NOT_FOUND);
+      }
+      throw new HttpException(message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 }
