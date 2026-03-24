@@ -413,6 +413,30 @@ model Parcel {
 
   // Contact tracking (org-specific phone notes)
   phoneNotes  PhoneNote[]
+
+  // Property list assignments (org-specific categorization)
+  listAssignments  ParcelListAssignment[]
+}
+
+enum ParcelListType {
+  IMMEDIATE
+  LONG_TERM
+  NOT_INTERESTED
+}
+
+model ParcelListAssignment {
+  id             String         @id @default(cuid())
+  parcelId       String
+  parcel         Parcel         @relation(fields: [parcelId], references: [id], onDelete: Cascade)
+  organizationId String
+  listType       ParcelListType
+  assignedBy     String         // userId who assigned
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@unique([parcelId, organizationId])
+  @@index([organizationId, listType])
+  @@index([parcelId])
 }
 
 enum PhoneStatus {

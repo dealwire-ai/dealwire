@@ -24,9 +24,10 @@ import { CareScraperService } from '../service/public-data/care-scraper.service'
 import { ParcelQueryService } from '../service/public-data/parcel-query.service';
 import { SkipTraceService } from '../service/public-data/skip-trace.service';
 import { PhoneNoteService } from '../service/public-data/phone-note.service';
+import { PropertyListService } from '../service/public-data/property-list.service';
 import { BOROUGH_NAMES } from '../service/public-data/nyc-utils';
 import { resolveFeatureFlags } from '../util/feature-flags';
-import { PhoneStatus } from '@prisma/client';
+import { PhoneStatus, ParcelListType } from '@prisma/client';
 
 @Controller('public-data')
 @UseGuards(ClerkAuthGuard)
@@ -41,6 +42,7 @@ export class PublicDataController {
     private readonly parcelQuery: ParcelQueryService,
     private readonly skipTrace: SkipTraceService,
     private readonly phoneNote: PhoneNoteService,
+    private readonly propertyList: PropertyListService,
   ) {}
 
   private async assertParcelsEnabled(organizationId: string | null) {
@@ -189,6 +191,8 @@ export class PublicDataController {
     @Query('maxOutstandingTaxBill') maxOutstandingTaxBill?: string,
     @Query('minLienSaleAmount') minLienSaleAmount?: string,
     @Query('maxLienSaleAmount') maxLienSaleAmount?: string,
+    @Query('listType') listType?: string,
+    @Query('hasNoList') hasNoList?: string,
     @Query('sort') sort?: string,
     @Query('order') order?: 'asc' | 'desc',
   ) {
@@ -226,6 +230,9 @@ export class PublicDataController {
       buildingClassGroups: buildingClassGroups
         ? buildingClassGroups.split(',')
         : undefined,
+      listType: listType || undefined,
+      hasNoList: hasNoList === 'true' ? true : undefined,
+      organizationId: organizationId!,
       sort,
       order,
       page,
@@ -517,6 +524,76 @@ export class PublicDataController {
       queueId: result.queueId,
       estimatedCostUsd: +(result.queued.length * 0.02).toFixed(2),
     };
+  }
+
+  @Put('parcels/:bbl/list')
+  async assignList(
+    @AuthUser('organizationId') organizationId: string | null,
+    @AuthUser('userId') userId: string | null,
+    @Param('bbl') bbl: string,
+    @Body() body: { listType: string | null },
+  ) {
+    await this.assertParcelsEnabled(organizationId);
+
+    const listType =
+      body.listType !== null
+        ? ParcelListType[body.listType as keyof typeof ParcelListType]
+        : null;
+    if (body.listType !== null && !listType) {
+      throw new HttpException(
+        `Invalid listType: ${body.listType}. Valid: IMMEDIATE, LONG_TERM, NOT_INTERESTED`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    try {
+      const assignment = await this.propertyList.assign({
+        bbl,
+        organizationId: organizationId!,
+        userId: userId!,
+        listType,
+      });
+      return { assignment };
+    } catch (err) {
+      const message = (err as Error).message;
+      if (message.includes('not found')) {
+        throw new HttpException(message, HttpStatus.NOT_FOUND);
+      }
+      throw new HttpException(message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @Post('parcels/batch-list')
+  async batchAssignList(
+    @AuthUser('organizationId') organizationId: string | null,
+    @AuthUser('userId') userId: string | null,
+    @Body() body: { bbls: string[]; listType: string | null },
+  ) {
+    await this.assertParcelsEnabled(organizationId);
+
+    if (!body.bbls || body.bbls.length === 0) {
+      throw new HttpException('bbls array is required', HttpStatus.BAD_REQUEST);
+    }
+
+    const listType =
+      body.listType !== null
+        ? ParcelListType[body.listType as keyof typeof ParcelListType]
+        : null;
+    if (body.listType !== null && !listType) {
+      throw new HttpException(
+        `Invalid listType: ${body.listType}. Valid: IMMEDIATE, LONG_TERM, NOT_INTERESTED`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const updated = await this.propertyList.batchAssign({
+      bbls: body.bbls,
+      organizationId: organizationId!,
+      userId: userId!,
+      listType,
+    });
+
+    return { updated };
   }
 
   @Get('parcels/:bbl/phone-notes')

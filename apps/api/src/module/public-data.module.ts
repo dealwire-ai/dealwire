@@ -11,6 +11,7 @@ import { SkipTraceService } from '../service/public-data/skip-trace.service';
 import { NyctlQuarterlyService } from '../service/public-data/nyctl-quarterly.service';
 import { CareScraperService } from '../service/public-data/care-scraper.service';
 import { PhoneNoteService } from '../service/public-data/phone-note.service';
+import { PropertyListService } from '../service/public-data/property-list.service';
 import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
 
 @Module({
@@ -25,6 +26,7 @@ import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
     NyctlQuarterlyService,
     CareScraperService,
     PhoneNoteService,
+    PropertyListService,
     ClerkAuthGuard,
   ],
   exports: [ParcelQueryService],
