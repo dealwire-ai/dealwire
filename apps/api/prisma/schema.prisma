@@ -410,4 +410,30 @@ model Parcel {
   @@index([distressScore(sort: Desc)])
   @@index([hasActiveLien])
   @@index([borough, hasActiveLien])
+
+  // Contact tracking (org-specific phone notes)
+  phoneNotes  PhoneNote[]
+}
+
+enum PhoneStatus {
+  GOOD
+  BAD
+  UNKNOWN
+}
+
+model PhoneNote {
+  id             String      @id @default(cuid())
+  parcelId       String
+  parcel         Parcel      @relation(fields: [parcelId], references: [id], onDelete: Cascade)
+  phoneNumber    String      // Exact string from ownerPhones[].number
+  organizationId String
+  status         PhoneStatus @default(UNKNOWN)
+  note           String?     @db.Text
+  userId         String
+  userInitials   String      // Denormalized "DS", "DG" for display
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  @@unique([parcelId, phoneNumber, organizationId])
+  @@index([parcelId, organizationId])
 }
