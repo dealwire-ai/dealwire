@@ -271,6 +271,34 @@ export function ParcelFilters({ filters, onSetFilter }: ParcelFiltersProps) {
         value={filters.buildingClassGroups || ""}
         onChange={(v) => onSetFilter("buildingClassGroups", v)}
       />
+
+      {/* List filter */}
+      <Select
+        value={filters.listType || filters.hasNoList || "all"}
+        onValueChange={(value) => {
+          if (value === "all") {
+            onSetFilter("listType", "");
+            onSetFilter("hasNoList", "");
+          } else if (value === "uncategorized") {
+            onSetFilter("listType", "");
+            onSetFilter("hasNoList", "true");
+          } else {
+            onSetFilter("hasNoList", "");
+            onSetFilter("listType", value);
+          }
+        }}
+      >
+        <SelectTrigger className="w-[160px] bg-zinc-950 border-zinc-800 text-white">
+          <SelectValue placeholder="List" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All Lists</SelectItem>
+          <SelectItem value="uncategorized">Uncategorized</SelectItem>
+          <SelectItem value="IMMEDIATE">Immediate</SelectItem>
+          <SelectItem value="LONG_TERM">Long Term</SelectItem>
+          <SelectItem value="NOT_INTERESTED">Not Interested</SelectItem>
+        </SelectContent>
+      </Select>
     </>
   );
 }
