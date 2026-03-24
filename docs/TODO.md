@@ -7,6 +7,7 @@
 
 ## Biz Dev
    - quick demo for Thomas Dolan
+   - one-pager for Jamie Gull
    
 
 ## Deal Screener
