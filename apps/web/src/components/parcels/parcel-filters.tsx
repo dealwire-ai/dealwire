@@ -2,19 +2,13 @@
 
 import { useState } from "react";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { ChevronDown } from "lucide-react";
+import { Check, ChevronDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 /**
  * Building class groups per Daniel's 3/4 feedback:
@@ -176,6 +170,66 @@ const BOROUGHS = [
   { code: "4", name: "Queens" },
 ];
 
+/** Popover-based single-select filter (replaces Radix Select which has pointer event issues) */
+function FilterSelect({
+  value,
+  onValueChange,
+  options,
+  width,
+}: {
+  value: string;
+  onValueChange: (v: string) => void;
+  options: { value: string; label: string }[];
+  width: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const selected = options.find((o) => o.value === value);
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          size="sm"
+          className={cn(
+            width,
+            "justify-between bg-zinc-950 border-zinc-800 text-white hover:bg-zinc-900 font-normal text-left",
+          )}
+        >
+          <span className="truncate">{selected?.label ?? value}</span>
+          <ChevronDown className="h-4 w-4 opacity-50 shrink-0" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent
+        className="w-[var(--radix-popover-trigger-width)] p-1 bg-zinc-950 border-zinc-800"
+        align="start"
+      >
+        {options.map((opt) => (
+          <button
+            key={opt.value}
+            onClick={() => {
+              onValueChange(opt.value);
+              setOpen(false);
+            }}
+            className={cn(
+              "flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-zinc-200 hover:bg-zinc-800/50 cursor-pointer",
+              opt.value === value && "text-white",
+            )}
+          >
+            <Check
+              className={cn(
+                "h-4 w-4 shrink-0",
+                opt.value === value ? "opacity-100" : "opacity-0",
+              )}
+            />
+            {opt.label}
+          </button>
+        ))}
+      </PopoverContent>
+    </Popover>
+  );
+}
+
 interface ParcelFiltersProps {
   filters: Record<string, string>;
   onSetFilter: (key: string, value: string) => void;
@@ -185,86 +239,70 @@ export function ParcelFilters({ filters, onSetFilter }: ParcelFiltersProps) {
   return (
     <>
       {/* Borough filter */}
-      <Select
+      <FilterSelect
         value={filters.borough || "all"}
         onValueChange={(value) =>
           onSetFilter("borough", value === "all" ? "" : value)
         }
-      >
-        <SelectTrigger className="w-[140px] bg-zinc-950 border-zinc-800 text-white">
-          <SelectValue placeholder="Borough" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All Boroughs</SelectItem>
-          {BOROUGHS.map((b) => (
-            <SelectItem key={b.code} value={b.code}>
-              {b.name}
-            </SelectItem>
-          ))}
-          <SelectItem value="3,4">BK + QN</SelectItem>
-          <SelectItem value="1,3,4">MN + BK + QN</SelectItem>
-        </SelectContent>
-      </Select>
+        width="w-[140px]"
+        options={[
+          { value: "all", label: "All Boroughs" },
+          ...BOROUGHS.map((b) => ({ value: b.code, label: b.name })),
+          { value: "3,4", label: "BK + QN" },
+          { value: "1,3,4", label: "MN + BK + QN" },
+        ]}
+      />
 
       {/* Min distress score */}
-      <Select
+      <FilterSelect
         value={filters.minDistressScore || "any"}
         onValueChange={(value) =>
           onSetFilter("minDistressScore", value === "any" ? "" : value)
         }
-      >
-        <SelectTrigger className="w-[150px] bg-zinc-950 border-zinc-800 text-white">
-          <SelectValue placeholder="Min Score" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="any">Any Score</SelectItem>
-          <SelectItem value="20">Score 20+</SelectItem>
-          <SelectItem value="30">Score 30+</SelectItem>
-          <SelectItem value="50">Score 50+</SelectItem>
-          <SelectItem value="60">Score 60+</SelectItem>
-          <SelectItem value="80">Score 80+</SelectItem>
-        </SelectContent>
-      </Select>
+        width="w-[150px]"
+        options={[
+          { value: "any", label: "Any Score" },
+          { value: "20", label: "Score 20+" },
+          { value: "30", label: "Score 30+" },
+          { value: "50", label: "Score 50+" },
+          { value: "60", label: "Score 60+" },
+          { value: "80", label: "Score 80+" },
+        ]}
+      />
 
       {/* Min outstanding tax bill */}
-      <Select
+      <FilterSelect
         value={filters.minOutstandingTaxBill || "any"}
         onValueChange={(value) =>
           onSetFilter("minOutstandingTaxBill", value === "any" ? "" : value)
         }
-      >
-        <SelectTrigger className="w-[160px] bg-zinc-950 border-zinc-800 text-white">
-          <SelectValue placeholder="Min Tax Bill" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="any">Tax Bill</SelectItem>
-          <SelectItem value="1">Has Tax Bill</SelectItem>
-          <SelectItem value="1000">$1,000+</SelectItem>
-          <SelectItem value="5000">$5,000+</SelectItem>
-          <SelectItem value="10000">$10,000+</SelectItem>
-          <SelectItem value="25000">$25,000+</SelectItem>
-        </SelectContent>
-      </Select>
+        width="w-[160px]"
+        options={[
+          { value: "any", label: "Tax Bill" },
+          { value: "1", label: "Has Tax Bill" },
+          { value: "1000", label: "$1,000+" },
+          { value: "5000", label: "$5,000+" },
+          { value: "10000", label: "$10,000+" },
+          { value: "25000", label: "$25,000+" },
+        ]}
+      />
 
       {/* Min lien sale amount */}
-      <Select
+      <FilterSelect
         value={filters.minLienSaleAmount || "any"}
         onValueChange={(value) =>
           onSetFilter("minLienSaleAmount", value === "any" ? "" : value)
         }
-      >
-        <SelectTrigger className="w-[170px] bg-zinc-950 border-zinc-800 text-white">
-          <SelectValue placeholder="Min Lien Sale" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="any">Lien Sale</SelectItem>
-          <SelectItem value="1">Has Lien Sale</SelectItem>
-          <SelectItem value="10000">$10K+</SelectItem>
-          <SelectItem value="25000">$25K+</SelectItem>
-          <SelectItem value="50000">$50K+</SelectItem>
-          <SelectItem value="100000">$100K+</SelectItem>
-        </SelectContent>
-      </Select>
+        width="w-[170px]"
+        options={[
+          { value: "any", label: "Lien Sale" },
+          { value: "1", label: "Has Lien Sale" },
+          { value: "10000", label: "$10K+" },
+          { value: "25000", label: "$25K+" },
+          { value: "50000", label: "$50K+" },
+          { value: "100000", label: "$100K+" },
+        ]}
+      />
 
       {/* Building class groups */}
       <BuildingClassGroupFilter
@@ -273,7 +311,7 @@ export function ParcelFilters({ filters, onSetFilter }: ParcelFiltersProps) {
       />
 
       {/* List filter */}
-      <Select
+      <FilterSelect
         value={filters.listType || filters.hasNoList || "all"}
         onValueChange={(value) => {
           if (value === "all") {
@@ -287,18 +325,15 @@ export function ParcelFilters({ filters, onSetFilter }: ParcelFiltersProps) {
             onSetFilter("listType", value);
           }
         }}
-      >
-        <SelectTrigger className="w-[160px] bg-zinc-950 border-zinc-800 text-white">
-          <SelectValue placeholder="List" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All Lists</SelectItem>
-          <SelectItem value="uncategorized">Uncategorized</SelectItem>
-          <SelectItem value="IMMEDIATE">Immediate</SelectItem>
-          <SelectItem value="LONG_TERM">Long Term</SelectItem>
-          <SelectItem value="NOT_INTERESTED">Not Interested</SelectItem>
-        </SelectContent>
-      </Select>
+        width="w-[160px]"
+        options={[
+          { value: "all", label: "All Lists" },
+          { value: "uncategorized", label: "Uncategorized" },
+          { value: "IMMEDIATE", label: "Immediate" },
+          { value: "LONG_TERM", label: "Long Term" },
+          { value: "NOT_INTERESTED", label: "Not Interested" },
+        ]}
+      />
     </>
   );
 }
