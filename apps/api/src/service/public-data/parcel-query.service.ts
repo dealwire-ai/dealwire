@@ -66,6 +66,9 @@ export interface ParcelQueryFilters {
   search?: string;
   buildingClasses?: string[];
   buildingClassGroups?: string[];
+  listType?: string;
+  hasNoList?: boolean;
+  organizationId?: string;
   sort?: string;
   order?: 'asc' | 'desc';
   page?: number;
@@ -204,6 +207,22 @@ export class ParcelQueryService {
       ];
     }
 
+    // List type filtering (requires organizationId)
+    if (filters.organizationId) {
+      if (filters.listType) {
+        where.listAssignments = {
+          some: {
+            organizationId: filters.organizationId,
+            listType: filters.listType as any,
+          },
+        };
+      } else if (filters.hasNoList) {
+        where.listAssignments = {
+          none: { organizationId: filters.organizationId },
+        };
+      }
+    }
+
     return where;
   }
 
@@ -257,18 +276,40 @@ export class ParcelQueryService {
     const where = this.buildWhere(filters);
     const orderBy = this.buildOrderBy(filters.sort, filters.order);
 
+    const includeListAssignments = filters.organizationId
+      ? {
+          listAssignments: {
+            where: { organizationId: filters.organizationId },
+            select: { listType: true },
+            take: 1,
+          },
+        }
+      : undefined;
+
     const [data, total] = await Promise.all([
       this.prisma.parcel.findMany({
         where,
         orderBy,
         skip,
         take: limit,
+        ...(includeListAssignments && { include: includeListAssignments }),
       }),
       this.prisma.parcel.count({ where }),
     ]);
 
+    // Flatten listAssignments into a top-level _listType field
+    const flatData = filters.organizationId
+      ? data.map((p) => {
+          const record = p as typeof p & {
+            listAssignments?: { listType: string }[];
+          };
+          const _listType = record.listAssignments?.[0]?.listType ?? null;
+          return { ...p, _listType };
+        })
+      : data;
+
     return {
-      data,
+      data: flatData,
       pagination: {
         page,
         limit,

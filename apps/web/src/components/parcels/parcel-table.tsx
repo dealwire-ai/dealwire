@@ -20,6 +20,11 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScoreBadge } from "./score-badge";
 import { SkipTraceButton } from "./skip-trace-button";
+import {
+  ListAssignPopover,
+  ListBadge,
+  type ParcelListType,
+} from "./list-assign-popover";
 import { formatBuildingClass } from "@/lib/building-class-labels";
 
 const BOROUGH_NAMES: Record<string, string> = {
@@ -88,6 +93,8 @@ export interface Parcel {
   skipTraceStatus: "pending" | "found" | "not_found" | "error" | null;
   // Transient: set client-side when a phone is marked GOOD via contact tracking
   _verifiedPhone?: string | null;
+  // List assignment from API (flattened from listAssignments)
+  _listType?: ParcelListType | null;
 }
 
 export interface ColumnDef {
@@ -159,6 +166,13 @@ export const COLUMNS: ColumnDef[] = [
     field: "ownerPhones",
     defaultVisible: true,
     sortable: true,
+  },
+  {
+    key: "listType",
+    label: "List",
+    field: "listType",
+    defaultVisible: true,
+    sortable: false,
   },
   // Hidden by default
   {
@@ -282,7 +296,11 @@ function formatNumber(value: number | null | undefined): string {
   return new Intl.NumberFormat("en-US").format(value);
 }
 
-function renderCell(key: string, parcel: Parcel) {
+function renderCell(
+  key: string,
+  parcel: Parcel,
+  onParcelUpdated?: (bbl: string, updates: Partial<Parcel>) => void,
+) {
   switch (key) {
     case "distressScore":
       return <ScoreBadge score={parcel.distressScore} />;
@@ -357,6 +375,16 @@ function renderCell(key: string, parcel: Parcel) {
       );
     case "ownerPhones":
       return <PhoneCell parcel={parcel} />;
+    case "listType":
+      return (
+        <ListAssignPopover
+          bbl={parcel.bbl}
+          currentList={parcel._listType ?? null}
+          onAssigned={(listType) =>
+            onParcelUpdated?.(parcel.bbl, { _listType: listType })
+          }
+        />
+      );
     default:
       return "-";
   }
@@ -496,8 +524,13 @@ export function ParcelTable({
                 {activeColumns.map((col, i) => {
                   const showDataDotBefore =
                     i === 1 && activeColumns[0]?.key === "distressScore";
-                  const cellContent = renderCell(col.key, parcel);
-                  const needsStopPropagation = col.key === "ownerPhones";
+                  const cellContent = renderCell(
+                    col.key,
+                    parcel,
+                    onParcelUpdated,
+                  );
+                  const needsStopPropagation =
+                    col.key === "ownerPhones" || col.key === "listType";
                   return (
                     <Fragment key={col.key}>
                       {showDataDotBefore && (
@@ -555,6 +588,23 @@ export function ParcelTable({
                             <DetailRow label="Address" value={parcel.address} />
                             <DetailRow label="Zip" value={parcel.zipCode} />
                             <DetailRow label="Owner" value={parcel.ownerName} />
+                            <div>
+                              <span className="text-zinc-500">List: </span>
+                              <span
+                                className="inline-block"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <ListAssignPopover
+                                  bbl={parcel.bbl}
+                                  currentList={parcel._listType ?? null}
+                                  onAssigned={(listType) =>
+                                    onParcelUpdated?.(parcel.bbl, {
+                                      _listType: listType,
+                                    })
+                                  }
+                                />
+                              </span>
+                            </div>
                             {parcel._verifiedPhone && (
                               <DetailRow
                                 label="Verified Phone"

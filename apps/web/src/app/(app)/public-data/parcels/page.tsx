@@ -12,6 +12,8 @@ import { ParcelFilters } from "@/components/parcels/parcel-filters";
 import { ExportButton } from "@/components/parcels/export-button";
 import { ColumnToggle } from "@/components/parcels/column-toggle";
 import { BatchSkipTraceButton } from "@/components/parcels/batch-skip-trace-button";
+import { BatchListAssignButton } from "@/components/parcels/batch-list-assign-button";
+import type { ParcelListType } from "@/components/parcels/list-assign-popover";
 import { DataCoverageBar } from "@/components/parcels/data-coverage-bar";
 import { TableToolbar } from "@/components/table-toolbar";
 import { TablePagination } from "@/components/table-pagination";
@@ -223,20 +225,34 @@ export default function ParcelsPage() {
             }
             actionSlot={
               selectedBbls.size > 0 ? (
-                <BatchSkipTraceButton
-                  selectedBbls={selectedBbls}
-                  onQueued={() => {
-                    // Mark selected parcels as pending locally
-                    setParcels((prev) =>
-                      prev.map((p) =>
-                        selectedBbls.has(p.bbl)
-                          ? { ...p, skipTraceStatus: "pending" }
-                          : p,
-                      ),
-                    );
-                    setSelectedBbls(new Set());
-                  }}
-                />
+                <div className="flex items-center gap-2">
+                  <BatchListAssignButton
+                    selectedBbls={selectedBbls}
+                    onAssigned={(listType: ParcelListType | null) => {
+                      setParcels((prev) =>
+                        prev.map((p) =>
+                          selectedBbls.has(p.bbl)
+                            ? { ...p, _listType: listType }
+                            : p,
+                        ),
+                      );
+                      setSelectedBbls(new Set());
+                    }}
+                  />
+                  <BatchSkipTraceButton
+                    selectedBbls={selectedBbls}
+                    onQueued={() => {
+                      setParcels((prev) =>
+                        prev.map((p) =>
+                          selectedBbls.has(p.bbl)
+                            ? { ...p, skipTraceStatus: "pending" }
+                            : p,
+                        ),
+                      );
+                      setSelectedBbls(new Set());
+                    }}
+                  />
+                </div>
               ) : null
             }
           />
