@@ -1,13 +1,12 @@
 # TODO
 
 ## General Ops
-   - (noah) gsuite + related accounts
    - make a really strong, energetic e2e demo (deal screening, underwriting, (and optionally) IC report generation)
+   - play around with pinchfin
    - Update Rho
 
 ## Biz Dev
-   -  Send custom deal screener demo to Quinn Breslin
-   -  play around with pinchfin
+   
 
 ## Deal Screener
    - **[JK 3/3]** Underwriting pipeline improvements:
@@ -17,11 +16,9 @@
       - Buttons to easily update screening criteria from digest email as well as "mute" deals that keep getting sent over and over  
 
 ## Tax Lien Analyzer
-   - see docs for roadmap
-   - look into ATTOM or other valuation APIs
+   - collect $1.5K for phase 2
 
 ## Frontstep Acquisition
-   - execute + track media outreach
    - prepare to close
     
 ## Survey Platform
