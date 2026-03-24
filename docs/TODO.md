@@ -6,6 +6,7 @@
    - Update Rho
 
 ## Biz Dev
+   - quick demo for Thomas Dolan
    
 
 ## Deal Screener
