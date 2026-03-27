@@ -6,6 +6,8 @@ import { openai } from '@ai-sdk/openai';
  *
  * Set UNDERWRITING_LLM_PROVIDER=openai to use OpenAI models,
  * defaults to anthropic.
+ *
+ * PDF documents always use Anthropic (native PDF support via file blocks).
  */
 const provider = (
   process.env.UNDERWRITING_LLM_PROVIDER || 'anthropic'
@@ -21,6 +23,11 @@ export function extractorModel() {
   return provider === 'openai'
     ? openai('gpt-4o')
     : anthropic('claude-sonnet-4-6');
+}
+
+/** Always use Anthropic for PDF extraction (native file block support). */
+export function pdfExtractorModel() {
+  return anthropic('claude-sonnet-4-6');
 }
 
 export function mapperModel() {
