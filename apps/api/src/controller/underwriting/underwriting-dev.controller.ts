@@ -7,7 +7,6 @@ import {
   UploadedFiles,
   HttpException,
   HttpStatus,
-  OnModuleInit,
   Logger,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
@@ -17,13 +16,13 @@ import { S3Service } from '../../service/s3/s3.service';
 import { UnderwritingOrchestratorService } from '../../service/underwriting/underwriting-orchestrator.service';
 
 /**
- * Dev-only endpoint for testing the underwriting pipeline locally.
+ * Endpoint for testing the underwriting pipeline.
  * Bypasses email → SQS intake — upload files directly and run the pipeline.
  *
- * Disabled in production (NODE_ENV=production).
+ * Protected by Clerk auth in all environments.
  *
  * Usage:
- *   curl -X POST http://localhost:3001/underwriting/dev/run \
+ *   curl -X POST https://api.dealwire.ai/underwriting/dev/run \
  *     -H "Authorization: Bearer <clerk-token>" \
  *     -F "files=@rent_roll.xlsx" \
  *     -F "files=@t12.pdf" \
@@ -34,7 +33,7 @@ import { UnderwritingOrchestratorService } from '../../service/underwriting/unde
  */
 @Controller('underwriting/dev')
 @UseGuards(ClerkAuthGuard)
-export class UnderwritingDevController implements OnModuleInit {
+export class UnderwritingDevController {
   private readonly logger = new Logger(UnderwritingDevController.name);
 
   constructor(
@@ -43,15 +42,9 @@ export class UnderwritingDevController implements OnModuleInit {
   ) {}
 
   onModuleInit() {
-    if (process.env.NODE_ENV === 'production') {
-      this.logger.warn(
-        'UnderwritingDevController is loaded in production — it will reject all requests',
-      );
-    } else {
-      this.logger.log(
-        'UnderwritingDevController active — POST /underwriting/dev/run',
-      );
-    }
+    this.logger.log(
+      'UnderwritingDevController active — POST /underwriting/dev/run',
+    );
   }
 
   @Post('run')
@@ -61,13 +54,6 @@ export class UnderwritingDevController implements OnModuleInit {
     @UploadedFiles() files: Express.Multer.File[],
     @Query('deliver') deliverTo?: string,
   ) {
-    if (process.env.NODE_ENV === 'production') {
-      throw new HttpException(
-        'Not available in production',
-        HttpStatus.FORBIDDEN,
-      );
-    }
-
     if (!files?.length) {
       throw new HttpException(
         'Upload at least one file (rent roll, T-12, or OM)',
