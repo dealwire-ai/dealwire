@@ -21,14 +21,7 @@
 
 ## Tax Lien Analyzer
 
-- collect $1.5K for phase 2 (invoiced 3/25 — Venmo or invoice)
-- skip tracing provider evaluation (current Tracerfy ~25% hit rate, researching alternatives)
-- ATTOM API trial (reached out 3/22, $600/mo after trial — could cover lis pendens + valuations)
-- dynamic tax calculations (#185 — compounding interest, annual bill increases)
-- lis pendens data ingestion (PropertyShark Excel export or ATTOM)
-- UI contrast fix (gray text on dark bg)
-- Manhattan expansion
-- confirm new meeting time (proposed: Fridays 11am)
+- collect $1.5K for phase 2
 
 ## Frontstep Acquisition
 
