@@ -4,7 +4,6 @@
 
 - make a really strong, energetic e2e demo (deal screening, underwriting, (and optionally) IC report generation)
 - play around with pinchfin
-- Update Rho
 - Send David prospect list (with George from Kings Cap)
 
 ## Biz Dev
