@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { generateObject } from 'ai';
-import { anthropic } from '@ai-sdk/anthropic';
 import { S3Service } from '../../s3/s3.service';
+import { extractorModel } from '../model-config';
 import { ClassifiedDocument } from './document-classifier.service';
 import {
   RentRollExtractionSchema,
@@ -67,7 +67,7 @@ export class RentRollExtractorService {
       ];
 
       const { object } = await generateObject({
-        model: anthropic('claude-sonnet-4-6'),
+        model: extractorModel(),
         schema: RentRollExtractionSchema,
         system: SYSTEM_PROMPT,
         messages: [{ role: 'user', content: content as any }],
@@ -87,7 +87,7 @@ export class RentRollExtractorService {
     userText = `Filename: "${doc.filename}"\n\n${text}\n\nExtract every unit from this Rent Roll.${fieldHint}`;
 
     const { object } = await generateObject({
-      model: anthropic('claude-sonnet-4-6'),
+      model: extractorModel(),
       schema: RentRollExtractionSchema,
       system: SYSTEM_PROMPT,
       messages: [{ role: 'user', content: userText }],

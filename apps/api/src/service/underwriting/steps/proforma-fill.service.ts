@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { generateObject } from 'ai';
-import { anthropic } from '@ai-sdk/anthropic';
 import { z } from 'zod';
+import { mapperModel } from '../model-config';
 import { S3Service } from '../../s3/s3.service';
 import { ExtractionResults } from '../extractors/extraction-types';
 import { FieldMapEntry } from '../proforma.service';
@@ -91,7 +91,7 @@ export class ProformaFillService {
     for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
       try {
         const { object } = await generateObject({
-          model: anthropic('claude-sonnet-4-6'),
+          model: mapperModel(),
           maxRetries: 0,
           schema: MappingSchema,
           system: `You are mapping real estate deal data to pro forma input fields.
