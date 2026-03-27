@@ -148,12 +148,18 @@ export class ProformaFillService {
       fieldNameLookup.set(f.name.toLowerCase(), f.name);
     }
 
-    // Helper to set a mapping if the field exists in the field map
+    // Helper to set a mapping if the field exists in the field map.
+    // Uses word-boundary regex to avoid cross-contamination
+    // (e.g. 'state' matching "Real Estate", 'city' matching "Electricity").
     const trySet = (patterns: string[], value: number | string | null) => {
       if (value === null || value === undefined) return;
       for (const pattern of patterns) {
+        const re = new RegExp(
+          `\\b${pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`,
+          'i',
+        );
         for (const [lower, actual] of fieldNameLookup) {
-          if (lower.includes(pattern.toLowerCase())) {
+          if (re.test(lower)) {
             map.set(actual, value);
             return;
           }
@@ -272,11 +278,25 @@ export class ProformaFillService {
 
     // The Unit Mix sheet has rows starting at row 2 (row 1 is headers).
     // Columns: A=Unit Name, C=Beds, D=Baths, F=SF/Unit, G=Units, I=Rent/Unit
-    // We write to fixed row offsets (row 2, 3, 4, etc.)
-    let cellsWritten = 0;
     const startRow = 2; // 1-indexed, row after headers
+    const maxRows = 20;
+    const unitMixCols = ['A', 'C', 'D', 'F', 'G', 'I'];
 
-    for (let i = 0; i < unitMix.length && i < 20; i++) {
+    // Clear existing rows first to prevent stale template data
+    for (let i = 0; i < maxRows; i++) {
+      const row = startRow + i;
+      for (const col of unitMixCols) {
+        try {
+          sheet.cell(`${col}${row}`).value('');
+        } catch {
+          // cell may not exist
+        }
+      }
+    }
+
+    let cellsWritten = 0;
+
+    for (let i = 0; i < unitMix.length && i < maxRows; i++) {
       const row = startRow + i;
       const mix = unitMix[i];
       try {
@@ -355,23 +375,23 @@ export class ProformaFillService {
       .sort((a, b) => a.beds - b.beds || a.baths - b.baths);
   }
 
-  /** Parse bed/bath from various formats: "1/1.00", "2/2", "1BR/1BA", "1 Bed / 1 Bath" */
+  /** Parse bed/bath from various formats: "1/1.00", "2/2", "1BR/1.5BA", "1 Bed / 1.5 Bath" */
   private parseBedBath(type: string): { beds: number; baths: number } | null {
     // Try "N/N" or "N/N.00" format
     const slashMatch = type.match(/^(\d+)\s*\/\s*(\d+(?:\.\d+)?)/);
     if (slashMatch) {
       return {
         beds: parseInt(slashMatch[1]),
-        baths: Math.round(parseFloat(slashMatch[2])),
+        baths: parseFloat(slashMatch[2]),
       };
     }
-    // Try "1BR/1BA" or "1 Bed / 1 Bath" format
+    // Try "1BR/1.5BA" or "1 Bed / 1.5 Bath" format
     const brMatch = type.match(/(\d+)\s*(?:BR|Bed)/i);
-    const baMatch = type.match(/(\d+)\s*(?:BA|Bath)/i);
+    const baMatch = type.match(/(\d+(?:\.\d+)?)\s*(?:BA|Bath)/i);
     if (brMatch) {
       return {
         beds: parseInt(brMatch[1]),
-        baths: baMatch ? parseInt(baMatch[1]) : 1,
+        baths: baMatch ? parseFloat(baMatch[1]) : 1,
       };
     }
     return null;
