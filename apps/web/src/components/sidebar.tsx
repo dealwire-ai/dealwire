@@ -21,7 +21,7 @@ import {
   MoreHorizontal,
 } from "lucide-react";
 import { useFeatureFlags } from "@/hooks/use-feature-flags";
-import { isInternalUser } from "@/lib/utils";
+import { isInternalUser, isAdminUser } from "@/lib/utils";
 import posthog from "posthog-js";
 import { useState, useCallback } from "react";
 import {
@@ -127,6 +127,7 @@ export function Sidebar() {
 
   const email = user?.primaryEmailAddress?.emailAddress;
   const isFrontstep = isInternalUser(email);
+  const isAdmin = isAdminUser(email);
 
   const initials =
     [user?.firstName?.[0], user?.lastName?.[0]]
@@ -299,7 +300,7 @@ export function Sidebar() {
                 {email}
               </DropdownMenuLabel>
               <DropdownMenuSeparator className="bg-zinc-800" />
-              {isFrontstep && (
+              {isAdmin && (
                 <>
                   <div className="px-2 py-1.5">
                     <OrganizationSwitcher
