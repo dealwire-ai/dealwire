@@ -149,15 +149,15 @@ export class ProformaFillService {
     }
 
     // Helper to set a mapping if the field exists in the field map.
-    // Uses word-boundary regex to avoid cross-contamination
+    // Uses boundary-aware matching to avoid cross-contamination
     // (e.g. 'state' matching "Real Estate", 'city' matching "Electricity").
+    // Uses (?<![a-zA-Z]) / (?![a-zA-Z]) instead of \b to handle patterns
+    // starting with non-word chars like "# of units".
     const trySet = (patterns: string[], value: number | string | null) => {
       if (value === null || value === undefined) return;
       for (const pattern of patterns) {
-        const re = new RegExp(
-          `\\b${pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`,
-          'i',
-        );
+        const escaped = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const re = new RegExp(`(?<![a-zA-Z])${escaped}(?![a-zA-Z])`, 'i');
         for (const [lower, actual] of fieldNameLookup) {
           if (re.test(lower)) {
             map.set(actual, value);
