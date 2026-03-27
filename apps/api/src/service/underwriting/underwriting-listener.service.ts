@@ -72,10 +72,18 @@ export class UnderwritingListenerService {
       inReplyToMessageId: parsed.inReplyToMessageId,
     };
 
-    // Run the full pipeline synchronously within this handler.
-    // Message is acknowledged when run() resolves.
-    // Re-throws on error → SQS retries automatically (visibilityTimeout: 600s).
-    await this.pipeline.run(ctx);
+    // Run the full pipeline. Catch errors so the SQS consumer keeps polling
+    // (unhandled throws kill the sqs-consumer polling loop permanently).
+    // The message is still acknowledged — failed jobs won't retry endlessly.
+    try {
+      await this.pipeline.run(ctx);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      this.logger.error(
+        `[${parsed.dealId}] Pipeline failed: ${msg}`,
+        err instanceof Error ? err.stack : undefined,
+      );
+    }
   }
 
   @SqsConsumerEventHandler('underwriting', 'processing_error')
