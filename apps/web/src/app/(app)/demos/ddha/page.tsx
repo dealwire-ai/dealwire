@@ -142,11 +142,9 @@ export default function DDHADemoPage() {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatMessages]);
 
-  // Reference date for arrival filter
-  const refDate = new Date("2026-04-07");
-
   // Filter guests
   const filtered = useMemo(() => {
+    const refDate = new Date("2026-04-07");
     const cutoff = new Date(refDate);
     cutoff.setDate(cutoff.getDate() + arrivalDays);
 
@@ -587,7 +585,7 @@ export default function DDHADemoPage() {
               : sortCol === "totalStays"
                 ? "stays"
                 : "arrival date"}{" "}
-        // click column headers to sort
+        {/* click column headers to sort */}
       </p>
 
       {/* Section: Analyst */}
