@@ -12,6 +12,7 @@ import {
   SlidersHorizontal,
   LayoutTemplate,
   Map,
+  Presentation,
   LogOut,
   PanelLeftClose,
   PanelLeftOpen,
@@ -182,6 +183,11 @@ export function Sidebar() {
       title: "Market Data",
       items: [{ label: "Parcels", href: "/public-data/parcels", icon: Map }],
       flag: flags.parcels,
+    },
+    {
+      title: "Demos",
+      items: [{ label: "Demos", href: "/demos", icon: Presentation }],
+      frontstepOnly: true,
     },
   ];
 
