@@ -1,9 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { generateObject } from 'ai';
-import { anthropic } from '@ai-sdk/anthropic';
 import { S3Service } from '../../s3/s3.service';
+import { extractorModel } from '../model-config';
 import { ClassifiedDocument } from './document-classifier.service';
-import { OMExtractionSchema, OMExtraction, excelToText } from './extraction-types';
+import {
+  OMExtractionSchema,
+  OMExtraction,
+  excelToText,
+} from './extraction-types';
 
 const SYSTEM_PROMPT = `You are an expert real estate underwriter extracting key metrics from an Offering Memorandum (OM).
 
@@ -23,7 +27,10 @@ export class OMExtractorService {
 
   constructor(private readonly s3Service: S3Service) {}
 
-  async extract(doc: ClassifiedDocument, neededFields?: string[]): Promise<OMExtraction> {
+  async extract(
+    doc: ClassifiedDocument,
+    neededFields?: string[],
+  ): Promise<OMExtraction> {
     this.logger.log(`[om-extractor] Extracting from "${doc.filename}"`);
 
     const isPdf =
@@ -43,7 +50,11 @@ export class OMExtractorService {
 
     if (isPdf) {
       const buffer = await this.s3Service.downloadDealAttachment(doc.s3Key);
-      content.unshift({ type: 'file', data: buffer, mimeType: 'application/pdf' });
+      content.unshift({
+        type: 'file',
+        data: buffer,
+        mimeType: 'application/pdf',
+      });
     } else {
       // Excel / CSV — convert to text
       const buffer = await this.s3Service.downloadDealAttachment(doc.s3Key);
@@ -55,7 +66,7 @@ export class OMExtractorService {
     }
 
     const { object } = await generateObject({
-      model: anthropic('claude-sonnet-4-6'),
+      model: extractorModel(),
       schema: OMExtractionSchema,
       system: SYSTEM_PROMPT,
       messages: [{ role: 'user', content: content as any }],
