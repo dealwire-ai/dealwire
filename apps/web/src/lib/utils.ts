@@ -10,3 +10,17 @@ export function isInternalUser(email: string | null | undefined): boolean {
     !!email?.endsWith("@dealwire.ai") || !!email?.endsWith("@frontstep.ai")
   );
 }
+
+const ADMIN_EMAILS = [
+  "imlevine@outlook.com",
+  "isaac@dealwire.ai",
+  "isaac@frontstep.ai",
+  "noahweinstein345@outlook.com",
+  "noah@dealwire.ai",
+  "noah@frontstep.ai",
+];
+
+export function isAdminUser(email: string | null | undefined): boolean {
+  if (!email) return false;
+  return ADMIN_EMAILS.includes(email.toLowerCase());
+}
