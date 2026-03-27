@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { generateObject } from 'ai';
 import { S3Service } from '../../s3/s3.service';
-import { extractorModel } from '../model-config';
+import { extractorModel, pdfExtractorModel } from '../model-config';
 import { ClassifiedDocument } from './document-classifier.service';
 import {
   T12ExtractionSchema,
@@ -13,16 +13,43 @@ const SYSTEM_PROMPT = `You are an expert real estate underwriter extracting annu
 
 Rules:
 - All values must be ANNUAL totals in dollars. If the document shows monthly columns, sum them. Add a flag if you summed monthly figures.
+- Use the most recent 12-month period available.
+
+INCOME FIELDS:
 - grossRentalIncome: total scheduled / actual rent collected annually.
-- otherIncome: laundry, parking, late fees, etc. — everything that is not rent.
+- otherIncome: everything that is not base rent (utility reimbursement, garage, pet rent, fees, etc.).
 - effectiveGrossIncome: grossRentalIncome + otherIncome (net of vacancy if stated). Null if not derivable.
-- operatingExpenses: total of all operating expense line items (exclude debt service).
-- taxes, insurance, utilities, repairsAndMaintenance, managementFees: individual line items. Null if not separately stated.
+- utilityReimbursement: tenant utility bill-back / utility income. Null if not stated.
+- garageRent: garage/parking income. Null if not stated.
+- petRent: pet rent income. Null if not stated.
+- lateFeesAndAdmin: late fees, admin fees, lease termination fees combined. Null if not stated.
+
+EXPENSE FIELDS (all annual, exclude debt service / mortgage / interest / owner expenses):
+- operatingExpenses: total of all operating expense line items.
+- taxes: real estate / property taxes.
+- insurance: property insurance.
+- managementFees: property management fees.
+- administrative: office expense, G&A, payroll, salaries, commissions combined.
+- wasteDisposal: trash removal / waste collection.
+- waterAndSewer: water & sewer combined.
+- gas: natural gas. Null if not separately stated.
+- electric: electric utilities. If "utilities" is a single line item that is NOT water/sewer/gas, put it here.
+- telephone: telephone/telecom. Null if not stated.
+- repairsAndMaintenance: repairs & maintenance.
+- pestControl: pest control.
+- landscaping: lawn & landscaping.
+- contracts: contract services (not maintenance).
+- makeReady: make-ready / unit turn costs — painting, carpet replacement, cleaning combined.
+- supplies: supplies/materials.
+- advertising: marketing & advertising.
+- securityMonitoring: security monitoring. Null if not stated.
 - otherExpenses: catch-all for any operating expense not in the above categories.
+
+BOTTOM LINE:
 - noi: effectiveGrossIncome - operatingExpenses. If explicitly stated, use stated value; if derived, add a flag.
 - expenseRatio: operatingExpenses / effectiveGrossIncome as a decimal. Null if either is null.
 
-Do NOT include debt service (mortgage, interest) in operating expenses.
+Do NOT include debt service (mortgage, interest), owner expenses, or capital expenditures in operating expenses.
 Set confidence (0–1) based on completeness. Flag assumptions and derivations.`;
 
 @Injectable()
@@ -56,7 +83,7 @@ export class T12ExtractorService {
       ];
 
       const { object } = await generateObject({
-        model: extractorModel(),
+        model: pdfExtractorModel(),
         schema: T12ExtractionSchema,
         system: SYSTEM_PROMPT,
         messages: [{ role: 'user', content: content as any }],

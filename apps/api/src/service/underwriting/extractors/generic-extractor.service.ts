@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { S3Service } from '../../s3/s3.service';
 import { ClassifiedDocument } from './document-classifier.service';
 import { excelToText, GenericExtraction } from './extraction-types';
-import { extractorModel } from '../model-config';
+import { extractorModel, pdfExtractorModel } from '../model-config';
 
 const GenericExtractionSchema = z.object({
   fields: z.array(
@@ -66,7 +66,7 @@ Rules:
       ];
 
       const { object } = await generateObject({
-        model: extractorModel(),
+        model: pdfExtractorModel(),
         schema: GenericExtractionSchema,
         system,
         messages: [{ role: 'user', content: content as any }],

@@ -54,9 +54,11 @@ export function excelToTextWithCellRefs(buffer: Buffer): string {
  * These match the fieldMap entries stored on the Proforma record.
  */
 export const OMExtractionSchema = z.object({
+  propertyName: z.string().nullable(), // e.g. "Preston Gardens Apartments"
   propertyAddress: z.string().nullable(),
   city: z.string().nullable(),
   state: z.string().nullable(),
+  zipCode: z.string().nullable(),
   propertyType: z.string().nullable(), // "multifamily", "office", "retail", etc.
   yearBuilt: z.number().int().nullable(),
   totalUnits: z.number().int().nullable(),
@@ -113,13 +115,33 @@ export const T12ExtractionSchema = z.object({
   otherIncome: z.number().nullable(),
   effectiveGrossIncome: z.number().nullable(),
 
-  // Expenses (annual)
+  // Revenue detail (annual)
+  utilityReimbursement: z.number().nullable(), // tenant utility bill-back
+  garageRent: z.number().nullable(),
+  petRent: z.number().nullable(),
+  lateFeesAndAdmin: z.number().nullable(), // late fees, admin fees, lease termination fees
+
+  // Expenses (annual) — totals
   operatingExpenses: z.number().nullable(), // total
   taxes: z.number().nullable(),
   insurance: z.number().nullable(),
-  utilities: z.number().nullable(),
-  repairsAndMaintenance: z.number().nullable(),
   managementFees: z.number().nullable(),
+
+  // Expense detail (annual line items)
+  administrative: z.number().nullable(), // office, G&A, payroll, commissions
+  wasteDisposal: z.number().nullable(), // trash removal
+  waterAndSewer: z.number().nullable(),
+  gas: z.number().nullable(),
+  electric: z.number().nullable(), // electric / utilities (non-water, non-gas)
+  telephone: z.number().nullable(),
+  repairsAndMaintenance: z.number().nullable(),
+  pestControl: z.number().nullable(),
+  landscaping: z.number().nullable(),
+  contracts: z.number().nullable(), // contract services
+  makeReady: z.number().nullable(), // make-ready / turn costs (painting, carpet, cleaning)
+  supplies: z.number().nullable(),
+  advertising: z.number().nullable(),
+  securityMonitoring: z.number().nullable(),
   otherExpenses: z.number().nullable(),
 
   // Bottom line (annual)

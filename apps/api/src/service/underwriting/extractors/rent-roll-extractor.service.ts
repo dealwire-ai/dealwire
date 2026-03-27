@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { generateObject } from 'ai';
 import { S3Service } from '../../s3/s3.service';
-import { extractorModel } from '../model-config';
+import { extractorModel, pdfExtractorModel } from '../model-config';
 import { ClassifiedDocument } from './document-classifier.service';
 import {
   RentRollExtractionSchema,
@@ -67,7 +67,7 @@ export class RentRollExtractorService {
       ];
 
       const { object } = await generateObject({
-        model: extractorModel(),
+        model: pdfExtractorModel(),
         schema: RentRollExtractionSchema,
         system: SYSTEM_PROMPT,
         messages: [{ role: 'user', content: content as any }],
