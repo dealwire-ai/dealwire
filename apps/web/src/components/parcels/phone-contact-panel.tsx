@@ -153,6 +153,16 @@ export function PhoneContactPanel({
                 {p.number}
               </a>
               <span className="text-zinc-600 capitalize">{p.type}</span>
+              {p.isDnc && (
+                <span className="text-red-400 text-[10px] font-medium px-1 py-0.5 bg-red-400/10 rounded">
+                  DNC
+                </span>
+              )}
+              {p.source && (
+                <span className="text-zinc-700 text-[10px]">
+                  {p.source === "skipsherpa" ? "sherpa" : p.source}
+                </span>
+              )}
 
               {/* Copy */}
               <button

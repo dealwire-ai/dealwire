@@ -6,6 +6,48 @@ interface OwnerPhone {
   number: string;
   type: string;
   rank: number;
+  source?: 'tracerfy' | 'skipsherpa';
+  isDnc?: boolean;
+}
+
+/** Skip Sherpa property lookup request */
+interface SkipSherpaLookup {
+  property_address_lookup: {
+    street: string;
+    city: string;
+    state: string;
+    zip?: string;
+  };
+  owner_entity_lookup?: { name: string } | null;
+}
+
+/** Skip Sherpa phone number in response */
+interface SkipSherpaPhone {
+  e164_format?: string;
+  local_format?: string;
+  type?: string;
+  carrier?: string;
+  last_seen?: string;
+  dnc_statuses?: Array<{ is_dnc?: boolean; is_registered?: boolean }>;
+}
+
+/** Skip Sherpa person/owner in response */
+interface SkipSherpaPerson {
+  name?: string;
+  phone_numbers?: SkipSherpaPhone[];
+  emails?: Array<{ email_address?: string }>;
+}
+
+/** Skip Sherpa property result */
+interface SkipSherpaPropertyResult {
+  status_code: number;
+  issues?: Array<{ code_str?: string }>;
+  property?: {
+    owners?: Array<{
+      person?: SkipSherpaPerson | null;
+      business?: SkipSherpaPerson | null;
+    }>;
+  } | null;
 }
 
 /** A single result record from GET /queue/:id (flat phone/email fields) */
@@ -59,6 +101,10 @@ export class SkipTraceService {
   private readonly monthlyCreditCap = parseInt(
     process.env.TRACERFY_MONTHLY_CREDIT_CAP ?? '500',
   );
+
+  /** Skip Sherpa fallback provider */
+  private readonly skipSherpaApiKey = process.env.SKIPSHERPA_API_KEY;
+  private readonly skipSherpaBaseUrl = 'https://skipsherpa.com/api/beta6';
 
   /** Buffer for single-BBL requests — flushed as one batch after FLUSH_DELAY_MS */
   private pendingQueue: QueuedRequest[] = [];
@@ -393,20 +439,14 @@ export class SkipTraceService {
     results: TracerfyResultRecord[],
   ): Promise<void> {
     const now = new Date();
+    const missedBbls: string[] = [];
 
     for (let i = 0; i < bbls.length; i++) {
       const bbl = bbls[i];
       const result = results[i];
 
       if (!result) {
-        await this.prisma.parcel.updateMany({
-          where: { bbl },
-          data: {
-            skipTraceStatus: 'not_found',
-            skipTracedAt: now,
-            skipTraceQueueId: null,
-          },
-        });
+        missedBbls.push(bbl);
         continue;
       }
 
@@ -414,29 +454,45 @@ export class SkipTraceService {
       const emails = this.parseEmails(result);
       const hasContact = phones.length > 0 || emails.length > 0;
 
+      if (!hasContact) {
+        missedBbls.push(bbl);
+        continue;
+      }
+
       await this.prisma.parcel.updateMany({
         where: { bbl },
         data: {
-          ...(phones.length > 0 && {
-            ownerPhones: phones as unknown as object[],
-          }),
+          ownerPhones: phones as unknown as object[],
           ...(emails.length > 0 && { ownerEmails: emails }),
-          skipTraceStatus: hasContact ? 'found' : 'not_found',
+          skipTraceStatus: 'found',
           skipTracedAt: now,
           skipTraceQueueId: null,
         },
       });
     }
 
-    const foundCount = bbls.filter((_, i) => {
-      const r = results[i];
-      if (!r) return false;
-      return this.parsePhones(r).length > 0 || this.parseEmails(r).length > 0;
-    }).length;
-
+    const foundCount = bbls.length - missedBbls.length;
     this.logger.log(
-      `Queue ${queueId} complete: ${foundCount}/${bbls.length} records with contact data`,
+      `Queue ${queueId} Tracerfy: ${foundCount}/${bbls.length} found`,
     );
+
+    // Run misses through Skip Sherpa fallback
+    if (missedBbls.length > 0 && this.skipSherpaApiKey) {
+      this.logger.log(
+        `Running ${missedBbls.length} Tracerfy misses through Skip Sherpa fallback`,
+      );
+      await this.skipSherpaFallback(missedBbls);
+    } else if (missedBbls.length > 0) {
+      // No Skip Sherpa key — mark misses as not_found
+      await this.prisma.parcel.updateMany({
+        where: { bbl: { in: missedBbls } },
+        data: {
+          skipTraceStatus: 'not_found',
+          skipTracedAt: now,
+          skipTraceQueueId: null,
+        },
+      });
+    }
   }
 
   /**
@@ -452,7 +508,7 @@ export class SkipTraceService {
       const number = raw.trim();
       if (seen.has(number)) return;
       seen.add(number);
-      phones.push({ number, type, rank });
+      phones.push({ number, type, rank, source: 'tracerfy' });
     };
 
     // Primary phone gets rank 1
@@ -479,6 +535,181 @@ export class SkipTraceService {
       if (email) emails.push(email);
     }
     return emails;
+  }
+
+  /**
+   * Skip Sherpa fallback: look up parcels that Tracerfy missed.
+   * Processes in batches of 25 (Skip Sherpa's max per request).
+   */
+  private async skipSherpaFallback(bbls: string[]): Promise<void> {
+    const parcels = await this.prisma.parcel.findMany({
+      where: { bbl: { in: bbls } },
+      select: {
+        bbl: true,
+        address: true,
+        zipCode: true,
+        borough: true,
+        ownerName: true,
+      },
+    });
+
+    // Process in chunks of 25
+    for (let i = 0; i < parcels.length; i += 25) {
+      const chunk = parcels.slice(i, i + 25);
+      await this.skipSherpaLookupBatch(chunk);
+    }
+  }
+
+  private async skipSherpaLookupBatch(
+    parcels: Array<{
+      bbl: string;
+      address: string | null;
+      zipCode: string | null;
+      borough: string;
+      ownerName: string | null;
+    }>,
+  ): Promise<void> {
+    const now = new Date();
+
+    const lookups: SkipSherpaLookup[] = parcels.map((p) => ({
+      property_address_lookup: {
+        street: p.address || '',
+        city: BOROUGH_NAMES[p.borough] || 'New York',
+        state: 'NY',
+        zip: p.zipCode || undefined,
+      },
+      owner_entity_lookup: p.ownerName ? { name: p.ownerName } : null,
+    }));
+
+    try {
+      const response = await fetch(`${this.skipSherpaBaseUrl}/properties`, {
+        method: 'PUT',
+        headers: {
+          'API-Key': this.skipSherpaApiKey!,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ property_lookups: lookups }),
+      });
+
+      if (!response.ok) {
+        const text = await response.text().catch(() => response.statusText);
+        this.logger.error(
+          `Skip Sherpa fallback failed: ${response.status} ${text}`,
+        );
+        // Mark all as not_found
+        await this.prisma.parcel.updateMany({
+          where: { bbl: { in: parcels.map((p) => p.bbl) } },
+          data: {
+            skipTraceStatus: 'not_found',
+            skipTracedAt: now,
+            skipTraceQueueId: null,
+          },
+        });
+        return;
+      }
+
+      const data = (await response.json()) as {
+        property_results: SkipSherpaPropertyResult[];
+      };
+      const results = data.property_results || [];
+
+      let fallbackFound = 0;
+      for (let i = 0; i < parcels.length; i++) {
+        const parcel = parcels[i];
+        const result = results[i];
+
+        if (!result || result.status_code !== 200 || !result.property) {
+          await this.prisma.parcel.updateMany({
+            where: { bbl: parcel.bbl },
+            data: {
+              skipTraceStatus: 'not_found',
+              skipTracedAt: now,
+              skipTraceQueueId: null,
+            },
+          });
+          continue;
+        }
+
+        const { phones, emails } = this.parseSkipSherpaOwners(
+          result.property.owners || [],
+        );
+        const hasContact = phones.length > 0 || emails.length > 0;
+
+        await this.prisma.parcel.updateMany({
+          where: { bbl: parcel.bbl },
+          data: {
+            ...(phones.length > 0 && {
+              ownerPhones: phones as unknown as object[],
+            }),
+            ...(emails.length > 0 && { ownerEmails: emails }),
+            skipTraceStatus: hasContact ? 'found' : 'not_found',
+            skipTracedAt: now,
+            skipTraceQueueId: null,
+          },
+        });
+
+        if (hasContact) fallbackFound++;
+      }
+
+      this.logger.log(
+        `Skip Sherpa fallback: ${fallbackFound}/${parcels.length} found`,
+      );
+    } catch (err) {
+      this.logger.error(
+        `Skip Sherpa fallback error: ${(err as Error).message}`,
+      );
+      await this.prisma.parcel.updateMany({
+        where: { bbl: { in: parcels.map((p) => p.bbl) } },
+        data: {
+          skipTraceStatus: 'not_found',
+          skipTracedAt: now,
+          skipTraceQueueId: null,
+        },
+      });
+    }
+  }
+
+  /** Parse Skip Sherpa owners into OwnerPhone[] and emails */
+  private parseSkipSherpaOwners(
+    owners: Array<{
+      person?: SkipSherpaPerson | null;
+      business?: SkipSherpaPerson | null;
+    }>,
+  ): { phones: OwnerPhone[]; emails: string[] } {
+    const seen = new Set<string>();
+    const phones: OwnerPhone[] = [];
+    const emails: string[] = [];
+
+    for (const owner of owners) {
+      const entity = owner.person || owner.business;
+      if (!entity) continue;
+
+      // Phones
+      for (const ph of entity.phone_numbers || []) {
+        const number = ph.local_format || ph.e164_format || '';
+        if (!number || seen.has(number)) continue;
+        seen.add(number);
+
+        const isDnc = ph.dnc_statuses?.[0]?.is_dnc ?? undefined;
+
+        phones.push({
+          number,
+          type: ph.type || 'unknown',
+          rank: phones.length + 1,
+          source: 'skipsherpa',
+          isDnc,
+        });
+      }
+
+      // Emails
+      for (const em of entity.emails || []) {
+        if (em.email_address && !emails.includes(em.email_address)) {
+          emails.push(em.email_address);
+        }
+      }
+    }
+
+    return { phones, emails };
   }
 
   async checkMonthlyUsage(): Promise<number> {
