@@ -39,6 +39,8 @@ export interface OwnerPhone {
   number: string;
   type: string;
   rank: number;
+  source?: "tracerfy" | "skipsherpa";
+  isDnc?: boolean;
 }
 
 export interface Parcel {
