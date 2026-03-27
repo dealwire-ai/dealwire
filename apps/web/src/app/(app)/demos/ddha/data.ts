@@ -1,6 +1,9 @@
 export interface Guest {
   name: string;
   phone: string;
+  email: string | null;
+  city: string | null;
+  state: string | null;
   totalStays: number;
   totalRevenue: number;
   lastStay: string;
@@ -24,6 +27,9 @@ export const guests: Guest[] = [
   {
     name: "Harrington, Claire",
     phone: "914.552.3847",
+    email: "claire.harrington@blackstone.com",
+    city: "Manhattan",
+    state: "NY",
     totalStays: 6,
     totalRevenue: 8940,
     lastStay: "2025-11-15",
@@ -45,6 +51,9 @@ export const guests: Guest[] = [
   {
     name: "Westbrook, Marcus",
     phone: "917.384.6120",
+    email: "marcus.westbrook@marriott.com",
+    city: "Brooklyn",
+    state: "NY",
     totalStays: 5,
     totalRevenue: 7250,
     lastStay: "2025-12-28",
@@ -66,6 +75,9 @@ export const guests: Guest[] = [
   {
     name: "Chen, Lily",
     phone: "646.891.2043",
+    email: "lily.chen@wk.com",
+    city: "Manhattan",
+    state: "NY",
     totalStays: 4,
     totalRevenue: 5680,
     lastStay: "2025-10-22",
@@ -87,6 +99,9 @@ export const guests: Guest[] = [
   {
     name: "Kowalski, Brian",
     phone: "516.447.8832",
+    email: "brian.kowalski@nyulangone.org",
+    city: "White Plains",
+    state: "NY",
     totalStays: 4,
     totalRevenue: 6120,
     lastStay: "2025-09-14",
@@ -108,6 +123,9 @@ export const guests: Guest[] = [
   {
     name: "Alvarez, Sofia",
     phone: "212.903.4471",
+    email: "sofia.alvarez@gs.com",
+    city: "Scarsdale",
+    state: "NY",
     totalStays: 3,
     totalRevenue: 4350,
     lastStay: "2025-08-30",
@@ -129,6 +147,9 @@ export const guests: Guest[] = [
   {
     name: "Brennan, Patrick",
     phone: "845.221.6609",
+    email: "patrick.brennan@kingstoncityschools.org",
+    city: "Hunter",
+    state: "NY",
     totalStays: 3,
     totalRevenue: 3870,
     lastStay: "2025-11-02",
@@ -150,6 +171,9 @@ export const guests: Guest[] = [
   {
     name: "Tanaka, Yuki",
     phone: "347.882.1155",
+    email: "yuki.tanaka@onepeloton.com",
+    city: "Manhasset",
+    state: "NY",
     totalStays: 3,
     totalRevenue: 5190,
     lastStay: "2025-07-19",
@@ -171,6 +195,9 @@ export const guests: Guest[] = [
   {
     name: "Morrison, Beth",
     phone: "631.445.9023",
+    email: null,
+    city: "Greenwich",
+    state: "CT",
     totalStays: 3,
     totalRevenue: 4080,
     lastStay: "2025-12-20",
@@ -192,6 +219,9 @@ export const guests: Guest[] = [
   {
     name: "Dominguez, Rafael",
     phone: "718.330.7782",
+    email: "rafael.dominguez@jean-georges.com",
+    city: "Stamford",
+    state: "CT",
     totalStays: 2,
     totalRevenue: 3240,
     lastStay: "2025-06-08",
@@ -213,6 +243,9 @@ export const guests: Guest[] = [
   {
     name: "Sullivan, Kate",
     phone: "203.661.4490",
+    email: "kate.sullivan@deloitte.com",
+    city: "Hoboken",
+    state: "NJ",
     totalStays: 2,
     totalRevenue: 2780,
     lastStay: "2025-10-05",
@@ -234,6 +267,9 @@ export const guests: Guest[] = [
   {
     name: "Patel, Aarav",
     phone: "862.209.3374",
+    email: "aarav.patel@stripe.com",
+    city: "Montclair",
+    state: "NJ",
     totalStays: 2,
     totalRevenue: 2460,
     lastStay: "2025-05-18",
@@ -255,6 +291,9 @@ export const guests: Guest[] = [
   {
     name: "O'Brien, Declan",
     phone: "914.773.2218",
+    email: null,
+    city: "Phoenicia",
+    state: "NY",
     totalStays: 2,
     totalRevenue: 3560,
     lastStay: "2025-09-28",
@@ -276,6 +315,9 @@ export const guests: Guest[] = [
   {
     name: "Nakamura, Emi",
     phone: "917.550.8891",
+    email: "emi.nakamura@condenast.com",
+    city: "Manhattan",
+    state: "NY",
     totalStays: 2,
     totalRevenue: 4180,
     lastStay: "2025-11-30",
@@ -297,6 +339,9 @@ export const guests: Guest[] = [
   {
     name: "Wheeler, James",
     phone: "845.339.1102",
+    email: null,
+    city: "Brooklyn",
+    state: "NY",
     totalStays: 2,
     totalRevenue: 1980,
     lastStay: "2025-04-12",
@@ -318,6 +363,9 @@ export const guests: Guest[] = [
   {
     name: "Fitzgerald, Nora",
     phone: "508.229.6647",
+    email: "nora.fitzgerald@catskillvet.com",
+    city: "Catskill",
+    state: "NY",
     totalStays: 2,
     totalRevenue: 2890,
     lastStay: "2025-08-17",
@@ -339,6 +387,9 @@ export const guests: Guest[] = [
   {
     name: "Kim, Daniel",
     phone: "646.201.9938",
+    email: "daniel.kim@benchmark.com",
+    city: "Rye",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 1756,
     lastStay: "2025-12-31",
@@ -360,6 +411,9 @@ export const guests: Guest[] = [
   {
     name: "Rossi, Valentina",
     phone: "212.774.3301",
+    email: "valentina.rossi@studiorossi.com",
+    city: "Larchmont",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 1347,
     lastStay: "2025-11-22",
@@ -381,6 +435,9 @@ export const guests: Guest[] = [
   {
     name: "Thompson, Greg",
     phone: "973.882.4456",
+    email: "greg.thompson@edwardjones.com",
+    city: "Manhattan",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 598,
     lastStay: "2025-10-10",
@@ -402,6 +459,9 @@ export const guests: Guest[] = [
   {
     name: "Liu, Jasmine",
     phone: "347.991.5528",
+    email: "jasmine.liu@glossier.com",
+    city: "Park Slope",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 538,
     lastStay: "2025-09-05",
@@ -423,6 +483,9 @@ export const guests: Guest[] = [
   {
     name: "Murphy, Sean",
     phone: "845.626.7734",
+    email: null,
+    city: "Tribeca",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 498,
     lastStay: "2025-07-04",
@@ -444,6 +507,9 @@ export const guests: Guest[] = [
   {
     name: "Bakshi, Priya",
     phone: "201.330.9981",
+    email: "priya.bakshi@mountsinai.org",
+    city: "Manhattan",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 1047,
     lastStay: "2025-06-20",
@@ -465,6 +531,9 @@ export const guests: Guest[] = [
   {
     name: "Carlson, Erik",
     phone: "518.774.2209",
+    email: null,
+    city: null,
+    state: null,
     totalStays: 1,
     totalRevenue: 398,
     lastStay: "2025-12-14",
@@ -486,6 +555,9 @@ export const guests: Guest[] = [
   {
     name: "Williams, Jasper",
     phone: "929.415.6673",
+    email: "jasper.williams@willowandstone.com",
+    city: "Manhattan",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 898,
     lastStay: "2025-08-09",
@@ -507,6 +579,9 @@ export const guests: Guest[] = [
   {
     name: "Romano, Gina",
     phone: "914.882.3310",
+    email: "gina.romano@compass.com",
+    city: "White Plains",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 538,
     lastStay: "2025-05-25",
@@ -528,6 +603,9 @@ export const guests: Guest[] = [
   {
     name: "Banks, Terrence",
     phone: "718.550.1127",
+    email: "terrence.banks@gmail.com",
+    city: "Scarsdale",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 996,
     lastStay: "2025-11-08",
@@ -549,6 +627,9 @@ export const guests: Guest[] = [
   {
     name: "Duffy, Maeve",
     phone: "203.447.8895",
+    email: "maeve.duffy@davispolk.com",
+    city: "Great Neck",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 598,
     lastStay: "2025-10-19",
@@ -570,6 +651,9 @@ export const guests: Guest[] = [
   {
     name: "Ostrowski, Jan",
     phone: "631.228.4401",
+    email: null,
+    city: null,
+    state: null,
     totalStays: 1,
     totalRevenue: 398,
     lastStay: "2025-04-30",
@@ -591,6 +675,9 @@ export const guests: Guest[] = [
   {
     name: "Rivera, Marco",
     phone: "917.663.8847",
+    email: "marco.rivera@nike.com",
+    city: "Greenwich",
+    state: "CT",
     totalStays: 1,
     totalRevenue: 1047,
     lastStay: "2025-09-20",
@@ -612,6 +699,9 @@ export const guests: Guest[] = [
   {
     name: "Jensen, Karen",
     phone: "845.991.2234",
+    email: "karen.jensen@saugerties.k12.ny.us",
+    city: "Tannersville",
+    state: "NY",
     totalStays: 2,
     totalRevenue: 2380,
     lastStay: "2025-07-27",
@@ -633,6 +723,9 @@ export const guests: Guest[] = [
   {
     name: "Park, Joon",
     phone: "646.338.7721",
+    email: "joon.park@shoparc.com",
+    city: "Hoboken",
+    state: "NJ",
     totalStays: 1,
     totalRevenue: 898,
     lastStay: "2025-12-07",
@@ -654,6 +747,9 @@ export const guests: Guest[] = [
   {
     name: "McAllister, Fiona",
     phone: "508.773.4456",
+    email: "fiona.mcallister@hudsonvalleypt.com",
+    city: "Montclair",
+    state: "NJ",
     totalStays: 1,
     totalRevenue: 538,
     lastStay: "2025-06-14",
@@ -675,6 +771,9 @@ export const guests: Guest[] = [
   {
     name: "Foster, Derek",
     phone: "973.115.9938",
+    email: null,
+    city: "Queens",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 498,
     lastStay: "2025-08-23",
@@ -696,6 +795,9 @@ export const guests: Guest[] = [
   {
     name: "Adebayo, Tunde",
     phone: "347.228.5501",
+    email: "tunde.adebayo@kkr.com",
+    city: "Manhattan",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 1396,
     lastStay: "2025-10-31",
@@ -717,6 +819,9 @@ export const guests: Guest[] = [
   {
     name: "Chambers, Lori",
     phone: "914.447.3320",
+    email: null,
+    city: "Brooklyn",
+    state: "NY",
     totalStays: 2,
     totalRevenue: 2180,
     lastStay: "2025-09-13",
@@ -738,6 +843,9 @@ export const guests: Guest[] = [
   {
     name: "Volkov, Dmitri",
     phone: "718.993.7748",
+    email: "dmitri.volkov@twosigma.com",
+    city: "Westchester",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 747,
     lastStay: "2025-11-16",
@@ -759,6 +867,9 @@ export const guests: Guest[] = [
   {
     name: "Santiago, Isabel",
     phone: "212.881.6632",
+    email: "isabel.santiago@pcma.org",
+    city: "Rye",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 598,
     lastStay: "2025-07-11",
@@ -780,6 +891,9 @@ export const guests: Guest[] = [
   {
     name: "Crawford, Bill",
     phone: "845.667.1109",
+    email: null,
+    city: null,
+    state: null,
     totalStays: 3,
     totalRevenue: 3570,
     lastStay: "2025-12-26",
@@ -801,6 +915,9 @@ export const guests: Guest[] = [
   {
     name: "Nguyen, Tiffany",
     phone: "929.774.2283",
+    email: "tiffany.nguyen@airbnb.com",
+    city: "Manhattan",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 538,
     lastStay: "2025-05-03",
@@ -822,6 +939,9 @@ export const guests: Guest[] = [
   {
     name: "Gallagher, Tom",
     phone: "516.882.4478",
+    email: "tom.gallagher@gallagherbuilders.com",
+    city: "Catskill",
+    state: "NY",
     totalStays: 4,
     totalRevenue: 5960,
     lastStay: "2025-10-18",
@@ -843,6 +963,9 @@ export const guests: Guest[] = [
   {
     name: "Becker, Anna",
     phone: "201.559.8814",
+    email: "anna.becker@mindfulmovementco.com",
+    city: "Tribeca",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 898,
     lastStay: "2025-08-02",
@@ -864,6 +987,9 @@ export const guests: Guest[] = [
   {
     name: "Hart, Douglas",
     phone: "845.334.0091",
+    email: null,
+    city: null,
+    state: null,
     totalStays: 2,
     totalRevenue: 1960,
     lastStay: "2025-06-29",
@@ -885,6 +1011,9 @@ export const guests: Guest[] = [
   {
     name: "Lee, Sarah",
     phone: "646.502.3319",
+    email: "sarah.lee@warbyparker.com",
+    city: "Brooklyn",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 1047,
     lastStay: "2025-12-05",
@@ -906,6 +1035,9 @@ export const guests: Guest[] = [
   {
     name: "Moretti, Giancarlo",
     phone: "914.220.5587",
+    email: "giancarlo.moretti@trattoriamoretti.com",
+    city: "Saugerties",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 598,
     lastStay: "2025-09-27",
@@ -927,6 +1059,9 @@ export const guests: Guest[] = [
   {
     name: "Shaw, Rebecca",
     phone: "203.991.7743",
+    email: "rebecca.shaw@woodstocklibrary.org",
+    city: "Phoenicia",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 498,
     lastStay: "2025-04-19",
@@ -948,6 +1083,9 @@ export const guests: Guest[] = [
   {
     name: "Ahmed, Farid",
     phone: "347.661.8804",
+    email: "farid.ahmed@cumc.columbia.edu",
+    city: "Scarsdale",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 1396,
     lastStay: "2025-10-25",
@@ -969,6 +1107,9 @@ export const guests: Guest[] = [
   {
     name: "Collins, Megan",
     phone: "917.443.2276",
+    email: "megan.collins@corepoweryoga.com",
+    city: "Great Neck",
+    state: "NY",
     totalStays: 2,
     totalRevenue: 2780,
     lastStay: "2025-11-09",
@@ -990,6 +1131,9 @@ export const guests: Guest[] = [
   {
     name: "Reeves, Craig",
     phone: "516.774.0023",
+    email: null,
+    city: null,
+    state: null,
     totalStays: 1,
     totalRevenue: 438,
     lastStay: "2025-07-26",
@@ -1011,6 +1155,9 @@ export const guests: Guest[] = [
   {
     name: "Blackwell, Simone",
     phone: "718.229.4458",
+    email: "simone.blackwell@blackwellfilms.com",
+    city: "Greenwich",
+    state: "CT",
     totalStays: 1,
     totalRevenue: 898,
     lastStay: "2025-12-21",
@@ -1032,6 +1179,9 @@ export const guests: Guest[] = [
   {
     name: "Howell, Kenneth",
     phone: "845.558.3347",
+    email: null,
+    city: "Woodstock",
+    state: "NY",
     totalStays: 3,
     totalRevenue: 3270,
     lastStay: "2025-08-16",
@@ -1053,6 +1203,9 @@ export const guests: Guest[] = [
   {
     name: "Warren, Lisa",
     phone: "212.663.9912",
+    email: "lisa.warren@nytimes.com",
+    city: "Hoboken",
+    state: "NJ",
     totalStays: 1,
     totalRevenue: 1047,
     lastStay: "2025-10-04",
@@ -1074,6 +1227,9 @@ export const guests: Guest[] = [
   {
     name: "DiMaggio, Tony",
     phone: "914.330.7765",
+    email: "tony.dimaggio@dimaggiomotors.com",
+    city: "Saugerties",
+    state: "NY",
     totalStays: 2,
     totalRevenue: 2460,
     lastStay: "2025-09-06",
@@ -1095,6 +1251,9 @@ export const guests: Guest[] = [
   {
     name: "Yoon, Grace",
     phone: "646.889.1104",
+    email: "grace.yoon@a16z.com",
+    city: "Queens",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 538,
     lastStay: "2025-06-07",
@@ -1116,6 +1275,9 @@ export const guests: Guest[] = [
   {
     name: "Campbell, Robert",
     phone: "845.774.8890",
+    email: null,
+    city: "Tannersville",
+    state: "NY",
     totalStays: 5,
     totalRevenue: 6850,
     lastStay: "2025-12-13",
@@ -1137,6 +1299,9 @@ export const guests: Guest[] = [
   {
     name: "Torres, Diana",
     phone: "929.337.5568",
+    email: "diana.torres@catskillcenter.org",
+    city: "Hunter",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 598,
     lastStay: "2025-05-10",
@@ -1158,6 +1323,9 @@ export const guests: Guest[] = [
   {
     name: "Katz, Jason",
     phone: "516.229.6631",
+    email: "jason.katz@katzfamilydental.com",
+    city: "Westchester",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 498,
     lastStay: "2025-08-30",
@@ -1179,6 +1347,9 @@ export const guests: Guest[] = [
   {
     name: "Novak, Peter",
     phone: "862.441.3309",
+    email: "peter.novak@a24films.com",
+    city: "Rye",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 1047,
     lastStay: "2025-11-28",
@@ -1200,6 +1371,9 @@ export const guests: Guest[] = [
   {
     name: "Mitchell, Sandra",
     phone: "203.882.5547",
+    email: null,
+    city: "Larchmont",
+    state: "NY",
     totalStays: 2,
     totalRevenue: 2380,
     lastStay: "2025-10-11",
@@ -1221,6 +1395,9 @@ export const guests: Guest[] = [
   {
     name: "Ruiz, Alejandro",
     phone: "347.773.9921",
+    email: "alejandro.ruiz@electricfeelstudios.com",
+    city: "Manhattan",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 898,
     lastStay: "2025-07-19",
@@ -1242,6 +1419,9 @@ export const guests: Guest[] = [
   {
     name: "Donahue, Patrick",
     phone: "914.559.0012",
+    email: "patrick.donahue@donahueassociates.com",
+    city: "Saugerties",
+    state: "NY",
     totalStays: 3,
     totalRevenue: 4170,
     lastStay: "2025-12-06",
@@ -1263,6 +1443,9 @@ export const guests: Guest[] = [
   {
     name: "Hayashi, Kenji",
     phone: "646.118.7743",
+    email: "kenji.hayashi@tesla.com",
+    city: "Tribeca",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 538,
     lastStay: "2025-09-13",
@@ -1284,6 +1467,9 @@ export const guests: Guest[] = [
   {
     name: "Powers, Linda",
     phone: "518.993.4421",
+    email: null,
+    city: null,
+    state: null,
     totalStays: 1,
     totalRevenue: 398,
     lastStay: "2025-04-05",
@@ -1305,6 +1491,9 @@ export const guests: Guest[] = [
   {
     name: "Gibson, Marcus",
     phone: "917.229.8836",
+    email: "marcus.gibson@caa.com",
+    city: "Brooklyn",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 1047,
     lastStay: "2025-11-01",
@@ -1326,6 +1515,9 @@ export const guests: Guest[] = [
   {
     name: "Quinn, Eileen",
     phone: "845.441.2278",
+    email: null,
+    city: "Catskill",
+    state: "NY",
     totalStays: 2,
     totalRevenue: 2180,
     lastStay: "2025-08-24",
@@ -1347,6 +1539,9 @@ export const guests: Guest[] = [
   {
     name: "Okafor, Chidi",
     phone: "347.554.1198",
+    email: "chidi.okafor@nomadstay.com",
+    city: "White Plains",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 898,
     lastStay: "2025-12-19",
@@ -1368,6 +1563,9 @@ export const guests: Guest[] = [
   {
     name: "Larson, Steve",
     phone: "516.663.0054",
+    email: "steve.larson@larsonmillercpa.com",
+    city: "Woodstock",
+    state: "NY",
     totalStays: 4,
     totalRevenue: 5480,
     lastStay: "2025-10-26",
@@ -1389,6 +1587,9 @@ export const guests: Guest[] = [
   {
     name: "Vasquez, Carolina",
     phone: "212.338.9907",
+    email: "carolina.vasquez@pepsico.com",
+    city: "Great Neck",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 598,
     lastStay: "2025-06-21",
@@ -1410,6 +1611,9 @@ export const guests: Guest[] = [
   {
     name: "Pike, George",
     phone: "845.882.7712",
+    email: null,
+    city: null,
+    state: null,
     totalStays: 2,
     totalRevenue: 1960,
     lastStay: "2025-07-05",
@@ -1431,6 +1635,9 @@ export const guests: Guest[] = [
   {
     name: "Cho, Mina",
     phone: "929.661.4432",
+    email: "mina.cho@frogdesign.com",
+    city: "Greenwich",
+    state: "CT",
     totalStays: 1,
     totalRevenue: 1047,
     lastStay: "2025-10-03",
@@ -1452,6 +1659,9 @@ export const guests: Guest[] = [
   {
     name: "Barrett, Kathleen",
     phone: "203.774.1165",
+    email: "kathleen.barrett@barrettvaluation.com",
+    city: "Stamford",
+    state: "CT",
     totalStays: 1,
     totalRevenue: 498,
     lastStay: "2025-05-17",
@@ -1473,6 +1683,9 @@ export const guests: Guest[] = [
   {
     name: "Hoffman, Rachel",
     phone: "718.443.5521",
+    email: "rachel.hoffman@condenast.com",
+    city: "Hoboken",
+    state: "NJ",
     totalStays: 1,
     totalRevenue: 898,
     lastStay: "2025-11-14",
@@ -1494,6 +1707,9 @@ export const guests: Guest[] = [
   {
     name: "Greco, Vincent",
     phone: "914.991.3348",
+    email: "vincent.greco@cvshealth.com",
+    city: "Montclair",
+    state: "NJ",
     totalStays: 3,
     totalRevenue: 3870,
     lastStay: "2025-12-28",
@@ -1515,6 +1731,9 @@ export const guests: Guest[] = [
   {
     name: "Sato, Hiro",
     phone: "646.772.8819",
+    email: "hiro.sato@bostondynamics.com",
+    city: "Queens",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 538,
     lastStay: "2025-08-09",
@@ -1536,6 +1755,9 @@ export const guests: Guest[] = [
   {
     name: "Kelly, Maureen",
     phone: "845.228.4467",
+    email: null,
+    city: "Woodstock",
+    state: "NY",
     totalStays: 2,
     totalRevenue: 2380,
     lastStay: "2025-09-20",
@@ -1557,6 +1779,9 @@ export const guests: Guest[] = [
   {
     name: "Bennett, Tyler",
     phone: "917.338.6657",
+    email: "tyler.bennett@suarezfamilybrewery.com",
+    city: "Kingston",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 1047,
     lastStay: "2025-10-17",
@@ -1578,6 +1803,9 @@ export const guests: Guest[] = [
   {
     name: "Price, Dorothy",
     phone: "518.662.3345",
+    email: null,
+    city: null,
+    state: null,
     totalStays: 1,
     totalRevenue: 398,
     lastStay: "2025-04-26",
@@ -1599,6 +1827,9 @@ export const guests: Guest[] = [
   {
     name: "Abrams, Leah",
     phone: "347.882.0093",
+    email: "leah.abrams@gmail.com",
+    city: "Rye",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 598,
     lastStay: "2025-11-22",
@@ -1620,6 +1851,9 @@ export const guests: Guest[] = [
   {
     name: "Petrov, Nikolai",
     phone: "718.991.4438",
+    email: "nikolai.petrov@aecom.com",
+    city: "Larchmont",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 498,
     lastStay: "2025-07-12",
@@ -1641,6 +1875,9 @@ export const guests: Guest[] = [
   {
     name: "Walsh, Bridget",
     phone: "914.663.2219",
+    email: "bridget.walsh@hss.edu",
+    city: "Manhattan",
+    state: "NY",
     totalStays: 2,
     totalRevenue: 2780,
     lastStay: "2025-12-14",
@@ -1662,6 +1899,9 @@ export const guests: Guest[] = [
   {
     name: "Monroe, David",
     phone: "845.447.8801",
+    email: null,
+    city: "Park Slope",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 438,
     lastStay: "2025-06-28",
@@ -1683,6 +1923,9 @@ export const guests: Guest[] = [
   {
     name: "Singh, Arjun",
     phone: "929.223.5541",
+    email: "arjun.singh@apollo.com",
+    city: "Tribeca",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 1396,
     lastStay: "2025-10-31",
@@ -1704,6 +1947,9 @@ export const guests: Guest[] = [
   {
     name: "Porter, Janet",
     phone: "203.559.1178",
+    email: null,
+    city: "Manhattan",
+    state: "NY",
     totalStays: 3,
     totalRevenue: 3570,
     lastStay: "2025-09-07",
@@ -1725,6 +1971,9 @@ export const guests: Guest[] = [
   {
     name: "Ortega, Mateo",
     phone: "646.774.3327",
+    email: "mateo.ortega@gmail.com",
+    city: "Brooklyn",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 898,
     lastStay: "2025-12-06",
@@ -1746,6 +1995,9 @@ export const guests: Guest[] = [
   {
     name: "Fleming, Scott",
     phone: "516.882.9934",
+    email: "scott.fleming@salesforce.com",
+    city: "Manhattan",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 598,
     lastStay: "2025-08-16",
@@ -1767,6 +2019,9 @@ export const guests: Guest[] = [
   {
     name: "Bergman, Annika",
     phone: "201.441.7762",
+    email: "annika.bergman@epa.gov",
+    city: "White Plains",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 538,
     lastStay: "2025-05-24",
@@ -1788,6 +2043,9 @@ export const guests: Guest[] = [
   {
     name: "Hawkins, Darnell",
     phone: "347.993.1182",
+    email: "darnell.hawkins@equinox.com",
+    city: "Scarsdale",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 1047,
     lastStay: "2025-11-08",
@@ -1809,6 +2067,9 @@ export const guests: Guest[] = [
   {
     name: "Stone, Margaret",
     phone: "845.334.5568",
+    email: "margaret.stone@stonegallerywoodstock.com",
+    city: "Hunter",
+    state: "NY",
     totalStays: 4,
     totalRevenue: 5160,
     lastStay: "2025-12-21",
@@ -1830,6 +2091,9 @@ export const guests: Guest[] = [
   {
     name: "Young, Andre",
     phone: "917.110.4489",
+    email: "andre.young@bronxacademyofletters.org",
+    city: "Manhasset",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 498,
     lastStay: "2025-07-05",
@@ -1851,6 +2115,9 @@ export const guests: Guest[] = [
   {
     name: "Magnusson, Erik",
     phone: "718.557.2213",
+    email: "erik.magnusson@mvvainc.com",
+    city: "Greenwich",
+    state: "CT",
     totalStays: 1,
     totalRevenue: 898,
     lastStay: "2025-10-18",
@@ -1872,6 +2139,9 @@ export const guests: Guest[] = [
   {
     name: "Cooper, Denise",
     phone: "914.228.3341",
+    email: null,
+    city: "Stamford",
+    state: "CT",
     totalStays: 2,
     totalRevenue: 2180,
     lastStay: "2025-09-14",
@@ -1893,6 +2163,9 @@ export const guests: Guest[] = [
   {
     name: "Keane, Ryan",
     phone: "646.339.7756",
+    email: "ryan.keane@theadventurepod.com",
+    city: "Hoboken",
+    state: "NJ",
     totalStays: 1,
     totalRevenue: 1047,
     lastStay: "2025-12-01",
@@ -1920,6 +2193,9 @@ export const guests: Guest[] = [
   {
     name: "Lang, Christine",
     phone: "203.882.0056",
+    email: "christine.lang@wholehealthnutrition.com",
+    city: "Montclair",
+    state: "NJ",
     totalStays: 1,
     totalRevenue: 538,
     lastStay: "2025-06-13",
@@ -1941,6 +2217,9 @@ export const guests: Guest[] = [
   {
     name: "Marshall, Wayne",
     phone: "845.991.6678",
+    email: null,
+    city: "Phoenicia",
+    state: "NY",
     totalStays: 3,
     totalRevenue: 3870,
     lastStay: "2025-11-23",
@@ -1962,6 +2241,9 @@ export const guests: Guest[] = [
   {
     name: "Andersen, Mia",
     phone: "929.447.8821",
+    email: "mia.andersen@mckinsey.com",
+    city: "Manhattan",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 598,
     lastStay: "2025-08-02",
@@ -1983,6 +2265,9 @@ export const guests: Guest[] = [
   {
     name: "Schultz, Gary",
     phone: "516.330.1147",
+    email: null,
+    city: null,
+    state: null,
     totalStays: 1,
     totalRevenue: 398,
     lastStay: "2025-04-12",
@@ -2004,6 +2289,9 @@ export const guests: Guest[] = [
   {
     name: "Dubois, Camille",
     phone: "212.661.3398",
+    email: "camille.dubois@lelabofragrances.com",
+    city: "Westchester",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 1396,
     lastStay: "2025-10-05",
@@ -2025,6 +2313,9 @@ export const guests: Guest[] = [
   {
     name: "Mooney, Jack",
     phone: "845.557.4429",
+    email: "jack.mooney@catskillflyfishing.com",
+    city: "Windham",
+    state: "NY",
     totalStays: 5,
     totalRevenue: 7450,
     lastStay: "2025-12-27",
@@ -2046,6 +2337,9 @@ export const guests: Guest[] = [
   {
     name: "Franklin, Amy",
     phone: "917.774.5563",
+    email: "amy.franklin@nychealthandhospitals.org",
+    city: "Larchmont",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 498,
     lastStay: "2025-05-31",
@@ -2067,6 +2361,9 @@ export const guests: Guest[] = [
   {
     name: "Eriksson, Lars",
     phone: "646.993.2247",
+    email: "lars.eriksson@windhammountain.com",
+    city: "Kingston",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 898,
     lastStay: "2025-11-15",
@@ -2088,6 +2385,9 @@ export const guests: Guest[] = [
   {
     name: "Palmer, Joan",
     phone: "203.441.8834",
+    email: null,
+    city: "Park Slope",
+    state: "NY",
     totalStays: 2,
     totalRevenue: 2380,
     lastStay: "2025-10-19",
@@ -2109,6 +2409,9 @@ export const guests: Guest[] = [
   {
     name: "Cross, Damien",
     phone: "347.118.6694",
+    email: "damien.cross@pentagram.com",
+    city: "Tribeca",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 1047,
     lastStay: "2025-07-26",
@@ -2130,6 +2433,9 @@ export const guests: Guest[] = [
   {
     name: "Thornton, Richard",
     phone: "914.663.0025",
+    email: null,
+    city: "Manhattan",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 438,
     lastStay: "2025-09-06",
@@ -2151,6 +2457,9 @@ export const guests: Guest[] = [
   {
     name: "Wu, Kevin",
     phone: "929.882.3316",
+    email: "kevin.wu@datadoghq.com",
+    city: "Brooklyn",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 538,
     lastStay: "2025-12-13",
@@ -2172,6 +2481,9 @@ export const guests: Guest[] = [
   {
     name: "McGuire, Colleen",
     phone: "845.774.2298",
+    email: "colleen.mcguire@thecatskilllodge.com",
+    city: "Catskill",
+    state: "NY",
     totalStays: 3,
     totalRevenue: 3570,
     lastStay: "2025-11-02",
@@ -2193,6 +2505,9 @@ export const guests: Guest[] = [
   {
     name: "Pham, Linh",
     phone: "646.447.9928",
+    email: "linh.pham@tasteofnewyork.com",
+    city: "White Plains",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 898,
     lastStay: "2025-08-23",
@@ -2219,6 +2534,9 @@ export const guests: Guest[] = [
   {
     name: "Gregory, Donald",
     phone: "518.339.0012",
+    email: null,
+    city: null,
+    state: null,
     totalStays: 1,
     totalRevenue: 398,
     lastStay: "2025-04-19",
@@ -2240,6 +2558,9 @@ export const guests: Guest[] = [
   {
     name: "Ellis, Shannon",
     phone: "201.882.7743",
+    email: "shannon.ellis@clubpilates.com",
+    city: "Great Neck",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 1047,
     lastStay: "2025-10-11",
@@ -2261,6 +2582,9 @@ export const guests: Guest[] = [
   {
     name: "Moran, Patrick",
     phone: "914.221.5589",
+    email: "patrick.moran@saugertiesfd.com",
+    city: "Saugerties",
+    state: "NY",
     totalStays: 2,
     totalRevenue: 2460,
     lastStay: "2025-09-28",
@@ -2282,6 +2606,9 @@ export const guests: Guest[] = [
   {
     name: "Tancredi, Maria",
     phone: "212.559.8812",
+    email: "maria.tancredi@saksfifthavenue.com",
+    city: "Greenwich",
+    state: "CT",
     totalStays: 1,
     totalRevenue: 598,
     lastStay: "2025-06-07",
@@ -2303,6 +2630,9 @@ export const guests: Guest[] = [
   {
     name: "Gray, Harold",
     phone: "845.663.1156",
+    email: null,
+    city: "Stamford",
+    state: "CT",
     totalStays: 4,
     totalRevenue: 5480,
     lastStay: "2025-12-20",
@@ -2324,6 +2654,9 @@ export const guests: Guest[] = [
   {
     name: "Stein, Rebecca",
     phone: "929.774.5541",
+    email: "rebecca.stein@burke.org",
+    city: "Hoboken",
+    state: "NJ",
     totalStays: 1,
     totalRevenue: 498,
     lastStay: "2025-07-19",
@@ -2345,6 +2678,9 @@ export const guests: Guest[] = [
   {
     name: "Santos, Miguel",
     phone: "718.338.0091",
+    email: "miguel.santos@elevenmadisonpark.com",
+    city: "Montclair",
+    state: "NJ",
     totalStays: 1,
     totalRevenue: 1396,
     lastStay: "2025-11-29",
@@ -2366,6 +2702,9 @@ export const guests: Guest[] = [
   {
     name: "Ingram, Wendy",
     phone: "203.993.4456",
+    email: null,
+    city: null,
+    state: null,
     totalStays: 1,
     totalRevenue: 438,
     lastStay: "2025-05-10",
@@ -2387,6 +2726,9 @@ export const guests: Guest[] = [
   {
     name: "Rosen, Daniel",
     phone: "646.220.8837",
+    email: "daniel.rosen@citadel.com",
+    city: "Manhattan",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 898,
     lastStay: "2025-10-04",
@@ -2408,6 +2750,9 @@ export const guests: Guest[] = [
   {
     name: "Phillips, Carol",
     phone: "845.447.2234",
+    email: null,
+    city: "Brooklyn",
+    state: "NY",
     totalStays: 2,
     totalRevenue: 2180,
     lastStay: "2025-08-30",
@@ -2429,6 +2774,9 @@ export const guests: Guest[] = [
   {
     name: "Bhatt, Vikram",
     phone: "347.661.3315",
+    email: "vikram.bhatt@google.com",
+    city: "Westchester",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 1047,
     lastStay: "2025-12-08",
@@ -2450,6 +2798,9 @@ export const guests: Guest[] = [
   {
     name: "Leonard, Sheila",
     phone: "914.882.6678",
+    email: "sheila.leonard@whitecase.com",
+    city: "Rye",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 538,
     lastStay: "2025-06-21",
@@ -2471,6 +2822,9 @@ export const guests: Guest[] = [
   {
     name: "Burke, Sean",
     phone: "516.993.4409",
+    email: "sean.burke@burkelandscapes.com",
+    city: "Tannersville",
+    state: "NY",
     totalStays: 3,
     totalRevenue: 4170,
     lastStay: "2025-11-16",
@@ -2492,6 +2846,9 @@ export const guests: Guest[] = [
   {
     name: "Castillo, Elena",
     phone: "212.447.2205",
+    email: "elena.castillo@sunshinesachs.com",
+    city: "Manhattan",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 598,
     lastStay: "2025-08-09",
@@ -2513,6 +2870,9 @@ export const guests: Guest[] = [
   {
     name: "Newton, Henry",
     phone: "845.228.7741",
+    email: null,
+    city: null,
+    state: null,
     totalStays: 1,
     totalRevenue: 398,
     lastStay: "2025-04-05",
@@ -2534,6 +2894,9 @@ export const guests: Guest[] = [
   {
     name: "Chang, Wendy",
     phone: "929.553.1168",
+    email: "wendy.chang@sequoiacap.com",
+    city: "Tribeca",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 1047,
     lastStay: "2025-10-25",
@@ -2555,6 +2918,9 @@ export const guests: Guest[] = [
   {
     name: "Doyle, Kevin",
     phone: "914.559.3312",
+    email: "kevin.doyle@kingstoncityschools.org",
+    city: "Woodstock",
+    state: "NY",
     totalStays: 2,
     totalRevenue: 2780,
     lastStay: "2025-12-06",
@@ -2576,6 +2942,9 @@ export const guests: Guest[] = [
   {
     name: "Lindqvist, Astrid",
     phone: "646.881.0094",
+    email: "astrid.lindqvist@elledecor.com",
+    city: "Brooklyn",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 898,
     lastStay: "2025-07-11",
@@ -2603,6 +2972,9 @@ export const guests: Guest[] = [
   {
     name: "Russo, Anthony",
     phone: "845.662.8809",
+    email: null,
+    city: "Saugerties",
+    state: "NY",
     totalStays: 6,
     totalRevenue: 8340,
     lastStay: "2025-12-28",
@@ -2624,6 +2996,9 @@ export const guests: Guest[] = [
   {
     name: "Segal, Nina",
     phone: "212.993.5547",
+    email: "nina.segal@gmail.com",
+    city: "White Plains",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 538,
     lastStay: "2025-09-13",
@@ -2645,6 +3020,9 @@ export const guests: Guest[] = [
   {
     name: "Patterson, Earl",
     phone: "518.441.2267",
+    email: null,
+    city: null,
+    state: null,
     totalStays: 1,
     totalRevenue: 398,
     lastStay: "2025-04-26",
@@ -2666,6 +3044,9 @@ export const guests: Guest[] = [
   {
     name: "Yamamoto, Saki",
     phone: "347.774.8836",
+    email: "saki.yamamoto@studiosaki.com",
+    city: "Great Neck",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 1396,
     lastStay: "2025-11-01",
@@ -2687,6 +3068,9 @@ export const guests: Guest[] = [
   {
     name: "Nolan, Brendan",
     phone: "914.773.0028",
+    email: "brendan.nolan@nolanwoodworks.com",
+    city: "Catskill",
+    state: "NY",
     totalStays: 2,
     totalRevenue: 2460,
     lastStay: "2025-10-18",
@@ -2708,6 +3092,9 @@ export const guests: Guest[] = [
   {
     name: "Reed, Angela",
     phone: "917.441.3378",
+    email: "angela.reed@diaart.org",
+    city: "Greenwich",
+    state: "CT",
     totalStays: 1,
     totalRevenue: 598,
     lastStay: "2025-06-28",
@@ -2729,6 +3116,9 @@ export const guests: Guest[] = [
   {
     name: "Beck, Jonathan",
     phone: "646.335.9914",
+    email: "jonathan.beck@beckdevgroup.com",
+    city: "Stamford",
+    state: "CT",
     totalStays: 1,
     totalRevenue: 898,
     lastStay: "2025-12-19",
@@ -2750,6 +3140,9 @@ export const guests: Guest[] = [
   {
     name: "Garza, Lucia",
     phone: "718.883.4421",
+    email: "lucia.garza@ogilvy.com",
+    city: "Hoboken",
+    state: "NJ",
     totalStays: 1,
     totalRevenue: 498,
     lastStay: "2025-08-16",
@@ -2771,6 +3164,9 @@ export const guests: Guest[] = [
   {
     name: "Fitzgerald, Owen",
     phone: "845.559.7712",
+    email: null,
+    city: "Saugerties",
+    state: "NY",
     totalStays: 2,
     totalRevenue: 2180,
     lastStay: "2025-09-21",
@@ -2792,6 +3188,9 @@ export const guests: Guest[] = [
   {
     name: "Park, Eunji",
     phone: "929.228.3305",
+    email: "eunji.park@dominiqueansel.com",
+    city: "Queens",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 1047,
     lastStay: "2025-10-31",
@@ -2813,6 +3212,9 @@ export const guests: Guest[] = [
   {
     name: "Hudson, Frank",
     phone: "516.774.1189",
+    email: null,
+    city: null,
+    state: null,
     totalStays: 1,
     totalRevenue: 438,
     lastStay: "2025-05-17",
@@ -2834,6 +3236,9 @@ export const guests: Guest[] = [
   {
     name: "Mason, Olivia",
     phone: "212.882.7765",
+    email: "olivia.mason@gramercytavern.com",
+    city: "Brooklyn",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 538,
     lastStay: "2025-11-08",
@@ -2855,6 +3260,9 @@ export const guests: Guest[] = [
   {
     name: "Brady, Collin",
     phone: "845.993.0056",
+    email: "collin.brady@bradyelectric.com",
+    city: "Catskill",
+    state: "NY",
     totalStays: 4,
     totalRevenue: 5960,
     lastStay: "2025-12-14",
@@ -2876,6 +3284,9 @@ export const guests: Guest[] = [
   {
     name: "Klein, Maya",
     phone: "929.661.2209",
+    email: "maya.klein@figma.com",
+    city: "Rye",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 898,
     lastStay: "2025-07-05",
@@ -2897,6 +3308,9 @@ export const guests: Guest[] = [
   {
     name: "Hampton, Bruce",
     phone: "914.330.4412",
+    email: null,
+    city: "Larchmont",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 498,
     lastStay: "2025-09-27",
@@ -2918,6 +3332,9 @@ export const guests: Guest[] = [
   {
     name: "Takahashi, Ren",
     phone: "646.554.7743",
+    email: "ren.takahashi@rga.com",
+    city: "Manhattan",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 1396,
     lastStay: "2025-10-17",
@@ -2939,6 +3356,9 @@ export const guests: Guest[] = [
   {
     name: "Griffin, Maureen",
     phone: "845.441.5567",
+    email: null,
+    city: "Park Slope",
+    state: "NY",
     totalStays: 3,
     totalRevenue: 3270,
     lastStay: "2025-11-30",
@@ -2960,6 +3380,9 @@ export const guests: Guest[] = [
   {
     name: "Harris, Jerome",
     phone: "347.993.4438",
+    email: "jerome.harris@mtvernoncsd.org",
+    city: "Tribeca",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 598,
     lastStay: "2025-06-14",
@@ -2981,6 +3404,9 @@ export const guests: Guest[] = [
   {
     name: "Weaver, Patty",
     phone: "203.662.8845",
+    email: "patty.weaver@catskillmountainflorals.com",
+    city: "Tannersville",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 498,
     lastStay: "2025-08-02",
@@ -3002,6 +3428,9 @@ export const guests: Guest[] = [
   {
     name: "Zimmerman, Max",
     phone: "917.773.1102",
+    email: "max.zimmerman@rei.com",
+    city: "Brooklyn",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 1047,
     lastStay: "2025-12-26",
@@ -3023,6 +3452,9 @@ export const guests: Guest[] = [
   {
     name: "Carpenter, Diane",
     phone: "845.228.0034",
+    email: null,
+    city: "Manhattan",
+    state: "NY",
     totalStays: 2,
     totalRevenue: 2460,
     lastStay: "2025-10-05",
@@ -3044,6 +3476,9 @@ export const guests: Guest[] = [
   {
     name: "Min, David",
     phone: "646.991.8824",
+    email: "david.min@patagonia.com",
+    city: "White Plains",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 898,
     lastStay: "2025-09-06",
@@ -3065,6 +3500,9 @@ export const guests: Guest[] = [
   {
     name: "Feeney, Lorraine",
     phone: "518.884.3367",
+    email: null,
+    city: null,
+    state: null,
     totalStays: 1,
     totalRevenue: 398,
     lastStay: "2025-04-12",
@@ -3086,6 +3524,9 @@ export const guests: Guest[] = [
   {
     name: "Brooks, Tyrell",
     phone: "347.229.6615",
+    email: "tyrell.brooks@gmail.com",
+    city: "Great Neck",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 538,
     lastStay: "2025-11-22",
@@ -3107,6 +3548,9 @@ export const guests: Guest[] = [
   {
     name: "Sweeney, Kathleen",
     phone: "845.662.4423",
+    email: "kathleen.sweeney@phoeniciainn.com",
+    city: "Saugerties",
+    state: "NY",
     totalStays: 5,
     totalRevenue: 6850,
     lastStay: "2025-12-07",
@@ -3128,6 +3572,9 @@ export const guests: Guest[] = [
   {
     name: "Green, Marcus",
     phone: "929.447.1107",
+    email: "marcus.green@catskillmtb.com",
+    city: "Phoenicia",
+    state: "NY",
     totalStays: 1,
     totalRevenue: 1047,
     lastStay: "2025-07-26",
@@ -3149,6 +3596,9 @@ export const guests: Guest[] = [
   {
     name: "Oberman, Claire",
     phone: "212.662.5538",
+    email: "claire.oberman@wk.com",
+    city: "Stamford",
+    state: "CT",
     totalStays: 1,
     totalRevenue: 598,
     lastStay: "2025-10-11",
