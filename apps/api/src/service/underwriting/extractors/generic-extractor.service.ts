@@ -1,10 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { generateObject } from 'ai';
-import { anthropic } from '@ai-sdk/anthropic';
 import { z } from 'zod';
 import { S3Service } from '../../s3/s3.service';
 import { ClassifiedDocument } from './document-classifier.service';
 import { excelToText, GenericExtraction } from './extraction-types';
+import { extractorModel } from '../model-config';
 
 const GenericExtractionSchema = z.object({
   fields: z.array(
@@ -23,13 +23,19 @@ export class GenericExtractorService {
 
   constructor(private readonly s3Service: S3Service) {}
 
-  async extract(doc: ClassifiedDocument, neededFields: string[]): Promise<GenericExtraction> {
+  async extract(
+    doc: ClassifiedDocument,
+    neededFields: string[],
+  ): Promise<GenericExtraction> {
     this.logger.log(
       `[generic-extractor] Extracting ${neededFields.length} fields from "${doc.filename}"`,
     );
 
     if (neededFields.length === 0) {
-      return { fields: [], flags: ['No proforma fields configured — nothing to extract'] };
+      return {
+        fields: [],
+        flags: ['No proforma fields configured — nothing to extract'],
+      };
     }
 
     const fieldList = neededFields.map((f) => `- ${f}`).join('\n');
@@ -60,7 +66,7 @@ Rules:
       ];
 
       const { object } = await generateObject({
-        model: anthropic('claude-sonnet-4-6'),
+        model: extractorModel(),
         schema: GenericExtractionSchema,
         system,
         messages: [{ role: 'user', content: content as any }],
@@ -76,10 +82,13 @@ Rules:
     const buffer = await this.s3Service.downloadDealAttachment(doc.s3Key);
     const rawText = excelToText(buffer);
     const MAX_CHARS = 120_000;
-    const text = rawText.length > MAX_CHARS ? rawText.slice(0, MAX_CHARS) + '\n\n[... truncated ...]' : rawText;
+    const text =
+      rawText.length > MAX_CHARS
+        ? rawText.slice(0, MAX_CHARS) + '\n\n[... truncated ...]'
+        : rawText;
 
     const { object } = await generateObject({
-      model: anthropic('claude-sonnet-4-6'),
+      model: extractorModel(),
       schema: GenericExtractionSchema,
       system,
       messages: [

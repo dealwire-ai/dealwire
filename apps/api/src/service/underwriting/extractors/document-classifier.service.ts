@@ -1,8 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { generateObject } from 'ai';
-import { anthropic } from '@ai-sdk/anthropic';
 import { z } from 'zod';
 import { S3Service } from '../../s3/s3.service';
+import { classifierModel } from '../model-config';
 import { UnderwritingDocument } from '../underwriting-orchestrator.service';
 
 export type DocumentType = 'om' | 'rent-roll' | 't12' | 'proforma' | 'other';
@@ -20,7 +20,9 @@ const ClassificationSchema = z.object({
       'om = Offering Memorandum, rent-roll = Rent Roll / Schedule of Rent, t12 = Trailing 12-Month Financials, proforma = Pro Forma template, other = anything else',
     ),
   confidence: z.number().min(0).max(1).describe('Confidence score 0–1'),
-  reasoning: z.string().describe('Brief explanation of classification decision'),
+  reasoning: z
+    .string()
+    .describe('Brief explanation of classification decision'),
 });
 
 const SYSTEM_PROMPT = `You are classifying commercial real estate documents for underwriting analysis.
@@ -43,11 +45,15 @@ export class DocumentClassifierService {
   /**
    * Classify all documents in parallel. Each document gets its own Claude Haiku call.
    */
-  async classify(documents: UnderwritingDocument[]): Promise<ClassifiedDocument[]> {
+  async classify(
+    documents: UnderwritingDocument[],
+  ): Promise<ClassifiedDocument[]> {
     return Promise.all(documents.map((doc) => this.classifyOne(doc)));
   }
 
-  private async classifyOne(doc: UnderwritingDocument): Promise<ClassifiedDocument> {
+  private async classifyOne(
+    doc: UnderwritingDocument,
+  ): Promise<ClassifiedDocument> {
     const isPdf =
       doc.contentType === 'application/pdf' ||
       doc.filename.toLowerCase().endsWith('.pdf');
@@ -65,7 +71,11 @@ export class DocumentClassifierService {
       if (isPdf) {
         try {
           const buffer = await this.s3Service.downloadDealAttachment(doc.s3Key);
-          content.unshift({ type: 'file', data: buffer, mimeType: 'application/pdf' });
+          content.unshift({
+            type: 'file',
+            data: buffer,
+            mimeType: 'application/pdf',
+          });
         } catch (err) {
           const msg = err instanceof Error ? err.message : String(err);
           this.logger.warn(
@@ -75,7 +85,7 @@ export class DocumentClassifierService {
       }
 
       const { object } = await generateObject({
-        model: anthropic('claude-haiku-4-5-20251001'),
+        model: classifierModel(),
         schema: ClassificationSchema,
         system: SYSTEM_PROMPT,
         messages: [{ role: 'user', content: content as any }],

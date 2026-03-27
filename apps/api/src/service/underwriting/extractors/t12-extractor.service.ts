@@ -1,9 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { generateObject } from 'ai';
-import { anthropic } from '@ai-sdk/anthropic';
 import { S3Service } from '../../s3/s3.service';
+import { extractorModel } from '../model-config';
 import { ClassifiedDocument } from './document-classifier.service';
-import { T12ExtractionSchema, T12Extraction, excelToText } from './extraction-types';
+import {
+  T12ExtractionSchema,
+  T12Extraction,
+  excelToText,
+} from './extraction-types';
 
 const SYSTEM_PROMPT = `You are an expert real estate underwriter extracting annual income and expense figures from a T-12 (Trailing 12-Month) financial statement.
 
@@ -27,7 +31,10 @@ export class T12ExtractorService {
 
   constructor(private readonly s3Service: S3Service) {}
 
-  async extract(doc: ClassifiedDocument, neededFields?: string[]): Promise<T12Extraction> {
+  async extract(
+    doc: ClassifiedDocument,
+    neededFields?: string[],
+  ): Promise<T12Extraction> {
     this.logger.log(`[t12-extractor] Extracting from "${doc.filename}"`);
 
     const isPdf =
@@ -49,7 +56,7 @@ export class T12ExtractorService {
       ];
 
       const { object } = await generateObject({
-        model: anthropic('claude-sonnet-4-6'),
+        model: extractorModel(),
         schema: T12ExtractionSchema,
         system: SYSTEM_PROMPT,
         messages: [{ role: 'user', content: content as any }],
@@ -67,7 +74,7 @@ export class T12ExtractorService {
     const text = excelToText(buffer);
 
     const { object } = await generateObject({
-      model: anthropic('claude-sonnet-4-6'),
+      model: extractorModel(),
       schema: T12ExtractionSchema,
       system: SYSTEM_PROMPT,
       messages: [
