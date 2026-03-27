@@ -1,7 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { SqsMessageHandler, SqsConsumerEventHandler } from '@ssut/nestjs-sqs';
 import { Message } from '@aws-sdk/client-sqs';
-import { UnderwritingOrchestratorService, UnderwritingJobContext } from './underwriting-orchestrator.service';
+import {
+  UnderwritingOrchestratorService,
+  UnderwritingJobContext,
+} from './underwriting-orchestrator.service';
 
 export interface UnderwritingJobMessage {
   type: 'underwriting-job';
@@ -33,7 +36,9 @@ export class UnderwritingListenerService {
     try {
       parsed = JSON.parse(message.Body) as UnderwritingJobMessage;
     } catch {
-      this.logger.error('Failed to parse underwriting message body — discarding');
+      this.logger.error(
+        'Failed to parse underwriting message body — discarding',
+      );
       return;
     }
 
@@ -42,9 +47,17 @@ export class UnderwritingListenerService {
       return;
     }
 
-    if (!parsed.dealId || !parsed.orgId || !parsed.documents?.length || !parsed.senderEmail) {
-      this.logger.error(`Invalid underwriting message — missing required fields: ${message.Body}`);
+    if (!parsed.dealId || !parsed.documents?.length || !parsed.senderEmail) {
+      this.logger.error(
+        `Invalid underwriting message — missing required fields: ${message.Body}`,
+      );
       return;
+    }
+
+    if (!parsed.orgId) {
+      this.logger.warn(
+        `[${parsed.dealId}] No orgId — pipeline will run but pro forma fill will be skipped`,
+      );
     }
 
     this.logger.log(
