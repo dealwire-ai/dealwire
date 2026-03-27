@@ -56,12 +56,22 @@ echo "Sending underwriting test to $UNDERWRITING_EMAIL..."
 echo "  From: $FROM_NAME <$FROM_ADDR>"
 echo "  Files: ${#FILES[@]}"
 
-# Build attachments JSON array
-ATTACHMENTS="["
-FIRST=true
+# Build request JSON using temp files (large PDFs exceed arg limits)
+TMPDIR=$(mktemp -d)
+trap "rm -rf $TMPDIR" EXIT
+
+# Start with base request
+jq -n \
+  --arg from "$FROM_NAME <$FROM_ADDR>" \
+  --arg to "$UNDERWRITING_EMAIL" \
+  --arg subject "underwrite" \
+  --arg html "<p>Please underwrite the attached deal documents.</p>" \
+  '{from: $from, to: [$to], subject: $subject, html: $html, attachments: []}' \
+  > "$TMPDIR/request.json"
+
 for f in "${FILES[@]}"; do
   FILENAME=$(basename "$f")
-  CONTENT=$(base64 < "$f")
+  base64 < "$f" > "$TMPDIR/b64.txt"
 
   # Determine MIME type
   EXT="${FILENAME##*.}"
@@ -73,36 +83,24 @@ for f in "${FILES[@]}"; do
     *) MIME="application/octet-stream" ;;
   esac
 
-  if [ "$FIRST" = true ]; then
-    FIRST=false
-  else
-    ATTACHMENTS+=","
-  fi
-  # Use jq to safely encode the base64 content into JSON
-  ATTACHMENT=$(jq -n \
-    --arg fn "$FILENAME" \
-    --arg content "$CONTENT" \
-    --arg type "$MIME" \
-    '{filename: $fn, content: $content, type: $type}')
-  ATTACHMENTS+="$ATTACHMENT"
+  # Build attachment object from file (avoids arg length limits)
+  jq -n --arg fn "$FILENAME" --arg type "$MIME" --rawfile content "$TMPDIR/b64.txt" \
+    '{filename: $fn, content: ($content | rtrimstr("\n")), type: $type}' > "$TMPDIR/att.json"
+
+  # Append to request
+  jq --slurpfile att "$TMPDIR/att.json" '.attachments += $att' "$TMPDIR/request.json" \
+    > "$TMPDIR/request2.json" && mv "$TMPDIR/request2.json" "$TMPDIR/request.json"
+
   echo "    - $FILENAME ($MIME)"
 done
-ATTACHMENTS+="]"
 
-# Build the full request body with jq
-BODY=$(jq -n \
-  --arg from "$FROM_NAME <$FROM_ADDR>" \
-  --arg to "$UNDERWRITING_EMAIL" \
-  --arg subject "underwrite" \
-  --arg html "<p>Please underwrite the attached deal documents.</p>" \
-  --argjson attachments "$ATTACHMENTS" \
-  '{from: $from, to: [$to], subject: $subject, html: $html, attachments: $attachments}')
+BODY_FILE="$TMPDIR/request.json"
 
 HTTP_CODE=$(curl -s -o /tmp/resend-uw-response.json -w "%{http_code}" \
   -X POST "https://api.resend.com/emails" \
   -H "Authorization: Bearer $RESEND_API_KEY" \
   -H "Content-Type: application/json" \
-  -d "$BODY")
+  -d @"$BODY_FILE")
 
 RESPONSE=$(cat /tmp/resend-uw-response.json)
 
