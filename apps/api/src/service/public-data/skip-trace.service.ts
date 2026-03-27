@@ -462,7 +462,9 @@ export class SkipTraceService {
       await this.prisma.parcel.updateMany({
         where: { bbl },
         data: {
-          ownerPhones: phones as unknown as object[],
+          ...(phones.length > 0 && {
+            ownerPhones: phones as unknown as object[],
+          }),
           ...(emails.length > 0 && { ownerEmails: emails }),
           skipTraceStatus: 'found',
           skipTracedAt: now,
@@ -681,30 +683,34 @@ export class SkipTraceService {
     const emails: string[] = [];
 
     for (const owner of owners) {
-      const entity = owner.person || owner.business;
-      if (!entity) continue;
+      // Process both person and business entities (not just one)
+      const entities = [owner.person, owner.business].filter(
+        Boolean,
+      ) as SkipSherpaPerson[];
 
-      // Phones
-      for (const ph of entity.phone_numbers || []) {
-        const number = ph.local_format || ph.e164_format || '';
-        if (!number || seen.has(number)) continue;
-        seen.add(number);
+      for (const entity of entities) {
+        // Phones
+        for (const ph of entity.phone_numbers || []) {
+          const number = ph.local_format || ph.e164_format || '';
+          if (!number || seen.has(number)) continue;
+          seen.add(number);
 
-        const isDnc = ph.dnc_statuses?.[0]?.is_dnc ?? undefined;
+          const isDnc = ph.dnc_statuses?.[0]?.is_dnc ?? undefined;
 
-        phones.push({
-          number,
-          type: ph.type || 'unknown',
-          rank: phones.length + 1,
-          source: 'skipsherpa',
-          isDnc,
-        });
-      }
+          phones.push({
+            number,
+            type: ph.type || 'unknown',
+            rank: phones.length + 1,
+            source: 'skipsherpa',
+            isDnc,
+          });
+        }
 
-      // Emails
-      for (const em of entity.emails || []) {
-        if (em.email_address && !emails.includes(em.email_address)) {
-          emails.push(em.email_address);
+        // Emails
+        for (const em of entity.emails || []) {
+          if (em.email_address && !emails.includes(em.email_address)) {
+            emails.push(em.email_address);
+          }
         }
       }
     }
