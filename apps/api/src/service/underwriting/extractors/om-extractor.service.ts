@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { generateObject } from 'ai';
 import { S3Service } from '../../s3/s3.service';
-import { extractorModel } from '../model-config';
+import { extractorModel, pdfExtractorModel } from '../model-config';
 import { ClassifiedDocument } from './document-classifier.service';
 import {
   OMExtractionSchema,
@@ -13,10 +13,14 @@ const SYSTEM_PROMPT = `You are an expert real estate underwriter extracting key 
 
 Extract all values exactly as stated in the document. If a value is not present, return null. Do not infer or calculate values unless you explicitly flag the derivation in the flags array.
 
-Percentage values: return as decimals (6.5% = 0.065, 95% = 0.95).
-Dollar values: return raw numbers without formatting (1,500,000 = 1500000).
-Cap rate: always decimal form.
-If NOI is not stated but price and cap rate are, you may compute NOI = price × capRate and add a flag.
+- propertyName: the property/community name (e.g. "Preston Gardens Apartments"). Not the address.
+- propertyAddress: the street address (e.g. "11011 Preston Gardens Ct").
+- city, state, zipCode: parsed from the address or header.
+- Percentage values: return as decimals (6.5% = 0.065, 95% = 0.95).
+- Dollar values: return raw numbers without formatting (1,500,000 = 1500000).
+- Cap rate: always decimal form.
+- If the listing price says "Request for Offer", "Call for Pricing", or similar — set askingPrice to null.
+- If NOI is not stated but price and cap rate are, you may compute NOI = price × capRate and add a flag.
 
 Set confidence (0–1) based on how complete and unambiguous the document is.
 Add descriptive flags for any assumptions, derivations, or data quality issues.`;
@@ -66,7 +70,7 @@ export class OMExtractorService {
     }
 
     const { object } = await generateObject({
-      model: extractorModel(),
+      model: isPdf ? pdfExtractorModel() : extractorModel(),
       schema: OMExtractionSchema,
       system: SYSTEM_PROMPT,
       messages: [{ role: 'user', content: content as any }],
