@@ -166,6 +166,17 @@ After implementing any feature, API change, or architectural change — update t
 
 ## Git & PRs
 
+### Branch Hygiene
+
+Before starting any new work, **always fetch and update `main`**:
+
+```bash
+git fetch origin main
+git checkout main && git pull origin main
+```
+
+Then create a new feature branch off the updated `main`. Never branch off a stale `main` or off another feature branch unless intentional. This prevents PRs from carrying commits that already landed on `main`.
+
 ### Commit Messages
 
 Use **Conventional Commits** format: `type: short description`
