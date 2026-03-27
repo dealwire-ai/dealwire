@@ -23,12 +23,13 @@ gdrive files export <fileId> /tmp/tax-lien-doc.txt
 
 ## Meeting Transcripts
 
-| Date | Link                                                                       | Notes                                                             |
-| ---- | -------------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| 2/4  | [Granola](https://notes.granola.ai/t/648f69bf-f9af-439c-9ff5-74ac5d8ff6fb) | Data demo                                                         |
-| 2/12 | [Granola](https://notes.granola.ai/t/873b558a-84ce-4bd6-bd9f-5cb1fea9f91b) | Scope & lis pendens                                               |
-| 3/4  | [Granola](https://notes.granola.ai/d/c7f8f518-3326-49ee-9ef0-ec825441e010) | Platform demo & feedback                                          |
-| 3/18 | [Granola](https://notes.granola.ai/d/2abfddfa-4aa4-4907-b692-8de662169bd8) | Live testing & UX feedback. Platform transitioning to active use. |
+| Date | Link                                                                       | Notes                                                                                                                          |
+| ---- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| 2/4  | [Granola](https://notes.granola.ai/t/648f69bf-f9af-439c-9ff5-74ac5d8ff6fb) | Data demo                                                                                                                      |
+| 2/12 | [Granola](https://notes.granola.ai/t/873b558a-84ce-4bd6-bd9f-5cb1fea9f91b) | Scope & lis pendens                                                                                                            |
+| 3/4  | [Granola](https://notes.granola.ai/d/c7f8f518-3326-49ee-9ef0-ec825441e010) | Platform demo & feedback                                                                                                       |
+| 3/18 | [Granola](https://notes.granola.ai/d/2abfddfa-4aa4-4907-b692-8de662169bd8) | Live testing & UX feedback. Platform transitioning to active use.                                                              |
+| 3/25 | No transcript (transcription disabled)                                     | Weekly update. Shipped contact tracking + custom lists. Skip tracing provider discussion. ATTOM API outreach. Phase 2 payment. |
 
 ## Related Project Docs
 
