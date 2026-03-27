@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useRef, useEffect } from "react";
+import { useState, useMemo, useRef, useEffect, Fragment } from "react";
 import { DashboardPageShell } from "@/components/dashboard-page-shell";
 import { Badge } from "@/components/ui/badge";
 import { guests, type Guest } from "./data";
@@ -131,6 +131,9 @@ export default function DDHADemoPage() {
     | "nextArrival"
   >("vipScore");
   const [sortAsc, setSortAsc] = useState(false);
+
+  // Expandable row
+  const [expandedRow, setExpandedRow] = useState<string | null>(null);
 
   // Chat
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -463,6 +466,7 @@ export default function DDHADemoPage() {
             <table className="w-full text-sm">
               <thead className="sticky top-0 bg-zinc-900 z-10">
                 <tr className="border-b border-zinc-800/60">
+                  <th className="w-8 px-1 py-2" />
                   <th className="text-left px-3 py-2 text-[10px] uppercase tracking-wider text-zinc-600 font-mono font-medium">
                     Guest
                   </th>
@@ -508,66 +512,319 @@ export default function DDHADemoPage() {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((guest, i) => (
-                  <tr
-                    key={`${guest.name}-${i}`}
-                    className="border-b border-zinc-800/30 hover:bg-zinc-800/20 transition-colors"
-                  >
-                    <td className="px-3 py-2">
-                      <div>
-                        <span className="text-zinc-300 font-medium">
-                          {guest.name}
-                        </span>
-                        <p className="text-[10px] text-zinc-600 font-mono">
-                          {guest.phone}
-                          {guest.ageEstimate && ` · ~${guest.ageEstimate}y`}
-                        </p>
-                      </div>
-                    </td>
-                    <td className="px-3 py-2">
-                      {guest.occupation ? (
-                        <div>
-                          <span className="text-zinc-400 text-xs">
-                            {guest.occupation}
-                          </span>
-                          {guest.company && (
-                            <p className="text-[10px] text-zinc-600">
-                              {guest.company}
+                {filtered.map((guest, i) => {
+                  const isExpanded = expandedRow === guest.name;
+                  return (
+                    <Fragment key={`${guest.name}-${i}`}>
+                      <tr
+                        className="border-b border-zinc-800/30 hover:bg-zinc-800/20 transition-colors cursor-pointer"
+                        onClick={() =>
+                          setExpandedRow(isExpanded ? null : guest.name)
+                        }
+                      >
+                        <td className="w-8 px-1 py-2 text-center">
+                          <svg
+                            className={`w-3.5 h-3.5 text-zinc-600 transition-transform mx-auto ${isExpanded ? "rotate-90" : ""}`}
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth={2}
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M9 5l7 7-7 7"
+                            />
+                          </svg>
+                        </td>
+                        <td className="px-3 py-2">
+                          <div>
+                            <span className="text-[#C8A96E] hover:text-[#d4b87a] font-medium cursor-pointer">
+                              {guest.name}
+                            </span>
+                            <p className="text-[10px] text-zinc-600 font-mono">
+                              {guest.phone}
+                              {guest.ageEstimate && ` · ~${guest.ageEstimate}y`}
                             </p>
+                          </div>
+                        </td>
+                        <td className="px-3 py-2">
+                          {guest.occupation ? (
+                            <div>
+                              <span className="text-zinc-400 text-xs">
+                                {guest.occupation}
+                              </span>
+                              {guest.company && (
+                                <p className="text-[10px] text-zinc-600">
+                                  {guest.company}
+                                </p>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="text-zinc-700 text-xs italic">
+                              not enriched
+                            </span>
                           )}
-                        </div>
-                      ) : (
-                        <span className="text-zinc-700 text-xs italic">
-                          not enriched
-                        </span>
+                        </td>
+                        <td className="px-3 py-2 text-center text-zinc-500 font-mono text-xs">
+                          {guest.totalStays}
+                        </td>
+                        <td className="px-3 py-2 text-right text-zinc-500 font-mono text-xs">
+                          ${guest.totalRevenue.toLocaleString()}
+                        </td>
+                        <td className="px-3 py-2 text-zinc-500 text-xs font-mono">
+                          {guest.nextArrival}
+                          <span className="text-zinc-700 ml-1">
+                            ({guest.bookingLeadDays}d lead)
+                          </span>
+                        </td>
+                        <td className="px-3 py-2 text-zinc-600 text-xs font-mono">
+                          {guest.roomType}
+                        </td>
+                        <td className="px-3 py-2 text-center">
+                          <SegmentBadge segment={guest.guestSegment} />
+                        </td>
+                        <td className="px-3 py-2 text-center">
+                          <EnrichmentBadge score={guest.enrichmentScore} />
+                        </td>
+                        <td className="px-3 py-2 text-center">
+                          <VipBadge score={guest.vipScore} />
+                        </td>
+                      </tr>
+                      {isExpanded && (
+                        <tr>
+                          <td
+                            colSpan={10}
+                            className="bg-zinc-950/50 p-0 transition-all duration-200"
+                          >
+                            <div className="border-l-2 border-[#C8A96E] pl-4 py-4 pr-4">
+                              <div className="grid grid-cols-3 gap-6 text-sm">
+                                {/* Contact Info */}
+                                <div>
+                                  <div className="text-zinc-400 mb-2 font-medium text-xs uppercase tracking-wider">
+                                    Contact Info
+                                  </div>
+                                  <div className="space-y-1">
+                                    <div>
+                                      <span className="text-zinc-500">
+                                        Phone:{" "}
+                                      </span>
+                                      <a
+                                        href={`tel:${guest.phone.replace(/\./g, "")}`}
+                                        className="text-zinc-300 hover:text-[#C8A96E]"
+                                        onClick={(e) => e.stopPropagation()}
+                                      >
+                                        {guest.phone}
+                                      </a>
+                                    </div>
+                                    <div>
+                                      <span className="text-zinc-500">
+                                        Email:{" "}
+                                      </span>
+                                      {guest.email ? (
+                                        <a
+                                          href={`mailto:${guest.email}`}
+                                          className="text-zinc-300 hover:text-[#C8A96E]"
+                                          onClick={(e) => e.stopPropagation()}
+                                        >
+                                          {guest.email}
+                                        </a>
+                                      ) : (
+                                        <span className="text-zinc-700 italic">
+                                          not enriched
+                                        </span>
+                                      )}
+                                    </div>
+                                    {(guest.city || guest.state) && (
+                                      <div>
+                                        <span className="text-zinc-500">
+                                          Location:{" "}
+                                        </span>
+                                        <span className="text-zinc-300">
+                                          {[guest.city, guest.state]
+                                            .filter(Boolean)
+                                            .join(", ")}
+                                        </span>
+                                      </div>
+                                    )}
+                                    <div>
+                                      <span className="text-zinc-500">
+                                        LinkedIn:{" "}
+                                      </span>
+                                      {guest.linkedinUrl ? (
+                                        <a
+                                          href={guest.linkedinUrl}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="text-zinc-300 hover:text-[#C8A96E]"
+                                          onClick={(e) => e.stopPropagation()}
+                                        >
+                                          Profile →
+                                        </a>
+                                      ) : (
+                                        <span className="text-zinc-700 italic">
+                                          not found
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* Guest Profile */}
+                                <div>
+                                  <div className="text-zinc-400 mb-2 font-medium text-xs uppercase tracking-wider">
+                                    Guest Profile
+                                  </div>
+                                  <div className="space-y-1">
+                                    <div>
+                                      <span className="text-zinc-500">
+                                        Occupation:{" "}
+                                      </span>
+                                      <span className="text-zinc-300">
+                                        {guest.occupation ?? (
+                                          <span className="text-zinc-700 italic">
+                                            unknown
+                                          </span>
+                                        )}
+                                      </span>
+                                    </div>
+                                    {guest.company && (
+                                      <div>
+                                        <span className="text-zinc-500">
+                                          Company:{" "}
+                                        </span>
+                                        <span className="text-zinc-300">
+                                          {guest.company}
+                                        </span>
+                                      </div>
+                                    )}
+                                    {guest.ageEstimate && (
+                                      <div>
+                                        <span className="text-zinc-500">
+                                          Est. Age:{" "}
+                                        </span>
+                                        <span className="text-zinc-300">
+                                          ~{guest.ageEstimate}
+                                        </span>
+                                      </div>
+                                    )}
+                                    <div>
+                                      <span className="text-zinc-500">
+                                        Social Presence:{" "}
+                                      </span>
+                                      <span className="text-zinc-300 capitalize">
+                                        {guest.socialPresence}
+                                      </span>
+                                    </div>
+                                    <div className="flex items-center gap-1.5 mt-1">
+                                      <span className="text-zinc-500">
+                                        Segment:{" "}
+                                      </span>
+                                      <SegmentBadge
+                                        segment={guest.guestSegment}
+                                      />
+                                    </div>
+                                    {guest.tags.length > 0 && (
+                                      <div className="flex flex-wrap gap-1 mt-2">
+                                        {guest.tags.map((tag) => (
+                                          <Badge
+                                            key={tag}
+                                            className="bg-zinc-800/50 text-zinc-500 border-zinc-700/50 text-[10px]"
+                                          >
+                                            {tag}
+                                          </Badge>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+
+                                {/* Stay History */}
+                                <div>
+                                  <div className="text-zinc-400 mb-2 font-medium text-xs uppercase tracking-wider">
+                                    Stay History
+                                  </div>
+                                  <div className="space-y-1">
+                                    <div>
+                                      <span className="text-zinc-500">
+                                        Total Stays:{" "}
+                                      </span>
+                                      <span className="text-zinc-300">
+                                        {guest.totalStays}
+                                      </span>
+                                    </div>
+                                    <div>
+                                      <span className="text-zinc-500">
+                                        Total Revenue:{" "}
+                                      </span>
+                                      <span className="text-zinc-300">
+                                        ${guest.totalRevenue.toLocaleString()}
+                                      </span>
+                                    </div>
+                                    <div>
+                                      <span className="text-zinc-500">
+                                        Last Stay:{" "}
+                                      </span>
+                                      <span className="text-zinc-300">
+                                        {guest.lastStay}
+                                      </span>
+                                    </div>
+                                    <div>
+                                      <span className="text-zinc-500">
+                                        Next Arrival:{" "}
+                                      </span>
+                                      <span className="text-zinc-300">
+                                        {guest.nextArrival} · {guest.nights}n
+                                      </span>
+                                    </div>
+                                    <div>
+                                      <span className="text-zinc-500">
+                                        Nightly Rate:{" "}
+                                      </span>
+                                      <span className="text-zinc-300">
+                                        ${guest.nightlyRate}
+                                      </span>
+                                    </div>
+                                    <div>
+                                      <span className="text-zinc-500">
+                                        Room Type:{" "}
+                                      </span>
+                                      <span className="text-zinc-300 font-mono">
+                                        {guest.roomType}
+                                      </span>
+                                    </div>
+                                    <div>
+                                      <span className="text-zinc-500">
+                                        Booking Lead:{" "}
+                                      </span>
+                                      <span className="text-zinc-300">
+                                        {guest.bookingLeadDays} days
+                                      </span>
+                                    </div>
+                                    <div className="flex items-center gap-2 mt-2">
+                                      <span className="text-zinc-500">
+                                        VIP:{" "}
+                                      </span>
+                                      <VipBadge score={guest.vipScore} />
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-zinc-500">
+                                        Enrichment:{" "}
+                                      </span>
+                                      <EnrichmentBadge
+                                        score={guest.enrichmentScore}
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
                       )}
-                    </td>
-                    <td className="px-3 py-2 text-center text-zinc-500 font-mono text-xs">
-                      {guest.totalStays}
-                    </td>
-                    <td className="px-3 py-2 text-right text-zinc-500 font-mono text-xs">
-                      ${guest.totalRevenue.toLocaleString()}
-                    </td>
-                    <td className="px-3 py-2 text-zinc-500 text-xs font-mono">
-                      {guest.nextArrival}
-                      <span className="text-zinc-700 ml-1">
-                        ({guest.bookingLeadDays}d lead)
-                      </span>
-                    </td>
-                    <td className="px-3 py-2 text-zinc-600 text-xs font-mono">
-                      {guest.roomType}
-                    </td>
-                    <td className="px-3 py-2 text-center">
-                      <SegmentBadge segment={guest.guestSegment} />
-                    </td>
-                    <td className="px-3 py-2 text-center">
-                      <EnrichmentBadge score={guest.enrichmentScore} />
-                    </td>
-                    <td className="px-3 py-2 text-center">
-                      <VipBadge score={guest.vipScore} />
-                    </td>
-                  </tr>
-                ))}
+                    </Fragment>
+                  );
+                })}
               </tbody>
             </table>
           </div>
