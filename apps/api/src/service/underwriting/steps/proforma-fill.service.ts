@@ -153,11 +153,12 @@ export class ProformaFillService {
     // (e.g. 'state' matching "Real Estate", 'city' matching "Electricity").
     // Uses (?<![a-zA-Z]) / (?![a-zA-Z]) instead of \b to handle patterns
     // starting with non-word chars like "# of units".
+    // Tolerates trailing plural 's' (e.g. "contract" matches "contracts").
     const trySet = (patterns: string[], value: number | string | null) => {
       if (value === null || value === undefined) return;
       for (const pattern of patterns) {
         const escaped = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const re = new RegExp(`(?<![a-zA-Z])${escaped}(?![a-zA-Z])`, 'i');
+        const re = new RegExp(`(?<![a-zA-Z])${escaped}s?(?![a-zA-Z])`, 'i');
         for (const [lower, actual] of fieldNameLookup) {
           if (re.test(lower)) {
             map.set(actual, value);
@@ -181,7 +182,10 @@ export class ProformaFillService {
         om.zipCode ??
           (om.propertyAddress ? this.extractZip(om.propertyAddress) : null),
       );
-      trySet(['total units', 'number of units', '# of units'], om.totalUnits);
+      trySet(
+        ['units unrenovated', 'total units', 'number of units', '# of units'],
+        om.totalUnits,
+      );
       trySet(['rentable sf', 'total sf', 'rentable square'], om.totalSqFt);
       trySet(['year built'], om.yearBuilt);
       trySet(
@@ -194,7 +198,10 @@ export class ProformaFillService {
     // Rent roll data
     if (rentRoll) {
       if (!om?.totalUnits && rentRoll.totalUnits) {
-        trySet(['total units', 'number of units'], rentRoll.totalUnits);
+        trySet(
+          ['units unrenovated', 'total units', 'number of units'],
+          rentRoll.totalUnits,
+        );
       }
       trySet(['physical vacancy'], rentRoll.vacancyRate);
     }
@@ -203,7 +210,16 @@ export class ProformaFillService {
     if (t12) {
       trySet(['property tax', 'real estate tax', 'taxes'], t12.taxes);
       trySet(['property insurance', 'insurance'], t12.insurance);
-      trySet(['management fee', 'property management'], t12.managementFees);
+      // Management fee as dollar amount for expense fields
+      trySet(
+        ['management fee annual', 'property management annual'],
+        t12.managementFees,
+      );
+      // Management fee as percentage for percentage fields
+      if (t12.managementFees && t12.effectiveGrossIncome) {
+        const mgmtPct = t12.managementFees / t12.effectiveGrossIncome;
+        trySet(['management fee percentage'], mgmtPct);
+      }
       trySet(['administrative', 'admin'], t12.administrative);
       trySet(['waste', 'trash'], t12.wasteDisposal);
       trySet(
@@ -231,6 +247,11 @@ export class ProformaFillService {
       trySet(['garage rent', 'parking income'], t12.garageRent);
       trySet(['pet rent'], t12.petRent);
       trySet(['other income'], t12.otherIncome);
+      trySet(
+        ['gross rental income', 'gross potential rent'],
+        t12.grossRentalIncome,
+      );
+      trySet(['effective gross income', 'egi'], t12.effectiveGrossIncome);
     }
 
     // Normalized / reconciled
@@ -420,7 +441,13 @@ export class ProformaFillService {
 For each field, find the best matching value from the extraction data.
 Return null if no confident match exists. Use numbers for numeric fields (not strings).
 Do not invent values — only use what's present in the extraction data.
-For percentage fields (vacancy, cap rate, expense ratios), return as decimals (e.g. 0.05 for 5%).`,
+For percentage fields (vacancy, cap rate, expense ratios), return as decimals (e.g. 0.05 for 5%).
+
+IMPORTANT: Return null for fields that are investor assumptions or projections, NOT extractable
+from deal documents. These include: loan terms (interest rates, amortization, LTV), renovation costs,
+closing costs, fee percentages, growth rates, discount rates, exit cap rates, stabilization timelines,
+disposition years, CAPEX reserves, and any field about future projections. Only map fields where the
+extraction data contains a clear, factual match.`,
           messages: [
             {
               role: 'user',
