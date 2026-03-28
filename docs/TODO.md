@@ -5,6 +5,7 @@
 - play around with pinchfin
 - Send David prospect list (with George from Kings Cap)
 - Get back to Alex Gibson
+- Pay Taxes (4/15)
 
 ## Biz Dev
 - quick demo for Thomas Dolan
