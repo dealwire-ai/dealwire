@@ -1,15 +1,13 @@
 # TODO
 
 ## General Ops
-
 - make a really strong, energetic e2e demo (deal screening, underwriting, (and optionally) IC report generation)
 - play around with pinchfin
 - Send David prospect list (with George from Kings Cap)
+- Get back to Alex Gibson
 
 ## Biz Dev
-
 - quick demo for Thomas Dolan
-- one-pager for Jamie Gull
 
 ## Deal Screener
 
