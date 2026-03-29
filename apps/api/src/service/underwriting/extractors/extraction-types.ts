@@ -21,14 +21,25 @@ export function excelToText(buffer: Buffer): string {
  * Use this for template field scanning — CSV loses row numbers, causing
  * Claude to misidentify cell addresses.
  */
-export function excelToTextWithCellRefs(buffer: Buffer): string {
+export function excelToTextWithCellRefs(
+  buffer: Buffer,
+  options?: { inputSheetsOnly?: boolean },
+): string {
   const workbook = XLSX.read(buffer, { type: 'buffer' });
-  return workbook.SheetNames.map((sheetName) => {
+  const filterInputOnly = options?.inputSheetsOnly ?? false;
+
+  const sheets: string[] = [];
+
+  for (const sheetName of workbook.SheetNames) {
     const ws = workbook.Sheets[sheetName];
-    if (!ws['!ref']) return `=== Sheet: ${sheetName} ===\n(empty)`;
+    if (!ws['!ref']) {
+      if (!filterInputOnly) sheets.push(`=== Sheet: ${sheetName} ===\n(empty)`);
+      continue;
+    }
 
     const range = XLSX.utils.decode_range(ws['!ref']);
     const lines: string[] = [];
+    let hasInputCells = false;
 
     for (let R = range.s.r; R <= range.e.r; R++) {
       const rowCells: string[] = [];
@@ -36,15 +47,22 @@ export function excelToTextWithCellRefs(buffer: Buffer): string {
         const ref = XLSX.utils.encode_cell({ r: R, c: C });
         const cell = ws[ref];
         if (cell && cell.v !== undefined && cell.v !== '') {
-          const tag = cell.f ? '(formula)' : '';
+          const isFormula = !!cell.f;
+          if (!isFormula) hasInputCells = true;
+          const tag = isFormula ? '(formula)' : '';
           rowCells.push(`${ref}${tag}:"${cell.v}"`);
         }
       }
       if (rowCells.length > 0) lines.push(rowCells.join('  '));
     }
 
-    return `=== Sheet: ${sheetName} ===\n${lines.join('\n')}`;
-  }).join('\n\n');
+    // When filtering, skip sheets that have only formula cells (no inputs to fill)
+    if (filterInputOnly && !hasInputCells) continue;
+
+    sheets.push(`=== Sheet: ${sheetName} ===\n${lines.join('\n')}`);
+  }
+
+  return sheets.join('\n\n');
 }
 
 // ─── OM ───────────────────────────────────────────────────────────────────────

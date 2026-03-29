@@ -1,8 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { generateObject } from 'ai';
 import { anthropic } from '@ai-sdk/anthropic';
-import * as XLSX from 'xlsx';
 import { CellMappingSchema, CellMappings, DealAnalysis } from './agentic-types';
+import { excelToTextWithCellRefs } from '../extractors/extraction-types';
 
 const SYSTEM_PROMPT = `You are mapping commercial real estate deal data into a pro forma Excel template.
 
@@ -35,7 +35,9 @@ export class TemplateFillerService {
     templateBuffer: Buffer,
     dealId: string,
   ): Promise<CellMappings> {
-    const templateText = this.serializeTemplate(templateBuffer);
+    const templateText = excelToTextWithCellRefs(templateBuffer, {
+      inputSheetsOnly: true,
+    });
 
     this.logger.log(
       `[${dealId}] Template serialized: ${templateText.length.toLocaleString()} chars`,
@@ -61,45 +63,5 @@ export class TemplateFillerService {
     );
 
     return object;
-  }
-
-  /**
-   * Serialize the Excel template to text with cell references,
-   * filtering out sheets that contain ONLY formula cells (no inputs to fill).
-   */
-  private serializeTemplate(buffer: Buffer): string {
-    const workbook = XLSX.read(buffer, { type: 'buffer' });
-    const sheets: string[] = [];
-
-    for (const sheetName of workbook.SheetNames) {
-      const ws = workbook.Sheets[sheetName];
-      if (!ws['!ref']) continue;
-
-      const range = XLSX.utils.decode_range(ws['!ref']);
-      const lines: string[] = [];
-      let hasInputCells = false;
-
-      for (let R = range.s.r; R <= range.e.r; R++) {
-        const rowCells: string[] = [];
-        for (let C = range.s.c; C <= range.e.c; C++) {
-          const ref = XLSX.utils.encode_cell({ r: R, c: C });
-          const cell = ws[ref];
-          if (cell && cell.v !== undefined && cell.v !== '') {
-            const isFormula = !!cell.f;
-            const tag = isFormula ? '(formula)' : '';
-            if (!isFormula) hasInputCells = true;
-            rowCells.push(`${ref}${tag}:"${cell.v}"`);
-          }
-        }
-        if (rowCells.length > 0) lines.push(rowCells.join('  '));
-      }
-
-      // Only include sheets that have at least one non-formula cell
-      if (hasInputCells && lines.length > 0) {
-        sheets.push(`=== Sheet: ${sheetName} ===\n${lines.join('\n')}`);
-      }
-    }
-
-    return sheets.join('\n\n');
   }
 }
