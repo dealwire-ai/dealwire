@@ -71,9 +71,9 @@
 │   │  │  SQSService.enqueueNormalizedEmail() ──────────────────────┐         │  │  │
 │   │  │                                                            │         │  │  │
 │   │  │                                            ┌───────────────┼──────┐  │  │  │
-│   │  │                                            │   AWS SQS     │      │  │  │  │
-│   │  │                                            │   normalized- │      │  │  │  │
-│   │  │                                            │   email queue │      │  │  │  │
+│   │  │                                            │   AWS SQS     │      │  │  │
+│   │  │                                            │   normalized- │      │  │  │
+│   │  │                                            │   email queue │      │  │  │
 │   │  │                                            └───────────────┼──────┘  │  │  │
 │   │  │                                                            │         │  │  │
 │   │  │  NormalizedEmailListenerService ◄──────────────────────────┘         │  │  │
@@ -92,6 +92,18 @@
 │   │  │                                                                      │  │  │
 │   │  └──────────────────────────────────────────────────────────────────────┘  │  │
 │   │                                                                            │  │
+│   │  ┌─────────────────────── Underwriting Pipeline ──────────────────────┐  │  │
+│   │  │                                                                      │  │  │
+│   │  │  Resend inbound webhook (OM received)                                │  │  │
+│   │  │    │                                                                 │  │  │
+│   │  │    ▼                                                                 │  │  │
+│   │  │  SQS queue ──► UnderwritingService                                   │  │  │
+│   │  │    ├── Extract deal terms (Anthropic Claude)                          │  │  │
+│   │  │    ├── Fill pro forma template                                       │  │  │
+│   │  │    └── Deliver Excel via email                                       │  │  │
+│   │  │                                                                      │  │  │
+│   │  └──────────────────────────────────────────────────────────────────────┘  │  │
+│   │                                                                            │  │
 │   │  ┌─────────────────────── AI / Agent Layer ─────────────────────────────┐  │  │
 │   │  │                                                                      │  │  │
 │   │  │  AnalyzerAgentService (unified agent for chat + email replies)       │  │  │
@@ -105,6 +117,10 @@
 │   │  │  SodaAdapter ──► NycIngestionService ──► DistressScoringService      │  │  │
 │   │  │  (generic         (tax liens, PLUTO,      (compute 0-100 scores)     │  │  │
 │   │  │   Socrata client)  HPD violations)                                   │  │  │
+│   │  │                                                                      │  │  │
+│   │  │  NyctlAdapter (NYCTL tax lien sale lists)                            │  │  │
+│   │  │  CareScraperAdapter (CARE property data)                             │  │  │
+│   │  │  SkipTraceAdapter (owner/contact lookup)                             │  │  │
 │   │  │                                                                      │  │  │
 │   │  │  ParcelQueryService (filter, paginate, export)                       │  │  │
 │   │  │                                                                      │  │  │
@@ -124,18 +140,18 @@
 │                                                                                   │
 └───────────────────────────────┬───────────────────────────────────────────────────┘
                                 │
-                ┌───────────────┼───────────────┐
-                │               │               │
-                ▼               ▼               ▼
-     ┌────────────────┐ ┌────────────┐ ┌──────────────┐
-     │   PostgreSQL   │ │  AWS S3    │ │   OpenAI     │
-     │   (Supabase)   │ │            │ │  gpt-4o-mini │
-     │                │ │  Document  │ │              │
-     │  Users         │ │  storage   │ │  Deal detect │
-     │  Organizations │ │  (attach-  │ │  Summarize   │
-     │  Deals         │ │   ments)   │ │  Screen      │
-     │  Screenings    │ │            │ │  Agent chat  │
-     │  Assets        │ └────────────┘ └──────────────┘
+                ┌───────────────┼───────────────┬───────────────┐
+                │               │               │               │
+                ▼               ▼               ▼               ▼
+     ┌────────────────┐ ┌────────────┐ ┌──────────────┐ ┌──────────────┐
+     │   PostgreSQL   │ │  AWS S3    │ │   OpenAI     │ │  Anthropic   │
+     │   (Supabase)   │ │            │ │  gpt-4o-mini │ │  Claude      │
+     │                │ │  Document  │ │              │ │              │
+     │  Users         │ │  storage   │ │  Deal detect │ │  Underwrite  │
+     │  Organizations │ │  (attach-  │ │  Summarize   │ │  Extract     │
+     │  Deals         │ │   ments)   │ │  Screen      │ │  terms       │
+     │  Screenings    │ │            │ │  Agent chat  │ │              │
+     │  Assets        │ └────────────┘ └──────────────┘ └──────────────┘
      │  Contacts      │
      │  Parcels       │        ┌──────────────┐
      │  Documents     │        │   Resend     │
