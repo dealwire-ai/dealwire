@@ -73,7 +73,7 @@ function NavLink({ item, collapsed }: { item: NavItem; collapsed: boolean }) {
     <Link
       href={item.href}
       className={`group flex items-center gap-2.5 rounded-md text-[13px] transition-all ${
-        collapsed ? "px-3 py-2 justify-center" : "px-3 py-1.5"
+        collapsed ? "px-3 py-2" : "px-3 py-1.5"
       } ${
         isActive
           ? "bg-zinc-800 text-white font-medium"
@@ -227,9 +227,7 @@ export function Sidebar() {
           </Link>
           <button
             onClick={toggleCollapsed}
-            className={`cursor-pointer text-zinc-600 hover:text-zinc-300 transition-colors rounded-md p-0.5 hover:bg-zinc-800 ${
-              collapsed ? "mx-auto" : "ml-auto"
-            }`}
+            className="cursor-pointer text-zinc-600 hover:text-zinc-300 transition-colors rounded-md p-0.5 hover:bg-zinc-800 ml-auto"
           >
             {collapsed ? (
               <PanelLeftOpen className="w-5 h-5" />
