@@ -297,16 +297,18 @@ export class ProformaFillService {
     const unitMix = this.aggregateUnitMix(rentRoll);
     if (unitMix.length === 0) return 0;
 
-    // The Unit Mix sheet has rows starting at row 2 (row 1 is headers).
-    // Columns: A=Unit Name, C=Beds, D=Baths, F=SF/Unit, G=Units, I=Rent/Unit
-    const startRow = 2; // 1-indexed, row after headers
-    const maxRows = 20;
-    const unitMixCols = ['A', 'C', 'D', 'F', 'G', 'I'];
+    // Template layout (Fern Forest): rows 2-3 are headers, data in rows 4-31.
+    // Row 32 = Totals (SUM formulas), Row 33 = Averages.
+    // Columns: B=Unit Name, D=Beds, E=Baths, G=SF/Unit, H=Units, J=Rent/Unit
+    // Columns I (Total SF), K (Total Rent) are formulas — don't overwrite.
+    const startRow = 4; // first data row (rows 2-3 are headers)
+    const maxRows = 28; // rows 4-31
+    const clearCols = ['B', 'C', 'D', 'E', 'G', 'H', 'J'];
 
-    // Clear existing rows first to prevent stale template data
+    // Clear existing data rows to prevent stale template data
     for (let i = 0; i < maxRows; i++) {
       const row = startRow + i;
-      for (const col of unitMixCols) {
+      for (const col of clearCols) {
         try {
           sheet.cell(`${col}${row}`).value('');
         } catch {
@@ -321,12 +323,12 @@ export class ProformaFillService {
       const row = startRow + i;
       const mix = unitMix[i];
       try {
-        sheet.cell(`A${row}`).value(`${mix.beds}BR/${mix.baths}BA`);
-        sheet.cell(`C${row}`).value(`${mix.beds} Bed(s)`);
-        sheet.cell(`D${row}`).value(`${mix.baths} Bath(s)`);
-        sheet.cell(`F${row}`).value(Math.round(mix.sqFt));
-        sheet.cell(`G${row}`).value(mix.units);
-        sheet.cell(`I${row}`).value(Math.round(mix.avgRent));
+        sheet.cell(`B${row}`).value(`${mix.beds}BR/${mix.baths}BA`);
+        sheet.cell(`D${row}`).value(mix.beds);
+        sheet.cell(`E${row}`).value(mix.baths);
+        sheet.cell(`G${row}`).value(Math.round(mix.sqFt));
+        sheet.cell(`H${row}`).value(mix.units);
+        sheet.cell(`J${row}`).value(Math.round(mix.avgRent));
         cellsWritten += 6;
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
