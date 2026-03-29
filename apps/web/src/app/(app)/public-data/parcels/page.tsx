@@ -230,7 +230,7 @@ export default function ParcelsPage() {
                     <div className="mt-3 pt-3 border-t border-zinc-800">
                       <div className="flex items-center gap-3">
                         <span className="text-xs text-zinc-400 w-44 shrink-0">
-                          Monthly Quota
+                          Monthly Skip Tracing Quota
                         </span>
                         <div className="flex-1 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
                           <div
