@@ -15,6 +15,8 @@ import { useApi } from "@/hooks/use-api";
 interface BatchSkipTraceButtonProps {
   selectedBbls: Set<string>;
   onQueued: () => void;
+  quotaRemaining?: number;
+  quotaLimit?: number;
 }
 
 type ButtonState = "idle" | "confirming" | "loading" | "queued" | "error";
@@ -22,6 +24,8 @@ type ButtonState = "idle" | "confirming" | "loading" | "queued" | "error";
 export function BatchSkipTraceButton({
   selectedBbls,
   onQueued,
+  quotaRemaining,
+  quotaLimit,
 }: BatchSkipTraceButtonProps) {
   const { apiCall } = useApi();
   const [state, setState] = useState<ButtonState>("idle");
@@ -33,6 +37,7 @@ export function BatchSkipTraceButton({
 
   const count = selectedBbls.size;
   const estimatedCost = (count * 0.02).toFixed(2);
+  const overQuota = quotaRemaining !== undefined && count > quotaRemaining;
 
   async function handleConfirm() {
     setState("loading");
@@ -107,6 +112,24 @@ export function BatchSkipTraceButton({
                 <span className="text-zinc-300">$0.02 / record</span>
               </div>
             </div>
+            {quotaRemaining !== undefined && quotaLimit !== undefined && (
+              <div className="flex justify-between text-xs">
+                <span className="text-zinc-400">Monthly quota</span>
+                <span
+                  className={
+                    overQuota ? "text-red-400 font-medium" : "text-zinc-300"
+                  }
+                >
+                  {quotaLimit - quotaRemaining} / {quotaLimit} used
+                </span>
+              </div>
+            )}
+            {overQuota && (
+              <p className="text-red-400 text-xs">
+                Exceeds remaining quota ({quotaRemaining} traces left this
+                month). Select fewer parcels.
+              </p>
+            )}
             {errorMsg && <p className="text-red-400 text-xs">{errorMsg}</p>}
           </div>
 
@@ -125,7 +148,7 @@ export function BatchSkipTraceButton({
             <Button
               size="sm"
               onClick={handleConfirm}
-              disabled={state === "loading"}
+              disabled={state === "loading" || overQuota}
               className="bg-[#C8A96E] hover:bg-[#b8996e] text-black"
             >
               {state === "loading" ? "Submitting..." : "Confirm"}

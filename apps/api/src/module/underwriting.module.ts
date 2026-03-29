@@ -15,10 +15,10 @@ import { UnderwritingDevController } from '../controller/underwriting/underwriti
 import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
 import { PrismaModule } from './prisma.module';
 import { S3Module } from './s3.module';
-import { EmailServicesModule } from './email.module';
+import { EmailModule } from './email.module';
 
 @Module({
-  imports: [PrismaModule, S3Module, EmailServicesModule],
+  imports: [PrismaModule, S3Module, EmailModule],
   controllers: [ProformaController, UnderwritingDevController],
   providers: [
     ClerkAuthGuard,

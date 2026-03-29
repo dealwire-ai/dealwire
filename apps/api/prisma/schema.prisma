@@ -416,6 +416,9 @@ model Parcel {
 
   // Property list assignments (org-specific categorization)
   listAssignments  ParcelListAssignment[]
+
+  // Org-scoped skip trace access (tracks which orgs have "unlocked" this parcel's contact data)
+  orgSkipTraces  OrgSkipTrace[]
 }
 
 enum ParcelListType {
@@ -436,6 +439,18 @@ model ParcelListAssignment {
 
   @@unique([parcelId, organizationId])
   @@index([organizationId, listType])
+  @@index([parcelId])
+}
+
+model OrgSkipTrace {
+  id             String   @id @default(cuid())
+  parcelId       String
+  parcel         Parcel   @relation(fields: [parcelId], references: [id], onDelete: Cascade)
+  organizationId String
+  tracedAt       DateTime @default(now())
+
+  @@unique([parcelId, organizationId])
+  @@index([organizationId, tracedAt])
   @@index([parcelId])
 }
 

@@ -418,6 +418,14 @@ export class PublicDataController {
     });
   }
 
+  @Get('parcels/skip-trace/usage')
+  async getSkipTraceUsage(
+    @AuthUser('organizationId') organizationId: string | null,
+  ) {
+    await this.assertParcelsEnabled(organizationId);
+    return this.skipTrace.getOrgUsageInfo(organizationId!);
+  }
+
   @Get('parcels/:bbl')
   async getParcel(
     @AuthUser('organizationId') organizationId: string | null,
@@ -425,7 +433,10 @@ export class PublicDataController {
   ) {
     await this.assertParcelsEnabled(organizationId);
 
-    const parcel = await this.parcelQuery.getParcelByBbl(bbl);
+    const parcel = await this.parcelQuery.getParcelByBbl(
+      bbl,
+      organizationId ?? undefined,
+    );
     if (!parcel) {
       throw new HttpException('Parcel not found', HttpStatus.NOT_FOUND);
     }
@@ -451,12 +462,17 @@ export class PublicDataController {
 
     let result: { queueId: string; queued: string[]; skipped: number };
     try {
-      result = await this.skipTrace.submitBatch(body.bbls, body.force ?? false);
+      result = await this.skipTrace.submitBatch(
+        body.bbls,
+        organizationId!,
+        body.force ?? false,
+      );
     } catch (err) {
       const message = (err as Error).message;
       if (
         message.includes('credit cap') ||
-        message.includes('already traced')
+        message.includes('already traced') ||
+        message.includes('skip trace limit')
       ) {
         throw new HttpException(message, HttpStatus.TOO_MANY_REQUESTS);
       }
@@ -473,8 +489,10 @@ export class PublicDataController {
       throw new HttpException(message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    // Fire-and-forget polling
-    this.skipTrace.pollAndStore(result.queueId, result.queued);
+    // Fire-and-forget polling (only if there are queued items)
+    if (result.queued.length > 0 && result.queueId !== 'cache') {
+      this.skipTrace.pollAndStore(result.queueId, result.queued);
+    }
 
     return {
       queued: result.queued.length,
@@ -494,14 +512,17 @@ export class PublicDataController {
 
     let result: { queueId: string; queued: string[]; skipped: number };
     try {
-      // Use enqueue to buffer single-BBL requests and flush as one batch,
-      // avoiding Tracerfy's rate limit on multiple 1-row uploads
-      result = await this.skipTrace.enqueue(bbl, body.force ?? false);
+      result = await this.skipTrace.enqueue(
+        bbl,
+        organizationId!,
+        body.force ?? false,
+      );
     } catch (err) {
       const message = (err as Error).message;
       if (
         message.includes('credit cap') ||
-        message.includes('already traced')
+        message.includes('already traced') ||
+        message.includes('skip trace limit')
       ) {
         throw new HttpException(message, HttpStatus.TOO_MANY_REQUESTS);
       }
