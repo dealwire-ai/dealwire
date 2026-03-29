@@ -4,7 +4,6 @@ import { S3Service } from '../../s3/s3.service';
 import { DealAnalyzerService } from './deal-analyzer.service';
 import { TemplateFillerService } from './template-filler.service';
 import { AgenticDeliveryService } from './agentic-delivery.service';
-import { DealAnalysis } from './agentic-types';
 import {
   UnderwritingJobContext,
   UnderwritingResult,
@@ -87,13 +86,8 @@ export class AgenticUnderwritingService {
           }
         }
 
-        // Fill unit mix if present
-        if (analysis.unitMix.length > 0) {
-          filled += this.fillUnitMix(workbook, analysis, dealId);
-        }
-
         this.logger.log(
-          `[${dealId}] Filled ${filled} cells (${cellMappings.mappings.length} AI-mapped + unit mix)`,
+          `[${dealId}] Filled ${filled}/${cellMappings.mappings.length} AI-mapped cells`,
         );
 
         // Upload filled proforma
@@ -142,74 +136,5 @@ export class AgenticUnderwritingService {
       humanReviewFlags: analysis.flags,
       durationMs,
     };
-  }
-
-  /**
-   * Fill the Unit Mix sheet from the analysis unit mix data.
-   * Matches the same layout as the legacy pipeline (rows 4-31, cols B/D/E/G/H/J).
-   */
-  private fillUnitMix(
-    workbook: any,
-    analysis: DealAnalysis,
-    dealId: string,
-  ): number {
-    const sheet = workbook.sheet('Unit Mix');
-    if (!sheet) {
-      this.logger.warn(
-        `[${dealId}] No "Unit Mix" sheet found — skipping unit mix fill`,
-      );
-      return 0;
-    }
-
-    const startRow = 4;
-    const maxRows = 28;
-    const clearCols = ['B', 'C', 'D', 'E', 'G', 'H', 'J'];
-
-    // Clear existing data rows
-    for (let i = 0; i < maxRows; i++) {
-      const row = startRow + i;
-      for (const col of clearCols) {
-        try {
-          sheet.cell(`${col}${row}`).value('');
-        } catch {
-          // cell may not exist
-        }
-      }
-    }
-
-    let cellsWritten = 0;
-    const sortedMix = [...analysis.unitMix].sort(
-      (a, b) => a.beds - b.beds || a.baths - b.baths,
-    );
-
-    for (let i = 0; i < sortedMix.length && i < maxRows; i++) {
-      const row = startRow + i;
-      const mix = sortedMix[i];
-      try {
-        sheet.cell(`B${row}`).value(`${mix.beds}BR/${mix.baths}BA`);
-        sheet.cell(`D${row}`).value(mix.beds);
-        sheet.cell(`E${row}`).value(mix.baths);
-        sheet.cell(`H${row}`).value(mix.unitCount);
-        cellsWritten += 4;
-        if (mix.avgSqFt) {
-          sheet.cell(`G${row}`).value(Math.round(mix.avgSqFt));
-          cellsWritten++;
-        }
-        if (mix.avgMonthlyRent) {
-          sheet.cell(`J${row}`).value(Math.round(mix.avgMonthlyRent));
-          cellsWritten++;
-        }
-      } catch (err) {
-        const msg = err instanceof Error ? err.message : String(err);
-        this.logger.warn(
-          `[${dealId}] Could not write unit mix row ${row}: ${msg}`,
-        );
-      }
-    }
-
-    this.logger.log(
-      `[${dealId}] Filled ${sortedMix.length} unit mix rows (${cellsWritten} cells)`,
-    );
-    return cellsWritten;
   }
 }
