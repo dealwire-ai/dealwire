@@ -3,7 +3,6 @@
 ## General Ops
 - make a really strong, energetic e2e demo (deal screening, underwriting, (and optionally) IC report generation)
 - play around with pinchfin
-- Send David prospect list (with George from Kings Cap)
 - Get back to Alex Gibson
 - Pay Taxes (4/15)
 
@@ -19,13 +18,10 @@
   - Buttons to easily update screening criteria from digest email as well as "mute" deals that keep getting sent over and over
 
 ## Tax Lien Analyzer
-
 - collect $1.5K for phase 2
 
 ## Frontstep Acquisition
-
 - prepare to close
 
 ## Survey Platform
-
 - M5 (final touches + testing)
