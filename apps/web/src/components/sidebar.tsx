@@ -87,7 +87,13 @@ function NavLink({ item, collapsed }: { item: NavItem; collapsed: boolean }) {
             : "text-zinc-600 group-hover:text-zinc-400"
         }`}
       />
-      {!collapsed && item.label}
+      <span
+        className={`overflow-hidden whitespace-nowrap transition-opacity duration-200 ${
+          collapsed ? "opacity-0 w-0" : "opacity-100"
+        }`}
+      >
+        {item.label}
+      </span>
     </Link>
   );
 
@@ -200,20 +206,25 @@ export function Sidebar() {
   return (
     <TooltipProvider delayDuration={200}>
       <aside
-        className={`flex flex-col h-screen shrink-0 transition-all duration-200 ${
+        className={`flex flex-col h-screen shrink-0 overflow-hidden transition-all duration-200 ${
           collapsed ? "w-[56px]" : "w-[240px]"
         }`}
       >
         {/* Logo + collapse toggle */}
         <div className="px-3 py-4 flex items-center justify-between min-h-[53px]">
-          {!collapsed && (
-            <Link href="/" className="flex items-center gap-2.5 min-w-0 group">
-              <SignalMark className="shrink-0 w-[28px]" />
-              <span className="text-white font-semibold tracking-tight text-sm truncate group-hover:text-zinc-300 transition-colors">
-                Dealwire
-              </span>
-            </Link>
-          )}
+          <Link
+            href="/"
+            className={`flex items-center gap-2.5 min-w-0 group transition-opacity duration-200 ${
+              collapsed
+                ? "opacity-0 w-0 overflow-hidden pointer-events-none"
+                : "opacity-100"
+            }`}
+          >
+            <SignalMark className="shrink-0 w-[28px]" />
+            <span className="text-white font-semibold tracking-tight text-sm truncate group-hover:text-zinc-300 transition-colors whitespace-nowrap">
+              Dealwire
+            </span>
+          </Link>
           <button
             onClick={toggleCollapsed}
             className={`cursor-pointer text-zinc-600 hover:text-zinc-300 transition-colors rounded-md p-0.5 hover:bg-zinc-800 ${
@@ -238,12 +249,20 @@ export function Sidebar() {
 
             return (
               <div key={section.title}>
-                {!collapsed && (
-                  <p className="px-3 mb-1 text-[11px] font-medium uppercase tracking-widest text-zinc-600">
+                <div className="relative mb-1">
+                  <p
+                    className={`px-3 text-[11px] font-medium uppercase tracking-widest text-zinc-600 whitespace-nowrap overflow-hidden transition-opacity duration-200 ${
+                      collapsed ? "opacity-0 h-0" : "opacity-100"
+                    }`}
+                  >
                     {section.title}
                   </p>
-                )}
-                {collapsed && <div className="mb-1 h-px bg-zinc-800/60 mx-1" />}
+                  <div
+                    className={`h-px bg-zinc-800/60 mx-1 transition-opacity duration-200 ${
+                      collapsed ? "opacity-100" : "opacity-0 h-0"
+                    }`}
+                  />
+                </div>
                 <div className="space-y-0.5">
                   {section.items.map((item) => (
                     <NavLink
@@ -271,14 +290,18 @@ export function Sidebar() {
                         {initials}
                       </AvatarFallback>
                     </Avatar>
-                    {!collapsed && (
-                      <>
-                        <span className="text-xs text-zinc-400 truncate flex-1 min-w-0 text-left">
-                          {displayName}
-                        </span>
-                        <MoreHorizontal className="w-3.5 h-3.5 text-zinc-600 group-hover:text-zinc-400 shrink-0" />
-                      </>
-                    )}
+                    <span
+                      className={`text-xs text-zinc-400 truncate flex-1 min-w-0 text-left overflow-hidden whitespace-nowrap transition-opacity duration-200 ${
+                        collapsed ? "opacity-0 w-0" : "opacity-100"
+                      }`}
+                    >
+                      {displayName}
+                    </span>
+                    <MoreHorizontal
+                      className={`w-3.5 h-3.5 text-zinc-600 group-hover:text-zinc-400 shrink-0 transition-opacity duration-200 ${
+                        collapsed ? "opacity-0 w-0" : "opacity-100"
+                      }`}
+                    />
                   </button>
                 </DropdownMenuTrigger>
               </TooltipTrigger>
