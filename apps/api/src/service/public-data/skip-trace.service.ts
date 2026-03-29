@@ -145,31 +145,41 @@ export class SkipTraceService {
     });
   }
 
-  /** Flush all pending single-BBL requests as one submitBatch call */
+  /** Flush all pending single-BBL requests, grouped by org */
   private async flushQueue(): Promise<void> {
     this.flushTimer = null;
     const items = this.pendingQueue.splice(0);
     if (items.length === 0) return;
 
-    const bbls = items.map((i) => i.bbl);
-    const force = items.some((i) => i.force);
-    const organizationId = items[0].organizationId;
+    // Group items by organizationId so each org gets its own batch
+    const byOrg = new Map<string, QueuedRequest[]>();
+    for (const item of items) {
+      const existing = byOrg.get(item.organizationId) ?? [];
+      existing.push(item);
+      byOrg.set(item.organizationId, existing);
+    }
 
-    this.logger.log(
-      `Flushing ${items.length} queued skip trace requests as one batch: [${bbls.join(', ')}]`,
-    );
+    for (const [organizationId, orgItems] of byOrg) {
+      const bbls = orgItems.map((i) => i.bbl);
+      const force = orgItems.some((i) => i.force);
 
-    try {
-      const result = await this.submitBatch(bbls, organizationId, force);
-      // Start polling for results
-      this.pollAndStore(result.queueId, result.queued);
-      // Resolve all waiting callers with the shared result
-      for (const item of items) {
-        item.resolve(result);
-      }
-    } catch (err) {
-      for (const item of items) {
-        item.reject(err as Error);
+      this.logger.log(
+        `Flushing ${orgItems.length} queued skip trace requests for org ${organizationId}: [${bbls.join(', ')}]`,
+      );
+
+      try {
+        const result = await this.submitBatch(bbls, organizationId, force);
+        // Only poll if there are actual API-queued items
+        if (result.queued.length > 0 && result.queueId !== 'cache') {
+          this.pollAndStore(result.queueId, result.queued);
+        }
+        for (const item of orgItems) {
+          item.resolve(result);
+        }
+      } catch (err) {
+        for (const item of orgItems) {
+          item.reject(err as Error);
+        }
       }
     }
   }
@@ -185,26 +195,6 @@ export class SkipTraceService {
 
     if (!this.apiKey) {
       throw new Error('TRACERFY_API_KEY is not configured');
-    }
-
-    // Check per-org monthly quota
-    const orgUsage = await this.getOrgMonthlyUsage(organizationId);
-    if (orgUsage + bbls.length > this.orgMonthlyLimit) {
-      const remaining = Math.max(0, this.orgMonthlyLimit - orgUsage);
-      throw new Error(
-        `Monthly skip trace limit reached. Used: ${orgUsage}/${this.orgMonthlyLimit}. ` +
-          `${remaining} traces remaining this month. Requested: ${bbls.length}.`,
-      );
-    }
-
-    // Check global usage cap
-    const currentUsage = await this.checkMonthlyUsage();
-    if (currentUsage + bbls.length > this.monthlyCreditCap) {
-      const remaining = Math.max(0, this.monthlyCreditCap - currentUsage);
-      throw new Error(
-        `Monthly credit cap exceeded. Used: ${currentUsage}/${this.monthlyCreditCap}. ` +
-          `${remaining} credits remaining. Requested: ${bbls.length}.`,
-      );
     }
 
     // Load parcels from DB
@@ -238,14 +228,13 @@ export class SkipTraceService {
         parcel.skipTracedAt > thirtyDaysAgo;
 
       if (alreadyTraced && !force) {
-        // Data exists and is fresh — just grant org access (no API call)
         cacheHits.push(parcel);
       } else {
         toQueue.push(parcel);
       }
     }
 
-    // Grant org access for cache hits (no API cost)
+    // Grant org access for cache hits (no API cost, doesn't count against quota)
     if (cacheHits.length > 0) {
       await this.grantOrgAccess(
         cacheHits.map((p) => p.id),
@@ -258,11 +247,25 @@ export class SkipTraceService {
       return { queueId: 'cache', queued: [], skipped };
     }
 
-    // Grant org access for new traces too
-    await this.grantOrgAccess(
-      toQueue.map((p) => p.id),
-      organizationId,
-    );
+    // Check per-org monthly quota (only for new traces, not cache hits)
+    const orgUsage = await this.getOrgMonthlyUsage(organizationId);
+    if (orgUsage + toQueue.length > this.orgMonthlyLimit) {
+      const remaining = Math.max(0, this.orgMonthlyLimit - orgUsage);
+      throw new Error(
+        `Monthly skip trace limit reached. Used: ${orgUsage}/${this.orgMonthlyLimit}. ` +
+          `${remaining} traces remaining this month. Requested: ${toQueue.length}.`,
+      );
+    }
+
+    // Check global usage cap (only for new traces)
+    const currentUsage = await this.checkMonthlyUsage();
+    if (currentUsage + toQueue.length > this.monthlyCreditCap) {
+      const remaining = Math.max(0, this.monthlyCreditCap - currentUsage);
+      throw new Error(
+        `Monthly credit cap exceeded. Used: ${currentUsage}/${this.monthlyCreditCap}. ` +
+          `${remaining} credits remaining. Requested: ${toQueue.length}.`,
+      );
+    }
 
     // Mark all as pending before sending to Tracerfy
     await this.prisma.parcel.updateMany({
@@ -337,7 +340,12 @@ export class SkipTraceService {
     const data = (await response.json()) as { queue_id: string | number };
     const queueId = String(data.queue_id);
 
-    // Store queue_id on each parcel so we can correlate results
+    // API call succeeded — now grant org access and store queue_id
+    await this.grantOrgAccess(
+      toQueue.map((p) => p.id),
+      organizationId,
+    );
+
     await this.prisma.parcel.updateMany({
       where: { bbl: { in: toQueue.map((p) => p.bbl) } },
       data: { skipTraceQueueId: queueId },

@@ -356,21 +356,24 @@ export class ParcelQueryService {
 
     if (!parcel) return null;
 
-    // Strip contact data if org hasn't traced this parcel
+    // Strip contact data if org hasn't traced this parcel, and remove internal relation
     if (organizationId) {
       const record = parcel as typeof parcel & {
         orgSkipTraces?: { id: string }[];
       };
       const hasAccess = (record.orgSkipTraces?.length ?? 0) > 0;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { orgSkipTraces, ...rest } = record;
       if (!hasAccess) {
         return {
-          ...parcel,
+          ...rest,
           ownerPhones: null,
           ownerEmails: null,
           skipTraceStatus: null,
           skipTracedAt: null,
         };
       }
+      return rest;
     }
 
     return parcel;
