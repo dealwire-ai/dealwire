@@ -85,6 +85,7 @@ interface TracerfyQueueResponse {
 interface QueuedRequest {
   bbl: string;
   force: boolean;
+  organizationId: string;
   resolve: (result: {
     queueId: string;
     queued: string[];
@@ -100,6 +101,11 @@ export class SkipTraceService {
   private readonly baseUrl = 'https://tracerfy.com/v1/api';
   private readonly monthlyCreditCap = parseInt(
     process.env.TRACERFY_MONTHLY_CREDIT_CAP ?? '500',
+  );
+
+  /** Per-org monthly skip trace limit */
+  private readonly orgMonthlyLimit = parseInt(
+    process.env.ORG_SKIP_TRACE_MONTHLY_LIMIT ?? '100',
   );
 
   /** Skip Sherpa fallback provider */
@@ -120,10 +126,11 @@ export class SkipTraceService {
    */
   enqueue(
     bbl: string,
+    organizationId: string,
     force = false,
   ): Promise<{ queueId: string; queued: string[]; skipped: number }> {
     return new Promise((resolve, reject) => {
-      this.pendingQueue.push({ bbl, force, resolve, reject });
+      this.pendingQueue.push({ bbl, force, organizationId, resolve, reject });
 
       this.logger.log(
         `Enqueued BBL ${bbl} for batched skip trace (${this.pendingQueue.length} pending)`,
@@ -146,13 +153,14 @@ export class SkipTraceService {
 
     const bbls = items.map((i) => i.bbl);
     const force = items.some((i) => i.force);
+    const organizationId = items[0].organizationId;
 
     this.logger.log(
       `Flushing ${items.length} queued skip trace requests as one batch: [${bbls.join(', ')}]`,
     );
 
     try {
-      const result = await this.submitBatch(bbls, force);
+      const result = await this.submitBatch(bbls, organizationId, force);
       // Start polling for results
       this.pollAndStore(result.queueId, result.queued);
       // Resolve all waiting callers with the shared result
@@ -168,17 +176,28 @@ export class SkipTraceService {
 
   async submitBatch(
     bbls: string[],
+    organizationId: string,
     force = false,
   ): Promise<{ queueId: string; queued: string[]; skipped: number }> {
     this.logger.log(
-      `submitBatch called: ${bbls.length} BBLs [${bbls.join(', ')}], force=${force}`,
+      `submitBatch called: ${bbls.length} BBLs [${bbls.join(', ')}], org=${organizationId}, force=${force}`,
     );
 
     if (!this.apiKey) {
       throw new Error('TRACERFY_API_KEY is not configured');
     }
 
-    // Check monthly usage cap
+    // Check per-org monthly quota
+    const orgUsage = await this.getOrgMonthlyUsage(organizationId);
+    if (orgUsage + bbls.length > this.orgMonthlyLimit) {
+      const remaining = Math.max(0, this.orgMonthlyLimit - orgUsage);
+      throw new Error(
+        `Monthly skip trace limit reached. Used: ${orgUsage}/${this.orgMonthlyLimit}. ` +
+          `${remaining} traces remaining this month. Requested: ${bbls.length}.`,
+      );
+    }
+
+    // Check global usage cap
     const currentUsage = await this.checkMonthlyUsage();
     if (currentUsage + bbls.length > this.monthlyCreditCap) {
       const remaining = Math.max(0, this.monthlyCreditCap - currentUsage);
@@ -192,6 +211,7 @@ export class SkipTraceService {
     const parcels = await this.prisma.parcel.findMany({
       where: { bbl: { in: bbls } },
       select: {
+        id: true,
         bbl: true,
         ownerName: true,
         address: true,
@@ -199,13 +219,16 @@ export class SkipTraceService {
         borough: true,
         skipTracedAt: true,
         skipTraceStatus: true,
+        ownerPhones: true,
+        ownerEmails: true,
       },
     });
 
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
-    // Determine which BBLs to skip (already traced within 30 days with 'found')
+    // Separate parcels into: already have data (cache hit) vs need API call
     const toQueue: typeof parcels = [];
+    const cacheHits: typeof parcels = [];
     let skipped = 0;
 
     for (const parcel of parcels) {
@@ -215,17 +238,31 @@ export class SkipTraceService {
         parcel.skipTracedAt > thirtyDaysAgo;
 
       if (alreadyTraced && !force) {
-        skipped++;
+        // Data exists and is fresh — just grant org access (no API call)
+        cacheHits.push(parcel);
       } else {
         toQueue.push(parcel);
       }
     }
 
-    if (toQueue.length === 0) {
-      throw new Error(
-        `All ${skipped} parcels were already traced recently. Use force=true to re-trace.`,
+    // Grant org access for cache hits (no API cost)
+    if (cacheHits.length > 0) {
+      await this.grantOrgAccess(
+        cacheHits.map((p) => p.id),
+        organizationId,
       );
+      skipped = cacheHits.length;
     }
+
+    if (toQueue.length === 0) {
+      return { queueId: 'cache', queued: [], skipped };
+    }
+
+    // Grant org access for new traces too
+    await this.grantOrgAccess(
+      toQueue.map((p) => p.id),
+      organizationId,
+    );
 
     // Mark all as pending before sending to Tracerfy
     await this.prisma.parcel.updateMany({
@@ -727,6 +764,51 @@ export class SkipTraceService {
         skipTracedAt: { gte: startOfMonth },
         skipTraceStatus: { not: 'pending' },
       },
+    });
+  }
+
+  /** Count how many skip traces an org has used this month */
+  async getOrgMonthlyUsage(organizationId: string): Promise<number> {
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    return this.prisma.orgSkipTrace.count({
+      where: {
+        organizationId,
+        tracedAt: { gte: startOfMonth },
+      },
+    });
+  }
+
+  /** Get org skip trace usage info for frontend display */
+  async getOrgUsageInfo(organizationId: string): Promise<{
+    used: number;
+    limit: number;
+    remaining: number;
+  }> {
+    const used = await this.getOrgMonthlyUsage(organizationId);
+    return {
+      used,
+      limit: this.orgMonthlyLimit,
+      remaining: Math.max(0, this.orgMonthlyLimit - used),
+    };
+  }
+
+  /** Grant an org access to see a parcel's skip trace data */
+  private async grantOrgAccess(
+    parcelIds: string[],
+    organizationId: string,
+  ): Promise<void> {
+    // Upsert each — skipOnDuplicates handles re-traces
+    const data = parcelIds.map((parcelId) => ({
+      id: `${parcelId}_${organizationId}`,
+      parcelId,
+      organizationId,
+    }));
+
+    await this.prisma.orgSkipTrace.createMany({
+      data,
+      skipDuplicates: true,
     });
   }
 

@@ -276,11 +276,16 @@ export class ParcelQueryService {
     const where = this.buildWhere(filters);
     const orderBy = this.buildOrderBy(filters.sort, filters.order);
 
-    const includeListAssignments = filters.organizationId
+    const includeRelations = filters.organizationId
       ? {
           listAssignments: {
             where: { organizationId: filters.organizationId },
             select: { listType: true },
+            take: 1,
+          },
+          orgSkipTraces: {
+            where: { organizationId: filters.organizationId },
+            select: { id: true },
             take: 1,
           },
         }
@@ -292,19 +297,32 @@ export class ParcelQueryService {
         orderBy,
         skip,
         take: limit,
-        ...(includeListAssignments && { include: includeListAssignments }),
+        ...(includeRelations && { include: includeRelations }),
       }),
       this.prisma.parcel.count({ where }),
     ]);
 
-    // Flatten listAssignments into a top-level _listType field
+    // Flatten relations and strip phone data for orgs that haven't traced
     const flatData = filters.organizationId
       ? data.map((p) => {
           const record = p as typeof p & {
             listAssignments?: { listType: string }[];
+            orgSkipTraces?: { id: string }[];
           };
           const _listType = record.listAssignments?.[0]?.listType ?? null;
-          return { ...p, _listType };
+          const hasOrgAccess = (record.orgSkipTraces?.length ?? 0) > 0;
+
+          // Strip contact data if org hasn't skip traced this parcel
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { listAssignments, orgSkipTraces, ...rest } = record;
+          return {
+            ...rest,
+            _listType,
+            ownerPhones: hasOrgAccess ? rest.ownerPhones : null,
+            ownerEmails: hasOrgAccess ? rest.ownerEmails : null,
+            skipTraceStatus: hasOrgAccess ? rest.skipTraceStatus : null,
+            skipTracedAt: hasOrgAccess ? rest.skipTracedAt : null,
+          };
         })
       : data;
 
@@ -322,8 +340,40 @@ export class ParcelQueryService {
   /**
    * Get a single parcel by BBL.
    */
-  async getParcelByBbl(bbl: string) {
-    return this.prisma.parcel.findUnique({ where: { bbl } });
+  async getParcelByBbl(bbl: string, organizationId?: string) {
+    const parcel = await this.prisma.parcel.findUnique({
+      where: { bbl },
+      ...(organizationId && {
+        include: {
+          orgSkipTraces: {
+            where: { organizationId },
+            select: { id: true },
+            take: 1,
+          },
+        },
+      }),
+    });
+
+    if (!parcel) return null;
+
+    // Strip contact data if org hasn't traced this parcel
+    if (organizationId) {
+      const record = parcel as typeof parcel & {
+        orgSkipTraces?: { id: string }[];
+      };
+      const hasAccess = (record.orgSkipTraces?.length ?? 0) > 0;
+      if (!hasAccess) {
+        return {
+          ...parcel,
+          ownerPhones: null,
+          ownerEmails: null,
+          skipTraceStatus: null,
+          skipTracedAt: null,
+        };
+      }
+    }
+
+    return parcel;
   }
 
   /**
