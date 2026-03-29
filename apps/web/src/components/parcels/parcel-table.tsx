@@ -867,7 +867,15 @@ function PhoneCell({
     );
   }
 
-  // Not traced yet — show inline trace button
+  if (status === "not_found") {
+    return <span className="text-zinc-500 text-xs">No phone</span>;
+  }
+
+  if (status === "error") {
+    return <span className="text-red-400/70 text-xs">Error</span>;
+  }
+
+  // Not traced yet (null status) — show inline trace button
   return <InlineSkipTraceButton bbl={parcel.bbl} onUpdated={onUpdated} />;
 }
 
