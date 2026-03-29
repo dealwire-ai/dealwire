@@ -276,27 +276,27 @@ export function Sidebar() {
         </nav>
 
         {/* Footer */}
-        <div className="p-2">
+        <div className="border-t border-zinc-800/60 p-2">
           <DropdownMenu>
             <Tooltip>
               <TooltipTrigger asChild>
                 <DropdownMenuTrigger asChild>
-                  <button className="w-full flex items-center gap-2.5 px-2 py-1.5 rounded-md hover:bg-zinc-800/80 transition-colors group min-w-0">
-                    <Avatar className="w-6 h-6 shrink-0">
+                  <button className="w-full flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-zinc-800/80 transition-colors group min-w-0">
+                    <Avatar className="w-7 h-7 shrink-0 ring-1 ring-zinc-700/50">
                       <AvatarImage src={user?.imageUrl} />
-                      <AvatarFallback className="bg-zinc-700 text-[10px] font-semibold text-zinc-200">
+                      <AvatarFallback className="bg-gradient-to-br from-amber-600/80 to-amber-800/80 text-[10px] font-semibold text-zinc-100">
                         {initials}
                       </AvatarFallback>
                     </Avatar>
                     <span
-                      className={`text-xs text-zinc-400 truncate flex-1 min-w-0 text-left overflow-hidden whitespace-nowrap transition-opacity duration-200 ${
+                      className={`text-sm font-medium text-zinc-300 truncate flex-1 min-w-0 text-left overflow-hidden whitespace-nowrap transition-opacity duration-200 ${
                         collapsed ? "opacity-0 w-0" : "opacity-100"
                       }`}
                     >
                       {displayName}
                     </span>
                     <MoreHorizontal
-                      className={`w-3.5 h-3.5 text-zinc-600 group-hover:text-zinc-400 shrink-0 transition-opacity duration-200 ${
+                      className={`w-4 h-4 text-zinc-600 group-hover:text-zinc-400 shrink-0 transition-opacity duration-200 ${
                         collapsed ? "opacity-0 w-0" : "opacity-100"
                       }`}
                     />
