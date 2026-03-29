@@ -32,6 +32,12 @@ interface Stats {
   withSkipTrace: number;
 }
 
+interface SkipTraceUsage {
+  used: number;
+  limit: number;
+  remaining: number;
+}
+
 export default function ParcelsPage() {
   const { userId, isLoaded } = useAuth();
   const router = useRouter();
@@ -44,6 +50,9 @@ export default function ParcelsPage() {
   const [error, setError] = useState<string | null>(null);
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const [selectedBbls, setSelectedBbls] = useState<Set<string>>(new Set());
+  const [skipTraceUsage, setSkipTraceUsage] = useState<SkipTraceUsage | null>(
+    null,
+  );
   const [showCoverage, setShowCoverage] = useState(() => {
     if (typeof window === "undefined") return true;
     return localStorage.getItem("parcels-show-coverage") !== "false";
@@ -98,6 +107,17 @@ export default function ParcelsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoaded, userId, table.filters.borough]);
 
+  const fetchSkipTraceUsage = useCallback(async () => {
+    if (!isLoaded || !userId) return;
+    try {
+      const response = await apiCall("/public-data/parcels/skip-trace/usage");
+      setSkipTraceUsage(response);
+    } catch {
+      // Non-critical
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoaded, userId]);
+
   // Redirect if feature flag is off
   useEffect(() => {
     if (!flagsLoading && !flags.parcels) {
@@ -112,6 +132,10 @@ export default function ParcelsPage() {
   useEffect(() => {
     fetchStats();
   }, [fetchStats]);
+
+  useEffect(() => {
+    fetchSkipTraceUsage();
+  }, [fetchSkipTraceUsage]);
 
   useEffect(() => {
     setExpandedRows(new Set());
@@ -202,6 +226,39 @@ export default function ParcelsPage() {
                     count={stats.withSkipTrace}
                     total={stats.total}
                   />
+                  {skipTraceUsage && (
+                    <div className="mt-3 pt-3 border-t border-zinc-800">
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs text-zinc-400 w-44 shrink-0">
+                          Monthly Quota
+                        </span>
+                        <div className="flex-1 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                          <div
+                            className="h-full rounded-full transition-all"
+                            style={{
+                              width: `${Math.min(100, Math.round((skipTraceUsage.used / skipTraceUsage.limit) * 100))}%`,
+                              backgroundColor:
+                                skipTraceUsage.used / skipTraceUsage.limit > 0.9
+                                  ? "#ef4444"
+                                  : skipTraceUsage.used / skipTraceUsage.limit >
+                                      0.7
+                                    ? "#f59e0b"
+                                    : "#C8A96E",
+                            }}
+                          />
+                        </div>
+                        <span className="text-xs text-zinc-300 w-28 text-right shrink-0 tabular-nums">
+                          {skipTraceUsage.used} / {skipTraceUsage.limit}
+                        </span>
+                        <span className="text-xs text-zinc-500 w-10 text-right shrink-0 tabular-nums">
+                          {Math.round(
+                            (skipTraceUsage.used / skipTraceUsage.limit) * 100,
+                          )}
+                          %
+                        </span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -241,6 +298,8 @@ export default function ParcelsPage() {
                   />
                   <BatchSkipTraceButton
                     selectedBbls={selectedBbls}
+                    quotaRemaining={skipTraceUsage?.remaining}
+                    quotaLimit={skipTraceUsage?.limit}
                     onQueued={() => {
                       setParcels((prev) =>
                         prev.map((p) =>
@@ -250,6 +309,7 @@ export default function ParcelsPage() {
                         ),
                       );
                       setSelectedBbls(new Set());
+                      fetchSkipTraceUsage();
                     }}
                   />
                 </div>

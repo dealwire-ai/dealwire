@@ -85,6 +85,7 @@ interface TracerfyQueueResponse {
 interface QueuedRequest {
   bbl: string;
   force: boolean;
+  organizationId: string;
   resolve: (result: {
     queueId: string;
     queued: string[];
@@ -100,6 +101,11 @@ export class SkipTraceService {
   private readonly baseUrl = 'https://tracerfy.com/v1/api';
   private readonly monthlyCreditCap = parseInt(
     process.env.TRACERFY_MONTHLY_CREDIT_CAP ?? '500',
+  );
+
+  /** Per-org monthly skip trace limit */
+  private readonly orgMonthlyLimit = parseInt(
+    process.env.ORG_SKIP_TRACE_MONTHLY_LIMIT ?? '100',
   );
 
   /** Skip Sherpa fallback provider */
@@ -120,10 +126,11 @@ export class SkipTraceService {
    */
   enqueue(
     bbl: string,
+    organizationId: string,
     force = false,
   ): Promise<{ queueId: string; queued: string[]; skipped: number }> {
     return new Promise((resolve, reject) => {
-      this.pendingQueue.push({ bbl, force, resolve, reject });
+      this.pendingQueue.push({ bbl, force, organizationId, resolve, reject });
 
       this.logger.log(
         `Enqueued BBL ${bbl} for batched skip trace (${this.pendingQueue.length} pending)`,
@@ -138,60 +145,63 @@ export class SkipTraceService {
     });
   }
 
-  /** Flush all pending single-BBL requests as one submitBatch call */
+  /** Flush all pending single-BBL requests, grouped by org */
   private async flushQueue(): Promise<void> {
     this.flushTimer = null;
     const items = this.pendingQueue.splice(0);
     if (items.length === 0) return;
 
-    const bbls = items.map((i) => i.bbl);
-    const force = items.some((i) => i.force);
+    // Group items by organizationId so each org gets its own batch
+    const byOrg = new Map<string, QueuedRequest[]>();
+    for (const item of items) {
+      const existing = byOrg.get(item.organizationId) ?? [];
+      existing.push(item);
+      byOrg.set(item.organizationId, existing);
+    }
 
-    this.logger.log(
-      `Flushing ${items.length} queued skip trace requests as one batch: [${bbls.join(', ')}]`,
-    );
+    for (const [organizationId, orgItems] of byOrg) {
+      const bbls = orgItems.map((i) => i.bbl);
+      const force = orgItems.some((i) => i.force);
 
-    try {
-      const result = await this.submitBatch(bbls, force);
-      // Start polling for results
-      this.pollAndStore(result.queueId, result.queued);
-      // Resolve all waiting callers with the shared result
-      for (const item of items) {
-        item.resolve(result);
-      }
-    } catch (err) {
-      for (const item of items) {
-        item.reject(err as Error);
+      this.logger.log(
+        `Flushing ${orgItems.length} queued skip trace requests for org ${organizationId}: [${bbls.join(', ')}]`,
+      );
+
+      try {
+        const result = await this.submitBatch(bbls, organizationId, force);
+        // Only poll if there are actual API-queued items
+        if (result.queued.length > 0 && result.queueId !== 'cache') {
+          this.pollAndStore(result.queueId, result.queued);
+        }
+        for (const item of orgItems) {
+          item.resolve(result);
+        }
+      } catch (err) {
+        for (const item of orgItems) {
+          item.reject(err as Error);
+        }
       }
     }
   }
 
   async submitBatch(
     bbls: string[],
+    organizationId: string,
     force = false,
   ): Promise<{ queueId: string; queued: string[]; skipped: number }> {
     this.logger.log(
-      `submitBatch called: ${bbls.length} BBLs [${bbls.join(', ')}], force=${force}`,
+      `submitBatch called: ${bbls.length} BBLs [${bbls.join(', ')}], org=${organizationId}, force=${force}`,
     );
 
     if (!this.apiKey) {
       throw new Error('TRACERFY_API_KEY is not configured');
     }
 
-    // Check monthly usage cap
-    const currentUsage = await this.checkMonthlyUsage();
-    if (currentUsage + bbls.length > this.monthlyCreditCap) {
-      const remaining = Math.max(0, this.monthlyCreditCap - currentUsage);
-      throw new Error(
-        `Monthly credit cap exceeded. Used: ${currentUsage}/${this.monthlyCreditCap}. ` +
-          `${remaining} credits remaining. Requested: ${bbls.length}.`,
-      );
-    }
-
     // Load parcels from DB
     const parcels = await this.prisma.parcel.findMany({
       where: { bbl: { in: bbls } },
       select: {
+        id: true,
         bbl: true,
         ownerName: true,
         address: true,
@@ -199,13 +209,16 @@ export class SkipTraceService {
         borough: true,
         skipTracedAt: true,
         skipTraceStatus: true,
+        ownerPhones: true,
+        ownerEmails: true,
       },
     });
 
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
-    // Determine which BBLs to skip (already traced within 30 days with 'found')
+    // Separate parcels into: already have data (cache hit) vs need API call
     const toQueue: typeof parcels = [];
+    const cacheHits: typeof parcels = [];
     let skipped = 0;
 
     for (const parcel of parcels) {
@@ -215,15 +228,42 @@ export class SkipTraceService {
         parcel.skipTracedAt > thirtyDaysAgo;
 
       if (alreadyTraced && !force) {
-        skipped++;
+        cacheHits.push(parcel);
       } else {
         toQueue.push(parcel);
       }
     }
 
+    // Grant org access for cache hits (no API cost, doesn't count against quota)
+    if (cacheHits.length > 0) {
+      await this.grantOrgAccess(
+        cacheHits.map((p) => p.id),
+        organizationId,
+      );
+      skipped = cacheHits.length;
+    }
+
     if (toQueue.length === 0) {
+      return { queueId: 'cache', queued: [], skipped };
+    }
+
+    // Check per-org monthly quota (only for new traces, not cache hits)
+    const orgUsage = await this.getOrgMonthlyUsage(organizationId);
+    if (orgUsage + toQueue.length > this.orgMonthlyLimit) {
+      const remaining = Math.max(0, this.orgMonthlyLimit - orgUsage);
       throw new Error(
-        `All ${skipped} parcels were already traced recently. Use force=true to re-trace.`,
+        `Monthly skip trace limit reached. Used: ${orgUsage}/${this.orgMonthlyLimit}. ` +
+          `${remaining} traces remaining this month. Requested: ${toQueue.length}.`,
+      );
+    }
+
+    // Check global usage cap (only for new traces)
+    const currentUsage = await this.checkMonthlyUsage();
+    if (currentUsage + toQueue.length > this.monthlyCreditCap) {
+      const remaining = Math.max(0, this.monthlyCreditCap - currentUsage);
+      throw new Error(
+        `Monthly credit cap exceeded. Used: ${currentUsage}/${this.monthlyCreditCap}. ` +
+          `${remaining} credits remaining. Requested: ${toQueue.length}.`,
       );
     }
 
@@ -300,7 +340,12 @@ export class SkipTraceService {
     const data = (await response.json()) as { queue_id: string | number };
     const queueId = String(data.queue_id);
 
-    // Store queue_id on each parcel so we can correlate results
+    // API call succeeded — now grant org access and store queue_id
+    await this.grantOrgAccess(
+      toQueue.map((p) => p.id),
+      organizationId,
+    );
+
     await this.prisma.parcel.updateMany({
       where: { bbl: { in: toQueue.map((p) => p.bbl) } },
       data: { skipTraceQueueId: queueId },
@@ -727,6 +772,51 @@ export class SkipTraceService {
         skipTracedAt: { gte: startOfMonth },
         skipTraceStatus: { not: 'pending' },
       },
+    });
+  }
+
+  /** Count how many skip traces an org has used this month */
+  async getOrgMonthlyUsage(organizationId: string): Promise<number> {
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    return this.prisma.orgSkipTrace.count({
+      where: {
+        organizationId,
+        tracedAt: { gte: startOfMonth },
+      },
+    });
+  }
+
+  /** Get org skip trace usage info for frontend display */
+  async getOrgUsageInfo(organizationId: string): Promise<{
+    used: number;
+    limit: number;
+    remaining: number;
+  }> {
+    const used = await this.getOrgMonthlyUsage(organizationId);
+    return {
+      used,
+      limit: this.orgMonthlyLimit,
+      remaining: Math.max(0, this.orgMonthlyLimit - used),
+    };
+  }
+
+  /** Grant an org access to see a parcel's skip trace data */
+  private async grantOrgAccess(
+    parcelIds: string[],
+    organizationId: string,
+  ): Promise<void> {
+    // Upsert each — skipOnDuplicates handles re-traces
+    const data = parcelIds.map((parcelId) => ({
+      id: `${parcelId}_${organizationId}`,
+      parcelId,
+      organizationId,
+    }));
+
+    await this.prisma.orgSkipTrace.createMany({
+      data,
+      skipDuplicates: true,
     });
   }
 
