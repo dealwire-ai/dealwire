@@ -476,3 +476,17 @@ model PhoneNote {
   @@unique([parcelId, phoneNumber, organizationId])
   @@index([parcelId, organizationId])
 }
+
+model IngestionRun {
+  id          String   @id @default(cuid())
+  trigger     String   // "manual" | "scheduled"
+  status      String   // "running" | "success" | "failed"
+  boroughs    String[] // ["1", "3", "4"]
+  results     Json?    // IngestionResult[] on completion
+  error       String?  @db.Text
+  startedAt   DateTime @default(now())
+  completedAt DateTime?
+
+  @@index([status])
+  @@index([startedAt])
+}

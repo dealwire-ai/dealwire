@@ -156,31 +156,33 @@ Preferences are automatically created when an Organization is created via Clerk 
 
 ## Environment Variables (API)
 
-| Variable                         | Purpose                                                                                                                                                     |
-| -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `DATABASE_URL`                   | PostgreSQL connection (Supabase pooler)                                                                                                                     |
-| `DIRECT_URL`                     | Direct PostgreSQL connection (for migrations)                                                                                                               |
-| `CLERK_SECRET_KEY`               | Clerk backend SDK                                                                                                                                           |
-| `CLERK_WEBHOOK_SECRET`           | Verify Clerk webhooks                                                                                                                                       |
-| `OPENAI_API_KEY`                 | AI services (deal screening, agent)                                                                                                                         |
-| `ANTHROPIC_API_KEY`              | Claude models (underwriting pipeline)                                                                                                                       |
-| `RESEND_API_KEY`                 | Email sending via Resend                                                                                                                                    |
-| `API_BASE_URL`                   | Production URL (https://api.dealwire.ai)                                                                                                                    |
-| `MICROSOFT_WEBHOOK_SECRET`       | Graph webhook clientState validation                                                                                                                        |
-| `FRONTEND_URL`                   | Frontend origin for CORS (http://localhost:3000 or production URL)                                                                                          |
-| `REQUIRE_AUTH`                   | Optional. Set to `true` to require Clerk JWT on protected routes even when not in production (default: auth required only when `NODE_ENV === 'production'`) |
-| `ENABLE_SQS`                     | Optional. Set to `true` to enable SQS consumer in development (default: only enabled in production)                                                         |
-| `AWS_REGION`                     | AWS region for S3 + SQS                                                                                                                                     |
-| `AWS_ACCESS_KEY_ID`              | AWS credentials                                                                                                                                             |
-| `AWS_SECRET_ACCESS_KEY`          | AWS credentials                                                                                                                                             |
-| `AWS_S3_BUCKET`                  | S3 bucket for deal attachments + pro formas                                                                                                                 |
-| `AWS_NORMALIZED_EMAIL_QUEUE_URL` | SQS queue URL for email screening pipeline                                                                                                                  |
-| `AWS_UNDERWRITING_QUEUE_URL`     | SQS queue URL for underwriting pipeline                                                                                                                     |
-| `FROM_EMAIL`                     | Default Resend sender address                                                                                                                               |
-| `UNDERWRITING_INBOUND_EMAIL`     | Resend inbound address for underwriting trigger emails                                                                                                      |
-| `NYC_OPEN_DATA_APP_TOKEN`        | Optional. Socrata app token for NYC Open Data (avoids rate limits)                                                                                          |
-| `TRACERFY_API_KEY`               | Bearer token for Tracerfy skip tracing API                                                                                                                  |
-| `TRACERFY_MONTHLY_CREDIT_CAP`    | Max Tracerfy credits per month (default: 500 = $10/mo)                                                                                                      |
+| Variable                           | Purpose                                                                                                                                                     |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `DATABASE_URL`                     | PostgreSQL connection (Supabase pooler)                                                                                                                     |
+| `DIRECT_URL`                       | Direct PostgreSQL connection (for migrations)                                                                                                               |
+| `CLERK_SECRET_KEY`                 | Clerk backend SDK                                                                                                                                           |
+| `CLERK_WEBHOOK_SECRET`             | Verify Clerk webhooks                                                                                                                                       |
+| `OPENAI_API_KEY`                   | AI services (deal screening, agent)                                                                                                                         |
+| `ANTHROPIC_API_KEY`                | Claude models (underwriting pipeline)                                                                                                                       |
+| `RESEND_API_KEY`                   | Email sending via Resend                                                                                                                                    |
+| `API_BASE_URL`                     | Production URL (https://api.dealwire.ai)                                                                                                                    |
+| `MICROSOFT_WEBHOOK_SECRET`         | Graph webhook clientState validation                                                                                                                        |
+| `FRONTEND_URL`                     | Frontend origin for CORS (http://localhost:3000 or production URL)                                                                                          |
+| `REQUIRE_AUTH`                     | Optional. Set to `true` to require Clerk JWT on protected routes even when not in production (default: auth required only when `NODE_ENV === 'production'`) |
+| `ENABLE_SQS`                       | Optional. Set to `true` to enable SQS consumer in development (default: only enabled in production)                                                         |
+| `AWS_REGION`                       | AWS region for S3 + SQS                                                                                                                                     |
+| `AWS_ACCESS_KEY_ID`                | AWS credentials                                                                                                                                             |
+| `AWS_SECRET_ACCESS_KEY`            | AWS credentials                                                                                                                                             |
+| `AWS_S3_BUCKET`                    | S3 bucket for deal attachments + pro formas                                                                                                                 |
+| `AWS_NORMALIZED_EMAIL_QUEUE_URL`   | SQS queue URL for email screening pipeline                                                                                                                  |
+| `AWS_UNDERWRITING_QUEUE_URL`       | SQS queue URL for underwriting pipeline                                                                                                                     |
+| `FROM_EMAIL`                       | Default Resend sender address                                                                                                                               |
+| `UNDERWRITING_INBOUND_EMAIL`       | Resend inbound address for underwriting trigger emails                                                                                                      |
+| `NYC_OPEN_DATA_APP_TOKEN`          | Optional. Socrata app token for NYC Open Data (avoids rate limits)                                                                                          |
+| `TRACERFY_API_KEY`                 | Bearer token for Tracerfy skip tracing API                                                                                                                  |
+| `TRACERFY_MONTHLY_CREDIT_CAP`      | Max Tracerfy credits per month (default: 500 = $10/mo)                                                                                                      |
+| `PUBLIC_DATA_AUTO_REFRESH_ENABLED` | Set to `true` to enable scheduled data ingestion (default: `false`)                                                                                         |
+| `PUBLIC_DATA_REFRESH_CRON`         | Cron schedule for auto-refresh (default: `0 3 * * 0` = Sunday 3am UTC)                                                                                      |
 
 ---
 
