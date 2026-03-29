@@ -45,6 +45,7 @@
     "cheerio": "^1.1.2",
     "cron": "^4.3.5",
     "cron-parser": "^5.5.0",
+    "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "marked": "^17.0.1",
     "openai": "^6.15.0",
