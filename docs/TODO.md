@@ -7,7 +7,6 @@
 - Pay Taxes (4/15)
 
 ## Biz Dev
-- quick demo for Thomas Dolan
 
 ## Deal Screener
 
@@ -20,8 +19,8 @@
 ## Tax Lien Analyzer
 - collect $1.5K for phase 2
 
-## Frontstep Acquisition
-- prepare to close
+## Frontstep Feature Development
+- Deliver calander scheduling + auto-qualification 
 
 ## Survey Platform
 - M5 (final touches + testing)
