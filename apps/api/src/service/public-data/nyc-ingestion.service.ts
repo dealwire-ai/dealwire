@@ -70,7 +70,10 @@ export class NycIngestionService {
    * Run full ingestion pipeline: tax liens → PLUTO enrichment → HPD violations → scoring.
    * Only one ingestion can run at a time. Throws if already running.
    */
-  async ingestAll(boroughs: string[]): Promise<IngestionResult[]> {
+  async ingestAll(
+    boroughs: string[],
+    trigger: 'manual' | 'scheduled' = 'manual',
+  ): Promise<IngestionResult[]> {
     if (this.running) {
       throw new Error('Ingestion is already running');
     }
@@ -79,9 +82,14 @@ export class NycIngestionService {
     const start = Date.now();
     const boroughNames = boroughs.map((b) => BOROUGH_NAMES[b] || b);
 
+    // Track this run
+    const run = await this.prisma.ingestionRun.create({
+      data: { trigger, status: 'running', boroughs },
+    });
+
     try {
       this.logger.log(
-        `Starting full ingestion for boroughs: ${boroughs.join(', ')}`,
+        `Starting full ingestion for boroughs: ${boroughs.join(', ')} (trigger: ${trigger}, run: ${run.id})`,
       );
       const results: IngestionResult[] = [];
 
@@ -133,12 +141,33 @@ export class NycIngestionService {
         `Full ingestion complete. Results: ${JSON.stringify(results.map((r) => `${r.source}: ${r.recordsProcessed}`))}`,
       );
 
+      // Mark run as success
+      await this.prisma.ingestionRun.update({
+        where: { id: run.id },
+        data: {
+          status: 'success',
+          completedAt: new Date(),
+          results: JSON.parse(JSON.stringify(results)) as object,
+        },
+      });
+
       // Notify admins
       await this.notifyIngestionComplete(boroughNames, results, durationMin);
 
       return results;
     } catch (err) {
       const durationMin = Math.round((Date.now() - start) / 1000 / 60);
+
+      // Mark run as failed
+      await this.prisma.ingestionRun.update({
+        where: { id: run.id },
+        data: {
+          status: 'failed',
+          completedAt: new Date(),
+          error: (err as Error).message,
+        },
+      });
+
       await this.notifyIngestionFailed(
         boroughNames,
         (err as Error).message,

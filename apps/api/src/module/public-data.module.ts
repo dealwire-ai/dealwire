@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ScheduleModule } from '@nestjs/schedule';
 import { PrismaModule } from './prisma.module';
 import { NotificationsModule } from './notifications.module';
 import { PublicDataController } from '../controller/public-data.controller';
@@ -12,10 +13,11 @@ import { NyctlQuarterlyService } from '../service/public-data/nyctl-quarterly.se
 import { CareScraperService } from '../service/public-data/care-scraper.service';
 import { PhoneNoteService } from '../service/public-data/phone-note.service';
 import { PropertyListService } from '../service/public-data/property-list.service';
+import { PublicDataSchedulerService } from '../service/public-data/public-data-scheduler.service';
 import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
 
 @Module({
-  imports: [PrismaModule, NotificationsModule],
+  imports: [PrismaModule, NotificationsModule, ScheduleModule],
   controllers: [PublicDataController, SkipTraceWebhookController],
   providers: [
     SodaAdapter,
@@ -27,6 +29,7 @@ import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
     CareScraperService,
     PhoneNoteService,
     PropertyListService,
+    PublicDataSchedulerService,
     ClerkAuthGuard,
   ],
   exports: [ParcelQueryService],

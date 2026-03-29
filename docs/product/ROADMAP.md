@@ -95,6 +95,7 @@ _Deep data is the moat. An analyst is only as good as their data access._
   - [ ] Dynamic tax calculations — real-time compounding interest on liens, dynamic annual tax bill
   - [ ] Lis pendens data — Daniel providing his list for ingestion
   - [ ] UI contrast improvements — lighter text on dark theme for readability
+- [x] **Automated public data refresh** — Scheduled weekly `@Cron` job calling `ingestAll()` (upsert-only, never deletes). `IngestionRun` model tracks run history (trigger, status, duration, results). "Last refreshed" indicator in parcels coverage dashboard. Configurable via `PUBLIC_DATA_REFRESH_CRON` + `PUBLIC_DATA_AUTO_REFRESH_ENABLED` env vars.
 - [ ] **Public data ingestion platform** — Adapter-based system for pulling tax liens, zoning, permits, assessments, and deed data from municipal/county sources. Starts with NYC (Socrata SODA API + ArcGIS), designed to expand city-by-city via configuration. See [`docs/product/PUBLIC_DATA_PLATFORM.md`](PUBLIC_DATA_PLATFORM.md) for full architecture.
 - [ ] **Property data enrichment** — Pull from public records, assessor databases, census/demographic data to auto-fill details the email didn't include (year built, lot size, zoning, ownership history, tax assessments).
 - [ ] **Market context** — Auto-attach market comps, submarket stats, rent trends to deal summaries. "This is priced 15% above recent comps in the submarket."
