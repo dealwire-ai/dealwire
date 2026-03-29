@@ -68,6 +68,7 @@ export interface ParcelQueryFilters {
   buildingClassGroups?: string[];
   listType?: string;
   hasNoList?: boolean;
+  skipTraceStatus?: string;
   organizationId?: string;
   sort?: string;
   order?: 'asc' | 'desc';
@@ -221,6 +222,10 @@ export class ParcelQueryService {
           none: { organizationId: filters.organizationId },
         };
       }
+    }
+
+    if (filters.skipTraceStatus) {
+      where.skipTraceStatus = filters.skipTraceStatus;
     }
 
     return where;
