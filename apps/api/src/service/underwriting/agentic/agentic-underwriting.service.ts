@@ -4,6 +4,7 @@ import { S3Service } from '../../s3/s3.service';
 import { DealAnalyzerService } from './deal-analyzer.service';
 import { TemplateFillerService } from './template-filler.service';
 import { AgenticDeliveryService } from './agentic-delivery.service';
+import { DealAnalysis } from './agentic-types';
 import {
   UnderwritingJobContext,
   UnderwritingResult,
@@ -149,15 +150,7 @@ export class AgenticUnderwritingService {
    */
   private fillUnitMix(
     workbook: any,
-    analysis: {
-      unitMix: Array<{
-        beds: number;
-        baths: number;
-        unitCount: number;
-        avgSqFt: number | null;
-        avgMonthlyRent: number | null;
-      }>;
-    },
+    analysis: DealAnalysis,
     dealId: string,
   ): number {
     const sheet = workbook.sheet('Unit Mix');
