@@ -1,5 +1,4 @@
 import { Injectable, Logger } from '@nestjs/common';
-import * as XLSX from 'xlsx';
 import { PrismaService } from '../../prisma/prisma.service';
 import { S3Service } from '../../s3/s3.service';
 import { DealAnalyzerService } from './deal-analyzer.service';
@@ -197,11 +196,16 @@ export class AgenticUnderwritingService {
         sheet.cell(`B${row}`).value(`${mix.beds}BR/${mix.baths}BA`);
         sheet.cell(`D${row}`).value(mix.beds);
         sheet.cell(`E${row}`).value(mix.baths);
-        if (mix.avgSqFt) sheet.cell(`G${row}`).value(Math.round(mix.avgSqFt));
         sheet.cell(`H${row}`).value(mix.unitCount);
-        if (mix.avgMonthlyRent)
+        cellsWritten += 4;
+        if (mix.avgSqFt) {
+          sheet.cell(`G${row}`).value(Math.round(mix.avgSqFt));
+          cellsWritten++;
+        }
+        if (mix.avgMonthlyRent) {
           sheet.cell(`J${row}`).value(Math.round(mix.avgMonthlyRent));
-        cellsWritten += 6;
+          cellsWritten++;
+        }
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
         this.logger.warn(
