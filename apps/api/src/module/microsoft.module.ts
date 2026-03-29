@@ -8,7 +8,7 @@ import { MicrosoftWebhookController } from '../controller/webhook/microsoft-webh
 import { PrismaModule } from './prisma.module';
 import { SqsModule } from './sqs.module';
 import { S3Module } from './s3.module';
-import { DealAnalysisModule } from './ai.module';
+import { DealAnalysisModule } from './deal-analysis.module';
 import { PreferencesModule } from './preferences.module';
 
 @Module({

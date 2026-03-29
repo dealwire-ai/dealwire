@@ -2,32 +2,24 @@
 
 import { useState } from "react";
 import { Download } from "lucide-react";
-import { useAuth } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import { useApi } from "@/hooks/use-api";
 
 interface ExportButtonProps {
   queryString: string;
 }
 
 export function ExportButton({ queryString }: ExportButtonProps) {
-  const { getToken } = useAuth();
+  const { apiCall } = useApi();
   const [loading, setLoading] = useState(false);
 
   const handleExport = async () => {
     setLoading(true);
     try {
-      const token = await getToken();
-      const url = `${API_URL}/public-data/parcels/export?${queryString}`;
-
-      const response = await fetch(url, {
-        headers: {
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
-      });
-
-      if (!response.ok) throw new Error(`Export failed: ${response.status}`);
+      const response = await apiCall(
+        `/public-data/parcels/export?${queryString}`,
+        { raw: true },
+      );
 
       const blob = await response.blob();
       const downloadUrl = window.URL.createObjectURL(blob);

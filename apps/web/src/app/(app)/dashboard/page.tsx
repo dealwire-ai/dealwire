@@ -22,62 +22,7 @@ import { useTableState } from "@/hooks/use-table-state";
 import { Chatbot } from "@/components/chat/chatbot";
 import { DashboardPageShell } from "@/components/dashboard-page-shell";
 import posthog from "posthog-js";
-
-interface Deal {
-  id: string;
-  sourceSubject: string | null;
-  sourceFrom: string | null;
-  sourceReceivedAt: string | null;
-  initialScreeningSummary: string | null;
-  detectionConfidence: string | null;
-  detectionReason: string | null;
-  folderMovedTo: string | null;
-  sourceMessageId?: string | null;
-  assetId?: string | null;
-  contactId?: string | null;
-  createdAt: string;
-  updatedAt: string;
-  receivedByUser?: {
-    id: string;
-    email: string;
-    firstName: string | null;
-    lastName: string | null;
-  } | null;
-  organization?: {
-    id: string;
-    name: string;
-  } | null;
-  initialScreening?: {
-    decision: "YES" | "NO";
-    reason: string;
-  } | null;
-  documents?: Array<{
-    id: string;
-    filename: string;
-    contentType: string;
-    sizeBytes: number;
-  }>;
-}
-
-interface Contact {
-  id: string;
-  email: string;
-  firstName: string | null;
-  lastName: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface Asset {
-  id: string;
-  address: string | null;
-  city: string | null;
-  state: string | null;
-  country: string | null;
-  normalizedAddress: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
+import type { Deal, Contact, Asset } from "@/types/api";
 
 export default function DashboardPage() {
   const { userId, isLoaded } = useAuth();

@@ -5,8 +5,6 @@ import { useAuth } from "@clerk/nextjs";
 import { useApi } from "@/hooks/use-api";
 import { DashboardPageShell } from "@/components/dashboard-page-shell";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
-
 interface FieldMapEntry {
   name: string;
   description: string;
@@ -118,13 +116,12 @@ function ProformaCard({
   proforma,
   onUpdate,
   onDelete,
-  token,
 }: {
   proforma: Proforma;
   onUpdate: (updated: Proforma) => void;
   onDelete: (id: string) => void;
-  token: string | null;
 }) {
+  const { apiCall } = useApi();
   const [expanded, setExpanded] = useState(false);
   const [editName, setEditName] = useState(proforma.name);
   const [editIsDefault, setEditIsDefault] = useState(proforma.isDefault);
@@ -144,24 +141,15 @@ function ProformaCard({
     setSaving(true);
     setError(null);
     try {
-      const res = await fetch(
-        `${API_URL}/underwriting/proforma/${proforma.id}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            ...(token && { Authorization: `Bearer ${token}` }),
-          },
-          body: JSON.stringify({
-            name: editName,
-            isDefault: editIsDefault,
-            isReady: editIsReady,
-            fieldMap: editFieldMap,
-          }),
-        },
-      );
-      if (!res.ok) throw new Error(await res.text());
-      const updated = await res.json();
+      const updated = await apiCall(`/underwriting/proforma/${proforma.id}`, {
+        method: "PATCH",
+        body: JSON.stringify({
+          name: editName,
+          isDefault: editIsDefault,
+          isReady: editIsReady,
+          fieldMap: editFieldMap,
+        }),
+      });
       onUpdate(updated);
       setExpanded(false);
     } catch (e) {
@@ -175,14 +163,9 @@ function ProformaCard({
     if (!confirm(`Delete "${proforma.name}"?`)) return;
     setDeleting(true);
     try {
-      const res = await fetch(
-        `${API_URL}/underwriting/proforma/${proforma.id}`,
-        {
-          method: "DELETE",
-          headers: { ...(token && { Authorization: `Bearer ${token}` }) },
-        },
-      );
-      if (!res.ok) throw new Error(await res.text());
+      await apiCall(`/underwriting/proforma/${proforma.id}`, {
+        method: "DELETE",
+      });
       onDelete(proforma.id);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Delete failed");
@@ -279,7 +262,7 @@ function ProformaCard({
 }
 
 export default function UnderwritingPage() {
-  const { userId, isLoaded, getToken } = useAuth();
+  const { userId, isLoaded } = useAuth();
   const { apiCall } = useApi();
 
   const [proformas, setProformas] = useState<Proforma[]>([]);
@@ -291,13 +274,6 @@ export default function UnderwritingPage() {
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const [token, setToken] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!isLoaded || !userId) return;
-    getToken().then(setToken);
-  }, [isLoaded, userId, getToken]);
 
   useEffect(() => {
     if (!isLoaded || !userId) return;
@@ -320,17 +296,14 @@ export default function UnderwritingPage() {
     setCreating(true);
     setCreateError(null);
     try {
-      const tok = await getToken();
       const form = new FormData();
       form.append("name", newName.trim());
       form.append("file", newFile);
-      const res = await fetch(`${API_URL}/underwriting/proforma`, {
+      const created = await apiCall("/underwriting/proforma", {
         method: "POST",
-        headers: { ...(tok && { Authorization: `Bearer ${tok}` }) },
+        skipContentType: true,
         body: form,
       });
-      if (!res.ok) throw new Error(await res.text());
-      const created = await res.json();
       setProformas((prev) => [created, ...prev]);
       setNewName("");
       setNewFile(null);
@@ -401,7 +374,6 @@ export default function UnderwritingPage() {
               <ProformaCard
                 key={p.id}
                 proforma={p}
-                token={token}
                 onUpdate={(updated) =>
                   setProformas((prev) =>
                     prev.map((x) => (x.id === updated.id ? updated : x)),

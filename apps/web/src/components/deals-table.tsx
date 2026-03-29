@@ -12,49 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { formatRelativeDate } from "@/lib/date-utils";
-
-interface Deal {
-  id: string;
-  sourceSubject: string | null;
-  sourceFrom: string | null;
-  sourceReceivedAt: string | null;
-  initialScreeningSummary: string | null;
-  folderMovedTo: string | null;
-  assetId?: string | null;
-  contactId?: string | null;
-  createdAt: string;
-  updatedAt: string;
-  receivedByUser?: {
-    id: string;
-    email: string;
-    firstName: string | null;
-    lastName: string | null;
-  } | null;
-  initialScreening?: {
-    decision: "YES" | "NO";
-    reason: string;
-  } | null;
-  documents?: Array<{
-    id: string;
-    filename: string;
-    contentType: string;
-    sizeBytes: number;
-  }>;
-}
-
-interface Asset {
-  id: string;
-  address: string | null;
-  city: string | null;
-  state: string | null;
-}
-
-interface Contact {
-  id: string;
-  email: string;
-  firstName: string | null;
-  lastName: string | null;
-}
+import type { Deal, Contact, Asset } from "@/types/api";
 
 interface DealsTableProps {
   deals: Deal[];
