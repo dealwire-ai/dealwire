@@ -6,16 +6,16 @@ import { MicrosoftWebhookService } from '../service/microsoft/microsoft-webhook.
 import { MicrosoftRenewalSchedulerService } from '../service/microsoft/microsoft-renewal-scheduler.service';
 import { MicrosoftWebhookController } from '../controller/webhook/microsoft-webhook.controller';
 import { PrismaModule } from './prisma.module';
-import { SQSModule } from './sqs.module';
+import { SqsModule } from './sqs.module';
 import { S3Module } from './s3.module';
-import { DealAnalysisModule } from './ai.module';
+import { DealAnalysisModule } from './deal-analysis.module';
 import { PreferencesModule } from './preferences.module';
 
 @Module({
   imports: [
     PrismaModule,
     ScheduleModule,
-    SQSModule, // For SQSService (was EmailProcessorModule — broke circular dep)
+    SqsModule, // For SQSService (was EmailProcessorModule — broke circular dep)
     S3Module,
     DealAnalysisModule, // For DealDetectionService
     PreferencesModule, // For ScreeningPreferencesService

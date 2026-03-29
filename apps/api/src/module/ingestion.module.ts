@@ -4,7 +4,7 @@ import { HistoricalIngestionService } from '../service/ingestion/historical-inge
 import { MicrosoftGraphListService } from '../service/microsoft/microsoft-graph-list.service';
 import { PrismaModule } from './prisma.module';
 import { MicrosoftModule } from './microsoft.module';
-import { DealAnalysisModule } from './ai.module';
+import { DealAnalysisModule } from './deal-analysis.module';
 import { EmailProcessorModule } from './email-processor.module';
 import { S3Module } from './s3.module';
 import { PreferencesModule } from './preferences.module';
