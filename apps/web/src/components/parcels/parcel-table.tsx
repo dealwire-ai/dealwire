@@ -1,12 +1,13 @@
 "use client";
 
-import { Fragment } from "react";
+import { Fragment, useState } from "react";
 import {
   ArrowDown,
   ArrowUp,
   ChevronDown,
   ChevronUp,
   Circle,
+  Phone,
 } from "lucide-react";
 import {
   Table,
@@ -26,6 +27,7 @@ import {
   type ParcelListType,
 } from "./list-assign-popover";
 import { formatBuildingClass } from "@/lib/building-class-labels";
+import { useApi } from "@/hooks/use-api";
 
 const BOROUGH_NAMES: Record<string, string> = {
   "1": "Manhattan",
@@ -376,7 +378,16 @@ function renderCell(
         </span>
       );
     case "ownerPhones":
-      return <PhoneCell parcel={parcel} />;
+      return (
+        <PhoneCell
+          parcel={parcel}
+          onUpdated={
+            onParcelUpdated
+              ? (updates) => onParcelUpdated(parcel.bbl, updates)
+              : undefined
+          }
+        />
+      );
     case "listType":
       return (
         <ListAssignPopover
@@ -449,6 +460,7 @@ export function ParcelTable({
                 }
               }}
               onClick={(e) => e.stopPropagation()}
+              className="cursor-pointer"
             />
           </TableHead>
           <TableHead className="w-10"></TableHead>
@@ -514,6 +526,7 @@ export function ParcelTable({
                   <Checkbox
                     checked={selectedBbls?.has(parcel.bbl) ?? false}
                     onCheckedChange={() => onToggleSelect?.(parcel.bbl)}
+                    className="cursor-pointer"
                   />
                 </TableCell>
                 <TableCell>
@@ -807,7 +820,13 @@ export function ParcelTable({
   );
 }
 
-function PhoneCell({ parcel }: { parcel: Parcel }) {
+function PhoneCell({
+  parcel,
+  onUpdated,
+}: {
+  parcel: Parcel;
+  onUpdated?: (updates: Partial<Parcel>) => void;
+}) {
   const status = parcel.skipTraceStatus;
 
   if (status === "pending") {
@@ -848,7 +867,55 @@ function PhoneCell({ parcel }: { parcel: Parcel }) {
     );
   }
 
-  return <span className="text-zinc-600 text-xs">&mdash;</span>;
+  // Not traced yet — show inline trace button
+  return <InlineSkipTraceButton bbl={parcel.bbl} onUpdated={onUpdated} />;
+}
+
+function InlineSkipTraceButton({
+  bbl,
+  onUpdated,
+}: {
+  bbl: string;
+  onUpdated?: (updates: Partial<Parcel>) => void;
+}) {
+  const { apiCall } = useApi();
+  const [loading, setLoading] = useState(false);
+
+  async function handleClick(e: React.MouseEvent) {
+    e.stopPropagation();
+    setLoading(true);
+    try {
+      await apiCall(`/public-data/parcels/${bbl}/skip-trace`, {
+        method: "POST",
+        body: JSON.stringify({ force: false }),
+      });
+      onUpdated?.({ skipTraceStatus: "pending" });
+    } catch {
+      // ignore — user can retry
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (loading) {
+    return (
+      <span className="inline-flex items-center gap-1 text-xs text-zinc-400">
+        <span className="h-2 w-2 rounded-full bg-yellow-500 animate-pulse" />
+        Looking up...
+      </span>
+    );
+  }
+
+  return (
+    <button
+      onClick={handleClick}
+      className="inline-flex items-center gap-1 text-xs text-zinc-500 hover:text-[#C8A96E] transition-colors cursor-pointer"
+      title="Skip trace this parcel"
+    >
+      <Phone className="w-3 h-3" />
+      <span>Trace</span>
+    </button>
+  );
 }
 
 function DetailRow({
