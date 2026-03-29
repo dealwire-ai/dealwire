@@ -57,8 +57,17 @@ export class ProformaFillService {
       normalized,
     );
 
-    // Step B: Ask AI to map remaining fields
-    const unmappedFields = fieldMap.filter((f) => !directMappings.has(f.name));
+    // Step B: Ask AI to map remaining fields.
+    // Exclude investor-assumption fields — these should never be filled from
+    // deal documents. They represent the buyer's underwriting parameters.
+    const INVESTOR_ASSUMPTION_PATTERNS =
+      /growth|discount rate|exit cap|capex|deficit reserve|reno|closing cost|loan|ltv|amortization|interest rate|refinance|stabiliz|disposition|sale cost|concession|bad debt|vacancy.*(?:rate|loss)|fee.*%|loan fee|acq.*fee/i;
+
+    const unmappedFields = fieldMap.filter(
+      (f) =>
+        !directMappings.has(f.name) &&
+        !INVESTOR_ASSUMPTION_PATTERNS.test(f.name),
+    );
     const aiMappings =
       unmappedFields.length > 0
         ? await this.mapFieldsWithAI(unmappedFields, extraction, normalized)
@@ -154,13 +163,17 @@ export class ProformaFillService {
     // Uses (?<![a-zA-Z]) / (?![a-zA-Z]) instead of \b to handle patterns
     // starting with non-word chars like "# of units".
     // Tolerates trailing plural 's' (e.g. "contract" matches "contracts").
-    const trySet = (patterns: string[], value: number | string | null) => {
+    const trySet = (
+      patterns: string[],
+      value: number | string | null,
+      exclude?: RegExp,
+    ) => {
       if (value === null || value === undefined) return;
       for (const pattern of patterns) {
         const escaped = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         const re = new RegExp(`(?<![a-zA-Z])${escaped}s?(?![a-zA-Z])`, 'i');
         for (const [lower, actual] of fieldNameLookup) {
-          if (re.test(lower)) {
+          if (re.test(lower) && (!exclude || !exclude.test(lower))) {
             map.set(actual, value);
             return;
           }
@@ -206,52 +219,74 @@ export class ProformaFillService {
       trySet(['physical vacancy'], rentRoll.vacancyRate);
     }
 
-    // T-12 income
+    // T-12 income and expenses
+    // Exclude pattern prevents dollar amounts from matching growth-rate /
+    // percentage fields that happen to share keywords (e.g. "Property Tax
+    // Growth Year 1" vs "Property Taxes Annual").
+    const notGrowthRate = /growth|rate|year\s*[0-9]|percentage|%/i;
+
     if (t12) {
-      trySet(['property tax', 'real estate tax', 'taxes'], t12.taxes);
-      trySet(['property insurance', 'insurance'], t12.insurance);
+      trySet(
+        ['property tax', 'real estate tax', 'taxes'],
+        t12.taxes,
+        notGrowthRate,
+      );
+      trySet(['property insurance', 'insurance'], t12.insurance, notGrowthRate);
       // Management fee as dollar amount for expense fields
       trySet(
         ['management fee annual', 'property management annual'],
         t12.managementFees,
+        notGrowthRate,
       );
       // Management fee as percentage for percentage fields
       if (t12.managementFees && t12.effectiveGrossIncome) {
         const mgmtPct = t12.managementFees / t12.effectiveGrossIncome;
         trySet(['management fee percentage'], mgmtPct);
       }
-      trySet(['administrative', 'admin'], t12.administrative);
-      trySet(['waste', 'trash'], t12.wasteDisposal);
+      trySet(['administrative', 'admin'], t12.administrative, notGrowthRate);
+      trySet(['waste', 'trash'], t12.wasteDisposal, notGrowthRate);
       trySet(
         ['water and sewer', 'water & sewer', 'water/sewer'],
         t12.waterAndSewer,
+        notGrowthRate,
       );
-      trySet(['gas'], t12.gas);
-      trySet(['electric'], t12.electric);
-      trySet(['telephone', 'telecom'], t12.telephone);
+      trySet(['gas'], t12.gas, notGrowthRate);
+      trySet(['electric'], t12.electric, notGrowthRate);
+      trySet(['telephone', 'telecom'], t12.telephone, notGrowthRate);
       trySet(
         ['repair', 'r&m', 'repairs and maintenance'],
         t12.repairsAndMaintenance,
+        notGrowthRate,
       );
-      trySet(['pest control'], t12.pestControl);
-      trySet(['landscaping', 'lawn'], t12.landscaping);
-      trySet(['contract'], t12.contracts);
-      trySet(['make ready', 'make-ready', 'turn cost'], t12.makeReady);
-      trySet(['supplies'], t12.supplies);
-      trySet(['advertising', 'marketing'], t12.advertising);
-      trySet(['security'], t12.securityMonitoring);
+      trySet(['pest control'], t12.pestControl, notGrowthRate);
+      trySet(['landscaping', 'lawn'], t12.landscaping, notGrowthRate);
+      trySet(['contract'], t12.contracts, notGrowthRate);
+      trySet(
+        ['make ready', 'make-ready', 'turn cost'],
+        t12.makeReady,
+        notGrowthRate,
+      );
+      trySet(['supplies'], t12.supplies, notGrowthRate);
+      trySet(['advertising', 'marketing'], t12.advertising, notGrowthRate);
+      trySet(['security'], t12.securityMonitoring, notGrowthRate);
       trySet(
         ['tenant reimbursement', 'utility reimbursement', 'utility income'],
         t12.utilityReimbursement,
+        notGrowthRate,
       );
-      trySet(['garage rent', 'parking income'], t12.garageRent);
-      trySet(['pet rent'], t12.petRent);
-      trySet(['other income'], t12.otherIncome);
+      trySet(['garage rent', 'parking income'], t12.garageRent, notGrowthRate);
+      trySet(['pet rent'], t12.petRent, notGrowthRate);
+      trySet(['other income'], t12.otherIncome, notGrowthRate);
       trySet(
         ['gross rental income', 'gross potential rent'],
         t12.grossRentalIncome,
+        notGrowthRate,
       );
-      trySet(['effective gross income', 'egi'], t12.effectiveGrossIncome);
+      trySet(
+        ['effective gross income', 'egi'],
+        t12.effectiveGrossIncome,
+        notGrowthRate,
+      );
     }
 
     // Normalized / reconciled
