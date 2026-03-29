@@ -4,7 +4,6 @@ import Link from "next/link";
 import { SignalMark } from "@/components/signal-mark";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useClerk, useUser, OrganizationSwitcher } from "@clerk/nextjs";
-import { dark } from "@clerk/themes";
 import {
   Inbox,
   Users,
@@ -303,10 +302,7 @@ export function Sidebar() {
               {isAdmin && (
                 <>
                   <div className="px-2 py-1.5">
-                    <OrganizationSwitcher
-                      hidePersonal
-                      appearance={{ baseTheme: dark }}
-                    />
+                    <OrganizationSwitcher hidePersonal />
                   </div>
                   <DropdownMenuSeparator className="bg-zinc-800" />
                 </>
