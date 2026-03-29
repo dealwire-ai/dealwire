@@ -304,6 +304,21 @@ export function ParcelFilters({ filters, onSetFilter }: ParcelFiltersProps) {
         ]}
       />
 
+      {/* Skip trace / phone filter */}
+      <FilterSelect
+        value={filters.skipTraceStatus || "any"}
+        onValueChange={(value) =>
+          onSetFilter("skipTraceStatus", value === "any" ? "" : value)
+        }
+        width="w-[150px]"
+        options={[
+          { value: "any", label: "Phone" },
+          { value: "found", label: "Has Phone" },
+          { value: "not_found", label: "No Phone" },
+          { value: "pending", label: "Pending" },
+        ]}
+      />
+
       {/* Building class groups */}
       <BuildingClassGroupFilter
         value={filters.buildingClassGroups || ""}

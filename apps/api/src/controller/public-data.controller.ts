@@ -193,6 +193,7 @@ export class PublicDataController {
     @Query('maxLienSaleAmount') maxLienSaleAmount?: string,
     @Query('listType') listType?: string,
     @Query('hasNoList') hasNoList?: string,
+    @Query('skipTraceStatus') skipTraceStatus?: string,
     @Query('sort') sort?: string,
     @Query('order') order?: 'asc' | 'desc',
   ) {
@@ -232,6 +233,7 @@ export class PublicDataController {
         : undefined,
       listType: listType || undefined,
       hasNoList: hasNoList === 'true' ? true : undefined,
+      skipTraceStatus: skipTraceStatus || undefined,
       organizationId: organizationId!,
       sort,
       order,

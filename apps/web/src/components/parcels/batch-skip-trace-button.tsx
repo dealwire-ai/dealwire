@@ -36,7 +36,6 @@ export function BatchSkipTraceButton({
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const count = selectedBbls.size;
-  const estimatedCost = (count * 0.02).toFixed(2);
   const overQuota = quotaRemaining !== undefined && count > quotaRemaining;
 
   async function handleConfirm() {
@@ -102,16 +101,6 @@ export function BatchSkipTraceButton({
               Look up contact info for{" "}
               <span className="text-white font-medium">{count} parcels</span>.
             </p>
-            <div className="bg-zinc-800/60 rounded-lg p-3 space-y-1 text-xs">
-              <div className="flex justify-between">
-                <span className="text-zinc-400">Estimated cost</span>
-                <span className="text-white font-medium">${estimatedCost}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-zinc-400">Rate</span>
-                <span className="text-zinc-300">$0.02 / record</span>
-              </div>
-            </div>
             {quotaRemaining !== undefined && quotaLimit !== undefined && (
               <div className="flex justify-between text-xs">
                 <span className="text-zinc-400">Monthly quota</span>

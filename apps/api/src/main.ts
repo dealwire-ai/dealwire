@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { json } from 'express';
@@ -6,7 +7,7 @@ import { JsonLogger } from './util/json-logger';
 async function bootstrap() {
   const jsonLogger = new JsonLogger();
   jsonLogger.setLogLevels(['error', 'warn', 'log']);
-  
+
   const app = await NestFactory.create(AppModule, {
     rawBody: true,
     logger: jsonLogger,
@@ -31,7 +32,10 @@ async function bootstrap() {
   await app.listen(port, '0.0.0.0');
 
   jsonLogger.log(`🚀 API running on port ${port}`, 'Bootstrap');
-  jsonLogger.log(`✅ Health check available at http://0.0.0.0:${port}/health`, 'Bootstrap');
+  jsonLogger.log(
+    `✅ Health check available at http://0.0.0.0:${port}/health`,
+    'Bootstrap',
+  );
 }
 
 bootstrap().catch((err) => {
@@ -48,4 +52,3 @@ bootstrap().catch((err) => {
   );
   process.exit(1);
 });
-
