@@ -11,17 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatRelativeDate } from "@/lib/date-utils";
-
-interface Asset {
-  id: string;
-  address: string | null;
-  city: string | null;
-  state: string | null;
-  country: string | null;
-  normalizedAddress: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
+import type { Asset } from "@/types/api";
 
 interface AssetsTableProps {
   assets: Asset[];

@@ -11,15 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatRelativeDate } from "@/lib/date-utils";
-
-interface Contact {
-  id: string;
-  email: string;
-  firstName: string | null;
-  lastName: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
+import type { Contact } from "@/types/api";
 
 interface ContactsTableProps {
   contacts: Contact[];
