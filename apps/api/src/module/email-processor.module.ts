@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { EmailProcessorService } from '../service/email/email-processor.service';
 import { NormalizedEmailListenerService } from '../service/email/normalized-email-listener.service';
 import { SQSService } from '../service/sqs/sqs.service';
-import { DealAnalysisModule } from './ai.module';
+import { DealAnalysisModule } from './deal-analysis.module';
 import { EmailModule } from './email.module';
 import { PrismaModule } from './prisma.module';
 import { MicrosoftModule } from './microsoft.module';

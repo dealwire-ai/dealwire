@@ -6,7 +6,7 @@ import { ResendWebhookService } from '../service/resend/resend-webhook.service';
 import { UnderwritingInboundService } from '../service/underwriting/underwriting-inbound.service';
 import { ScreeningInboundService } from '../service/screening/screening-inbound.service';
 import { EmailModule } from './email.module';
-import { DealAnalysisModule } from './ai.module';
+import { DealAnalysisModule } from './deal-analysis.module';
 import { PrismaModule } from './prisma.module';
 import { MicrosoftModule } from './microsoft.module';
 import { SqsModule } from './sqs.module';
