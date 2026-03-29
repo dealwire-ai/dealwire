@@ -103,8 +103,9 @@ All project instructions live in `CLAUDE.md` (this file). `.cursorrules` points 
 | `TESTING.md`           | Unit test philosophy, format, guidelines                                                                                      |
 | `DEVELOPMENT.md`       | Troubleshooting, migrations, local dev tips                                                                                   |
 | `GRAFANA_SETUP.md`     | Monitoring/observability setup guide                                                                                          |
-| `CLERK_AUTH_SETUP.md`  | Clerk authentication implementation details                                                                                   |
+| `CLERK_AUTH_SETUP.md`  | Clerk auth flow diagram + files modified (see BACKEND.md for detailed patterns)                                               |
 | `DESKTOP_DEEP_LINK.md` | MAPI entry ID fetch + `outlook:` protocol for desktop Outlook deep links in digest                                            |
+| `API_REFERENCE.md`     | Complete REST API endpoint reference                                                                                          |
 
 #### `docs/product/` — Product & Features
 
@@ -118,11 +119,13 @@ All project instructions live in `CLAUDE.md` (this file). `.cursorrules` points 
 
 #### `docs/clients/` — Client-Specific Notes
 
-| Document                        | Client         | Purpose                                                 |
-| ------------------------------- | -------------- | ------------------------------------------------------- |
-| `JK_NOTES.md`                   | Jordan Karlik  | Meeting notes, Google Drive folder, Granola transcripts |
-| `TAX_LIEN_NOTES.md`             | Daniel Gabay   | Tax lien research, proposals, Google Drive folder       |
-| `BOUTIQUE_HOTEL_OPPORTUNITY.md` | Minas Terlidis | Bohopo lead — hotel acquisition sourcing vertical       |
+| Document                        | Client         | Purpose                                                        |
+| ------------------------------- | -------------- | -------------------------------------------------------------- |
+| `JK_NOTES.md`                   | Jordan Karlik  | Meeting notes, Google Drive folder, Granola transcripts        |
+| `TAX_LIEN_NOTES.md`             | Daniel Gabay   | Tax lien research, proposals, Google Drive folder              |
+| `BOUTIQUE_HOTEL_OPPORTUNITY.md` | Minas Terlidis | Bohopo lead — hotel acquisition sourcing vertical              |
+| `DOLAN_DEMO.md`                 | Thomas Dolan   | DD\|HA demo script — Forever Wild guest intelligence           |
+| `SPREADSHEET_ASSESSMENT.md`     | Daniel Gabay   | PropertyShark spreadsheet assessment for lis pendens ingestion |
 
 #### Reference (not in docs/)
 
