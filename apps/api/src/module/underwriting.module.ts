@@ -10,6 +10,10 @@ import { ProformaService } from '../service/underwriting/proforma.service';
 import { ExtractionReconcilerService } from '../service/underwriting/steps/extraction-reconciler.service';
 import { ProformaFillService } from '../service/underwriting/steps/proforma-fill.service';
 import { DeliveryService } from '../service/underwriting/steps/delivery.service';
+import { AgenticUnderwritingService } from '../service/underwriting/agentic/agentic-underwriting.service';
+import { DealAnalyzerService } from '../service/underwriting/agentic/deal-analyzer.service';
+import { TemplateFillerService } from '../service/underwriting/agentic/template-filler.service';
+import { AgenticDeliveryService } from '../service/underwriting/agentic/agentic-delivery.service';
 import { ProformaController } from '../controller/underwriting/proforma.controller';
 import { UnderwritingDevController } from '../controller/underwriting/underwriting-dev.controller';
 import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
@@ -22,6 +26,7 @@ import { EmailModule } from './email.module';
   controllers: [ProformaController, UnderwritingDevController],
   providers: [
     ClerkAuthGuard,
+    // Legacy pipeline
     UnderwritingListenerService,
     UnderwritingOrchestratorService,
     DocumentClassifierService,
@@ -33,7 +38,12 @@ import { EmailModule } from './email.module';
     ExtractionReconcilerService,
     ProformaFillService,
     DeliveryService,
+    // Agentic pipeline (env: AGENTIC_UNDERWRITING_ENABLED=true)
+    AgenticUnderwritingService,
+    DealAnalyzerService,
+    TemplateFillerService,
+    AgenticDeliveryService,
   ],
-  exports: [UnderwritingOrchestratorService],
+  exports: [UnderwritingOrchestratorService, AgenticUnderwritingService],
 })
 export class UnderwritingModule {}
