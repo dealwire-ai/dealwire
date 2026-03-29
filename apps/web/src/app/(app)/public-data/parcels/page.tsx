@@ -38,6 +38,25 @@ interface SkipTraceUsage {
   remaining: number;
 }
 
+interface IngestionRun {
+  id: string;
+  trigger: string;
+  status: string;
+  completedAt: string | null;
+  startedAt: string;
+}
+
+function timeAgo(dateStr: string): string {
+  const seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+  if (seconds < 60) return "just now";
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
+}
+
 export default function ParcelsPage() {
   const { userId, isLoaded } = useAuth();
   const router = useRouter();
@@ -53,6 +72,7 @@ export default function ParcelsPage() {
   const [skipTraceUsage, setSkipTraceUsage] = useState<SkipTraceUsage | null>(
     null,
   );
+  const [lastRun, setLastRun] = useState<IngestionRun | null>(null);
   const [showCoverage, setShowCoverage] = useState(() => {
     if (typeof window === "undefined") return true;
     return localStorage.getItem("parcels-show-coverage") !== "false";
@@ -118,6 +138,18 @@ export default function ParcelsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoaded, userId]);
 
+  const fetchLastRun = useCallback(async () => {
+    if (!isLoaded || !userId) return;
+    try {
+      const runs: IngestionRun[] = await apiCall("/public-data/ingestion-runs");
+      const completed = runs.find((r) => r.status === "success");
+      if (completed) setLastRun(completed);
+    } catch {
+      // Non-critical
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoaded, userId]);
+
   // Redirect if feature flag is off
   useEffect(() => {
     if (!flagsLoading && !flags.parcels) {
@@ -136,6 +168,10 @@ export default function ParcelsPage() {
   useEffect(() => {
     fetchSkipTraceUsage();
   }, [fetchSkipTraceUsage]);
+
+  useEffect(() => {
+    fetchLastRun();
+  }, [fetchLastRun]);
 
   useEffect(() => {
     setExpandedRows(new Set());
@@ -196,7 +232,15 @@ export default function ParcelsPage() {
                 }}
                 className="w-full flex items-center justify-between px-4 py-2.5 text-xs text-zinc-400 hover:text-zinc-300 transition-colors"
               >
-                <span>Data Coverage</span>
+                <div className="flex items-center gap-3">
+                  <span>Data Coverage</span>
+                  {lastRun?.completedAt && (
+                    <span className="text-zinc-500">
+                      Last refreshed: {timeAgo(lastRun.completedAt)} (
+                      {lastRun.trigger})
+                    </span>
+                  )}
+                </div>
                 <span>{showCoverage ? "Hide" : "Show"}</span>
               </button>
               {showCoverage && (

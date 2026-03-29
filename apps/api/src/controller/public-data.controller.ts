@@ -94,7 +94,7 @@ export class PublicDataController {
 
     // Fire-and-forget — ingestion runs in the background
     this.ingestion
-      .ingestAll(boroughs)
+      .ingestAll(boroughs, 'manual')
       .then((results) => {
         this.logger.log(`Ingestion complete: ${JSON.stringify(results)}`);
       })
@@ -168,6 +168,17 @@ export class PublicDataController {
       });
 
     return { message: 'CARE scraper started' };
+  }
+
+  @Get('ingestion-runs')
+  async getIngestionRuns(
+    @AuthUser('organizationId') organizationId: string | null,
+  ) {
+    await this.assertParcelsEnabled(organizationId);
+    return this.prisma.ingestionRun.findMany({
+      orderBy: { startedAt: 'desc' },
+      take: 10,
+    });
   }
 
   @Get('parcels')
