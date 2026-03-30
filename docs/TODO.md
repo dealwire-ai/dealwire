@@ -17,10 +17,13 @@
   - Buttons to easily update screening criteria from digest email as well as "mute" deals that keep getting sent over and over
 
 ## Tax Lien Analyzer
-- collect $1.5K for phase 2
-
-## Frontstep Feature Development
-- Deliver calander scheduling + auto-qualification 
+- weekly update + meeting time?
+  
+## Frontstep
+- Deliver calander scheduling + auto-qualification
+- Export Pipeline (def remove alex)
+- take stock of remaining assets (DB?)
+- build a 'setup guide' with claude
 
 ## Survey Platform
 - M5 (final touches + testing)
