@@ -98,3 +98,28 @@ export const CellMappingSchema = z.object({
 });
 
 export type CellMappings = z.infer<typeof CellMappingSchema>;
+
+// ─── Call 3: Proforma Validation ─────────────────────────────────────────────
+
+export const ValidationIssueSchema = z.object({
+  severity: z.enum(['error', 'warning', 'info']),
+  sheet: z.string().optional(),
+  cell: z.string().optional(),
+  description: z.string(),
+});
+
+export const ValidationCorrectionSchema = z.object({
+  sheet: z.string(),
+  cell: z.string(),
+  currentValue: z.union([z.number(), z.string()]),
+  correctValue: z.union([z.number(), z.string()]).nullable(),
+  reason: z.string(),
+});
+
+export const ValidationResultSchema = z.object({
+  verdict: z.enum(['pass', 'pass_with_warnings', 'fail']),
+  issues: z.array(ValidationIssueSchema),
+  corrections: z.array(ValidationCorrectionSchema),
+});
+
+export type ValidationResult = z.infer<typeof ValidationResultSchema>;

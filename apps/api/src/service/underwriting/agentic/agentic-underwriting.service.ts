@@ -3,7 +3,9 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { S3Service } from '../../s3/s3.service';
 import { DealAnalyzerService } from './deal-analyzer.service';
 import { TemplateFillerService } from './template-filler.service';
+import { ProformaValidatorService } from './proforma-validator.service';
 import { AgenticDeliveryService } from './agentic-delivery.service';
+import { ValidationResult } from './agentic-types';
 import {
   UnderwritingJobContext,
   UnderwritingResult,
@@ -22,6 +24,7 @@ export class AgenticUnderwritingService {
     private readonly s3: S3Service,
     private readonly analyzer: DealAnalyzerService,
     private readonly filler: TemplateFillerService,
+    private readonly validator: ProformaValidatorService,
     private readonly delivery: AgenticDeliveryService,
   ) {}
 
@@ -49,6 +52,8 @@ export class AgenticUnderwritingService {
 
     // ── Call 2 + Excel write: Fill template ───────────────────────────────────
     let proformaS3Key: string | undefined;
+    let validation: ValidationResult | undefined;
+    let correctionsApplied = 0;
 
     if (proforma) {
       try {
@@ -56,15 +61,15 @@ export class AgenticUnderwritingService {
           proforma.s3Key,
         );
 
-        // Get cell mappings from AI
+        // Load workbook first — the filler reads styles (blue = input cells)
+        const workbook = await XlsxPopulate.fromDataAsync(templateBuffer);
+
+        // Get cell mappings from AI (uses workbook to detect blue input cells)
         const cellMappings = await this.filler.mapToTemplate(
           analysis,
-          templateBuffer,
+          workbook,
           dealId,
         );
-
-        // Write values into workbook
-        const workbook = await XlsxPopulate.fromDataAsync(templateBuffer);
         let filled = 0;
 
         for (const mapping of cellMappings.mappings) {
@@ -90,7 +95,43 @@ export class AgenticUnderwritingService {
           `[${dealId}] Filled ${filled}/${cellMappings.mappings.length} AI-mapped cells`,
         );
 
-        // Upload filled proforma
+        // ── Call 3: Validate filled proforma ─────────────────────────────────
+        const filledBuffer = Buffer.from(await workbook.outputAsync());
+
+        try {
+          validation = await this.validator.validate(
+            filledBuffer,
+            analysis,
+            dealId,
+          );
+
+          // Apply corrections from validator
+          if (validation.corrections.length > 0) {
+            for (const fix of validation.corrections) {
+              try {
+                const sheet = workbook.sheet(fix.sheet);
+                if (!sheet) continue;
+                const value = fix.correctValue === null ? '' : fix.correctValue;
+                sheet.cell(fix.cell).value(value);
+                correctionsApplied++;
+              } catch (err) {
+                const msg = err instanceof Error ? err.message : String(err);
+                this.logger.warn(
+                  `[${dealId}] Could not apply correction ${fix.sheet}!${fix.cell}: ${msg}`,
+                );
+              }
+            }
+            this.logger.log(
+              `[${dealId}] Applied ${correctionsApplied}/${validation.corrections.length} corrections`,
+            );
+          }
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : String(err);
+          this.logger.error(`[${dealId}] Validation failed: ${msg}`);
+          analysis.flags.push('Pro forma validation failed — see logs');
+        }
+
+        // Upload final proforma (with corrections applied)
         const outputBuffer = await workbook.outputAsync();
         proformaS3Key = await this.s3.uploadFilledProforma(
           Buffer.from(outputBuffer),
@@ -112,6 +153,8 @@ export class AgenticUnderwritingService {
           dealId,
           proformaS3Key,
           analysis,
+          validation,
+          correctionsApplied,
           inReplyToMessageId,
         });
       } catch (err) {
