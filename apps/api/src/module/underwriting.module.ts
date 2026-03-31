@@ -13,6 +13,7 @@ import { DeliveryService } from '../service/underwriting/steps/delivery.service'
 import { AgenticUnderwritingService } from '../service/underwriting/agentic/agentic-underwriting.service';
 import { DealAnalyzerService } from '../service/underwriting/agentic/deal-analyzer.service';
 import { TemplateFillerService } from '../service/underwriting/agentic/template-filler.service';
+import { ProformaValidatorService } from '../service/underwriting/agentic/proforma-validator.service';
 import { AgenticDeliveryService } from '../service/underwriting/agentic/agentic-delivery.service';
 import { ProformaController } from '../controller/underwriting/proforma.controller';
 import { UnderwritingDevController } from '../controller/underwriting/underwriting-dev.controller';
@@ -42,6 +43,7 @@ import { EmailModule } from './email.module';
     AgenticUnderwritingService,
     DealAnalyzerService,
     TemplateFillerService,
+    ProformaValidatorService,
     AgenticDeliveryService,
   ],
   exports: [UnderwritingOrchestratorService, AgenticUnderwritingService],
