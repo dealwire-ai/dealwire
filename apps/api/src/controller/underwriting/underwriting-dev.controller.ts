@@ -14,6 +14,7 @@ import { ClerkAuthGuard } from '../../guard/clerk-auth.guard';
 import { AuthUser } from '../../decorator/auth-user.decorator';
 import { S3Service } from '../../service/s3/s3.service';
 import { UnderwritingOrchestratorService } from '../../service/underwriting/underwriting-orchestrator.service';
+import { AgenticUnderwritingService } from '../../service/underwriting/agentic/agentic-underwriting.service';
 
 /**
  * Endpoint for testing the underwriting pipeline.
@@ -39,6 +40,7 @@ export class UnderwritingDevController {
   constructor(
     private readonly s3: S3Service,
     private readonly orchestrator: UnderwritingOrchestratorService,
+    private readonly agenticOrchestrator: AgenticUnderwritingService,
   ) {}
 
   onModuleInit() {
@@ -87,7 +89,15 @@ export class UnderwritingDevController {
       });
     }
 
-    const result = await this.orchestrator.run({
+    const useAgentic = process.env.AGENTIC_UNDERWRITING_ENABLED === 'true';
+
+    const pipeline = useAgentic ? this.agenticOrchestrator : this.orchestrator;
+
+    this.logger.log(
+      `Dev run: using ${useAgentic ? 'agentic' : 'legacy'} pipeline`,
+    );
+
+    const result = await pipeline.run({
       dealId,
       orgId: effectiveOrgId,
       senderEmail: deliverTo ?? '',
