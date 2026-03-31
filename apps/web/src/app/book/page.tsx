@@ -74,7 +74,7 @@ export default function BookPage() {
               Book an intro call
             </h1>
             <p className="text-white/40 text-lg max-w-xl mx-auto">
-              30 minutes. No pitch deck. We&apos;ll show you what we can build.
+              20 minutes — no pitch deck. We look forward to meeting you.
             </p>
           </div>
 
