@@ -139,11 +139,8 @@ export class TemplateFillerService {
       if (fontColor.rgb) {
         if (this.isBlueRgb(fontColor.rgb)) return true;
       }
-      // Theme-based — themes 4-5 are accent blue in standard Office themes
-      if (
-        fontColor.theme !== undefined &&
-        (fontColor.theme === 4 || fontColor.theme === 5)
-      ) {
+      // Theme-based — theme 4 is accent1 (blue in standard Office themes)
+      if (fontColor.theme === 4) {
         return true;
       }
     }
@@ -152,10 +149,7 @@ export class TemplateFillerService {
     const fill = cell.style('fill');
     if (fill?.type === 'solid' && fill?.color) {
       if (fill.color.rgb && this.isBlueRgb(fill.color.rgb)) return true;
-      if (
-        fill.color.theme !== undefined &&
-        (fill.color.theme === 4 || fill.color.theme === 5)
-      ) {
+      if (fill.color.theme === 4) {
         return true;
       }
     }
