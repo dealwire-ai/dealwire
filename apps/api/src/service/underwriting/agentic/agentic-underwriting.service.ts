@@ -53,6 +53,7 @@ export class AgenticUnderwritingService {
     // ── Call 2 + Excel write: Fill template ───────────────────────────────────
     let proformaS3Key: string | undefined;
     let validation: ValidationResult | undefined;
+    let correctionsApplied = 0;
 
     if (proforma) {
       try {
@@ -106,14 +107,13 @@ export class AgenticUnderwritingService {
 
           // Apply corrections from validator
           if (validation.corrections.length > 0) {
-            let corrected = 0;
             for (const fix of validation.corrections) {
               try {
                 const sheet = workbook.sheet(fix.sheet);
                 if (!sheet) continue;
                 const value = fix.correctValue === null ? '' : fix.correctValue;
                 sheet.cell(fix.cell).value(value);
-                corrected++;
+                correctionsApplied++;
               } catch (err) {
                 const msg = err instanceof Error ? err.message : String(err);
                 this.logger.warn(
@@ -122,7 +122,7 @@ export class AgenticUnderwritingService {
               }
             }
             this.logger.log(
-              `[${dealId}] Applied ${corrected}/${validation.corrections.length} corrections`,
+              `[${dealId}] Applied ${correctionsApplied}/${validation.corrections.length} corrections`,
             );
           }
         } catch (err) {
@@ -154,6 +154,7 @@ export class AgenticUnderwritingService {
           proformaS3Key,
           analysis,
           validation,
+          correctionsApplied,
           inReplyToMessageId,
         });
       } catch (err) {
