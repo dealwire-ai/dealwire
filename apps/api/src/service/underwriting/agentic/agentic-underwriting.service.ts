@@ -60,15 +60,15 @@ export class AgenticUnderwritingService {
           proforma.s3Key,
         );
 
-        // Get cell mappings from AI
+        // Load workbook first — the filler reads styles (blue = input cells)
+        const workbook = await XlsxPopulate.fromDataAsync(templateBuffer);
+
+        // Get cell mappings from AI (uses workbook to detect blue input cells)
         const cellMappings = await this.filler.mapToTemplate(
           analysis,
-          templateBuffer,
+          workbook,
           dealId,
         );
-
-        // Write values into workbook
-        const workbook = await XlsxPopulate.fromDataAsync(templateBuffer);
         let filled = 0;
 
         for (const mapping of cellMappings.mappings) {
