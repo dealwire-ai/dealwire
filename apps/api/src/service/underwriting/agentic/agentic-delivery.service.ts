@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { S3Service } from '../../s3/s3.service';
 import { EmailSenderService } from '../../email/email-sender.service';
 import { emailConfig } from '../../../config/email.config';
-import { DealAnalysis } from './agentic-types';
+import { DealAnalysis, ValidationResult } from './agentic-types';
 
 @Injectable()
 export class AgenticDeliveryService {
@@ -19,17 +19,24 @@ export class AgenticDeliveryService {
     dealId: string;
     proformaS3Key: string;
     analysis: DealAnalysis;
+    validation?: ValidationResult;
     inReplyToMessageId?: string;
   }): Promise<void> {
-    const { senderEmail, dealId, proformaS3Key, analysis, inReplyToMessageId } =
-      params;
+    const {
+      senderEmail,
+      dealId,
+      proformaS3Key,
+      analysis,
+      validation,
+      inReplyToMessageId,
+    } = params;
 
     const buffer = await this.s3.downloadDealAttachment(proformaS3Key);
 
     const propertyAddress = analysis.propertyAddress || dealId;
     const subject = `Underwriting Complete: ${propertyAddress}`;
 
-    const html = this.buildResultHtml(analysis, dealId);
+    const html = this.buildResultHtml(analysis, dealId, validation);
 
     const ccAddresses = this.config.adminEmails.filter(
       (addr) => addr.toLowerCase() !== senderEmail.toLowerCase(),
@@ -57,7 +64,11 @@ export class AgenticDeliveryService {
     );
   }
 
-  private buildResultHtml(analysis: DealAnalysis, dealId: string): string {
+  private buildResultHtml(
+    analysis: DealAnalysis,
+    dealId: string,
+    validation?: ValidationResult,
+  ): string {
     const fmt = (n: number | null | undefined, prefix = '', suffix = '') =>
       n !== null && n !== undefined
         ? `${prefix}${n.toLocaleString('en-US', { maximumFractionDigits: 2 })}${suffix}`
@@ -81,6 +92,22 @@ export class AgenticDeliveryService {
     const analystHtml = analysis.analystNotes
       ? `<h3>Analyst Notes</h3><p style="color:#374151;line-height:1.6;">${analysis.analystNotes}</p>`
       : '';
+
+    const verdictLabel = validation
+      ? {
+          pass: 'Passed',
+          pass_with_warnings: 'Passed with warnings',
+          fail: 'Review needed',
+        }[validation.verdict]
+      : undefined;
+
+    const verdictColor = validation
+      ? {
+          pass: '#15803d',
+          pass_with_warnings: '#b45309',
+          fail: '#dc2626',
+        }[validation.verdict]
+      : undefined;
 
     return `
 <!DOCTYPE html>
@@ -142,6 +169,15 @@ export class AgenticDeliveryService {
 
   ${missingDocsHtml}
   ${flagsHtml}
+
+  ${
+    validation
+      ? `<h3>Pro Forma QA Check</h3>
+  <p><strong>Verdict:</strong> <span style="color:${verdictColor};font-weight:bold;">${verdictLabel}</span>
+  ${validation.corrections.length > 0 ? ` &mdash; ${validation.corrections.length} correction(s) applied automatically` : ''}</p>
+  ${validation.issues.length > 0 ? `<ul style="font-size:14px;">${validation.issues.map((i) => `<li style="color:${i.severity === 'error' ? '#dc2626' : i.severity === 'warning' ? '#b45309' : '#6b7280'};">[${i.severity.toUpperCase()}] ${i.description}</li>`).join('')}</ul>` : ''}`
+      : ''
+  }
 
   <p style="margin-top:24px;color:#6b7280;font-size:13px;">
     The filled pro forma is attached. Review and adjust assumptions as needed.
