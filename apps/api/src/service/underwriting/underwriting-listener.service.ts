@@ -5,6 +5,7 @@ import {
   UnderwritingOrchestratorService,
   UnderwritingJobContext,
 } from './underwriting-orchestrator.service';
+import { AgenticUnderwritingService } from './agentic/agentic-underwriting.service';
 
 export interface UnderwritingJobMessage {
   type: 'underwriting-job';
@@ -23,7 +24,10 @@ export interface UnderwritingJobMessage {
 export class UnderwritingListenerService {
   private readonly logger = new Logger(UnderwritingListenerService.name);
 
-  constructor(private readonly pipeline: UnderwritingOrchestratorService) {}
+  constructor(
+    private readonly pipeline: UnderwritingOrchestratorService,
+    private readonly agenticPipeline: AgenticUnderwritingService,
+  ) {}
 
   @SqsMessageHandler('underwriting', false)
   async handleMessage(message: Message): Promise<void> {
@@ -72,11 +76,21 @@ export class UnderwritingListenerService {
       inReplyToMessageId: parsed.inReplyToMessageId,
     };
 
-    // Run the full pipeline. Catch errors so the SQS consumer keeps polling
+    const useAgentic = process.env.AGENTIC_UNDERWRITING_ENABLED === 'true';
+
+    this.logger.log(
+      `[${parsed.dealId}] Using ${useAgentic ? 'agentic' : 'legacy'} pipeline`,
+    );
+
+    // Run the pipeline. Catch errors so the SQS consumer keeps polling
     // (unhandled throws kill the sqs-consumer polling loop permanently).
     // The message is still acknowledged — failed jobs won't retry endlessly.
     try {
-      await this.pipeline.run(ctx);
+      if (useAgentic) {
+        await this.agenticPipeline.run(ctx);
+      } else {
+        await this.pipeline.run(ctx);
+      }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       this.logger.error(
