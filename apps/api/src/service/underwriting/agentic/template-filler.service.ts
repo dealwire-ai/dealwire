@@ -82,7 +82,6 @@ export class TemplateFillerService {
    * Sheets with only formula cells (no inputs) are skipped to save tokens.
    */
   private serializeWorkbook(workbook: any): string {
-    const BLUE_RGB = 'FF0000FF';
     const sheets: string[] = [];
 
     for (const sheet of workbook.sheets()) {
@@ -112,10 +111,7 @@ export class TemplateFillerService {
             rowCells.push(`${ref}(formula):"${value}"`);
           } else {
             hasInputCells = true;
-            // Check for blue font color (standard CRE input cell convention)
-            const fontColor = cell.style('fontColor');
-            const isBlueInput = fontColor?.rgb === BLUE_RGB;
-            const tag = isBlueInput ? '[input]' : '';
+            const tag = this.isInputCell(cell) ? '[input]' : '';
             rowCells.push(`${ref}${tag}:"${value}"`);
           }
         }
@@ -129,5 +125,54 @@ export class TemplateFillerService {
     }
 
     return sheets.join('\n\n');
+  }
+
+  /**
+   * Detect whether a cell is a designated input cell based on styling.
+   * CRE convention: blue font and/or light blue fill = user input.
+   * Handles explicit RGB colors, theme-based colors, and fill as fallback.
+   */
+  private isInputCell(cell: any): boolean {
+    const fontColor = cell.style('fontColor');
+    if (fontColor) {
+      // Explicit RGB — check if blue is the dominant channel
+      if (fontColor.rgb) {
+        if (this.isBlueRgb(fontColor.rgb)) return true;
+      }
+      // Theme-based — themes 4-5 are accent blue in standard Office themes
+      if (
+        fontColor.theme !== undefined &&
+        (fontColor.theme === 4 || fontColor.theme === 5)
+      ) {
+        return true;
+      }
+    }
+
+    // Fallback: check fill color (light blue background = input)
+    const fill = cell.style('fill');
+    if (fill?.type === 'solid' && fill?.color) {
+      if (fill.color.rgb && this.isBlueRgb(fill.color.rgb)) return true;
+      if (
+        fill.color.theme !== undefined &&
+        (fill.color.theme === 4 || fill.color.theme === 5)
+      ) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Check if an AARRGGBB hex string represents a blue-ish color.
+   * Blue-dominant means B channel > R and B channel > G with a minimum intensity.
+   */
+  private isBlueRgb(argb: string): boolean {
+    // Format: "FFRRGGBB" or "RRGGBB"
+    const hex = argb.length === 8 ? argb.slice(2) : argb;
+    const r = parseInt(hex.slice(0, 2), 16);
+    const g = parseInt(hex.slice(2, 4), 16);
+    const b = parseInt(hex.slice(4, 6), 16);
+    return b > 100 && b > r * 1.5 && b > g * 1.2;
   }
 }
