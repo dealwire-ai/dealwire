@@ -20,6 +20,7 @@ export class AgenticDeliveryService {
     proformaS3Key: string;
     analysis: DealAnalysis;
     validation?: ValidationResult;
+    correctionsApplied?: number;
     inReplyToMessageId?: string;
   }): Promise<void> {
     const {
@@ -28,6 +29,7 @@ export class AgenticDeliveryService {
       proformaS3Key,
       analysis,
       validation,
+      correctionsApplied,
       inReplyToMessageId,
     } = params;
 
@@ -36,7 +38,12 @@ export class AgenticDeliveryService {
     const propertyAddress = analysis.propertyAddress || dealId;
     const subject = `Underwriting Complete: ${propertyAddress}`;
 
-    const html = this.buildResultHtml(analysis, dealId, validation);
+    const html = this.buildResultHtml(
+      analysis,
+      dealId,
+      validation,
+      correctionsApplied,
+    );
 
     const ccAddresses = this.config.adminEmails.filter(
       (addr) => addr.toLowerCase() !== senderEmail.toLowerCase(),
@@ -68,6 +75,7 @@ export class AgenticDeliveryService {
     analysis: DealAnalysis,
     dealId: string,
     validation?: ValidationResult,
+    correctionsApplied?: number,
   ): string {
     const fmt = (n: number | null | undefined, prefix = '', suffix = '') =>
       n !== null && n !== undefined
@@ -174,7 +182,7 @@ export class AgenticDeliveryService {
     validation
       ? `<h3>Pro Forma QA Check</h3>
   <p><strong>Verdict:</strong> <span style="color:${verdictColor};font-weight:bold;">${verdictLabel}</span>
-  ${validation.corrections.length > 0 ? ` &mdash; ${validation.corrections.length} correction(s) applied automatically` : ''}</p>
+  ${correctionsApplied ? ` &mdash; ${correctionsApplied} correction(s) applied automatically` : ''}</p>
   ${validation.issues.length > 0 ? `<ul style="font-size:14px;">${validation.issues.map((i) => `<li style="color:${i.severity === 'error' ? '#dc2626' : i.severity === 'warning' ? '#b45309' : '#6b7280'};">[${i.severity.toUpperCase()}] ${i.description}</li>`).join('')}</ul>` : ''}`
       : ''
   }
