@@ -341,8 +341,9 @@ export default function Home() {
               { file: "hildreth.png", alt: "Hildreth Real Estate Advisors" },
               { file: "jke.svg", alt: "JK Equities" },
               { file: "dg-development.svg", alt: "DG Development Partners" },
+              { file: "foxfield.svg", alt: "Foxfield", height: "h-[32px]" },
               { file: "rm.png", alt: "R&M Capital Property Management" },
-            ].map(({ file, alt }) => (
+            ].map(({ file, alt, height }) => (
               <div
                 key={file}
                 className="opacity-25 hover:opacity-55 transition-opacity duration-300"
@@ -353,7 +354,7 @@ export default function Home() {
                   alt={alt}
                   width={140}
                   height={40}
-                  className="object-contain h-[42px] w-auto"
+                  className={`object-contain ${height ?? "h-[42px]"} w-auto`}
                 />
               </div>
             ))}
