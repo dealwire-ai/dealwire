@@ -341,8 +341,8 @@ export default function Home() {
               { file: "hildreth.png", alt: "Hildreth Real Estate Advisors" },
               { file: "jke.svg", alt: "JK Equities" },
               { file: "dg-development.svg", alt: "DG Development Partners" },
-              { file: "rm.png", alt: "R&M Capital Property Management" },
               { file: "foxfield.svg", alt: "Foxfield", height: "h-[32px]" },
+              { file: "rm.png", alt: "R&M Capital Property Management" },
             ].map(({ file, alt, height }) => (
               <div
                 key={file}
