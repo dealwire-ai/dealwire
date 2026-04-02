@@ -8,6 +8,10 @@
 
 ## Biz Dev
 
+## Foxfield OS
+- discovery phase (meeting 4/13)
+- send invoice
+
 ## Deal Screener
 
 - **[JK 3/3]** Underwriting pipeline improvements:
