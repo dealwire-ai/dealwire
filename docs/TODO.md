@@ -30,4 +30,4 @@
 - build a 'setup guide' with claude
 
 ## Survey Platform
-- M5 (final touches + testing)
+- get $200 for m5
