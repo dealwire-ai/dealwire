@@ -27,6 +27,7 @@ import {
   type ParcelListType,
 } from "./list-assign-popover";
 import { formatBuildingClass } from "@/lib/building-class-labels";
+import { StreetViewImage } from "./street-view-image";
 import { useApi } from "@/hooks/use-api";
 
 const BOROUGH_NAMES: Record<string, string> = {
@@ -592,7 +593,19 @@ export function ParcelTable({
                     className="bg-zinc-950/50 p-0 transition-all duration-200"
                   >
                     <div className="border-l-2 border-[#C8A96E] pl-4 py-4 pr-4">
-                      <div className="grid grid-cols-3 gap-6 text-sm">
+                      <div className="grid grid-cols-[280px_1fr_1fr_1fr] gap-6 text-sm">
+                        {/* Street View */}
+                        <div>
+                          <div className="text-zinc-400 mb-2 font-medium">
+                            Street View
+                          </div>
+                          <StreetViewImage
+                            address={parcel.address ?? ""}
+                            borough={parcel.borough}
+                            zipCode={parcel.zipCode}
+                          />
+                        </div>
+
                         {/* Property Details */}
                         <div>
                           <div className="text-zinc-400 mb-2 font-medium">
