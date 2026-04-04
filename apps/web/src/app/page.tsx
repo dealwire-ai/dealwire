@@ -342,7 +342,11 @@ export default function Home() {
               { file: "jke.svg", alt: "JK Equities" },
               { file: "dg-development.svg", alt: "DG Development Partners" },
               { file: "foxfield.svg", alt: "Foxfield", height: "h-[32px]" },
-              { file: "rm.png", alt: "R&M Capital Property Management" },
+              {
+                file: "rm.png",
+                alt: "R&M Capital Property Management",
+                height: "h-[56px]",
+              },
             ].map(({ file, alt, height }) => (
               <div
                 key={file}
