@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { ImageOff } from "lucide-react";
 
 interface StreetViewImageProps {
@@ -24,31 +25,34 @@ export function StreetViewImage({
   zipCode,
   className,
 }: StreetViewImageProps) {
-  const [status, setStatus] = useState<"loading" | "available" | "unavailable">(
-    "loading",
-  );
-
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
   const fullAddress = `${address}, ${BOROUGH_NAMES[borough] ?? borough}, NY${zipCode ? ` ${zipCode}` : ""}`;
   const encodedAddress = encodeURIComponent(fullAddress);
 
-  useEffect(() => {
-    if (!apiKey) {
-      setStatus("unavailable");
-      return;
-    }
+  const [status, setStatus] = useState<"loading" | "available" | "unavailable">(
+    apiKey ? "loading" : "unavailable",
+  );
 
+  useEffect(() => {
+    if (!apiKey) return;
+
+    const controller = new AbortController();
     fetch(
       `https://maps.googleapis.com/maps/api/streetview/metadata?location=${encodedAddress}&key=${apiKey}`,
+      { signal: controller.signal },
     )
       .then((res) => res.json())
       .then((data) =>
         setStatus(data.status === "OK" ? "available" : "unavailable"),
       )
-      .catch(() => setStatus("unavailable"));
+      .catch(() => {
+        if (!controller.signal.aborted) setStatus("unavailable");
+      });
+
+    return () => controller.abort();
   }, [encodedAddress, apiKey]);
 
-  if (!apiKey || status === "unavailable") {
+  if (status === "unavailable") {
     return (
       <div
         className={`flex flex-col items-center justify-center rounded-md bg-zinc-900 border border-zinc-800 text-zinc-600 ${className ?? "h-[200px] w-full"}`}
@@ -70,10 +74,13 @@ export function StreetViewImage({
   const imageUrl = `https://maps.googleapis.com/maps/api/streetview?size=600x400&location=${encodedAddress}&key=${apiKey}`;
 
   return (
-    <img
+    <Image
       src={imageUrl}
       alt={`Street view of ${address}`}
+      width={600}
+      height={400}
       className={`rounded-md object-cover ${className ?? "h-[200px] w-full"}`}
+      unoptimized
       onError={() => setStatus("unavailable")}
     />
   );
