@@ -23,10 +23,9 @@
 - weekly update + meeting time?
   
 ## Frontstep
-- Deliver calander scheduling + auto-qualification
-- take stock of remaining assets (DB?)
-- build a 'setup guide' with claude
+- they need to finish setting shit up
 - send invoice for 2250
+- update pricing page
 
 ## Survey Platform
 - get $200 for m5
