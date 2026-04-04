@@ -10,7 +10,6 @@
 
 ## Foxfield OS
 - discovery phase (meeting 4/13)
-- send invoice
 
 ## Deal Screener
 
@@ -25,9 +24,9 @@
   
 ## Frontstep
 - Deliver calander scheduling + auto-qualification
-- Export Pipeline (def remove alex)
 - take stock of remaining assets (DB?)
 - build a 'setup guide' with claude
+- send invoice for 2250
 
 ## Survey Platform
 - get $200 for m5
