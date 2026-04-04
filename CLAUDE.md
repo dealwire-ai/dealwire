@@ -226,6 +226,8 @@ Always assign issues to the project board and apply relevant labels (at minimum:
 
 **Conciseness is critical.** Issue titles should be short and scannable. Issue bodies should be a few tight bullet points at most — no paragraphs, no preamble, no restating the title. If the context is already in a linked doc, don't summarize it in the issue. Prefer 3 bullets over 3 sentences. Less is more.
 
+**When creating issues under an epic, you MUST link them as sub-issues immediately after creation.** Do not create child issues without linking them — orphaned issues break the project board's progress tracking. See [Linking sub-issues to epics](#linking-sub-issues-to-epics) below.
+
 ```bash
 # Standard issue
 gh issue create --repo dealwire-ai/dealwire \
@@ -244,7 +246,9 @@ gh issue create --repo dealwire-ai/dealwire \
 
 ### Linking sub-issues to epics
 
-Use the GraphQL API to create native parent/child relationships (shows in sidebar with progress tracking):
+**This is mandatory.** Every issue created under an epic MUST be linked as a native sub-issue immediately after creation. This is not optional — without it, the epic's progress tracking on the project board is broken.
+
+Use the GraphQL API to create native parent/child relationships:
 
 ```bash
 # 1. Get node IDs for the epic and child issue
@@ -263,6 +267,13 @@ gh api graphql -f query='mutation {
   }) { issue { number } }
 }'
 ```
+
+**Checklist when creating issues under an epic:**
+
+1. Create the issue with `gh issue create`
+2. Get node IDs for both the epic and the new issue
+3. Run `addSubIssue` mutation to link them
+4. Never skip step 2-3 — do it in the same workflow, not "later"
 
 Do NOT use "Part of #N" text in issue bodies — use native sub-issues instead.
 
