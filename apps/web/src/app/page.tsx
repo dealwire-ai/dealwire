@@ -86,7 +86,7 @@ export default function Home() {
               </button>
             ))}
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 md:gap-3">
             {isSignedIn ? (
               <>
                 <Link
@@ -98,12 +98,12 @@ export default function Home() {
                     })
                   }
                 >
-                  <Button className="bg-white/5 hover:bg-white/8 border border-white/10 text-white font-medium px-5 text-sm">
+                  <Button className="bg-white/5 hover:bg-white/8 border border-white/10 text-white font-medium px-3 md:px-5 text-xs md:text-sm">
                     Dashboard
                   </Button>
                 </Link>
                 <Button
-                  className="bg-white/5 hover:bg-white/8 border border-white/10 text-white font-medium px-5 text-sm"
+                  className="hidden md:inline-flex bg-white/5 hover:bg-white/8 border border-white/10 text-white font-medium px-3 md:px-5 text-xs md:text-sm"
                   onClick={() => {
                     posthog.capture("cta_clicked", {
                       cta_type: "sign_out",
@@ -126,7 +126,7 @@ export default function Home() {
                   })
                 }
               >
-                <Button className="bg-white/5 hover:bg-white/8 border border-white/10 text-white font-medium px-5 text-sm">
+                <Button className="bg-white/5 hover:bg-white/8 border border-white/10 text-white font-medium px-3 md:px-5 text-xs md:text-sm">
                   Sign In
                 </Button>
               </Link>
@@ -140,7 +140,7 @@ export default function Home() {
                 })
               }
             >
-              <Button className="bg-[#C8A96E] hover:bg-[#b8952a] text-black font-semibold px-5 text-sm">
+              <Button className="bg-[#C8A96E] hover:bg-[#b8952a] text-black font-semibold px-3 md:px-5 text-xs md:text-sm">
                 Request Access
               </Button>
             </Link>
@@ -338,11 +338,23 @@ export default function Home() {
           </p>
           <div className="flex flex-wrap items-center justify-center gap-x-14 gap-y-8">
             {[
-              { file: "hildreth.png", alt: "Hildreth Real Estate Advisors" },
-              { file: "jke.svg", alt: "JK Equities" },
-              { file: "dg-development.svg", alt: "DG Development Partners" },
-              { file: "foxfield.svg", alt: "Foxfield", height: "h-[32px]" },
-              { file: "rm.png", alt: "R&M Capital Property Management" },
+              {
+                file: "hildreth.png",
+                alt: "Hildreth Real Estate Advisors",
+                height: "h-[38px]",
+              },
+              { file: "jke.svg", alt: "JK Equities", height: "h-[36px]" },
+              {
+                file: "dg-development.svg",
+                alt: "DG Development Partners",
+                height: "h-[28px]",
+              },
+              { file: "foxfield.svg", alt: "Foxfield", height: "h-[26px]" },
+              {
+                file: "rm.png",
+                alt: "R&M Capital Property Management",
+                height: "h-[44px]",
+              },
             ].map(({ file, alt, height }) => (
               <div
                 key={file}
@@ -354,7 +366,7 @@ export default function Home() {
                   alt={alt}
                   width={140}
                   height={40}
-                  className={`object-contain ${height ?? "h-[42px]"} w-auto`}
+                  className={`object-contain ${height} w-auto`}
                 />
               </div>
             ))}
