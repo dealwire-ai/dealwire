@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { ImageOff } from "lucide-react";
+import { Camera, ImageOff } from "lucide-react";
 
 interface StreetViewImageProps {
   address: string;
@@ -32,6 +32,7 @@ export function StreetViewImage({
   const [status, setStatus] = useState<"loading" | "available" | "unavailable">(
     apiKey ? "loading" : "unavailable",
   );
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   useEffect(() => {
     if (!apiKey) return;
@@ -66,22 +67,36 @@ export function StreetViewImage({
   if (status === "loading") {
     return (
       <div
-        className={`animate-pulse rounded-md bg-zinc-800 ${className ?? "h-[200px] w-full"}`}
-      />
+        className={`flex flex-col items-center justify-center rounded-md bg-zinc-900 border border-zinc-800 text-zinc-600 animate-pulse ${className ?? "h-[200px] w-full"}`}
+      >
+        <Camera className="h-8 w-8 mb-2" />
+        <span className="text-xs">Loading Street View...</span>
+      </div>
     );
   }
 
   const imageUrl = `https://maps.googleapis.com/maps/api/streetview?size=600x400&location=${encodedAddress}&key=${apiKey}`;
 
   return (
-    <Image
-      src={imageUrl}
-      alt={`Street view of ${address}`}
-      width={600}
-      height={400}
-      className={`rounded-md object-cover ${className ?? "h-[200px] w-full"}`}
-      unoptimized
-      onError={() => setStatus("unavailable")}
-    />
+    <div
+      className={`relative overflow-hidden rounded-md ${className ?? "h-[200px] w-full"}`}
+    >
+      {!imageLoaded && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-900 border border-zinc-800 text-zinc-600 animate-pulse">
+          <Camera className="h-8 w-8 mb-2" />
+          <span className="text-xs">Loading Street View...</span>
+        </div>
+      )}
+      <Image
+        src={imageUrl}
+        alt={`Street view of ${address}`}
+        width={600}
+        height={400}
+        className={`object-cover w-full h-full transition-opacity duration-300 ${imageLoaded ? "opacity-100" : "opacity-0"}`}
+        unoptimized
+        onLoad={() => setImageLoaded(true)}
+        onError={() => setStatus("unavailable")}
+      />
+    </div>
   );
 }
