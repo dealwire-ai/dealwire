@@ -6,7 +6,10 @@ import { PrismaService } from '../prisma/prisma.service';
 import { DealDetectionService } from '../deal/deal-detection.service';
 import { SQSService } from '../sqs/sqs.service';
 import { S3Service } from '../s3/s3.service';
-import { NormalizedEmailEvent, NormalizedEmailAttachment } from '../../dto/normalized-email-event.dto';
+import {
+  NormalizedEmailEvent,
+  NormalizedEmailAttachment,
+} from '../../dto/normalized-email-event.dto';
 
 @Injectable()
 export class ResendWebhookService {
@@ -36,7 +39,17 @@ export class ResendWebhookService {
       // Convert Resend email to normalized format
       const emailEvent = await this.toNormalizedEvent(emailData);
       if (!emailEvent) {
-        this.logger.error(`Failed to convert Resend email ${emailId} to normalized format`);
+        this.logger.error(
+          `Failed to convert Resend email ${emailId} to normalized format`,
+        );
+        return;
+      }
+
+      // Skip emails from our own sending domain (underwriting replies, digests, etc.)
+      if (emailEvent.from.endsWith('@mail.dealwire.ai')) {
+        this.logger.log(
+          `Skipping self-sent email: ${emailId} from ${emailEvent.from} - "${emailEvent.subject}"`,
+        );
         return;
       }
 
@@ -56,12 +69,15 @@ export class ResendWebhookService {
           userEmail = forwarderEmail;
         } catch (error) {
           const msg = error instanceof Error ? error.message : String(error);
-          this.logger.warn(`Failed to lookup user for ${forwarderEmail}: ${msg}`);
+          this.logger.warn(
+            `Failed to lookup user for ${forwarderEmail}: ${msg}`,
+          );
         }
       }
 
       // Deal detection - must happen before S3 upload
-      const bodyText = emailEvent.bodyText || this.htmlToText(emailEvent.bodyHtml || '');
+      const bodyText =
+        emailEvent.bodyText || this.htmlToText(emailEvent.bodyHtml || '');
       const detection = await this.dealDetectionService.isDealEmail(
         emailEvent.subject,
         bodyText,
@@ -109,7 +125,10 @@ export class ResendWebhookService {
     const trimmed = value.trim();
     const match = trimmed.match(/^(.+?)\s*<([^>]+)>$/);
     if (match) {
-      return { email: match[2].trim().toLowerCase(), name: match[1].trim() || undefined };
+      return {
+        email: match[2].trim().toLowerCase(),
+        name: match[1].trim() || undefined,
+      };
     }
     return { email: trimmed || '', name: undefined };
   }
@@ -117,20 +136,24 @@ export class ResendWebhookService {
   /**
    * Convert Resend webhook payload to NormalizedEmailEvent format
    */
-  private async toNormalizedEvent(emailData: any): Promise<NormalizedEmailEvent | null> {
+  private async toNormalizedEvent(
+    emailData: any,
+  ): Promise<NormalizedEmailEvent | null> {
     try {
       const emailId = emailData.email_id;
-      
+
       // Fetch email body from Resend API
-      const { text: emailBodyText } = await this.emailProcessing.extractEmailBody(emailId);
+      const { text: emailBodyText } =
+        await this.emailProcessing.extractEmailBody(emailId);
       const emailHtml = emailData.html || '';
-      
+
       // Fetch attachments metadata
       const attachmentsMetadata = emailData.attachments || [];
       const attachments: NormalizedEmailAttachment[] = [];
 
       if (attachmentsMetadata.length > 0) {
-        const fetchedAttachments = await this.emailProcessing.fetchAttachments(emailId);
+        const fetchedAttachments =
+          await this.emailProcessing.fetchAttachments(emailId);
         for (const att of fetchedAttachments) {
           attachments.push({
             filename: att.filename,
@@ -141,7 +164,9 @@ export class ResendWebhookService {
         }
       }
 
-      const { email: fromEmail, name: fromName } = this.parseFromHeader(emailData.from || '');
+      const { email: fromEmail, name: fromName } = this.parseFromHeader(
+        emailData.from || '',
+      );
 
       return {
         source: 'resend',
@@ -153,12 +178,16 @@ export class ResendWebhookService {
         bodyHtml: emailHtml,
         bodyText: emailBodyText,
         attachments,
-        receivedAt: emailData.created_at ? new Date(emailData.created_at) : new Date(),
+        receivedAt: emailData.created_at
+          ? new Date(emailData.created_at)
+          : new Date(),
         rawData: emailData,
       };
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
-      this.logger.error(`Failed to convert Resend email to normalized format: ${msg}`);
+      this.logger.error(
+        `Failed to convert Resend email to normalized format: ${msg}`,
+      );
       return null;
     }
   }
@@ -168,7 +197,13 @@ export class ResendWebhookService {
    * Updates emailEvent.attachments with s3Key for each attachment
    */
   private async uploadAttachmentsToS3(
-    emailEvent: { attachments: Array<{ contentId: string; filename: string; s3Key?: string }> },
+    emailEvent: {
+      attachments: Array<{
+        contentId: string;
+        filename: string;
+        s3Key?: string;
+      }>;
+    },
     dealId: string,
   ): Promise<void> {
     for (const att of emailEvent.attachments) {
@@ -176,7 +211,9 @@ export class ResendWebhookService {
         // Download attachment content from Resend (contentId is the downloadUrl)
         const response = await fetch(att.contentId);
         if (!response.ok) {
-          this.logger.warn(`Failed to download attachment ${att.filename}, skipping S3 upload`);
+          this.logger.warn(
+            `Failed to download attachment ${att.filename}, skipping S3 upload`,
+          );
           continue;
         }
 
@@ -194,7 +231,9 @@ export class ResendWebhookService {
         att.s3Key = s3Key;
       } catch (error) {
         const msg = error instanceof Error ? error.message : String(error);
-        this.logger.warn(`Failed to upload attachment ${att.filename} to S3: ${msg}`);
+        this.logger.warn(
+          `Failed to upload attachment ${att.filename} to S3: ${msg}`,
+        );
       }
     }
   }
