@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { Camera, ImageOff } from "lucide-react";
+import { ImageOff, Loader2 } from "lucide-react";
 
 interface StreetViewImageProps {
   address: string;
@@ -69,8 +69,8 @@ export function StreetViewImage({
       <div
         className={`flex flex-col items-center justify-center rounded-md bg-zinc-900 border border-zinc-800 text-zinc-600 animate-pulse ${className ?? "h-[200px] w-full"}`}
       >
-        <Camera className="h-8 w-8 mb-2" />
-        <span className="text-xs">Loading Street View...</span>
+        <Loader2 className="h-6 w-6 animate-spin" />
+        <span className="text-xs mt-2">Loading Street View...</span>
       </div>
     );
   }
@@ -83,8 +83,8 @@ export function StreetViewImage({
     >
       {!imageLoaded && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-900 border border-zinc-800 text-zinc-600 animate-pulse">
-          <Camera className="h-8 w-8 mb-2" />
-          <span className="text-xs">Loading Street View...</span>
+          <Loader2 className="h-6 w-6 animate-spin" />
+          <span className="text-xs mt-2">Loading Street View...</span>
         </div>
       )}
       <Image
