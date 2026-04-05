@@ -94,6 +94,7 @@ model Deal {
   contactId         String?
   documents         Document[]
   initialScreening  InitialScreening?
+  underwritingRuns  UnderwritingRun[]
 
   isMuted           Boolean   @default(false)
   mutedAt           DateTime?
@@ -187,9 +188,9 @@ model Asset {
 
   normalizedAddress String? @unique // Normalized address for matching (e.g., "123 MAIN ST, NEW YORK, NY, USA")
 
-  deals     Deal[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  deals            Deal[]
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   @@index([normalizedAddress])
 }
@@ -314,6 +315,8 @@ model Proforma {
 
   isDefault      Boolean      @default(false) // Pipeline uses this template when org has multiple
   isReady        Boolean      @default(false) // False until fieldMap is confirmed via onboarding
+
+  underwritingRuns UnderwritingRun[]
 
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
@@ -502,27 +505,25 @@ enum UnderwritingStatus {
   FAILED
 }
 
-enum PipelineType {
-  LEGACY
-  AGENTIC
-}
-
 model UnderwritingRun {
   id             String              @id @default(cuid())
   organizationId String
   organization   Organization        @relation(fields: [organizationId], references: [id])
 
-  jobId          String              @unique  // uw_ prefixed job ID from inbound service
-  senderEmail    String
+  // Domain relations (all optional — populated as data becomes available)
+  dealId         String?
+  deal           Deal?               @relation(fields: [dealId], references: [id])
+  proformaId     String?
+  proforma       Proforma?           @relation(fields: [proformaId], references: [id])
+
+  jobId          String              @unique  // uw_ prefixed ID for S3 partitioning & SQS idempotency
+  senderEmail    String                       // Keep — runs can exist without a Deal
   emailSubject   String?
 
   status         UnderwritingStatus  @default(RUNNING)
-  pipelineType   PipelineType
 
-  // Analysis output — DealAnalysis (agentic) or { resolved, om } (legacy)
   analysisData   Json?
-
-  proformaS3Key  String?
+  filledProformaModelS3Key String?    // Filled proforma output (distinct from proforma.s3Key which is the template)
   humanReviewFlags String[]          @default([])
   confidence     Float?
   durationMs     Int?
@@ -536,4 +537,5 @@ model UnderwritingRun {
 
   @@index([organizationId, status])
   @@index([organizationId, completedAt(sort: Desc)])
+  @@index([dealId])
 }

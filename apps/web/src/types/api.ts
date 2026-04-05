@@ -56,13 +56,14 @@ export interface Asset {
 
 export interface UnderwritingRun {
   id: string;
+  dealId: string | null;
+  proformaId: string | null;
   jobId: string;
   senderEmail: string;
   emailSubject: string | null;
   status: "RUNNING" | "COMPLETED" | "FAILED";
-  pipelineType: "LEGACY" | "AGENTIC";
   analysisData?: Record<string, unknown> | null;
-  proformaS3Key: string | null;
+  filledProformaModelS3Key: string | null;
   humanReviewFlags: string[];
   confidence: number | null;
   durationMs: number | null;
