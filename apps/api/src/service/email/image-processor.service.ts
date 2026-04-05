@@ -26,6 +26,7 @@ export class ImageProcessorService {
     filename: string,
   ): Promise<string> {
     const start = Date.now();
+    const modelName = imageOcrModelName();
     try {
       // Convert buffer to base64
       const base64 = buffer.toString('base64');
@@ -41,7 +42,7 @@ export class ImageProcessorService {
         'associate them together. Include all financial metrics, property details, addresses, and contact information.';
 
       const response = await this.openai.chat.completions.create({
-        model: imageOcrModelName(),
+        model: modelName,
         temperature: 0,
         messages: [
           {
@@ -65,7 +66,7 @@ export class ImageProcessorService {
         const duration = (Date.now() - start) / 1000;
         this.metricsService.recordAICall(
           'image-ocr',
-          imageOcrModelName(),
+          modelName,
           duration,
           'error',
         );
@@ -75,7 +76,7 @@ export class ImageProcessorService {
       const duration = (Date.now() - start) / 1000;
       this.metricsService.recordAICall(
         'image-ocr',
-        imageOcrModelName(),
+        modelName,
         duration,
         'success',
       );
@@ -89,7 +90,7 @@ export class ImageProcessorService {
       const duration = (Date.now() - start) / 1000;
       this.metricsService.recordAICall(
         'image-ocr',
-        imageOcrModelName(),
+        modelName,
         duration,
         'error',
       );
@@ -137,6 +138,7 @@ export class ImageProcessorService {
     }
 
     const start = Date.now();
+    const modelName = imageOcrModelName();
     try {
       const content: OpenAI.Chat.Completions.ChatCompletionContentPart[] = [
         {
@@ -158,7 +160,7 @@ export class ImageProcessorService {
       }
 
       const response = await this.openai.chat.completions.create({
-        model: imageOcrModelName(),
+        model: modelName,
         temperature: 0,
         messages: [{ role: 'user', content }],
         max_tokens: 4096,
@@ -170,7 +172,7 @@ export class ImageProcessorService {
 
       this.metricsService.recordAICall(
         'image-ocr-multi',
-        imageOcrModelName(),
+        modelName,
         duration,
         extractedText ? 'success' : 'error',
       );
@@ -184,7 +186,7 @@ export class ImageProcessorService {
       const duration = (Date.now() - start) / 1000;
       this.metricsService.recordAICall(
         'image-ocr-multi',
-        imageOcrModelName(),
+        modelName,
         duration,
         'error',
       );

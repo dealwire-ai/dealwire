@@ -13,7 +13,7 @@ jest.mock('openai', () => ({
 }));
 
 jest.mock('../underwriting/model-config', () => ({
-  dealDetectionModelName: () => 'gpt-4.1-nano',
+  dealDetectionModelName: () => 'gpt-4.1-mini',
 }));
 
 describe('DealDetectionService', () => {
@@ -82,7 +82,7 @@ describe('DealDetectionService', () => {
     expect(result.reason).toBe('Broker blast with specific property details');
     expect(metricsService.recordAICall).toHaveBeenCalledWith(
       'detection',
-      'gpt-4.1-nano',
+      'gpt-4.1-mini',
       expect.any(Number),
       'success',
     );
@@ -117,7 +117,7 @@ describe('DealDetectionService', () => {
     expect(result.reason).toBe('SaaS platform offering, not a property deal');
     expect(metricsService.recordAICall).toHaveBeenCalledWith(
       'detection',
-      'gpt-4.1-nano',
+      'gpt-4.1-mini',
       expect.any(Number),
       'success',
     );
@@ -182,7 +182,7 @@ describe('DealDetectionService', () => {
     expect(result.reason).toBe('No response');
     expect(metricsService.recordAICall).toHaveBeenCalledWith(
       'detection',
-      'gpt-4.1-nano',
+      'gpt-4.1-mini',
       expect.any(Number),
       'error',
     );
@@ -207,7 +207,7 @@ describe('DealDetectionService', () => {
     expect(result.reason).toBe('Detection failed, defaulting to skip');
     expect(metricsService.recordAICall).toHaveBeenCalledWith(
       'detection',
-      'gpt-4.1-nano',
+      'gpt-4.1-mini',
       expect.any(Number),
       'error',
     );
@@ -242,7 +242,7 @@ describe('DealDetectionService', () => {
     expect(result.reason).toBe('Parse failed, defaulting to skip');
     expect(metricsService.recordAICall).toHaveBeenCalledWith(
       'detection',
-      'gpt-4.1-nano',
+      'gpt-4.1-mini',
       expect.any(Number),
       'error',
     );
@@ -261,7 +261,7 @@ describe('DealDetectionService', () => {
     expect(result.reason).toBe('Detection failed, defaulting to skip');
     expect(metricsService.recordAICall).toHaveBeenCalledWith(
       'detection',
-      'gpt-4.1-nano',
+      'gpt-4.1-mini',
       expect.any(Number),
       'error',
     );
@@ -339,7 +339,7 @@ describe('DealDetectionService', () => {
     expect(result.confidence).toBe('high');
     expect(metricsService.recordAICall).toHaveBeenCalledWith(
       'detection',
-      'gpt-4.1-nano',
+      'gpt-4.1-mini',
       expect.any(Number),
       'success',
     );
