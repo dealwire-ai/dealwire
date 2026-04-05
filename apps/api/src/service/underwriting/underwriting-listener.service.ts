@@ -6,12 +6,15 @@ import {
   UnderwritingJobContext,
 } from './underwriting-orchestrator.service';
 import { AgenticUnderwritingService } from './agentic/agentic-underwriting.service';
+import { PrismaService } from '../prisma/prisma.service';
+import { Prisma } from '@prisma/client';
 
 export interface UnderwritingJobMessage {
   type: 'underwriting-job';
   dealId: string;
   orgId: string;
   senderEmail: string;
+  emailSubject?: string;
   documents: Array<{
     s3Key: string;
     filename: string;
@@ -27,6 +30,7 @@ export class UnderwritingListenerService {
   constructor(
     private readonly pipeline: UnderwritingOrchestratorService,
     private readonly agenticPipeline: AgenticUnderwritingService,
+    private readonly prisma: PrismaService,
   ) {}
 
   @SqsMessageHandler('underwriting', false)
@@ -72,6 +76,7 @@ export class UnderwritingListenerService {
       dealId: parsed.dealId,
       orgId: parsed.orgId,
       senderEmail: parsed.senderEmail,
+      emailSubject: parsed.emailSubject,
       documents: parsed.documents,
       inReplyToMessageId: parsed.inReplyToMessageId,
     };
@@ -86,10 +91,44 @@ export class UnderwritingListenerService {
     // (unhandled throws kill the sqs-consumer polling loop permanently).
     // The message is still acknowledged — failed jobs won't retry endlessly.
     try {
-      if (useAgentic) {
-        await this.agenticPipeline.run(ctx);
-      } else {
-        await this.pipeline.run(ctx);
+      // Create initial record
+      const pipelineType = useAgentic ? 'AGENTIC' : 'LEGACY';
+
+      if (parsed.orgId) {
+        await this.prisma.underwritingRun.create({
+          data: {
+            jobId: parsed.dealId,
+            organizationId: parsed.orgId,
+            senderEmail: parsed.senderEmail,
+            emailSubject: parsed.emailSubject,
+            status: 'RUNNING',
+            pipelineType,
+          },
+        });
+      }
+
+      const result = useAgentic
+        ? await this.agenticPipeline.run(ctx)
+        : await this.pipeline.run(ctx);
+
+      // Persist completed result
+      if (parsed.orgId) {
+        await this.prisma.underwritingRun.update({
+          where: { jobId: parsed.dealId },
+          data: {
+            status: 'COMPLETED',
+            analysisData:
+              (result.analysisData as Prisma.InputJsonValue) ?? undefined,
+            proformaS3Key: result.proformaS3Key,
+            humanReviewFlags: result.humanReviewFlags,
+            confidence: result.confidence,
+            durationMs: result.durationMs,
+            completedAt: new Date(),
+          },
+        });
+        this.logger.log(
+          `[${parsed.dealId}] Underwriting result persisted to DB`,
+        );
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
@@ -97,6 +136,34 @@ export class UnderwritingListenerService {
         `[${parsed.dealId}] Pipeline failed: ${msg}`,
         err instanceof Error ? err.stack : undefined,
       );
+
+      // Persist failure
+      if (parsed.orgId) {
+        try {
+          await this.prisma.underwritingRun.upsert({
+            where: { jobId: parsed.dealId },
+            update: {
+              status: 'FAILED',
+              error: msg,
+              completedAt: new Date(),
+            },
+            create: {
+              jobId: parsed.dealId,
+              organizationId: parsed.orgId,
+              senderEmail: parsed.senderEmail,
+              emailSubject: parsed.emailSubject,
+              status: 'FAILED',
+              pipelineType: useAgentic ? 'AGENTIC' : 'LEGACY',
+              error: msg,
+              completedAt: new Date(),
+            },
+          });
+        } catch (persistErr) {
+          this.logger.error(
+            `[${parsed.dealId}] Failed to persist error state: ${persistErr}`,
+          );
+        }
+      }
     }
   }
 

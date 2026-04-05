@@ -17,6 +17,7 @@ import { ProformaValidatorService } from '../service/underwriting/agentic/profor
 import { AgenticDeliveryService } from '../service/underwriting/agentic/agentic-delivery.service';
 import { ProformaController } from '../controller/underwriting/proforma.controller';
 import { UnderwritingDevController } from '../controller/underwriting/underwriting-dev.controller';
+import { UnderwritingRunsController } from '../controller/underwriting/underwriting-runs.controller';
 import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
 import { PrismaModule } from './prisma.module';
 import { S3Module } from './s3.module';
@@ -24,7 +25,11 @@ import { EmailModule } from './email.module';
 
 @Module({
   imports: [PrismaModule, S3Module, EmailModule],
-  controllers: [ProformaController, UnderwritingDevController],
+  controllers: [
+    ProformaController,
+    UnderwritingDevController,
+    UnderwritingRunsController,
+  ],
   providers: [
     ClerkAuthGuard,
     // Legacy pipeline
