@@ -12,7 +12,10 @@ import { openai } from '@ai-sdk/openai';
 function resolveModel(envVar: string, fallback: string) {
   const name = process.env[envVar] || fallback;
   if (name.startsWith('claude-')) return anthropic(name);
-  return openai(name);
+  if (name.startsWith('gpt-')) return openai(name);
+  throw new Error(
+    `Unknown model prefix for ${envVar}="${name}". Expected claude-* or gpt-*.`,
+  );
 }
 
 function resolveModelName(envVar: string, fallback: string): string {
@@ -22,7 +25,7 @@ function resolveModelName(envVar: string, fallback: string): string {
 // ── Underwriting pipeline (AI SDK model objects) ────────────────────
 
 export function classifierModel() {
-  return resolveModel('UW_CLASSIFIER_MODEL', 'gpt-4.1-nano');
+  return resolveModel('UW_CLASSIFIER_MODEL', 'gpt-4.1-mini');
 }
 
 export function extractorModel() {
@@ -57,7 +60,7 @@ export function proformaScanModel() {
 // ── Deal screening (raw model name strings for openai.chat.completions.create) ─
 
 export function dealDetectionModelName(): string {
-  return resolveModelName('DEAL_DETECTION_MODEL', 'gpt-4.1-nano');
+  return resolveModelName('DEAL_DETECTION_MODEL', 'gpt-4.1-mini');
 }
 
 export function imageOcrModelName(): string {
