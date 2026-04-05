@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import OpenAI from 'openai';
 import { aiConfig } from '../../config/ai.config';
+import { dealGeneralModelName } from '../underwriting/model-config';
 import { MetricsService } from '../metrics/metrics.service';
 
 @Injectable()
@@ -14,10 +15,6 @@ export class DealSummaryService {
       apiKey: this.aiConfig.openaiApiKey,
       maxRetries: 3,
     });
-
-    this.logger.log(
-      `OpenAI LLM initialized (model: ${this.aiConfig.openaiModel}, temperature: ${this.aiConfig.openaiTemperature})`,
-    );
   }
 
   /**
@@ -43,13 +40,17 @@ export class DealSummaryService {
     extractedData?: Record<string, unknown>,
   ): Promise<string> {
     const start = Date.now();
+    const modelName = dealGeneralModelName();
     try {
       // Build relationship context for the prompt
       let relationshipContext = '';
       if (brokerContext && brokerContext.totalDeals > 1) {
         relationshipContext = `\n\nBROKER RELATIONSHIP CONTEXT (use subtly — don't list stats, just sound like you know them):
 - This broker has sent ${brokerContext.totalDeals} deals previously`;
-        if (brokerContext.recentPassingDeals && brokerContext.recentPassingDeals.length > 0) {
+        if (
+          brokerContext.recentPassingDeals &&
+          brokerContext.recentPassingDeals.length > 0
+        ) {
           relationshipContext += `\n- Recent deals from them you liked: ${brokerContext.recentPassingDeals.slice(0, 3).join(', ')}`;
         }
         if (brokerContext.notes) {
@@ -63,16 +64,19 @@ export class DealSummaryService {
         const missing: string[] = [];
         if (!extractedData.noi) missing.push('T-12 or current NOI');
         if (!extractedData.occupancy) missing.push('current occupancy');
-        if (!extractedData.askingPrice) missing.push('asking price or guidance');
-        if (!extractedData.units && !extractedData.squareFeet) missing.push('unit count or square footage');
+        if (!extractedData.askingPrice)
+          missing.push('asking price or guidance');
+        if (!extractedData.units && !extractedData.squareFeet)
+          missing.push('unit count or square footage');
         if (missing.length > 0) {
           missingDataContext = `\n\nMISSING INFORMATION (naturally ask about 1-2 of these — don't list them all):
 ${missing.join(', ')}`;
         }
       }
 
-      const systemPrompt = decision === 'yes'
-        ? `You are drafting a brief, professional email reply from a real estate acquisitions team to a broker who sent a deal.
+      const systemPrompt =
+        decision === 'yes'
+          ? `You are drafting a brief, professional email reply from a real estate acquisitions team to a broker who sent a deal.
 The team is interested in this deal. Write a short reply (2-4 sentences) that:
 - Thanks them for sending the deal
 - References the specific property or deal (use details from the text - address, property type, unit count, etc.)
@@ -84,7 +88,7 @@ ${companyName ? `- The user works at ${companyName}` : ''}${relationshipContext}
 
 Do NOT include a subject line. Do NOT include a greeting or sign-off (the email system handles threading). Just the body text.
 Keep it concise — 2-4 sentences max.`
-        : `You are drafting a brief, professional email reply from a real estate acquisitions team to a broker who sent a deal.
+          : `You are drafting a brief, professional email reply from a real estate acquisitions team to a broker who sent a deal.
 The team is NOT interested in this deal but wants to maintain the broker relationship. Write a short reply (2-3 sentences) that:
 - Thanks them for thinking of the team
 - Briefly explains it's not a fit right now (without being too specific about why)
@@ -96,26 +100,44 @@ Do NOT include a subject line. Do NOT include a greeting or sign-off. Just the b
 Keep it concise — 2-3 sentences max.`;
 
       const response = await this.openai.chat.completions.create({
-        model: this.aiConfig.openaiModel,
+        model: modelName,
         temperature: 0.7,
         messages: [
           { role: 'system', content: systemPrompt },
-          { role: 'user', content: `Deal text:\n\n${extractedText.slice(0, 3000)}` },
+          {
+            role: 'user',
+            content: `Deal text:\n\n${extractedText.slice(0, 3000)}`,
+          },
         ],
         user: 'broker-reply-draft',
       });
 
       const draft = response.choices[0]?.message?.content || '';
       const duration = (Date.now() - start) / 1000;
-      this.metricsService.recordAICall('broker-reply-draft', this.aiConfig.openaiModel, duration, 'success');
+      this.metricsService.recordAICall(
+        'broker-reply-draft',
+        modelName,
+        duration,
+        'success',
+      );
 
-      this.logger.log(`Broker reply draft generated (decision: ${decision}, length: ${draft.length}, hasContext: ${!!brokerContext})`);
+      this.logger.log(
+        `Broker reply draft generated (decision: ${decision}, length: ${draft.length}, hasContext: ${!!brokerContext})`,
+      );
       return draft;
     } catch (error) {
       const duration = (Date.now() - start) / 1000;
-      this.metricsService.recordAICall('broker-reply-draft', this.aiConfig.openaiModel, duration, 'error');
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      this.logger.error(`Broker reply draft generation failed: ${errorMessage}`);
+      this.metricsService.recordAICall(
+        'broker-reply-draft',
+        modelName,
+        duration,
+        'error',
+      );
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      this.logger.error(
+        `Broker reply draft generation failed: ${errorMessage}`,
+      );
       throw new Error(`Failed to generate broker reply draft: ${errorMessage}`);
     }
   }
@@ -130,6 +152,7 @@ Keep it concise — 2-3 sentences max.`;
     structuredData?: Record<string, unknown>,
   ): Promise<{ summary: string; narrative: string }> {
     const start = Date.now();
+    const modelName = dealGeneralModelName();
     try {
       let systemPrompt =
         'You are a real estate acquisitions analyst. ' +
@@ -170,7 +193,7 @@ Keep it concise — 2-3 sentences max.`;
       userPrompt += `Extracted text:\n\n${extractedText}`;
 
       const response = await this.openai.chat.completions.create({
-        model: this.aiConfig.openaiModel,
+        model: modelName,
         temperature: this.aiConfig.openaiTemperature,
         messages: [
           { role: 'system', content: systemPrompt },
@@ -185,7 +208,10 @@ Keep it concise — 2-3 sentences max.`;
         throw new Error('Empty response from OpenAI');
       }
 
-      const parsed = JSON.parse(content) as { summary?: string; narrative?: string };
+      const parsed = JSON.parse(content) as {
+        summary?: string;
+        narrative?: string;
+      };
       const summary = parsed.summary || '';
       const narrative = parsed.narrative || '';
 
@@ -194,24 +220,36 @@ Keep it concise — 2-3 sentences max.`;
       }
 
       const duration = (Date.now() - start) / 1000;
-      this.metricsService.recordAICall('summary-and-narrative', this.aiConfig.openaiModel, duration, 'success');
+      this.metricsService.recordAICall(
+        'summary-and-narrative',
+        modelName,
+        duration,
+        'success',
+      );
 
       this.logger.log(
-        `Deal summary+narrative generated (summary: ${summary.length}, narrative: ${narrative.length}, model: ${this.aiConfig.openaiModel})`,
+        `Deal summary+narrative generated (summary: ${summary.length}, narrative: ${narrative.length}, model: ${modelName})`,
       );
 
       return { summary, narrative };
     } catch (error) {
       const duration = (Date.now() - start) / 1000;
-      this.metricsService.recordAICall('summary-and-narrative', this.aiConfig.openaiModel, duration, 'error');
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      const errorType = error instanceof Error ? error.constructor.name : 'Unknown';
+      this.metricsService.recordAICall(
+        'summary-and-narrative',
+        modelName,
+        duration,
+        'error',
+      );
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      const errorType =
+        error instanceof Error ? error.constructor.name : 'Unknown';
       this.logger.error(
         `Deal summary+narrative failed: ${errorMessage} (type: ${errorType})`,
       );
-      throw new Error(`Failed to generate deal summary+narrative: ${errorMessage}`);
+      throw new Error(
+        `Failed to generate deal summary+narrative: ${errorMessage}`,
+      );
     }
   }
-
 }
-

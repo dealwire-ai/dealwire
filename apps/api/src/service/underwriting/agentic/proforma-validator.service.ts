@@ -1,12 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { generateObject } from 'ai';
-import { anthropic } from '@ai-sdk/anthropic';
 import {
   DealAnalysis,
   ValidationResultSchema,
   ValidationResult,
 } from './agentic-types';
 import { excelToTextWithCellRefs } from '../extractors/extraction-types';
+import { validatorModel } from '../model-config';
 
 const SYSTEM_PROMPT = `You are a QA reviewer for commercial real estate pro forma models. You are given:
 
@@ -68,7 +68,7 @@ export class ProformaValidatorService {
     const analysisJson = JSON.stringify(analysis, null, 2);
 
     const { object } = await generateObject({
-      model: anthropic('claude-sonnet-4-6'),
+      model: validatorModel(),
       schema: ValidationResultSchema,
       system: SYSTEM_PROMPT,
       messages: [

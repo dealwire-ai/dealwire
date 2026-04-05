@@ -341,6 +341,21 @@ When adding or modifying a NestJS module, verify:
 - `PrismaService` is in `providers` for any module that touches the DB (missing this causes startup crashes)
 - Any external module (e.g. `SqsModule`, `BullModule`) is only exported if other modules actually import it — unconditional exports cause crashes if the dep isn't configured
 
+### LLM Model Configuration
+
+All LLM model selections go through `apps/api/src/service/underwriting/model-config.ts`. **Never hardcode model names** (e.g. `'gpt-4o-mini'`, `anthropic('claude-sonnet-4-6')`) in service files.
+
+When adding a new LLM call:
+
+1. **Add a new model slot** in `model-config.ts` with its own env var and default:
+   - AI SDK consumers: `export function myNewModel() { return resolveModel('MY_NEW_MODEL', 'gpt-4.1-mini'); }`
+   - Raw OpenAI SDK consumers: `export function myNewModelName(): string { return resolveModelName('MY_NEW_MODEL', 'gpt-4.1-mini'); }`
+2. **Import from `model-config.ts`** in the service — never from `@ai-sdk/anthropic` or `@ai-sdk/openai` directly for model selection
+3. **Add the env var** to `apps/api/.env.example` (commented out, with the default and which service uses it)
+4. The `resolveModel` helper auto-detects provider from name prefix (`claude-*` → Anthropic, `gpt-*` → OpenAI)
+
+For OpenAI API key and temperature, use `aiConfig()` from `apps/api/src/config/ai.config.ts`.
+
 ---
 
 ## Code Quality

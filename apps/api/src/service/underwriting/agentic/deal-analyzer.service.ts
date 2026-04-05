@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { generateObject } from 'ai';
-import { anthropic } from '@ai-sdk/anthropic';
 import { S3Service } from '../../s3/s3.service';
+import { analyzerModel } from '../model-config';
 import { excelToText } from '../extractors/extraction-types';
 import { DealAnalysisSchema, DealAnalysis } from './agentic-types';
 import { UnderwritingDocument } from '../underwriting-orchestrator.service';
@@ -67,7 +67,7 @@ export class DealAnalyzerService {
     this.logger.log(`[${dealId}] Running deal analysis (single-pass)`);
 
     const { object } = await generateObject({
-      model: anthropic('claude-sonnet-4-6'),
+      model: analyzerModel(),
       schema: DealAnalysisSchema,
       system: SYSTEM_PROMPT,
       messages,

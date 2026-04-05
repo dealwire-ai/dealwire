@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { generateObject } from 'ai';
-import { anthropic } from '@ai-sdk/anthropic';
 import { CellMappingSchema, CellMappings, DealAnalysis } from './agentic-types';
+import { templateFillerModel } from '../model-config';
 
 const SYSTEM_PROMPT = `You are mapping commercial real estate deal data into a pro forma Excel template.
 
@@ -57,7 +57,7 @@ export class TemplateFillerService {
     const analysisJson = JSON.stringify(analysis, null, 2);
 
     const { object } = await generateObject({
-      model: anthropic('claude-sonnet-4-6'),
+      model: templateFillerModel(),
       schema: CellMappingSchema,
       system: SYSTEM_PROMPT,
       messages: [

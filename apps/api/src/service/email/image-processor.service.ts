@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import OpenAI from 'openai';
 import { aiConfig } from '../../config/ai.config';
+import { imageOcrModelName } from '../underwriting/model-config';
 import { MetricsService } from '../metrics/metrics.service';
 
 @Injectable()
@@ -14,22 +15,22 @@ export class ImageProcessorService {
       apiKey: this.aiConfig.openaiApiKey,
       maxRetries: 3,
     });
-
-    this.logger.log(
-      `OpenAI Vision API initialized (model: ${this.aiConfig.openaiModel}, temperature: ${this.aiConfig.openaiTemperature})`,
-    );
   }
 
   /**
    * Extract text from an image using OpenAI Vision API
    * Handles vertically stacked labels/values by preserving spatial relationships
    */
-  async extractTextFromImage(buffer: Buffer, filename: string): Promise<string> {
+  async extractTextFromImage(
+    buffer: Buffer,
+    filename: string,
+  ): Promise<string> {
     const start = Date.now();
+    const modelName = imageOcrModelName();
     try {
       // Convert buffer to base64
       const base64 = buffer.toString('base64');
-      
+
       // Detect image type from filename or default to png
       const imageType = this.detectImageType(filename) || 'png';
       const dataUrl = `data:image/${imageType};base64,${base64}`;
@@ -41,8 +42,8 @@ export class ImageProcessorService {
         'associate them together. Include all financial metrics, property details, addresses, and contact information.';
 
       const response = await this.openai.chat.completions.create({
-        model: this.aiConfig.openaiModel,
-        temperature: this.aiConfig.openaiTemperature,
+        model: modelName,
+        temperature: 0,
         messages: [
           {
             role: 'user',
@@ -65,7 +66,7 @@ export class ImageProcessorService {
         const duration = (Date.now() - start) / 1000;
         this.metricsService.recordAICall(
           'image-ocr',
-          this.aiConfig.openaiModel,
+          modelName,
           duration,
           'error',
         );
@@ -75,7 +76,7 @@ export class ImageProcessorService {
       const duration = (Date.now() - start) / 1000;
       this.metricsService.recordAICall(
         'image-ocr',
-        this.aiConfig.openaiModel,
+        modelName,
         duration,
         'success',
       );
@@ -89,12 +90,14 @@ export class ImageProcessorService {
       const duration = (Date.now() - start) / 1000;
       this.metricsService.recordAICall(
         'image-ocr',
-        this.aiConfig.openaiModel,
+        modelName,
         duration,
         'error',
       );
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      const errorType = error instanceof Error ? error.constructor.name : 'Unknown';
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      const errorType =
+        error instanceof Error ? error.constructor.name : 'Unknown';
       this.logger.error(
         `Image processing failed for ${filename}: ${errorMessage} (type: ${errorType})`,
       );
@@ -127,11 +130,15 @@ export class ImageProcessorService {
       // For a single image, fall back to the standard method with a buffer
       const match = images[0].data.match(/^data:image\/\w+;base64,(.+)$/);
       if (match) {
-        return this.extractTextFromImage(Buffer.from(match[1], 'base64'), images[0].label);
+        return this.extractTextFromImage(
+          Buffer.from(match[1], 'base64'),
+          images[0].label,
+        );
       }
     }
 
     const start = Date.now();
+    const modelName = imageOcrModelName();
     try {
       const content: OpenAI.Chat.Completions.ChatCompletionContentPart[] = [
         {
@@ -153,8 +160,8 @@ export class ImageProcessorService {
       }
 
       const response = await this.openai.chat.completions.create({
-        model: this.aiConfig.openaiModel,
-        temperature: this.aiConfig.openaiTemperature,
+        model: modelName,
+        temperature: 0,
         messages: [{ role: 'user', content }],
         max_tokens: 4096,
         user: 'image-ocr-multi',
@@ -165,7 +172,7 @@ export class ImageProcessorService {
 
       this.metricsService.recordAICall(
         'image-ocr-multi',
-        this.aiConfig.openaiModel,
+        modelName,
         duration,
         extractedText ? 'success' : 'error',
       );
@@ -177,8 +184,14 @@ export class ImageProcessorService {
       return extractedText;
     } catch (error) {
       const duration = (Date.now() - start) / 1000;
-      this.metricsService.recordAICall('image-ocr-multi', this.aiConfig.openaiModel, duration, 'error');
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      this.metricsService.recordAICall(
+        'image-ocr-multi',
+        modelName,
+        duration,
+        'error',
+      );
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       this.logger.error(`Multi-image processing failed: ${errorMessage}`);
       return '';
     }

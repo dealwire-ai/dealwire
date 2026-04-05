@@ -19,10 +19,12 @@ jest.mock('openai', () => ({
 jest.mock('../../config/ai.config', () => ({
   aiConfig: () => ({
     openaiApiKey: 'test-key',
-    openaiModel: 'gpt-4o-mini',
-    openaiScreeningModel: 'gpt-4o',
     openaiTemperature: 0,
   }),
+}));
+
+jest.mock('../underwriting/model-config', () => ({
+  dealScreeningModelName: () => 'gpt-4.1',
 }));
 
 const makeBucket = (
@@ -167,7 +169,7 @@ describe('InitialScreeningService', () => {
     );
     expect(metricsService.recordAICall).toHaveBeenCalledWith(
       'initial-screening',
-      'gpt-4o',
+      'gpt-4.1',
       expect.any(Number),
       'success',
     );
@@ -293,7 +295,7 @@ describe('InitialScreeningService', () => {
 
     expect(metricsService.recordAICall).toHaveBeenCalledWith(
       'initial-screening',
-      'gpt-4o',
+      'gpt-4.1',
       expect.any(Number),
       'error',
     );
@@ -312,7 +314,7 @@ describe('InitialScreeningService', () => {
 
     expect(metricsService.recordAICall).toHaveBeenCalledWith(
       'initial-screening',
-      'gpt-4o',
+      'gpt-4.1',
       expect.any(Number),
       'error',
     );
