@@ -36,6 +36,7 @@ model Organization {
   screeningBuckets      ScreeningBucket[]
   historicalIngestions   HistoricalIngestion[]
   proformas             Proforma[]
+  underwritingRuns      UnderwritingRun[]
   createdAt             DateTime               @default(now())
   updatedAt             DateTime               @updatedAt
 }
@@ -489,4 +490,46 @@ model IngestionRun {
 
   @@index([status])
   @@index([startedAt])
+}
+
+enum UnderwritingStatus {
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+enum PipelineType {
+  LEGACY
+  AGENTIC
+}
+
+model UnderwritingRun {
+  id             String              @id @default(cuid())
+  organizationId String
+  organization   Organization        @relation(fields: [organizationId], references: [id])
+
+  jobId          String              @unique  // uw_ prefixed job ID from inbound service
+  senderEmail    String
+  emailSubject   String?
+
+  status         UnderwritingStatus  @default(RUNNING)
+  pipelineType   PipelineType
+
+  // Analysis output — DealAnalysis (agentic) or { resolved, om } (legacy)
+  analysisData   Json?
+
+  proformaS3Key  String?
+  humanReviewFlags String[]          @default([])
+  confidence     Float?
+  durationMs     Int?
+  error          String?             @db.Text
+
+  startedAt      DateTime            @default(now())
+  completedAt    DateTime?
+
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+
+  @@index([organizationId, status])
+  @@index([organizationId, completedAt(sort: Desc)])
 }
