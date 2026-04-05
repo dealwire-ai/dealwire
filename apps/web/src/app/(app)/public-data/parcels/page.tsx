@@ -21,7 +21,7 @@ import { TableSkeleton } from "@/components/table-skeleton";
 import { useApi } from "@/hooks/use-api";
 import { useTableState } from "@/hooks/use-table-state";
 import { useFeatureFlags } from "@/hooks/use-feature-flags";
-// import { Chatbot } from "@/components/chat/chatbot";
+import { formatRelativeDate } from "@/lib/date-utils";
 
 interface Stats {
   total: number;
@@ -44,17 +44,6 @@ interface IngestionRun {
   status: string;
   completedAt: string | null;
   startedAt: string;
-}
-
-function timeAgo(dateStr: string): string {
-  const seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
-  if (seconds < 60) return "just now";
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  return `${days}d ago`;
 }
 
 export default function ParcelsPage() {
@@ -236,8 +225,8 @@ export default function ParcelsPage() {
                   <span>Data Coverage</span>
                   {lastRun?.completedAt && (
                     <span className="text-zinc-500">
-                      Last refreshed: {timeAgo(lastRun.completedAt)} (
-                      {lastRun.trigger})
+                      Last refreshed: {formatRelativeDate(lastRun.completedAt)}{" "}
+                      ({lastRun.trigger})
                     </span>
                   )}
                 </div>
