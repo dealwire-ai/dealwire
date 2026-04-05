@@ -364,11 +364,24 @@ export default function InboxPage() {
           </p>
           <div className="flex flex-wrap items-center justify-center gap-x-14 gap-y-8">
             {[
-              { file: "hildreth.png", alt: "Hildreth Real Estate Advisors" },
-              { file: "jke.svg", alt: "JK Equities" },
-              { file: "dg-development.svg", alt: "DG Development Partners" },
-              { file: "rm.png", alt: "R&M Capital Property Management" },
-            ].map(({ file, alt }) => (
+              {
+                file: "hildreth.png",
+                alt: "Hildreth Real Estate Advisors",
+                height: "h-[38px]",
+              },
+              { file: "jke.svg", alt: "JK Equities", height: "h-[36px]" },
+              {
+                file: "dg-development.svg",
+                alt: "DG Development Partners",
+                height: "h-[28px]",
+              },
+              { file: "foxfield.svg", alt: "Foxfield", height: "h-[26px]" },
+              {
+                file: "rm.png",
+                alt: "R&M Capital Property Management",
+                height: "h-[44px]",
+              },
+            ].map(({ file, alt, height }) => (
               <div
                 key={file}
                 className="opacity-25 hover:opacity-55 transition-opacity duration-300"
@@ -379,7 +392,7 @@ export default function InboxPage() {
                   alt={alt}
                   width={140}
                   height={40}
-                  className="object-contain h-[42px] w-auto"
+                  className={`object-contain ${height} w-auto`}
                 />
               </div>
             ))}
