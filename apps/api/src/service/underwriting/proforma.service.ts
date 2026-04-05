@@ -6,8 +6,8 @@ import {
 } from '@nestjs/common';
 import { Proforma, Prisma } from '@prisma/client';
 import { generateObject } from 'ai';
-import { anthropic } from '@ai-sdk/anthropic';
 import { z } from 'zod';
+import { proformaScanModel } from './model-config';
 import { PrismaService } from '../prisma/prisma.service';
 import { S3Service } from '../s3/s3.service';
 import { excelToTextWithCellRefs } from './extractors/extraction-types';
@@ -65,7 +65,7 @@ export class ProformaService {
           : rawText;
 
       const { object } = await generateObject({
-        model: anthropic('claude-haiku-4-5-20251001'),
+        model: proformaScanModel(),
         schema: ScannedFieldsSchema,
         system: `You are analyzing a real estate pro forma Excel template to identify input cells.
 
