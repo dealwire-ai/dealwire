@@ -29,7 +29,7 @@ export interface UnderwritingJobContext {
 export interface UnderwritingResult {
   dealId: string;
   status: 'completed' | 'failed';
-  proformaS3Key?: string;
+  filledProformaModelS3Key?: string;
   humanReviewFlags: string[];
   durationMs: number;
   analysisData?: Record<string, unknown>;
@@ -230,7 +230,7 @@ export class UnderwritingOrchestratorService {
     return {
       dealId,
       status: 'completed',
-      proformaS3Key,
+      filledProformaModelS3Key: proformaS3Key,
       humanReviewFlags: allFlags,
       durationMs,
       analysisData: {

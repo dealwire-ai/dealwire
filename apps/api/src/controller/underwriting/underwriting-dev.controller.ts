@@ -106,9 +106,9 @@ export class UnderwritingDevController {
 
     // Generate a presigned download URL for the filled pro forma if produced
     let proformaDownloadUrl: string | null = null;
-    if (result.proformaS3Key) {
+    if (result.filledProformaModelS3Key) {
       proformaDownloadUrl = await this.s3.getPresignedUrl(
-        result.proformaS3Key,
+        result.filledProformaModelS3Key,
         3600,
       );
     }

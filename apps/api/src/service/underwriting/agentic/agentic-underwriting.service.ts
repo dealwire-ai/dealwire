@@ -175,7 +175,7 @@ export class AgenticUnderwritingService {
     return {
       dealId,
       status: 'completed',
-      proformaS3Key,
+      filledProformaModelS3Key: proformaS3Key,
       humanReviewFlags: analysis.flags,
       durationMs,
       analysisData: {
