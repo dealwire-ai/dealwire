@@ -21,6 +21,7 @@ export interface UnderwritingJobContext {
   dealId: string;
   orgId: string;
   senderEmail: string;
+  emailSubject?: string;
   documents: UnderwritingDocument[];
   inReplyToMessageId?: string;
 }
@@ -31,6 +32,8 @@ export interface UnderwritingResult {
   proformaS3Key?: string;
   humanReviewFlags: string[];
   durationMs: number;
+  analysisData?: Record<string, unknown>; // NEW
+  confidence?: number; // NEW
 }
 
 @Injectable()
@@ -229,6 +232,12 @@ export class UnderwritingOrchestratorService {
       proformaS3Key,
       humanReviewFlags: allFlags,
       durationMs,
+      analysisData: {
+        pipeline: 'legacy',
+        resolved: normalized,
+        om: extraction.om ?? undefined,
+      },
+      confidence: extraction.om?.confidence ?? undefined,
     };
   }
 }

@@ -178,6 +178,11 @@ export class AgenticUnderwritingService {
       proformaS3Key,
       humanReviewFlags: analysis.flags,
       durationMs,
+      analysisData: {
+        pipeline: 'agentic',
+        ...analysis,
+      },
+      confidence: analysis.confidence,
     };
   }
 }

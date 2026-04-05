@@ -53,3 +53,21 @@ export interface Asset {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface UnderwritingRun {
+  id: string;
+  jobId: string;
+  senderEmail: string;
+  emailSubject: string | null;
+  status: "RUNNING" | "COMPLETED" | "FAILED";
+  pipelineType: "LEGACY" | "AGENTIC";
+  analysisData?: Record<string, unknown> | null;
+  proformaS3Key: string | null;
+  humanReviewFlags: string[];
+  confidence: number | null;
+  durationMs: number | null;
+  error: string | null;
+  startedAt: string;
+  completedAt: string | null;
+  createdAt: string;
+}

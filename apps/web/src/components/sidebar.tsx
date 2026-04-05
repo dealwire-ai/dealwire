@@ -178,7 +178,7 @@ export function Sidebar() {
       title: "Underwriting",
       items: [
         {
-          label: "Model Templates",
+          label: "Underwriting",
           href: "/underwriting",
           icon: LayoutTemplate,
         },

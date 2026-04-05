@@ -45,13 +45,15 @@ export class SQSService {
       const timestamp = Date.now();
       const random = Math.random().toString(36).substring(2, 10); // Base36, no decimals
       const id = `email-${timestamp}-${random}`.substring(0, 80); // Ensure max 80 chars
-      
+
       await this.sqsService.send('normalized-email', {
         id,
         body: messageBody,
       });
       this.metricsService.recordSqsMessageSent('normalized-email', 'success');
-      this.logger.debug(`Message sent to normalized-email queue: ${messageBody.event?.messageId} from ${messageBody.event?.from} to ${messageBody.inboxOwnerEmail} - "${messageBody.event?.subject}"`);
+      this.logger.debug(
+        `Message sent to normalized-email queue: ${messageBody.event?.messageId} from ${messageBody.event?.from} to ${messageBody.inboxOwnerEmail} - "${messageBody.event?.subject}"`,
+      );
     } catch (error) {
       this.metricsService.recordSqsMessageSent('normalized-email', 'error');
       this.metricsService.recordSqsError('normalized-email', 'send');
@@ -70,6 +72,7 @@ export class SQSService {
     dealId: string;
     orgId: string;
     senderEmail: string;
+    emailSubject?: string;
     documents: Array<{ s3Key: string; filename: string; contentType: string }>;
     inReplyToMessageId?: string;
   }): Promise<void> {
@@ -79,7 +82,9 @@ export class SQSService {
     }
 
     try {
-      this.logger.log(`Enqueueing underwriting job: dealId=${messageBody.dealId} docs=${messageBody.documents.map((d) => d.filename).join(', ')}`);
+      this.logger.log(
+        `Enqueueing underwriting job: dealId=${messageBody.dealId} docs=${messageBody.documents.map((d) => d.filename).join(', ')}`,
+      );
 
       const timestamp = Date.now();
       const random = Math.random().toString(36).substring(2, 10);
@@ -95,5 +100,4 @@ export class SQSService {
       throw error;
     }
   }
-
 }

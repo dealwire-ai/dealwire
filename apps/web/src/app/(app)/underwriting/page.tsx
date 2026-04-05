@@ -2,8 +2,15 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useAuth } from "@clerk/nextjs";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useApi } from "@/hooks/use-api";
+import { useTableState } from "@/hooks/use-table-state";
 import { DashboardPageShell } from "@/components/dashboard-page-shell";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { UnderwritingRunsTable } from "@/components/underwriting-runs-table";
+import { TableToolbar } from "@/components/table-toolbar";
+import { TablePagination } from "@/components/table-pagination";
+import type { UnderwritingRun } from "@/types/api";
 
 interface FieldMapEntry {
   name: string;
@@ -261,7 +268,7 @@ function ProformaCard({
   );
 }
 
-export default function UnderwritingPage() {
+function TemplatesTab() {
   const { userId, isLoaded } = useAuth();
   const { apiCall } = useApi();
 
@@ -320,73 +327,154 @@ export default function UnderwritingPage() {
   }
 
   return (
-    <DashboardPageShell title="Underwriting Templates">
-      <div>
-        {/* Create form */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6 mb-6">
-          <h2 className="text-lg font-semibold mb-4">Add Template</h2>
-          <div className="flex flex-col sm:flex-row gap-3">
+    <div>
+      {/* Create form */}
+      <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6 mb-6">
+        <h2 className="text-lg font-semibold mb-4">Add Template</h2>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <input
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+            placeholder="Template name (e.g. Standard Multifamily)"
+            className="flex-1 bg-zinc-800 border border-zinc-700 rounded px-3 py-2 text-white text-sm placeholder:text-zinc-500"
+          />
+          <label className="flex items-center gap-2 px-3 py-2 bg-zinc-800 border border-zinc-700 rounded text-sm text-zinc-300 cursor-pointer hover:bg-zinc-700 transition-colors">
+            <span>{newFile ? newFile.name : "Choose .xlsx file"}</span>
             <input
-              value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-              placeholder="Template name (e.g. Standard Multifamily)"
-              className="flex-1 bg-zinc-800 border border-zinc-700 rounded px-3 py-2 text-white text-sm placeholder:text-zinc-500"
+              ref={fileInputRef}
+              type="file"
+              accept=".xlsx"
+              className="hidden"
+              onChange={(e) => setNewFile(e.target.files?.[0] ?? null)}
             />
-            <label className="flex items-center gap-2 px-3 py-2 bg-zinc-800 border border-zinc-700 rounded text-sm text-zinc-300 cursor-pointer hover:bg-zinc-700 transition-colors">
-              <span>{newFile ? newFile.name : "Choose .xlsx file"}</span>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".xlsx"
-                className="hidden"
-                onChange={(e) => setNewFile(e.target.files?.[0] ?? null)}
-              />
-            </label>
-            <button
-              onClick={handleCreate}
-              disabled={creating}
-              className="px-5 py-2 bg-white text-black rounded-lg text-sm font-medium hover:bg-zinc-200 transition-colors disabled:opacity-50 whitespace-nowrap"
-            >
-              {creating ? "Scanning template..." : "Create"}
-            </button>
-          </div>
-          {createError && (
-            <p className="text-xs text-red-400 mt-2">{createError}</p>
-          )}
+          </label>
+          <button
+            onClick={handleCreate}
+            disabled={creating}
+            className="px-5 py-2 bg-white text-black rounded-lg text-sm font-medium hover:bg-zinc-200 transition-colors disabled:opacity-50 whitespace-nowrap"
+          >
+            {creating ? "Scanning template..." : "Create"}
+          </button>
         </div>
-
-        {/* Template list */}
-        {loading ? (
-          <div className="text-zinc-400 py-8 text-center">
-            Loading templates...
-          </div>
-        ) : error ? (
-          <div className="p-4 bg-red-900/20 border border-red-900/50 rounded-lg text-red-400">
-            {error}
-          </div>
-        ) : proformas.length === 0 ? (
-          <div className="text-zinc-500 py-8 text-center">
-            No templates yet. Upload a .xlsx proforma above.
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {proformas.map((p) => (
-              <ProformaCard
-                key={p.id}
-                proforma={p}
-                onUpdate={(updated) =>
-                  setProformas((prev) =>
-                    prev.map((x) => (x.id === updated.id ? updated : x)),
-                  )
-                }
-                onDelete={(id) =>
-                  setProformas((prev) => prev.filter((x) => x.id !== id))
-                }
-              />
-            ))}
-          </div>
+        {createError && (
+          <p className="text-xs text-red-400 mt-2">{createError}</p>
         )}
       </div>
+
+      {/* Template list */}
+      {loading ? (
+        <div className="text-zinc-400 py-8 text-center">
+          Loading templates...
+        </div>
+      ) : error ? (
+        <div className="p-4 bg-red-900/20 border border-red-900/50 rounded-lg text-red-400">
+          {error}
+        </div>
+      ) : proformas.length === 0 ? (
+        <div className="text-zinc-500 py-8 text-center">
+          No templates yet. Upload a .xlsx proforma above.
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {proformas.map((p) => (
+            <ProformaCard
+              key={p.id}
+              proforma={p}
+              onUpdate={(updated) =>
+                setProformas((prev) =>
+                  prev.map((x) => (x.id === updated.id ? updated : x)),
+                )
+              }
+              onDelete={(id) =>
+                setProformas((prev) => prev.filter((x) => x.id !== id))
+              }
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function RunsTab() {
+  const { userId, isLoaded } = useAuth();
+  const { apiCall } = useApi();
+  const table = useTableState();
+  const [runs, setRuns] = useState<UnderwritingRun[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!isLoaded || !userId) return;
+    setLoading(true);
+    apiCall(`/underwriting/runs?${table.queryString}`)
+      .then((res) => {
+        setRuns(res.data);
+        table.setMeta(res.pagination);
+      })
+      .catch(() => setRuns([]))
+      .finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoaded, userId, table.queryString]);
+
+  return (
+    <div>
+      <TableToolbar
+        search={table.search}
+        onSearchChange={table.setSearch}
+        totalLabel="runs"
+        total={table.meta.total}
+        hasActiveFilters={table.hasActiveFilters}
+        onClearFilters={table.clearFilters}
+      />
+      {loading ? (
+        <div className="text-zinc-400 py-8 text-center">Loading runs...</div>
+      ) : (
+        <UnderwritingRunsTable runs={runs} />
+      )}
+      <TablePagination
+        page={table.page}
+        totalPages={table.meta.totalPages}
+        total={table.meta.total}
+        limit={table.limit}
+        onPageChange={table.setPage}
+      />
+    </div>
+  );
+}
+
+export default function UnderwritingPage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const activeTab = searchParams.get("tab") || "templates";
+
+  const handleTabChange = (value: string) => {
+    router.push(`/underwriting?tab=${value}`);
+  };
+
+  return (
+    <DashboardPageShell
+      title="Underwriting"
+      headerTabNavigation={
+        <Tabs value={activeTab} onValueChange={handleTabChange}>
+          <TabsList className="bg-transparent border-0 p-0 h-auto gap-4">
+            <TabsTrigger
+              value="templates"
+              className="bg-transparent rounded-none border-b-2 border-transparent px-0 pb-3 pt-0 data-[state=active]:border-[#C8A96E] data-[state=active]:text-white text-zinc-400 data-[state=active]:shadow-none"
+            >
+              Model Templates
+            </TabsTrigger>
+            <TabsTrigger
+              value="runs"
+              className="bg-transparent rounded-none border-b-2 border-transparent px-0 pb-3 pt-0 data-[state=active]:border-[#C8A96E] data-[state=active]:text-white text-zinc-400 data-[state=active]:shadow-none"
+            >
+              Underwritten Deals
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      }
+    >
+      {activeTab === "templates" && <TemplatesTab />}
+      {activeTab === "runs" && <RunsTab />}
     </DashboardPageShell>
   );
 }
