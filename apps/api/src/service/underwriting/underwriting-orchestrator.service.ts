@@ -32,8 +32,9 @@ export interface UnderwritingResult {
   proformaS3Key?: string;
   humanReviewFlags: string[];
   durationMs: number;
-  analysisData?: Record<string, unknown>; // NEW
-  confidence?: number; // NEW
+  analysisData?: Record<string, unknown>;
+  confidence?: number;
+  proformaId?: string;
 }
 
 @Injectable()
@@ -238,6 +239,7 @@ export class UnderwritingOrchestratorService {
         om: extraction.om ?? undefined,
       },
       confidence: extraction.om?.confidence ?? undefined,
+      proformaId: proforma?.id,
     };
   }
 }

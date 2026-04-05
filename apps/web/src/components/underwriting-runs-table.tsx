@@ -127,15 +127,29 @@ export function UnderwritingRunsTable({
   runs,
   emptyMessage,
 }: UnderwritingRunsTableProps) {
+  const { apiCall } = useApi();
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+  const [detailCache, setDetailCache] = useState<
+    Record<string, UnderwritingRun>
+  >({});
 
-  const toggleRow = (id: string) => {
+  const toggleRow = async (id: string) => {
     setExpandedRows((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);
       return next;
     });
+
+    // Lazy-load full detail (including analysisData) on first expand
+    if (!detailCache[id]) {
+      try {
+        const detail = await apiCall(`/underwriting/runs/${id}`);
+        setDetailCache((prev) => ({ ...prev, [id]: detail }));
+      } catch {
+        // Detail fetch failed — expanded row will show without metrics
+      }
+    }
   };
 
   if (runs.length === 0) {
@@ -162,7 +176,8 @@ export function UnderwritingRunsTable({
       <TableBody>
         {runs.map((run) => {
           const isExpanded = expandedRows.has(run.id);
-          const m = getMetrics(run);
+          const detail = detailCache[run.id];
+          const m = getMetrics(detail ?? run);
 
           return (
             <Fragment key={run.id}>
@@ -265,7 +280,11 @@ export function UnderwritingRunsTable({
                 <TableRow>
                   <TableCell colSpan={7} className="bg-zinc-950/50 p-0">
                     <div className="border-l-2 border-[#C8A96E] pl-4 py-4 pr-4">
-                      <ExpandedRunDetail run={run} metrics={m} />
+                      <ExpandedRunDetail
+                        run={detail ?? run}
+                        metrics={m}
+                        loading={!detail}
+                      />
                     </div>
                   </TableCell>
                 </TableRow>
@@ -281,10 +300,16 @@ export function UnderwritingRunsTable({
 function ExpandedRunDetail({
   run,
   metrics: m,
+  loading,
 }: {
   run: UnderwritingRun;
   metrics: ReturnType<typeof getMetrics>;
+  loading?: boolean;
 }) {
+  if (loading) {
+    return <div className="text-zinc-400 text-sm py-2">Loading details...</div>;
+  }
+
   return (
     <div className="grid grid-cols-2 gap-6 text-sm">
       {/* Left: Financials */}

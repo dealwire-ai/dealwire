@@ -91,20 +91,37 @@ export class UnderwritingListenerService {
     // (unhandled throws kill the sqs-consumer polling loop permanently).
     // The message is still acknowledged — failed jobs won't retry endlessly.
     try {
-      // Create initial record
       const pipelineType = useAgentic ? 'AGENTIC' : 'LEGACY';
 
+      // Create initial RUNNING record. If this fails with a unique constraint
+      // violation, the job was already processed (SQS redelivery) — skip it.
       if (parsed.orgId) {
-        await this.prisma.underwritingRun.create({
-          data: {
-            jobId: parsed.dealId,
-            organizationId: parsed.orgId,
-            senderEmail: parsed.senderEmail,
-            emailSubject: parsed.emailSubject,
-            status: 'RUNNING',
-            pipelineType,
-          },
-        });
+        try {
+          await this.prisma.underwritingRun.create({
+            data: {
+              jobId: parsed.dealId,
+              organizationId: parsed.orgId,
+              senderEmail: parsed.senderEmail,
+              emailSubject: parsed.emailSubject,
+              status: 'RUNNING',
+              pipelineType,
+            },
+          });
+        } catch (createErr) {
+          const isUniqueViolation =
+            createErr instanceof Prisma.PrismaClientKnownRequestError &&
+            createErr.code === 'P2002';
+          if (isUniqueViolation) {
+            this.logger.warn(
+              `[${parsed.dealId}] Duplicate jobId — already processed, skipping pipeline`,
+            );
+            return;
+          }
+          // Non-duplicate error — log but continue, the failure upsert will still persist
+          this.logger.error(
+            `[${parsed.dealId}] Failed to create initial run record: ${createErr}`,
+          );
+        }
       }
 
       const result = useAgentic
@@ -123,6 +140,7 @@ export class UnderwritingListenerService {
             humanReviewFlags: result.humanReviewFlags,
             confidence: result.confidence,
             durationMs: result.durationMs,
+            proformaId: result.proformaId,
             completedAt: new Date(),
           },
         });
