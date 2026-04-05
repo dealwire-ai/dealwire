@@ -15,6 +15,13 @@ import { formatRelativeDate } from "@/lib/date-utils";
 import { useApi } from "@/hooks/use-api";
 import type { UnderwritingRun } from "@/types/api";
 
+interface UnitMixEntry {
+  beds: number;
+  baths: number;
+  unitCount: number;
+  avgMonthlyRent?: number | null;
+}
+
 function formatCurrency(value: number | null | undefined): string {
   if (value == null) return "-";
   return new Intl.NumberFormat("en-US", {
@@ -40,6 +47,7 @@ function StatusBadge({ status }: { status: UnderwritingRun["status"] }) {
 
 /** Extract key metrics from analysisData regardless of pipeline type */
 function getMetrics(run: UnderwritingRun) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const d = run.analysisData as Record<string, any> | null;
   if (!d) return {};
 
@@ -61,7 +69,9 @@ function getMetrics(run: UnderwritingRun) {
   }
 
   // Legacy pipeline
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const resolved = d.resolved as Record<string, any> | undefined;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const om = d.om as Record<string, any> | undefined;
   return {
     propertyName: om?.propertyName,
@@ -306,7 +316,7 @@ function ExpandedRunDetail({
               Unit Mix
             </div>
             <div className="space-y-0.5 text-xs">
-              {(m.unitMix as any[]).map((u: any, i: number) => (
+              {(m.unitMix as UnitMixEntry[]).map((u, i) => (
                 <div key={i} className="text-zinc-300">
                   {u.beds}BR/{u.baths}BA — {u.unitCount} units
                   {u.avgMonthlyRent != null &&
