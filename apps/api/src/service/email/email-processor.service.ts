@@ -646,7 +646,12 @@ export class EmailProcessorService {
                     ...(entryId && { sourceEntryId: entryId }),
                   },
                 })
-                .catch(() => {}); // fire-and-forget
+                .catch((err) => {
+                  const msg = err instanceof Error ? err.message : String(err);
+                  this.logger.warn(
+                    `Failed to persist webLink for deal ${dealId}: ${msg}`,
+                  );
+                });
             }
           }
         } catch (err) {
