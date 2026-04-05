@@ -8,23 +8,18 @@ DROP TYPE IF EXISTS "PipelineType";
 -- CreateEnum
 CREATE TYPE "UnderwritingStatus" AS ENUM ('RUNNING', 'COMPLETED', 'FAILED');
 
--- CreateEnum
-CREATE TYPE "PipelineType" AS ENUM ('LEGACY', 'AGENTIC');
-
 -- CreateTable
 CREATE TABLE "UnderwritingRun" (
     "id" TEXT NOT NULL,
     "organizationId" TEXT NOT NULL,
     "dealId" TEXT,
-    "assetId" TEXT,
     "proformaId" TEXT,
     "jobId" TEXT NOT NULL,
     "senderEmail" TEXT NOT NULL,
     "emailSubject" TEXT,
     "status" "UnderwritingStatus" NOT NULL DEFAULT 'RUNNING',
-    "pipelineType" "PipelineType" NOT NULL,
     "analysisData" JSONB,
-    "proformaS3Key" TEXT,
+    "filledProformaModelS3Key" TEXT,
     "humanReviewFlags" TEXT[] DEFAULT ARRAY[]::TEXT[],
     "confidence" DOUBLE PRECISION,
     "durationMs" INTEGER,
@@ -49,17 +44,11 @@ CREATE INDEX "UnderwritingRun_organizationId_completedAt_idx" ON "UnderwritingRu
 -- CreateIndex
 CREATE INDEX "UnderwritingRun_dealId_idx" ON "UnderwritingRun"("dealId");
 
--- CreateIndex
-CREATE INDEX "UnderwritingRun_assetId_idx" ON "UnderwritingRun"("assetId");
-
 -- AddForeignKey
 ALTER TABLE "UnderwritingRun" ADD CONSTRAINT "UnderwritingRun_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "UnderwritingRun" ADD CONSTRAINT "UnderwritingRun_dealId_fkey" FOREIGN KEY ("dealId") REFERENCES "Deal"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "UnderwritingRun" ADD CONSTRAINT "UnderwritingRun_assetId_fkey" FOREIGN KEY ("assetId") REFERENCES "Asset"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "UnderwritingRun" ADD CONSTRAINT "UnderwritingRun_proformaId_fkey" FOREIGN KEY ("proformaId") REFERENCES "Proforma"("id") ON DELETE SET NULL ON UPDATE CASCADE;

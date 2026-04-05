@@ -271,7 +271,9 @@ export function UnderwritingRunsTable({
                   )}
                 </TableCell>
                 <TableCell>
-                  {run.proformaS3Key && <DownloadButton runId={run.id} />}
+                  {run.filledProformaModelS3Key && (
+                    <DownloadButton runId={run.id} />
+                  )}
                 </TableCell>
               </TableRow>
 
@@ -407,7 +409,6 @@ function ExpandedRunDetail({
         )}
 
         <div className="mt-4 text-xs text-zinc-500 space-y-0.5">
-          <div>Pipeline: {run.pipelineType}</div>
           <div>Job ID: {run.jobId}</div>
           {run.durationMs != null && (
             <div>Duration: {(run.durationMs / 1000).toFixed(1)}s</div>

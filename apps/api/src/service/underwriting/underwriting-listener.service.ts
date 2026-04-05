@@ -91,8 +91,6 @@ export class UnderwritingListenerService {
     // (unhandled throws kill the sqs-consumer polling loop permanently).
     // The message is still acknowledged — failed jobs won't retry endlessly.
     try {
-      const pipelineType = useAgentic ? 'AGENTIC' : 'LEGACY';
-
       // Create initial RUNNING record. If this fails with a unique constraint
       // violation, the job was already processed (SQS redelivery) — skip it.
       if (parsed.orgId) {
@@ -104,7 +102,6 @@ export class UnderwritingListenerService {
               senderEmail: parsed.senderEmail,
               emailSubject: parsed.emailSubject,
               status: 'RUNNING',
-              pipelineType,
             },
           });
         } catch (createErr) {
@@ -136,7 +133,7 @@ export class UnderwritingListenerService {
             status: 'COMPLETED',
             analysisData:
               (result.analysisData as Prisma.InputJsonValue) ?? undefined,
-            proformaS3Key: result.proformaS3Key,
+            filledProformaModelS3Key: result.filledProformaModelS3Key,
             humanReviewFlags: result.humanReviewFlags,
             confidence: result.confidence,
             durationMs: result.durationMs,
@@ -171,7 +168,6 @@ export class UnderwritingListenerService {
               senderEmail: parsed.senderEmail,
               emailSubject: parsed.emailSubject,
               status: 'FAILED',
-              pipelineType: useAgentic ? 'AGENTIC' : 'LEGACY',
               error: msg,
               completedAt: new Date(),
             },

@@ -187,7 +187,6 @@ model Asset {
   normalizedAddress String? @unique // Normalized address for matching (e.g., "123 MAIN ST, NEW YORK, NY, USA")
 
   deals            Deal[]
-  underwritingRuns UnderwritingRun[]
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
@@ -502,11 +501,6 @@ enum UnderwritingStatus {
   FAILED
 }
 
-enum PipelineType {
-  LEGACY
-  AGENTIC
-}
-
 model UnderwritingRun {
   id             String              @id @default(cuid())
   organizationId String
@@ -515,8 +509,6 @@ model UnderwritingRun {
   // Domain relations (all optional — populated as data becomes available)
   dealId         String?
   deal           Deal?               @relation(fields: [dealId], references: [id])
-  assetId        String?
-  asset          Asset?              @relation(fields: [assetId], references: [id])
   proformaId     String?
   proforma       Proforma?           @relation(fields: [proformaId], references: [id])
 
@@ -525,10 +517,9 @@ model UnderwritingRun {
   emailSubject   String?
 
   status         UnderwritingStatus  @default(RUNNING)
-  pipelineType   PipelineType
 
   analysisData   Json?
-  proformaS3Key  String?             // Filled proforma output (distinct from proforma.s3Key which is the template)
+  filledProformaModelS3Key String?    // Filled proforma output (distinct from proforma.s3Key which is the template)
   humanReviewFlags String[]          @default([])
   confidence     Float?
   durationMs     Int?
@@ -543,5 +534,4 @@ model UnderwritingRun {
   @@index([organizationId, status])
   @@index([organizationId, completedAt(sort: Desc)])
   @@index([dealId])
-  @@index([assetId])
 }
