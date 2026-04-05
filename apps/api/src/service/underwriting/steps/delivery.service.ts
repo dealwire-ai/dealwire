@@ -38,7 +38,12 @@ export class DeliveryService {
     const propertyAddress = extraction.om?.propertyAddress || dealId;
     const subject = `Underwriting Complete: ${propertyAddress}`;
 
-    const html = this.buildResultHtml(normalized, extraction, dealId);
+    const html = this.buildResultHtml(
+      normalized,
+      extraction,
+      dealId,
+      senderEmail,
+    );
 
     const ccAddresses = this.config.adminEmails.filter(
       (addr) => addr.toLowerCase() !== senderEmail.toLowerCase(),
@@ -70,6 +75,7 @@ export class DeliveryService {
     normalized: ResolvedMetrics,
     extraction: ExtractionResults,
     dealId: string,
+    senderEmail?: string,
   ): string {
     const { om, t12 } = extraction;
     const {
@@ -108,6 +114,7 @@ export class DeliveryService {
 <body style="font-family:Arial,sans-serif;max-width:700px;margin:0 auto;color:#1a1a1a;">
   <h2 style="border-bottom:2px solid #2563eb;padding-bottom:8px;">Underwriting Complete</h2>
   <p><strong>Deal ID:</strong> ${dealId}</p>
+  ${senderEmail ? `<p style="color:#6b7280;font-size:13px;margin:4px 0 0;">Requested by ${senderEmail}</p>` : ''}
   ${om?.propertyAddress ? `<p><strong>Property:</strong> ${om.propertyAddress}${om.city ? `, ${om.city}` : ''}${om.state ? `, ${om.state}` : ''}</p>` : ''}
 
   <h3>Key Metrics</h3>

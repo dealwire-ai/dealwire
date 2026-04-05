@@ -41,6 +41,7 @@ export class AgenticDeliveryService {
     const html = this.buildResultHtml(
       analysis,
       dealId,
+      senderEmail,
       validation,
       correctionsApplied,
     );
@@ -74,6 +75,7 @@ export class AgenticDeliveryService {
   private buildResultHtml(
     analysis: DealAnalysis,
     dealId: string,
+    senderEmail?: string,
     validation?: ValidationResult,
     correctionsApplied?: number,
   ): string {
@@ -123,6 +125,7 @@ export class AgenticDeliveryService {
 <body style="font-family:Arial,sans-serif;max-width:700px;margin:0 auto;color:#1a1a1a;">
   <h2 style="border-bottom:2px solid #2563eb;padding-bottom:8px;">Underwriting Complete</h2>
   <p><strong>Deal ID:</strong> ${dealId}</p>
+  ${senderEmail ? `<p style="color:#6b7280;font-size:13px;margin:4px 0 0;">Requested by ${senderEmail}</p>` : ''}
   ${analysis.propertyAddress ? `<p><strong>Property:</strong> ${analysis.propertyAddress}${analysis.city ? `, ${analysis.city}` : ''}${analysis.state ? `, ${analysis.state}` : ''}</p>` : ''}
 
   ${analystHtml}
