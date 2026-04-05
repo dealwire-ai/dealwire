@@ -16,6 +16,7 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
+import { RequireOrgGuard } from '../guard/require-org.guard';
 import { AuthUser } from '../decorator/auth-user.decorator';
 import { PrismaService } from '../service/prisma/prisma.service';
 import { NycIngestionService } from '../service/public-data/nyc-ingestion.service';
@@ -30,7 +31,7 @@ import { resolveFeatureFlags } from '../util/feature-flags';
 import { PhoneStatus, ParcelListType } from '@prisma/client';
 
 @Controller('public-data')
-@UseGuards(ClerkAuthGuard)
+@UseGuards(ClerkAuthGuard, RequireOrgGuard)
 export class PublicDataController {
   private readonly logger = new Logger(PublicDataController.name);
 
@@ -45,10 +46,7 @@ export class PublicDataController {
     private readonly propertyList: PropertyListService,
   ) {}
 
-  private async assertParcelsEnabled(organizationId: string | null) {
-    if (!organizationId) {
-      throw new HttpException('User not in organization', HttpStatus.FORBIDDEN);
-    }
+  private async assertParcelsEnabled(organizationId: string) {
     const org = await this.prisma.organization.findUnique({
       where: { id: organizationId },
       select: { featureFlags: true },
@@ -64,7 +62,7 @@ export class PublicDataController {
 
   @Post('ingest')
   async triggerIngestion(
-    @AuthUser('organizationId') organizationId: string | null,
+    @AuthUser('organizationId') organizationId: string,
     @Body() body: { boroughs?: string[]; sources?: string[] },
   ) {
     await this.assertParcelsEnabled(organizationId);
@@ -110,7 +108,7 @@ export class PublicDataController {
 
   @Post('ingest/nyctl')
   async triggerNyctlIngestion(
-    @AuthUser('organizationId') organizationId: string | null,
+    @AuthUser('organizationId') organizationId: string,
     @Body() body: { reportDate: string },
   ) {
     await this.assertParcelsEnabled(organizationId);
@@ -143,9 +141,7 @@ export class PublicDataController {
   }
 
   @Post('ingest/care')
-  async triggerCareScraper(
-    @AuthUser('organizationId') organizationId: string | null,
-  ) {
+  async triggerCareScraper(@AuthUser('organizationId') organizationId: string) {
     await this.assertParcelsEnabled(organizationId);
 
     if (this.careScraper.isRunning) {
@@ -171,9 +167,7 @@ export class PublicDataController {
   }
 
   @Get('ingestion-runs')
-  async getIngestionRuns(
-    @AuthUser('organizationId') organizationId: string | null,
-  ) {
+  async getIngestionRuns(@AuthUser('organizationId') organizationId: string) {
     await this.assertParcelsEnabled(organizationId);
     return this.prisma.ingestionRun.findMany({
       orderBy: { startedAt: 'desc' },
@@ -183,7 +177,7 @@ export class PublicDataController {
 
   @Get('parcels')
   async getParcels(
-    @AuthUser('organizationId') organizationId: string | null,
+    @AuthUser('organizationId') organizationId: string,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(50), ParseIntPipe) limit: number,
     @Query('borough') borough?: string,
@@ -245,7 +239,7 @@ export class PublicDataController {
       listType: listType || undefined,
       hasNoList: hasNoList === 'true' ? true : undefined,
       skipTraceStatus: skipTraceStatus || undefined,
-      organizationId: organizationId!,
+      organizationId: organizationId,
       sort,
       order,
       page,
@@ -255,7 +249,7 @@ export class PublicDataController {
 
   @Get('parcels/export')
   async exportParcels(
-    @AuthUser('organizationId') organizationId: string | null,
+    @AuthUser('organizationId') organizationId: string,
     @Res() res: Response,
     @Query('borough') borough?: string,
     @Query('excludeCoops') excludeCoops?: string,
@@ -419,7 +413,7 @@ export class PublicDataController {
 
   @Get('stats')
   async getStats(
-    @AuthUser('organizationId') organizationId: string | null,
+    @AuthUser('organizationId') organizationId: string,
     @Query('borough') borough?: string,
     @Query('excludeCoops') excludeCoops?: string,
   ) {
@@ -432,24 +426,19 @@ export class PublicDataController {
   }
 
   @Get('parcels/skip-trace/usage')
-  async getSkipTraceUsage(
-    @AuthUser('organizationId') organizationId: string | null,
-  ) {
+  async getSkipTraceUsage(@AuthUser('organizationId') organizationId: string) {
     await this.assertParcelsEnabled(organizationId);
     return this.skipTrace.getOrgUsageInfo(organizationId!);
   }
 
   @Get('parcels/:bbl')
   async getParcel(
-    @AuthUser('organizationId') organizationId: string | null,
+    @AuthUser('organizationId') organizationId: string,
     @Param('bbl') bbl: string,
   ) {
     await this.assertParcelsEnabled(organizationId);
 
-    const parcel = await this.parcelQuery.getParcelByBbl(
-      bbl,
-      organizationId ?? undefined,
-    );
+    const parcel = await this.parcelQuery.getParcelByBbl(bbl, organizationId);
     if (!parcel) {
       throw new HttpException('Parcel not found', HttpStatus.NOT_FOUND);
     }
@@ -458,7 +447,7 @@ export class PublicDataController {
 
   @Post('parcels/skip-trace')
   async batchSkipTrace(
-    @AuthUser('organizationId') organizationId: string | null,
+    @AuthUser('organizationId') organizationId: string,
     @Body() body: { bbls: string[]; force?: boolean },
   ) {
     await this.assertParcelsEnabled(organizationId);
@@ -477,7 +466,7 @@ export class PublicDataController {
     try {
       result = await this.skipTrace.submitBatch(
         body.bbls,
-        organizationId!,
+        organizationId,
         body.force ?? false,
       );
     } catch (err) {
@@ -517,7 +506,7 @@ export class PublicDataController {
 
   @Post('parcels/:bbl/skip-trace')
   async singleSkipTrace(
-    @AuthUser('organizationId') organizationId: string | null,
+    @AuthUser('organizationId') organizationId: string,
     @Param('bbl') bbl: string,
     @Body() body: { force?: boolean },
   ) {
@@ -527,7 +516,7 @@ export class PublicDataController {
     try {
       result = await this.skipTrace.enqueue(
         bbl,
-        organizationId!,
+        organizationId,
         body.force ?? false,
       );
     } catch (err) {
@@ -562,7 +551,7 @@ export class PublicDataController {
 
   @Put('parcels/:bbl/list')
   async assignList(
-    @AuthUser('organizationId') organizationId: string | null,
+    @AuthUser('organizationId') organizationId: string,
     @AuthUser('userId') userId: string | null,
     @Param('bbl') bbl: string,
     @Body() body: { listType: string | null },
@@ -583,7 +572,7 @@ export class PublicDataController {
     try {
       const assignment = await this.propertyList.assign({
         bbl,
-        organizationId: organizationId!,
+        organizationId: organizationId,
         userId: userId!,
         listType,
       });
@@ -599,7 +588,7 @@ export class PublicDataController {
 
   @Post('parcels/batch-list')
   async batchAssignList(
-    @AuthUser('organizationId') organizationId: string | null,
+    @AuthUser('organizationId') organizationId: string,
     @AuthUser('userId') userId: string | null,
     @Body() body: { bbls: string[]; listType: string | null },
   ) {
@@ -622,7 +611,7 @@ export class PublicDataController {
 
     const updated = await this.propertyList.batchAssign({
       bbls: body.bbls,
-      organizationId: organizationId!,
+      organizationId: organizationId,
       userId: userId!,
       listType,
     });
@@ -632,7 +621,7 @@ export class PublicDataController {
 
   @Get('parcels/:bbl/phone-notes')
   async getPhoneNotes(
-    @AuthUser('organizationId') organizationId: string | null,
+    @AuthUser('organizationId') organizationId: string,
     @AuthUser('userId') userId: string | null,
     @Param('bbl') bbl: string,
   ) {
@@ -645,14 +634,14 @@ export class PublicDataController {
 
     const notes = await this.phoneNote.getNotesForParcel(
       parcel.id,
-      organizationId!,
+      organizationId,
     );
     return { notes };
   }
 
   @Put('parcels/:bbl/phone-notes')
   async upsertPhoneNote(
-    @AuthUser('organizationId') organizationId: string | null,
+    @AuthUser('organizationId') organizationId: string,
     @AuthUser('userId') userId: string | null,
     @Param('bbl') bbl: string,
     @Body()
@@ -675,7 +664,7 @@ export class PublicDataController {
       return await this.phoneNote.upsertNote({
         bbl,
         phoneNumber: body.phoneNumber,
-        organizationId: organizationId!,
+        organizationId: organizationId,
         userId: userId!,
         status: body.status
           ? PhoneStatus[body.status as keyof typeof PhoneStatus]

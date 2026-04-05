@@ -9,10 +9,11 @@ import {
 } from '@nestjs/common';
 import { ScreeningPreferencesService } from '../service/preferences/screening-preferences.service';
 import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
+import { RequireOrgGuard } from '../guard/require-org.guard';
 import { AuthUser } from '../decorator/auth-user.decorator';
 
 @Controller('screening-preferences')
-@UseGuards(ClerkAuthGuard)
+@UseGuards(ClerkAuthGuard, RequireOrgGuard)
 export class ScreeningPreferencesController {
   constructor(
     private readonly screeningPreferencesService: ScreeningPreferencesService,
@@ -20,18 +21,10 @@ export class ScreeningPreferencesController {
 
   @Get()
   async getScreeningPreferences(
-    @AuthUser('organizationId') organizationId: string | null,
+    @AuthUser('organizationId') organizationId: string,
   ) {
-    if (!organizationId) {
-      throw new HttpException(
-        'User not in organization',
-        HttpStatus.FORBIDDEN,
-      );
-    }
-
-    const prefs = await this.screeningPreferencesService.getPreferences(
-      organizationId,
-    );
+    const prefs =
+      await this.screeningPreferencesService.getPreferences(organizationId);
 
     if (Object.keys(prefs).length === 0) {
       throw new HttpException(
@@ -45,7 +38,7 @@ export class ScreeningPreferencesController {
 
   @Patch()
   async patchScreeningPreferences(
-    @AuthUser('organizationId') organizationId: string | null,
+    @AuthUser('organizationId') organizationId: string,
     @Body()
     body: {
       dealCriteria?: string;
@@ -57,13 +50,6 @@ export class ScreeningPreferencesController {
       brandColor?: string;
     },
   ) {
-    if (!organizationId) {
-      throw new HttpException(
-        'User not in organization',
-        HttpStatus.FORBIDDEN,
-      );
-    }
-
     return this.screeningPreferencesService.updatePreferences(
       organizationId,
       body,

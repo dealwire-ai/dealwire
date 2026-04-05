@@ -218,7 +218,7 @@ src/service/webhook/clerk-webhook.service.ts  # User created → create Graph su
 src/controller/webhook/clerk-webhook.controller.ts
 ```
 
-**Pattern:** Every protected controller uses `@UseGuards(ClerkAuthGuard)` and scopes all DB queries to `{ organizationId }`. Never accept `organizationId` from request params — always from `@AuthUser()`.
+**Pattern:** Every protected controller uses `@UseGuards(ClerkAuthGuard, RequireOrgGuard)` and scopes all DB queries to `{ organizationId }`. `RequireOrgGuard` rejects requests without an org (403), so controllers receive `organizationId: string` (non-null). Never accept `organizationId` from request params — always from `@AuthUser()`.
 
 **Env vars:** `CLERK_SECRET_KEY`, `CLERK_WEBHOOK_SECRET`, `REQUIRE_AUTH` (optional)
 

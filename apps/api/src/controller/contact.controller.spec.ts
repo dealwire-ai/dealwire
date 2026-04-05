@@ -4,6 +4,7 @@ import { ContactController } from './contact.controller';
 import { PrismaService } from '../service/prisma/prisma.service';
 import { BrokerIntelligenceService } from '../service/deal/broker-intelligence.service';
 import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
+import { RequireOrgGuard } from '../guard/require-org.guard';
 
 describe('ContactController', () => {
   let controller: ContactController;
@@ -13,7 +14,11 @@ describe('ContactController', () => {
     const mockFindMany = jest.fn();
     const mockCount = jest.fn();
     const mockFindUnique = jest.fn();
-    prisma = { findMany: mockFindMany, count: mockCount, findUnique: mockFindUnique };
+    prisma = {
+      findMany: mockFindMany,
+      count: mockCount,
+      findUnique: mockFindUnique,
+    };
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ContactController],
       providers: [
@@ -31,6 +36,8 @@ describe('ContactController', () => {
       ],
     })
       .overrideGuard(ClerkAuthGuard)
+      .useValue({ canActivate: () => true })
+      .overrideGuard(RequireOrgGuard)
       .useValue({ canActivate: () => true })
       .compile();
 
@@ -93,22 +100,15 @@ describe('ContactController', () => {
         }),
       );
     });
-
-    it('should throw FORBIDDEN when user not in organization', async () => {
-      // Act / Assert
-      await expect(controller.getContacts(null, 1, 20, undefined)).rejects.toMatchObject({
-        status: HttpStatus.FORBIDDEN,
-      });
-    });
   });
 
   describe('getContact', () => {
     it('should return contact when found', async () => {
       // Arrange
-      const contact = { 
-        id: 'c1', 
-        email: 'a@b.com', 
-        firstName: 'A', 
+      const contact = {
+        id: 'c1',
+        email: 'a@b.com',
+        firstName: 'A',
         lastName: 'B',
         deals: [{ id: 'd1' }],
       };
@@ -126,7 +126,12 @@ describe('ContactController', () => {
           }),
         }),
       );
-      expect(result).toEqual({ id: 'c1', email: 'a@b.com', firstName: 'A', lastName: 'B' });
+      expect(result).toEqual({
+        id: 'c1',
+        email: 'a@b.com',
+        firstName: 'A',
+        lastName: 'B',
+      });
     });
 
     it('should throw NOT_FOUND when contact does not exist', async () => {
@@ -134,7 +139,9 @@ describe('ContactController', () => {
       prisma.findUnique.mockResolvedValue(null);
 
       // Act / Assert
-      await expect(controller.getContact('org-1', 'nonexistent')).rejects.toMatchObject({
+      await expect(
+        controller.getContact('org-1', 'nonexistent'),
+      ).rejects.toMatchObject({
         status: HttpStatus.NOT_FOUND,
         message: 'Contact not found',
       });
@@ -142,8 +149,8 @@ describe('ContactController', () => {
 
     it('should throw NOT_FOUND when contact has no deals in user org', async () => {
       // Arrange
-      const contact = { 
-        id: 'c1', 
+      const contact = {
+        id: 'c1',
         email: 'a@b.com',
         deals: [], // No deals for this org
       };
@@ -153,13 +160,6 @@ describe('ContactController', () => {
       await expect(controller.getContact('org-1', 'c1')).rejects.toMatchObject({
         status: HttpStatus.NOT_FOUND,
         message: 'Contact not found',
-      });
-    });
-
-    it('should throw FORBIDDEN when user not in organization', async () => {
-      // Act / Assert
-      await expect(controller.getContact(null, 'c1')).rejects.toMatchObject({
-        status: HttpStatus.FORBIDDEN,
       });
     });
   });

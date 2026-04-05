@@ -3,6 +3,7 @@ import { HttpStatus } from '@nestjs/common';
 import { AssetController } from './asset.controller';
 import { PrismaService } from '../service/prisma/prisma.service';
 import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
+import { RequireOrgGuard } from '../guard/require-org.guard';
 
 describe('AssetController', () => {
   let controller: AssetController;
@@ -12,7 +13,11 @@ describe('AssetController', () => {
     const mockFindMany = jest.fn();
     const mockCount = jest.fn();
     const mockFindUnique = jest.fn();
-    prisma = { findMany: mockFindMany, count: mockCount, findUnique: mockFindUnique };
+    prisma = {
+      findMany: mockFindMany,
+      count: mockCount,
+      findUnique: mockFindUnique,
+    };
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AssetController],
       providers: [
@@ -23,6 +28,8 @@ describe('AssetController', () => {
       ],
     })
       .overrideGuard(ClerkAuthGuard)
+      .useValue({ canActivate: () => true })
+      .overrideGuard(RequireOrgGuard)
       .useValue({ canActivate: () => true })
       .compile();
 
@@ -80,28 +87,23 @@ describe('AssetController', () => {
               { address: { contains: 'boston', mode: 'insensitive' } },
               { city: { contains: 'boston', mode: 'insensitive' } },
               { state: { contains: 'boston', mode: 'insensitive' } },
-              { normalizedAddress: { contains: 'boston', mode: 'insensitive' } },
+              {
+                normalizedAddress: { contains: 'boston', mode: 'insensitive' },
+              },
             ],
           }),
         }),
       );
-    });
-
-    it('should throw FORBIDDEN when user not in organization', async () => {
-      // Act / Assert
-      await expect(controller.getAssets(null, 1, 20, undefined)).rejects.toMatchObject({
-        status: HttpStatus.FORBIDDEN,
-      });
     });
   });
 
   describe('getAsset', () => {
     it('should return asset when found', async () => {
       // Arrange
-      const asset = { 
-        id: 'a1', 
-        address: '123 Main St', 
-        city: 'Boston', 
+      const asset = {
+        id: 'a1',
+        address: '123 Main St',
+        city: 'Boston',
         state: 'MA',
         deals: [{ id: 'd1' }],
       };
@@ -119,7 +121,12 @@ describe('AssetController', () => {
           }),
         }),
       );
-      expect(result).toEqual({ id: 'a1', address: '123 Main St', city: 'Boston', state: 'MA' });
+      expect(result).toEqual({
+        id: 'a1',
+        address: '123 Main St',
+        city: 'Boston',
+        state: 'MA',
+      });
     });
 
     it('should throw NOT_FOUND when asset does not exist', async () => {
@@ -127,7 +134,9 @@ describe('AssetController', () => {
       prisma.findUnique.mockResolvedValue(null);
 
       // Act / Assert
-      await expect(controller.getAsset('org-1', 'nonexistent')).rejects.toMatchObject({
+      await expect(
+        controller.getAsset('org-1', 'nonexistent'),
+      ).rejects.toMatchObject({
         status: HttpStatus.NOT_FOUND,
         message: 'Asset not found',
       });
@@ -135,8 +144,8 @@ describe('AssetController', () => {
 
     it('should throw NOT_FOUND when asset has no deals in user org', async () => {
       // Arrange
-      const asset = { 
-        id: 'a1', 
+      const asset = {
+        id: 'a1',
         address: '123 Main St',
         deals: [], // No deals for this org
       };
@@ -146,13 +155,6 @@ describe('AssetController', () => {
       await expect(controller.getAsset('org-1', 'a1')).rejects.toMatchObject({
         status: HttpStatus.NOT_FOUND,
         message: 'Asset not found',
-      });
-    });
-
-    it('should throw FORBIDDEN when user not in organization', async () => {
-      // Act / Assert
-      await expect(controller.getAsset(null, 'a1')).rejects.toMatchObject({
-        status: HttpStatus.FORBIDDEN,
       });
     });
   });

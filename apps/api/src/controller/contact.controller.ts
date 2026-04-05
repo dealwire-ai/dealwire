@@ -12,10 +12,11 @@ import {
 import { PrismaService } from '../service/prisma/prisma.service';
 import { BrokerIntelligenceService } from '../service/deal/broker-intelligence.service';
 import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
+import { RequireOrgGuard } from '../guard/require-org.guard';
 import { AuthUser } from '../decorator/auth-user.decorator';
 
 @Controller('contacts')
-@UseGuards(ClerkAuthGuard)
+@UseGuards(ClerkAuthGuard, RequireOrgGuard)
 export class ContactController {
   constructor(
     private readonly prismaService: PrismaService,
@@ -24,18 +25,11 @@ export class ContactController {
 
   @Get()
   async getContacts(
-    @AuthUser('organizationId') organizationId: string | null,
+    @AuthUser('organizationId') organizationId: string,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number,
     @Query('search') search?: string,
   ) {
-    if (!organizationId) {
-      throw new HttpException(
-        'User not in organization',
-        HttpStatus.FORBIDDEN,
-      );
-    }
-
     const skip = (page - 1) * limit;
     const where: Record<string, unknown> = {
       deals: { some: { organizationId } },
@@ -73,15 +67,11 @@ export class ContactController {
   // Static routes MUST come before parameterized routes
   @Get('stats/leaderboard')
   async getBrokerLeaderboard(
-    @AuthUser('organizationId') organizationId: string | null,
+    @AuthUser('organizationId') organizationId: string,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
     @Query('sinceDays') sinceDays?: string,
     @Query('sortBy') sortBy?: string,
   ) {
-    if (!organizationId) {
-      throw new HttpException('User not in organization', HttpStatus.FORBIDDEN);
-    }
-
     const since = sinceDays
       ? new Date(Date.now() - parseInt(sinceDays, 10) * 24 * 60 * 60 * 1000)
       : undefined;
@@ -95,16 +85,9 @@ export class ContactController {
 
   @Get(':contactId')
   async getContact(
-    @AuthUser('organizationId') organizationId: string | null,
+    @AuthUser('organizationId') organizationId: string,
     @Param('contactId') contactId: string,
   ) {
-    if (!organizationId) {
-      throw new HttpException(
-        'User not in organization',
-        HttpStatus.FORBIDDEN,
-      );
-    }
-
     const contact = await this.prismaService.contact.findUnique({
       where: { id: contactId },
       include: {
@@ -132,16 +115,18 @@ export class ContactController {
 
   @Get(':contactId/stats')
   async getBrokerStats(
-    @AuthUser('organizationId') organizationId: string | null,
+    @AuthUser('organizationId') organizationId: string,
     @Param('contactId') contactId: string,
   ) {
-    if (!organizationId) {
-      throw new HttpException('User not in organization', HttpStatus.FORBIDDEN);
-    }
-
-    const stats = await this.brokerIntelligence.getBrokerStats(contactId, organizationId);
+    const stats = await this.brokerIntelligence.getBrokerStats(
+      contactId,
+      organizationId,
+    );
     if (!stats) {
-      throw new HttpException('Contact not found or has no deals', HttpStatus.NOT_FOUND);
+      throw new HttpException(
+        'Contact not found or has no deals',
+        HttpStatus.NOT_FOUND,
+      );
     }
 
     return stats;

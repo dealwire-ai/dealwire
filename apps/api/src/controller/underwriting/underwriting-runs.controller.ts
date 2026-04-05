@@ -13,12 +13,13 @@ import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../service/prisma/prisma.service';
 import { S3Service } from '../../service/s3/s3.service';
 import { ClerkAuthGuard } from '../../guard/clerk-auth.guard';
+import { RequireOrgGuard } from '../../guard/require-org.guard';
 import { AuthUser } from '../../decorator/auth-user.decorator';
 
 const VALID_STATUSES = ['RUNNING', 'COMPLETED', 'FAILED'] as const;
 
 @Controller('underwriting/runs')
-@UseGuards(ClerkAuthGuard)
+@UseGuards(ClerkAuthGuard, RequireOrgGuard)
 export class UnderwritingRunsController {
   constructor(
     private readonly prisma: PrismaService,
@@ -27,16 +28,12 @@ export class UnderwritingRunsController {
 
   @Get()
   async list(
-    @AuthUser('organizationId') orgId: string | null,
+    @AuthUser('organizationId') orgId: string,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number,
     @Query('status') status?: string,
     @Query('search') search?: string,
   ) {
-    if (!orgId) {
-      throw new HttpException('User not in organization', HttpStatus.FORBIDDEN);
-    }
-
     const cappedLimit = Math.min(Math.max(limit, 1), 100);
     const skip = (page - 1) * cappedLimit;
     const where: Prisma.UnderwritingRunWhereInput = { organizationId: orgId };
@@ -81,13 +78,9 @@ export class UnderwritingRunsController {
 
   @Get(':id')
   async get(
-    @AuthUser('organizationId') orgId: string | null,
+    @AuthUser('organizationId') orgId: string,
     @Param('id') id: string,
   ) {
-    if (!orgId) {
-      throw new HttpException('User not in organization', HttpStatus.FORBIDDEN);
-    }
-
     const run = await this.prisma.underwritingRun.findUnique({ where: { id } });
     if (!run || run.organizationId !== orgId) {
       throw new HttpException('Not found', HttpStatus.NOT_FOUND);
@@ -98,13 +91,9 @@ export class UnderwritingRunsController {
 
   @Get(':id/proforma-url')
   async getProformaUrl(
-    @AuthUser('organizationId') orgId: string | null,
+    @AuthUser('organizationId') orgId: string,
     @Param('id') id: string,
   ) {
-    if (!orgId) {
-      throw new HttpException('User not in organization', HttpStatus.FORBIDDEN);
-    }
-
     const run = await this.prisma.underwritingRun.findUnique({
       where: { id },
       select: { organizationId: true, proformaS3Key: true },
