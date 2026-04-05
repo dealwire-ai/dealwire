@@ -2,12 +2,17 @@ import { Injectable, Logger } from '@nestjs/common';
 import OpenAI from 'openai';
 import { z } from 'zod';
 import { aiConfig } from '../../config/ai.config';
+import { dealDetectionModelName } from '../underwriting/model-config';
 import { MetricsService } from '../metrics/metrics.service';
 import { PrismaService } from '../prisma/prisma.service';
 
 const DealDetectionSchema = z.object({
-  isDeal: z.boolean().describe('Whether this email is about a real estate deal offering'),
-  confidence: z.enum(['high', 'medium', 'low']).describe('Confidence level of the classification'),
+  isDeal: z
+    .boolean()
+    .describe('Whether this email is about a real estate deal offering'),
+  confidence: z
+    .enum(['high', 'medium', 'low'])
+    .describe('Confidence level of the classification'),
   reason: z.string().describe('Brief reason for the classification'),
 });
 
@@ -42,6 +47,7 @@ export class DealDetectionService {
     organizationId?: string | null,
   ): Promise<DealDetection> {
     const start = Date.now();
+    const modelName = dealDetectionModelName();
     try {
       // Load preferences if organizationId is provided
       let alwaysSkip: string | null = null;
@@ -54,7 +60,9 @@ export class DealDetectionService {
           alwaysSkip = prefs?.alwaysSkip || null;
         } catch (error) {
           const msg = error instanceof Error ? error.message : String(error);
-          this.logger.warn(`Failed to load preferences for org ${organizationId}: ${msg}`);
+          this.logger.warn(
+            `Failed to load preferences for org ${organizationId}: ${msg}`,
+          );
         }
       }
 
@@ -96,7 +104,7 @@ Consider attachments: PDFs may indicate deal memos or OMs, but only if the email
       }
 
       const response = await this.openai.chat.completions.create({
-        model: 'gpt-4o-mini', // we should keep this as something fast and cheap for deal classification
+        model: modelName,
         temperature: 0,
         messages: [
           {
@@ -120,7 +128,12 @@ Has attachments: ${hasAttachments ? 'Yes' : 'No'}`,
       const content = response.choices[0]?.message?.content;
       if (!content) {
         const duration = (Date.now() - start) / 1000;
-        this.metricsService.recordAICall('detection', 'gpt-4o-mini', duration, 'error');
+        this.metricsService.recordAICall(
+          'detection',
+          modelName,
+          duration,
+          'error',
+        );
         this.logger.warn('No content from deal detection');
         return { isDeal: false, confidence: 'low', reason: 'No response' };
       }
@@ -128,14 +141,30 @@ Has attachments: ${hasAttachments ? 'Yes' : 'No'}`,
       const result = DealDetectionSchema.safeParse(JSON.parse(content));
       if (!result.success) {
         const duration = (Date.now() - start) / 1000;
-        this.metricsService.recordAICall('detection', 'gpt-4o-mini', duration, 'error');
-        this.logger.warn(`Invalid deal detection response: ${result.error.message}`);
-        return { isDeal: false, confidence: 'low', reason: 'Parse failed, defaulting to skip' };
+        this.metricsService.recordAICall(
+          'detection',
+          modelName,
+          duration,
+          'error',
+        );
+        this.logger.warn(
+          `Invalid deal detection response: ${result.error.message}`,
+        );
+        return {
+          isDeal: false,
+          confidence: 'low',
+          reason: 'Parse failed, defaulting to skip',
+        };
       }
 
       const parsed = result.data;
       const duration = (Date.now() - start) / 1000;
-      this.metricsService.recordAICall('detection', 'gpt-4o-mini', duration, 'success');
+      this.metricsService.recordAICall(
+        'detection',
+        modelName,
+        duration,
+        'success',
+      );
 
       this.logger.log(
         `Deal detection: isDeal=${parsed.isDeal}, confidence=${parsed.confidence}, reason="${parsed.reason}"`,
@@ -144,12 +173,20 @@ Has attachments: ${hasAttachments ? 'Yes' : 'No'}`,
       return parsed;
     } catch (error) {
       const duration = (Date.now() - start) / 1000;
-      this.metricsService.recordAICall('detection', 'gpt-4o-mini', duration, 'error');
+      this.metricsService.recordAICall(
+        'detection',
+        modelName,
+        duration,
+        'error',
+      );
       const msg = error instanceof Error ? error.message : String(error);
       this.logger.error(`Deal detection failed: ${msg}`);
       // Default to false on error - conservative approach to avoid false positives
-      return { isDeal: false, confidence: 'low', reason: 'Detection failed, defaulting to skip' };
+      return {
+        isDeal: false,
+        confidence: 'low',
+        reason: 'Detection failed, defaulting to skip',
+      };
     }
   }
 }
-

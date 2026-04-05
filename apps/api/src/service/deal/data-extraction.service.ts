@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import OpenAI from 'openai';
 import { aiConfig } from '../../config/ai.config';
+import { dealGeneralModelName } from '../underwriting/model-config';
 import { MetricsService } from '../metrics/metrics.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { DealType, ExtractedData } from '../../model/extracted-data.model';
@@ -33,8 +34,12 @@ export class DataExtractionService {
    * @param extractedText - Combined text from email body and attachments
    * @returns The extracted deal type and structured data
    */
-  async extract(dealId: string, extractedText: string): Promise<DataExtractionResult> {
+  async extract(
+    dealId: string,
+    extractedText: string,
+  ): Promise<DataExtractionResult> {
     const start = Date.now();
+    const modelName = dealGeneralModelName();
 
     try {
       const systemPrompt =
@@ -66,7 +71,7 @@ export class DataExtractionService {
         'For non-real_estate deal types, still return extractedData as an empty object {} — we will add type-specific fields later.';
 
       const response = await this.openai.chat.completions.create({
-        model: this.aiConfig.openaiModel,
+        model: modelName,
         temperature: this.aiConfig.openaiTemperature,
         messages: [
           { role: 'system', content: systemPrompt },
@@ -83,7 +88,8 @@ export class DataExtractionService {
 
       const parsed = JSON.parse(content);
       const dealType: DealType = parsed.dealType || 'unknown';
-      const extractedData = (parsed.extractedData || {}) as Prisma.InputJsonValue;
+      const extractedData = (parsed.extractedData ||
+        {}) as Prisma.InputJsonValue;
 
       await this.prismaService.deal.update({
         where: { id: dealId },
@@ -91,18 +97,34 @@ export class DataExtractionService {
       });
 
       const duration = (Date.now() - start) / 1000;
-      this.metricsService.recordAICall('data-extraction', this.aiConfig.openaiModel, duration, 'success');
+      this.metricsService.recordAICall(
+        'data-extraction',
+        modelName,
+        duration,
+        'success',
+      );
 
       this.logger.log(
         `Data extraction completed for deal ${dealId}: type=${dealType} (${duration.toFixed(2)}s)`,
       );
 
-      return { dealType, extractedData: (parsed.extractedData || {}) as ExtractedData };
+      return {
+        dealType,
+        extractedData: (parsed.extractedData || {}) as ExtractedData,
+      };
     } catch (error) {
       const duration = (Date.now() - start) / 1000;
-      this.metricsService.recordAICall('data-extraction', this.aiConfig.openaiModel, duration, 'error');
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      this.logger.error(`Data extraction failed for deal ${dealId}: ${errorMessage}`);
+      this.metricsService.recordAICall(
+        'data-extraction',
+        modelName,
+        duration,
+        'error',
+      );
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      this.logger.error(
+        `Data extraction failed for deal ${dealId}: ${errorMessage}`,
+      );
       throw error;
     }
   }

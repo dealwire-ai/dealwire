@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import OpenAI from 'openai';
 import { aiConfig } from '../../config/ai.config';
+import { dealGeneralModelName } from '../underwriting/model-config';
 import { DealDecision } from '../../model/deal-decision.model';
 import { MetricsService } from '../metrics/metrics.service';
 
@@ -28,13 +29,14 @@ export class DealDecisionService {
     dealCriteria?: string,
   ): Promise<DealDecision> {
     const start = Date.now();
+    const modelName = dealGeneralModelName();
     try {
       // Build prompt based on whether criteria is provided
       let systemPrompt: string;
 
       if (dealCriteria) {
         systemPrompt =
-          'You are a real estate deal screener. Your ONLY job is to check if deals meet the client\'s specific screening requirements.\n\n' +
+          "You are a real estate deal screener. Your ONLY job is to check if deals meet the client's specific screening requirements.\n\n" +
           '=== IMPORTANT: THIS IS SCREENING, NOT UNDERWRITING ===\n' +
           '- Do NOT evaluate deal quality, financial viability, or investment metrics\n' +
           '- Do NOT reject deals for missing financial metrics, incomplete information, or subjective quality concerns\n' +
@@ -74,7 +76,7 @@ export class DealDecisionService {
       }
 
       const response = await this.openai.chat.completions.create({
-        model: this.aiConfig.openaiModel,
+        model: modelName,
         temperature: this.aiConfig.openaiTemperature,
         messages: [
           { role: 'system', content: systemPrompt },
@@ -97,18 +99,30 @@ export class DealDecisionService {
       };
 
       const duration = (Date.now() - start) / 1000;
-      this.metricsService.recordAICall('initial-screening', this.aiConfig.openaiModel, duration, 'success');
+      this.metricsService.recordAICall(
+        'initial-screening',
+        modelName,
+        duration,
+        'success',
+      );
 
       this.logger.log(
-        `Deal decision made: ${decision.decision} (model: ${this.aiConfig.openaiModel}) for deal criteria: ${dealCriteria}`,
+        `Deal decision made: ${decision.decision} (model: ${modelName}) for deal criteria: ${dealCriteria}`,
       );
 
       return decision;
     } catch (error) {
       const duration = (Date.now() - start) / 1000;
-      this.metricsService.recordAICall('initial-screening', this.aiConfig.openaiModel, duration, 'error');
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      const errorType = error instanceof Error ? error.constructor.name : 'Unknown';
+      this.metricsService.recordAICall(
+        'initial-screening',
+        modelName,
+        duration,
+        'error',
+      );
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      const errorType =
+        error instanceof Error ? error.constructor.name : 'Unknown';
       this.logger.error(
         `Deal decision failed: ${errorMessage} (type: ${errorType})`,
       );
@@ -116,4 +130,3 @@ export class DealDecisionService {
     }
   }
 }
-
