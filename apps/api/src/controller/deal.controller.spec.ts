@@ -3,6 +3,7 @@ import { HttpStatus } from '@nestjs/common';
 import { DealController } from './deal.controller';
 import { PrismaService } from '../service/prisma/prisma.service';
 import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
+import { RequireOrgGuard } from '../guard/require-org.guard';
 
 describe('DealController', () => {
   let controller: DealController;
@@ -31,6 +32,8 @@ describe('DealController', () => {
       ],
     })
       .overrideGuard(ClerkAuthGuard)
+      .useValue({ canActivate: () => true })
+      .overrideGuard(RequireOrgGuard)
       .useValue({ canActivate: () => true })
       .compile();
 
@@ -69,7 +72,9 @@ describe('DealController', () => {
       prisma.deal.findUnique.mockResolvedValue(null);
 
       // Act / Assert
-      await expect(controller.getDeal('org-1', 'nonexistent')).rejects.toMatchObject({
+      await expect(
+        controller.getDeal('org-1', 'nonexistent'),
+      ).rejects.toMatchObject({
         status: HttpStatus.NOT_FOUND,
         message: 'Deal not found',
       });
@@ -106,13 +111,6 @@ describe('DealController', () => {
       expect(result.data).toHaveLength(1);
       expect(result.pagination.total).toBe(1);
       expect(result.pagination.totalPages).toBe(1);
-    });
-
-    it('should throw FORBIDDEN when user not in organization', async () => {
-      // Act / Assert
-      await expect(controller.getDeals(null, 'user-1', 1, 20)).rejects.toMatchObject({
-        status: HttpStatus.FORBIDDEN,
-      });
     });
   });
 });

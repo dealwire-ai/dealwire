@@ -11,27 +11,21 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../service/prisma/prisma.service';
 import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
+import { RequireOrgGuard } from '../guard/require-org.guard';
 import { AuthUser } from '../decorator/auth-user.decorator';
 
 @Controller('assets')
-@UseGuards(ClerkAuthGuard)
+@UseGuards(ClerkAuthGuard, RequireOrgGuard)
 export class AssetController {
   constructor(private readonly prismaService: PrismaService) {}
 
   @Get()
   async getAssets(
-    @AuthUser('organizationId') organizationId: string | null,
+    @AuthUser('organizationId') organizationId: string,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(20), ParseIntPipe) limit: number,
     @Query('search') search?: string,
   ) {
-    if (!organizationId) {
-      throw new HttpException(
-        'User not in organization',
-        HttpStatus.FORBIDDEN,
-      );
-    }
-
     const skip = (page - 1) * limit;
     const where: Record<string, unknown> = {
       deals: { some: { organizationId } },
@@ -69,16 +63,9 @@ export class AssetController {
 
   @Get(':assetId')
   async getAsset(
-    @AuthUser('organizationId') organizationId: string | null,
+    @AuthUser('organizationId') organizationId: string,
     @Param('assetId') assetId: string,
   ) {
-    if (!organizationId) {
-      throw new HttpException(
-        'User not in organization',
-        HttpStatus.FORBIDDEN,
-      );
-    }
-
     const asset = await this.prismaService.asset.findUnique({
       where: { id: assetId },
       include: {
