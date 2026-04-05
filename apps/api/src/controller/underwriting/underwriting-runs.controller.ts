@@ -8,18 +8,18 @@ import {
   HttpException,
   HttpStatus,
   UseGuards,
-  Logger,
 } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../service/prisma/prisma.service';
 import { S3Service } from '../../service/s3/s3.service';
 import { ClerkAuthGuard } from '../../guard/clerk-auth.guard';
 import { AuthUser } from '../../decorator/auth-user.decorator';
 
+const VALID_STATUSES = ['RUNNING', 'COMPLETED', 'FAILED'] as const;
+
 @Controller('underwriting/runs')
 @UseGuards(ClerkAuthGuard)
 export class UnderwritingRunsController {
-  private readonly logger = new Logger(UnderwritingRunsController.name);
-
   constructor(
     private readonly prisma: PrismaService,
     private readonly s3: S3Service,
@@ -37,11 +37,18 @@ export class UnderwritingRunsController {
       throw new HttpException('User not in organization', HttpStatus.FORBIDDEN);
     }
 
-    const skip = (page - 1) * limit;
-    const where: any = { organizationId: orgId };
+    const cappedLimit = Math.min(Math.max(limit, 1), 100);
+    const skip = (page - 1) * cappedLimit;
+    const where: Prisma.UnderwritingRunWhereInput = { organizationId: orgId };
 
     if (status) {
-      where.status = status;
+      if (!VALID_STATUSES.includes(status as any)) {
+        throw new HttpException(
+          'Invalid status filter',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      where.status = status as Prisma.EnumUnderwritingStatusFilter['equals'];
     }
     if (search) {
       where.OR = [
@@ -55,31 +62,20 @@ export class UnderwritingRunsController {
       this.prisma.underwritingRun.findMany({
         where,
         skip,
-        take: limit,
+        take: cappedLimit,
         orderBy: { createdAt: 'desc' },
-        select: {
-          id: true,
-          jobId: true,
-          senderEmail: true,
-          emailSubject: true,
-          status: true,
-          pipelineType: true,
-          proformaS3Key: true,
-          humanReviewFlags: true,
-          confidence: true,
-          durationMs: true,
-          error: true,
-          startedAt: true,
-          completedAt: true,
-          createdAt: true,
-        },
       }),
       this.prisma.underwritingRun.count({ where }),
     ]);
 
     return {
       data: runs,
-      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+      pagination: {
+        page,
+        limit: cappedLimit,
+        total,
+        totalPages: Math.ceil(total / cappedLimit),
+      },
     };
   }
 
