@@ -56,6 +56,9 @@ export interface Asset {
 
 export interface UnderwritingRun {
   id: string;
+  dealId: string | null;
+  assetId: string | null;
+  proformaId: string | null;
   jobId: string;
   senderEmail: string;
   emailSubject: string | null;

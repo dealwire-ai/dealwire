@@ -183,6 +183,7 @@ export class AgenticUnderwritingService {
         ...analysis,
       },
       confidence: analysis.confidence,
+      proformaId: proforma?.id,
     };
   }
 }
