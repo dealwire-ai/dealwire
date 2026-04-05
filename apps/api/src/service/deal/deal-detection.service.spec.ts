@@ -12,6 +12,10 @@ jest.mock('openai', () => ({
   })),
 }));
 
+jest.mock('../underwriting/model-config', () => ({
+  dealDetectionModelName: () => 'gpt-4.1-nano',
+}));
+
 describe('DealDetectionService', () => {
   let service: DealDetectionService;
   let prismaService: jest.Mocked<PrismaService>;
@@ -78,7 +82,7 @@ describe('DealDetectionService', () => {
     expect(result.reason).toBe('Broker blast with specific property details');
     expect(metricsService.recordAICall).toHaveBeenCalledWith(
       'detection',
-      'gpt-4o-mini',
+      'gpt-4.1-nano',
       expect.any(Number),
       'success',
     );
@@ -113,7 +117,7 @@ describe('DealDetectionService', () => {
     expect(result.reason).toBe('SaaS platform offering, not a property deal');
     expect(metricsService.recordAICall).toHaveBeenCalledWith(
       'detection',
-      'gpt-4o-mini',
+      'gpt-4.1-nano',
       expect.any(Number),
       'success',
     );
@@ -121,7 +125,9 @@ describe('DealDetectionService', () => {
 
   it('should return isDeal=false when alwaysSkip criteria matches', async () => {
     // Arrange
-    (prismaService.screeningPreferences.findUnique as jest.Mock).mockResolvedValue({
+    (
+      prismaService.screeningPreferences.findUnique as jest.Mock
+    ).mockResolvedValue({
       alwaysSkip: 'retail properties',
     });
 
@@ -176,7 +182,7 @@ describe('DealDetectionService', () => {
     expect(result.reason).toBe('No response');
     expect(metricsService.recordAICall).toHaveBeenCalledWith(
       'detection',
-      'gpt-4o-mini',
+      'gpt-4.1-nano',
       expect.any(Number),
       'error',
     );
@@ -201,7 +207,7 @@ describe('DealDetectionService', () => {
     expect(result.reason).toBe('Detection failed, defaulting to skip');
     expect(metricsService.recordAICall).toHaveBeenCalledWith(
       'detection',
-      'gpt-4o-mini',
+      'gpt-4.1-nano',
       expect.any(Number),
       'error',
     );
@@ -236,7 +242,7 @@ describe('DealDetectionService', () => {
     expect(result.reason).toBe('Parse failed, defaulting to skip');
     expect(metricsService.recordAICall).toHaveBeenCalledWith(
       'detection',
-      'gpt-4o-mini',
+      'gpt-4.1-nano',
       expect.any(Number),
       'error',
     );
@@ -247,11 +253,7 @@ describe('DealDetectionService', () => {
     mockCreate.mockRejectedValue(new Error('API rate limit exceeded'));
 
     // Act
-    const result = await service.isDealEmail(
-      'Some subject',
-      'Some body',
-      true,
-    );
+    const result = await service.isDealEmail('Some subject', 'Some body', true);
 
     // Assert
     expect(result.isDeal).toBe(false);
@@ -259,7 +261,7 @@ describe('DealDetectionService', () => {
     expect(result.reason).toBe('Detection failed, defaulting to skip');
     expect(metricsService.recordAICall).toHaveBeenCalledWith(
       'detection',
-      'gpt-4o-mini',
+      'gpt-4.1-nano',
       expect.any(Number),
       'error',
     );
@@ -267,7 +269,9 @@ describe('DealDetectionService', () => {
 
   it('should load preferences when organizationId is provided', async () => {
     // Arrange
-    (prismaService.screeningPreferences.findUnique as jest.Mock).mockResolvedValue({
+    (
+      prismaService.screeningPreferences.findUnique as jest.Mock
+    ).mockResolvedValue({
       alwaysSkip: 'ground leases',
     });
 
@@ -303,9 +307,9 @@ describe('DealDetectionService', () => {
 
   it('should skip preferences gracefully when load fails', async () => {
     // Arrange
-    (prismaService.screeningPreferences.findUnique as jest.Mock).mockRejectedValue(
-      new Error('Database connection failed'),
-    );
+    (
+      prismaService.screeningPreferences.findUnique as jest.Mock
+    ).mockRejectedValue(new Error('Database connection failed'));
 
     mockCreate.mockResolvedValue({
       choices: [
@@ -335,7 +339,7 @@ describe('DealDetectionService', () => {
     expect(result.confidence).toBe('high');
     expect(metricsService.recordAICall).toHaveBeenCalledWith(
       'detection',
-      'gpt-4o-mini',
+      'gpt-4.1-nano',
       expect.any(Number),
       'success',
     );
@@ -361,6 +365,8 @@ describe('DealDetectionService', () => {
     await service.isDealEmail('Subject', 'Body', false);
 
     // Assert
-    expect(prismaService.screeningPreferences.findUnique).not.toHaveBeenCalled();
+    expect(
+      prismaService.screeningPreferences.findUnique,
+    ).not.toHaveBeenCalled();
   });
 });

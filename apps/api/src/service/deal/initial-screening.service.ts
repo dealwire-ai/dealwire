@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ScreeningBucket } from '@prisma/client';
 import OpenAI from 'openai';
 import { aiConfig } from '../../config/ai.config';
+import { dealScreeningModelName } from '../underwriting/model-config';
 import { InitialScreeningResult } from '../../model/initial-screening.model';
 import { MetricsService } from '../metrics/metrics.service';
 import { PrismaService } from '../prisma/prisma.service';
@@ -46,6 +47,7 @@ export class InitialScreeningService {
     structuredData?: Record<string, unknown>,
   ): Promise<InitialScreeningResult> {
     const start = Date.now();
+    const modelName = dealScreeningModelName();
     try {
       const systemPrompt = this.buildPrompt(buckets, !!structuredData);
 
@@ -63,7 +65,7 @@ export class InitialScreeningService {
       userContent += `Raw Extracted Text:\n\n${extractedText}`;
 
       const response = await this.openai.chat.completions.create({
-        model: this.aiConfig.openaiScreeningModel,
+        model: modelName,
         temperature: this.aiConfig.openaiTemperature,
         messages: [
           { role: 'system', content: systemPrompt },
@@ -155,13 +157,13 @@ export class InitialScreeningService {
       const duration = (Date.now() - start) / 1000;
       this.metricsService.recordAICall(
         'initial-screening',
-        this.aiConfig.openaiScreeningModel,
+        modelName,
         duration,
         'success',
       );
 
       this.logger.log(
-        `Initial screening completed: ${decision} bucket="${matchedBucket.name}" (model: ${this.aiConfig.openaiScreeningModel}) for deal ${dealId}${assetId ? ` with asset ${assetId}` : ' (no asset)'}${contactId ? ` with contact ${contactId}` : ' (no contact)'}`,
+        `Initial screening completed: ${decision} bucket="${matchedBucket.name}" (model: ${modelName}) for deal ${dealId}${assetId ? ` with asset ${assetId}` : ' (no asset)'}${contactId ? ` with contact ${contactId}` : ' (no contact)'}`,
       );
 
       return result;
@@ -169,7 +171,7 @@ export class InitialScreeningService {
       const duration = (Date.now() - start) / 1000;
       this.metricsService.recordAICall(
         'initial-screening',
-        this.aiConfig.openaiScreeningModel,
+        modelName,
         duration,
         'error',
       );

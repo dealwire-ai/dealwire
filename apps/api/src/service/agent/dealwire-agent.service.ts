@@ -6,7 +6,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { ScreeningPreferencesService } from '../preferences/screening-preferences.service';
 import { BrokerIntelligenceService } from '../deal/broker-intelligence.service';
 import { ParcelQueryService } from '../public-data/parcel-query.service';
-import { aiConfig } from '../../config/ai.config';
+import { dealGeneralModelName } from '../underwriting/model-config';
 import { BOROUGH_NAMES } from '../public-data/nyc-utils';
 
 const SYSTEM_PROMPT = `You are an AI acquisitions analyst for a real estate investment firm. You monitor their deal flow, track broker relationships, and help refine screening criteria. You communicate via email replies and web chat.
@@ -76,7 +76,6 @@ export class DealwireAgentService {
    * Generate a response (non-streaming). Used for email replies.
    */
   async generate(context: AgentContext, userMessage: string): Promise<string> {
-    const config = aiConfig();
     const tools = this.createTools(context);
 
     // Load current preferences for context
@@ -100,7 +99,7 @@ export class DealwireAgentService {
     const messages: CoreMessage[] = [{ role: 'user', content: userMessage }];
 
     const result = await generateText({
-      model: openai(config.openaiModel),
+      model: openai(dealGeneralModelName()),
       system: systemWithContext,
       messages,
       tools,
@@ -133,7 +132,6 @@ export class DealwireAgentService {
    * Stream a response. Used for web chat.
    */
   async stream(context: AgentContext, messages: CoreMessage[]) {
-    const config = aiConfig();
     const tools = this.createTools(context);
 
     // Load current preferences for context (same as generate)
@@ -155,7 +153,7 @@ export class DealwireAgentService {
       : SYSTEM_PROMPT;
 
     return streamText({
-      model: openai(config.openaiModel),
+      model: openai(dealGeneralModelName()),
       system: systemWithContext,
       messages,
       tools,
