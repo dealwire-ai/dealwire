@@ -12,6 +12,7 @@ export interface UnderwritingJobMessage {
   dealId: string;
   orgId: string;
   senderEmail: string;
+  emailSubject?: string;
   documents: Array<{
     s3Key: string;
     filename: string;
@@ -72,6 +73,7 @@ export class UnderwritingListenerService {
       dealId: parsed.dealId,
       orgId: parsed.orgId,
       senderEmail: parsed.senderEmail,
+      emailSubject: parsed.emailSubject,
       documents: parsed.documents,
       inReplyToMessageId: parsed.inReplyToMessageId,
     };

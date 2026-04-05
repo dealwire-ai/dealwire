@@ -116,6 +116,7 @@ export class UnderwritingInboundService {
       dealId: jobId,
       orgId,
       senderEmail: fromEmail,
+      emailSubject: subject || undefined,
       documents,
       inReplyToMessageId,
     });
