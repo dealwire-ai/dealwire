@@ -45,47 +45,25 @@ function StatusBadge({ status }: { status: UnderwritingRun["status"] }) {
   return <Badge className={styles[status]}>{status}</Badge>;
 }
 
-/** Extract key metrics from analysisData regardless of pipeline type */
+/** Extract key metrics from analysisData */
 function getMetrics(run: UnderwritingRun) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const d = run.analysisData as Record<string, any> | null;
   if (!d) return {};
 
-  if (d.pipeline === "agentic") {
-    return {
-      propertyName: d.propertyName,
-      propertyAddress: d.propertyAddress
-        ? [d.propertyAddress, d.city, d.state].filter(Boolean).join(", ")
-        : null,
-      askingPrice: d.askingPrice,
-      noi: d.noi,
-      capRate: d.capRate,
-      totalUnits: d.totalUnits,
-      occupancyRate: d.occupancyRate,
-      analystNotes: d.analystNotes,
-      unitMix: d.unitMix,
-      missingDocs: d.missingDocs,
-    };
-  }
-
-  // Legacy pipeline
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const resolved = d.resolved as Record<string, any> | undefined;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const om = d.om as Record<string, any> | undefined;
   return {
-    propertyName: om?.propertyName,
-    propertyAddress: om
-      ? [om.propertyAddress, om.city, om.state].filter(Boolean).join(", ")
+    propertyName: d.propertyName,
+    propertyAddress: d.propertyAddress
+      ? [d.propertyAddress, d.city, d.state].filter(Boolean).join(", ")
       : null,
-    askingPrice: om?.askingPrice,
-    noi: resolved?.reconciledNoi,
-    capRate: resolved?.capRate,
-    totalUnits: resolved?.reconciledTotalUnits,
-    occupancyRate: resolved?.reconciledOccupancyRate,
-    analystNotes: null,
-    unitMix: null,
-    missingDocs: resolved?.missingDocs,
+    askingPrice: d.askingPrice,
+    noi: d.noi,
+    capRate: d.capRate,
+    totalUnits: d.totalUnits,
+    occupancyRate: d.occupancyRate,
+    analystNotes: d.analystNotes,
+    unitMix: d.unitMix,
+    missingDocs: d.missingDocs,
   };
 }
 
