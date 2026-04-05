@@ -61,6 +61,27 @@ export class UnderwritingRunsController {
         skip,
         take: cappedLimit,
         orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          organizationId: true,
+          dealId: true,
+          proformaId: true,
+          jobId: true,
+          senderEmail: true,
+          emailSubject: true,
+          status: true,
+          filledProformaModelS3Key: true,
+          humanReviewFlags: true,
+          confidence: true,
+          durationMs: true,
+          error: true,
+          startedAt: true,
+          completedAt: true,
+          createdAt: true,
+          updatedAt: true,
+          // analysisData intentionally excluded — can be 50-200KB per row.
+          // Fetch via GET /underwriting/runs/:id for full detail.
+        },
       }),
       this.prisma.underwritingRun.count({ where }),
     ]);
@@ -96,17 +117,20 @@ export class UnderwritingRunsController {
   ) {
     const run = await this.prisma.underwritingRun.findUnique({
       where: { id },
-      select: { organizationId: true, proformaS3Key: true },
+      select: { organizationId: true, filledProformaModelS3Key: true },
     });
 
     if (!run || run.organizationId !== orgId) {
       throw new HttpException('Not found', HttpStatus.NOT_FOUND);
     }
-    if (!run.proformaS3Key) {
+    if (!run.filledProformaModelS3Key) {
       throw new HttpException('No proforma available', HttpStatus.NOT_FOUND);
     }
 
-    const url = await this.s3.getPresignedUrl(run.proformaS3Key, 3600);
+    const url = await this.s3.getPresignedUrl(
+      run.filledProformaModelS3Key,
+      3600,
+    );
     return { url };
   }
 }

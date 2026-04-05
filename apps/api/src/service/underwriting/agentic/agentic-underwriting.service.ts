@@ -175,14 +175,12 @@ export class AgenticUnderwritingService {
     return {
       dealId,
       status: 'completed',
-      proformaS3Key,
+      filledProformaModelS3Key: proformaS3Key,
       humanReviewFlags: analysis.flags,
       durationMs,
-      analysisData: {
-        pipeline: 'agentic',
-        ...analysis,
-      },
+      analysisData: { ...analysis },
       confidence: analysis.confidence,
+      proformaId: proforma?.id,
     };
   }
 }

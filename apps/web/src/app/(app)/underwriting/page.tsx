@@ -402,16 +402,21 @@ function RunsTab() {
   const table = useTableState();
   const [runs, setRuns] = useState<UnderwritingRun[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isLoaded || !userId) return;
     setLoading(true);
+    setError(null);
     apiCall(`/underwriting/runs?${table.queryString}`)
       .then((res) => {
         setRuns(res.data);
         table.setMeta(res.pagination);
       })
-      .catch(() => setRuns([]))
+      .catch((e) => {
+        setError(e instanceof Error ? e.message : "Failed to load runs");
+        setRuns([]);
+      })
       .finally(() => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoaded, userId, table.queryString]);
@@ -426,6 +431,11 @@ function RunsTab() {
         hasActiveFilters={table.hasActiveFilters}
         onClearFilters={table.clearFilters}
       />
+      {error && (
+        <div className="p-4 bg-red-900/20 border border-red-900/50 rounded-lg text-red-400 mb-4">
+          {error}
+        </div>
+      )}
       {loading ? (
         <div className="text-zinc-400 py-8 text-center">Loading runs...</div>
       ) : (

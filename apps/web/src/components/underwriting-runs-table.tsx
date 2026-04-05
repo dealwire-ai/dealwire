@@ -45,47 +45,25 @@ function StatusBadge({ status }: { status: UnderwritingRun["status"] }) {
   return <Badge className={styles[status]}>{status}</Badge>;
 }
 
-/** Extract key metrics from analysisData regardless of pipeline type */
+/** Extract key metrics from analysisData */
 function getMetrics(run: UnderwritingRun) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const d = run.analysisData as Record<string, any> | null;
   if (!d) return {};
 
-  if (d.pipeline === "agentic") {
-    return {
-      propertyName: d.propertyName,
-      propertyAddress: d.propertyAddress
-        ? [d.propertyAddress, d.city, d.state].filter(Boolean).join(", ")
-        : null,
-      askingPrice: d.askingPrice,
-      noi: d.noi,
-      capRate: d.capRate,
-      totalUnits: d.totalUnits,
-      occupancyRate: d.occupancyRate,
-      analystNotes: d.analystNotes,
-      unitMix: d.unitMix,
-      missingDocs: d.missingDocs,
-    };
-  }
-
-  // Legacy pipeline
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const resolved = d.resolved as Record<string, any> | undefined;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const om = d.om as Record<string, any> | undefined;
   return {
-    propertyName: om?.propertyName,
-    propertyAddress: om
-      ? [om.propertyAddress, om.city, om.state].filter(Boolean).join(", ")
+    propertyName: d.propertyName,
+    propertyAddress: d.propertyAddress
+      ? [d.propertyAddress, d.city, d.state].filter(Boolean).join(", ")
       : null,
-    askingPrice: om?.askingPrice,
-    noi: resolved?.reconciledNoi,
-    capRate: resolved?.capRate,
-    totalUnits: resolved?.reconciledTotalUnits,
-    occupancyRate: resolved?.reconciledOccupancyRate,
-    analystNotes: null,
-    unitMix: null,
-    missingDocs: resolved?.missingDocs,
+    askingPrice: d.askingPrice,
+    noi: d.noi,
+    capRate: d.capRate,
+    totalUnits: d.totalUnits,
+    occupancyRate: d.occupancyRate,
+    analystNotes: d.analystNotes,
+    unitMix: d.unitMix,
+    missingDocs: d.missingDocs,
   };
 }
 
@@ -127,15 +105,29 @@ export function UnderwritingRunsTable({
   runs,
   emptyMessage,
 }: UnderwritingRunsTableProps) {
+  const { apiCall } = useApi();
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+  const [detailCache, setDetailCache] = useState<
+    Record<string, UnderwritingRun>
+  >({});
 
-  const toggleRow = (id: string) => {
+  const toggleRow = async (id: string) => {
     setExpandedRows((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);
       return next;
     });
+
+    // Lazy-load full detail (including analysisData) on first expand
+    if (!detailCache[id]) {
+      try {
+        const detail = await apiCall(`/underwriting/runs/${id}`);
+        setDetailCache((prev) => ({ ...prev, [id]: detail }));
+      } catch {
+        // Detail fetch failed — expanded row will show without metrics
+      }
+    }
   };
 
   if (runs.length === 0) {
@@ -162,7 +154,8 @@ export function UnderwritingRunsTable({
       <TableBody>
         {runs.map((run) => {
           const isExpanded = expandedRows.has(run.id);
-          const m = getMetrics(run);
+          const detail = detailCache[run.id];
+          const m = getMetrics(detail ?? run);
 
           return (
             <Fragment key={run.id}>
@@ -256,7 +249,9 @@ export function UnderwritingRunsTable({
                   )}
                 </TableCell>
                 <TableCell>
-                  {run.proformaS3Key && <DownloadButton runId={run.id} />}
+                  {run.filledProformaModelS3Key && (
+                    <DownloadButton runId={run.id} />
+                  )}
                 </TableCell>
               </TableRow>
 
@@ -265,7 +260,11 @@ export function UnderwritingRunsTable({
                 <TableRow>
                   <TableCell colSpan={7} className="bg-zinc-950/50 p-0">
                     <div className="border-l-2 border-[#C8A96E] pl-4 py-4 pr-4">
-                      <ExpandedRunDetail run={run} metrics={m} />
+                      <ExpandedRunDetail
+                        run={detail ?? run}
+                        metrics={m}
+                        loading={!detail}
+                      />
                     </div>
                   </TableCell>
                 </TableRow>
@@ -281,10 +280,16 @@ export function UnderwritingRunsTable({
 function ExpandedRunDetail({
   run,
   metrics: m,
+  loading,
 }: {
   run: UnderwritingRun;
   metrics: ReturnType<typeof getMetrics>;
+  loading?: boolean;
 }) {
+  if (loading) {
+    return <div className="text-zinc-400 text-sm py-2">Loading details...</div>;
+  }
+
   return (
     <div className="grid grid-cols-2 gap-6 text-sm">
       {/* Left: Financials */}
@@ -382,7 +387,6 @@ function ExpandedRunDetail({
         )}
 
         <div className="mt-4 text-xs text-zinc-500 space-y-0.5">
-          <div>Pipeline: {run.pipelineType}</div>
           <div>Job ID: {run.jobId}</div>
           {run.durationMs != null && (
             <div>Duration: {(run.durationMs / 1000).toFixed(1)}s</div>

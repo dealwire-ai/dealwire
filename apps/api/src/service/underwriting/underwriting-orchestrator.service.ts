@@ -29,11 +29,12 @@ export interface UnderwritingJobContext {
 export interface UnderwritingResult {
   dealId: string;
   status: 'completed' | 'failed';
-  proformaS3Key?: string;
+  filledProformaModelS3Key?: string;
   humanReviewFlags: string[];
   durationMs: number;
-  analysisData?: Record<string, unknown>; // NEW
-  confidence?: number; // NEW
+  analysisData?: Record<string, unknown>;
+  confidence?: number;
+  proformaId?: string;
 }
 
 @Injectable()
@@ -229,15 +230,26 @@ export class UnderwritingOrchestratorService {
     return {
       dealId,
       status: 'completed',
-      proformaS3Key,
+      filledProformaModelS3Key: proformaS3Key,
       humanReviewFlags: allFlags,
       durationMs,
       analysisData: {
-        pipeline: 'legacy',
-        resolved: normalized,
-        om: extraction.om ?? undefined,
+        // Flatten resolved metrics + OM extraction into a uniform shape
+        propertyName: extraction.om?.propertyName ?? null,
+        propertyAddress: extraction.om?.propertyAddress ?? null,
+        city: extraction.om?.city ?? null,
+        state: extraction.om?.state ?? null,
+        askingPrice: extraction.om?.askingPrice ?? null,
+        totalUnits: normalized.reconciledTotalUnits,
+        occupancyRate: normalized.reconciledOccupancyRate,
+        noi: normalized.reconciledNoi,
+        capRate: normalized.capRate,
+        effectiveGrossIncome: normalized.effectiveGrossIncome,
+        expenseRatio: normalized.expenseRatio,
+        missingDocs: normalized.missingDocs,
       },
       confidence: extraction.om?.confidence ?? undefined,
+      proformaId: proforma?.id,
     };
   }
 }
