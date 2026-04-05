@@ -3,6 +3,7 @@ import { HttpStatus } from '@nestjs/common';
 import { ScreeningPreferencesController } from './screening-preferences.controller';
 import { ScreeningPreferencesService } from '../service/preferences/screening-preferences.service';
 import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
+import { RequireOrgGuard } from '../guard/require-org.guard';
 
 describe('ScreeningPreferencesController', () => {
   let controller: ScreeningPreferencesController;
@@ -20,6 +21,8 @@ describe('ScreeningPreferencesController', () => {
       ],
     })
       .overrideGuard(ClerkAuthGuard)
+      .useValue({ canActivate: () => true })
+      .overrideGuard(RequireOrgGuard)
       .useValue({ canActivate: () => true })
       .compile();
 
@@ -41,17 +44,10 @@ describe('ScreeningPreferencesController', () => {
       const result = await controller.getScreeningPreferences('org-1');
 
       // Assert
-      expect(screeningPreferencesService.getPreferences).toHaveBeenCalledWith('org-1');
+      expect(screeningPreferencesService.getPreferences).toHaveBeenCalledWith(
+        'org-1',
+      );
       expect(result).toEqual(prefs);
-    });
-
-    it('should throw FORBIDDEN when organizationId is missing', async () => {
-      // Act / Assert
-      await expect(controller.getScreeningPreferences(null)).rejects.toMatchObject({
-        status: HttpStatus.FORBIDDEN,
-        message: 'User not in organization',
-      });
-      expect(screeningPreferencesService.getPreferences).not.toHaveBeenCalled();
     });
 
     it('should throw NOT_FOUND when service returns empty preferences', async () => {
@@ -59,7 +55,9 @@ describe('ScreeningPreferencesController', () => {
       screeningPreferencesService.getPreferences.mockResolvedValue({});
 
       // Act / Assert
-      await expect(controller.getScreeningPreferences('org-unknown')).rejects.toMatchObject({
+      await expect(
+        controller.getScreeningPreferences('org-unknown'),
+      ).rejects.toMatchObject({
         status: HttpStatus.NOT_FOUND,
         message: 'Screening preferences not found for this organization',
       });

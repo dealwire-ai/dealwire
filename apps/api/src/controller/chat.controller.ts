@@ -11,23 +11,24 @@ import { Response } from 'express';
 import { Readable } from 'stream';
 import { DealwireAgentService } from '../service/agent/dealwire-agent.service';
 import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
+import { RequireOrgGuard } from '../guard/require-org.guard';
 import { AuthUser } from '../decorator/auth-user.decorator';
 import type { CoreMessage } from 'ai';
 
 @Controller('chat')
-@UseGuards(ClerkAuthGuard)
+@UseGuards(ClerkAuthGuard, RequireOrgGuard)
 export class ChatController {
   constructor(private readonly agent: DealwireAgentService) {}
 
   @Post()
   async chat(
-    @AuthUser('organizationId') organizationId: string | null,
+    @AuthUser('organizationId') organizationId: string,
     @AuthUser('userId') userId: string | null,
     @Body() body: { messages: CoreMessage[] },
     @Res() res: Response,
   ): Promise<void> {
-    if (!organizationId || !userId) {
-      throw new HttpException('User not in organization', HttpStatus.FORBIDDEN);
+    if (!userId) {
+      throw new HttpException('User not authenticated', HttpStatus.FORBIDDEN);
     }
     const { messages } = body || {};
     if (!Array.isArray(messages) || messages.length === 0) {

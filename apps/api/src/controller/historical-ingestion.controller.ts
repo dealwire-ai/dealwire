@@ -9,13 +9,14 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
+import { RequireOrgGuard } from '../guard/require-org.guard';
 import { AuthUser } from '../decorator/auth-user.decorator';
 import { HistoricalIngestionService } from '../service/ingestion/historical-ingestion.service';
 import { PrismaService } from '../service/prisma/prisma.service';
 import { StartIngestionDto } from '../dto/start-ingestion.dto';
 
 @Controller('historical-ingestion')
-@UseGuards(ClerkAuthGuard)
+@UseGuards(ClerkAuthGuard, RequireOrgGuard)
 export class HistoricalIngestionController {
   constructor(
     private readonly ingestionService: HistoricalIngestionService,
@@ -25,12 +26,12 @@ export class HistoricalIngestionController {
   /** Start a new historical ingestion job */
   @Post()
   async start(
-    @AuthUser('organizationId') organizationId: string | null,
+    @AuthUser('organizationId') organizationId: string,
     @AuthUser('userId') userId: string | null,
     @Body() body: StartIngestionDto,
   ) {
-    if (!organizationId || !userId) {
-      throw new HttpException('User not in organization', HttpStatus.FORBIDDEN);
+    if (!userId) {
+      throw new HttpException('User not authenticated', HttpStatus.FORBIDDEN);
     }
 
     try {
@@ -54,11 +55,7 @@ export class HistoricalIngestionController {
 
   /** List all ingestion jobs for this organization */
   @Get()
-  async list(@AuthUser('organizationId') organizationId: string | null) {
-    if (!organizationId) {
-      throw new HttpException('User not in organization', HttpStatus.FORBIDDEN);
-    }
-
+  async list(@AuthUser('organizationId') organizationId: string) {
     return this.prisma.historicalIngestion.findMany({
       where: { organizationId },
       orderBy: { createdAt: 'desc' },
@@ -85,13 +82,9 @@ export class HistoricalIngestionController {
   /** Get status/progress for a specific ingestion job */
   @Get(':id')
   async getStatus(
-    @AuthUser('organizationId') organizationId: string | null,
+    @AuthUser('organizationId') organizationId: string,
     @Param('id') id: string,
   ) {
-    if (!organizationId) {
-      throw new HttpException('User not in organization', HttpStatus.FORBIDDEN);
-    }
-
     const job = await this.prisma.historicalIngestion.findUnique({
       where: { id },
     });
@@ -106,13 +99,9 @@ export class HistoricalIngestionController {
   /** Pause a running ingestion job */
   @Post(':id/pause')
   async pause(
-    @AuthUser('organizationId') organizationId: string | null,
+    @AuthUser('organizationId') organizationId: string,
     @Param('id') id: string,
   ) {
-    if (!organizationId) {
-      throw new HttpException('User not in organization', HttpStatus.FORBIDDEN);
-    }
-
     const job = await this.prisma.historicalIngestion.findUnique({
       where: { id },
       select: { organizationId: true },
@@ -134,13 +123,9 @@ export class HistoricalIngestionController {
   /** Resume a paused or failed ingestion job */
   @Post(':id/resume')
   async resume(
-    @AuthUser('organizationId') organizationId: string | null,
+    @AuthUser('organizationId') organizationId: string,
     @Param('id') id: string,
   ) {
-    if (!organizationId) {
-      throw new HttpException('User not in organization', HttpStatus.FORBIDDEN);
-    }
-
     const job = await this.prisma.historicalIngestion.findUnique({
       where: { id },
       select: { organizationId: true },

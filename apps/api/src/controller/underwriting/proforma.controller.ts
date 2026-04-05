@@ -15,50 +15,54 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ClerkAuthGuard } from '../../guard/clerk-auth.guard';
+import { RequireOrgGuard } from '../../guard/require-org.guard';
 import { AuthUser } from '../../decorator/auth-user.decorator';
-import { ProformaService, ProformaPatch } from '../../service/underwriting/proforma.service';
+import {
+  ProformaService,
+  ProformaPatch,
+} from '../../service/underwriting/proforma.service';
 
 @Controller('underwriting/proforma')
-@UseGuards(ClerkAuthGuard)
+@UseGuards(ClerkAuthGuard, RequireOrgGuard)
 export class ProformaController {
   constructor(private readonly proformaService: ProformaService) {}
 
   @Get()
-  list(@AuthUser('organizationId') orgId: string | null) {
-    if (!orgId) throw new HttpException('User not in organization', HttpStatus.FORBIDDEN);
+  list(@AuthUser('organizationId') orgId: string) {
     return this.proformaService.list(orgId);
   }
 
   @Post()
   @UseInterceptors(FileInterceptor('file'))
   async create(
-    @AuthUser('organizationId') orgId: string | null,
+    @AuthUser('organizationId') orgId: string,
     @Body('name') name: string,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    if (!orgId) throw new HttpException('User not in organization', HttpStatus.FORBIDDEN);
-    if (!file) throw new HttpException('No file uploaded', HttpStatus.BAD_REQUEST);
-    if (!name) throw new HttpException('name is required', HttpStatus.BAD_REQUEST);
-    return this.proformaService.create(orgId, name, file.buffer, file.originalname);
+    if (!file)
+      throw new HttpException('No file uploaded', HttpStatus.BAD_REQUEST);
+    if (!name)
+      throw new HttpException('name is required', HttpStatus.BAD_REQUEST);
+    return this.proformaService.create(
+      orgId,
+      name,
+      file.buffer,
+      file.originalname,
+    );
   }
 
   @Patch(':id')
   update(
-    @AuthUser('organizationId') orgId: string | null,
+    @AuthUser('organizationId') orgId: string,
     @Param('id') id: string,
     @Body() patch: ProformaPatch,
   ) {
-    if (!orgId) throw new HttpException('User not in organization', HttpStatus.FORBIDDEN);
     return this.proformaService.update(orgId, id, patch);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(
-    @AuthUser('organizationId') orgId: string | null,
-    @Param('id') id: string,
-  ) {
-    if (!orgId) throw new HttpException('User not in organization', HttpStatus.FORBIDDEN);
+  remove(@AuthUser('organizationId') orgId: string, @Param('id') id: string) {
     return this.proformaService.remove(orgId, id);
   }
 }

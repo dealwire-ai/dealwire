@@ -223,8 +223,8 @@ Config lives in [apps/api/src/config/clerk.config.ts](apps/api/src/config/clerk.
 
 ### Applying the guard
 
-- Add `@UseGuards(ClerkAuthGuard)` to any controller that should be protected (e.g. DealController, and future Contact, Asset, ScreeningPreferences controllers).
-- Register `ClerkAuthGuard` in the same module's `providers` (it depends on `PrismaService`); AppModule already does this.
+- Add `@UseGuards(ClerkAuthGuard, RequireOrgGuard)` to any controller that should be protected. `ClerkAuthGuard` verifies the JWT and populates `req.auth`; `RequireOrgGuard` rejects requests where `organizationId` is null (returns 403).
+- Register `ClerkAuthGuard` in the same module's `providers` (it depends on `PrismaService`); AppModule already does this. `RequireOrgGuard` is stateless and needs no providers.
 - Do **not** put the guard on webhook controllers, health, or metrics (they use their own auth or none).
 
 ### Building Protected API Endpoints
@@ -236,31 +236,23 @@ When creating new protected endpoints that should be organization-scoped:
 ```typescript
 import { Controller, Get, UseGuards } from "@nestjs/common";
 import { ClerkAuthGuard } from "../guard/clerk-auth.guard";
+import { RequireOrgGuard } from "../guard/require-org.guard";
 import { AuthUser } from "../decorator/auth-user.decorator";
 
 @Controller("your-resource")
-@UseGuards(ClerkAuthGuard)
+@UseGuards(ClerkAuthGuard, RequireOrgGuard)
 export class YourController {
   @Get()
-  async list(@AuthUser("organizationId") organizationId: string | null) {
-    // IMPORTANT: Always check organizationId and throw 403 if null
-    if (!organizationId) {
-      throw new HttpException("User not in organization", HttpStatus.FORBIDDEN);
-    }
-
-    // Query scoped to user's organization
+  async list(@AuthUser("organizationId") organizationId: string) {
+    // organizationId is guaranteed non-null by RequireOrgGuard
     return this.service.findMany({ organizationId });
   }
 
   @Get(":id")
   async getOne(
-    @AuthUser("organizationId") organizationId: string | null,
+    @AuthUser("organizationId") organizationId: string,
     @Param("id") id: string,
   ) {
-    if (!organizationId) {
-      throw new HttpException("User not in organization", HttpStatus.FORBIDDEN);
-    }
-
     const resource = await this.service.findOne(id);
 
     // CRITICAL: Verify resource belongs to user's org
@@ -276,7 +268,7 @@ export class YourController {
 **Key Security Rules:**
 
 1. **NEVER** accept `organizationId` as a query parameter or body param - always get it from `@AuthUser('organizationId')`
-2. **ALWAYS** check if `organizationId` is null and return 403 if user not in an org
+2. **ALWAYS** use `RequireOrgGuard` on org-scoped controllers — do not manually check `organizationId` for null
 3. **ALWAYS** scope queries to `{ organizationId }` to prevent cross-org data leaks
 4. **ALWAYS** verify individual resource access by checking `resource.organizationId === organizationId`
 5. For relations (contacts, assets), filter by `deals: { some: { organizationId } }` to only show resources tied to org's deals
