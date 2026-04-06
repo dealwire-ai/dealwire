@@ -72,11 +72,11 @@ export class AttomAvmService {
       throw new Error(`Parcel not found: ${bbl}`);
     }
 
-    // Return cached data if we already have a valuation (less than 30 days old)
+    // Return cached data if we already have a valuation (less than 90 days old)
     if (parcel.avmValue != null && parcel.avmSyncedAt) {
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-      if (parcel.avmSyncedAt > thirtyDaysAgo) {
+      const cacheExpiry = new Date();
+      cacheExpiry.setDate(cacheExpiry.getDate() - 90);
+      if (parcel.avmSyncedAt > cacheExpiry) {
         // Still record org access (doesn't count toward quota if already looked up)
         await this.recordOrgAccess(parcel.id, organizationId);
         return {
