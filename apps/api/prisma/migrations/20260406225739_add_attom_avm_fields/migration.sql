@@ -25,11 +25,11 @@ CREATE INDEX "OrgAvmLookup_parcelId_idx" ON "OrgAvmLookup"("parcelId");
 -- CreateIndex
 CREATE UNIQUE INDEX "OrgAvmLookup_parcelId_organizationId_key" ON "OrgAvmLookup"("parcelId", "organizationId");
 
--- CreateIndex
-CREATE INDEX "Deal_organizationId_idx" ON "Deal"("organizationId");
+-- CreateIndex (idempotent — may already exist from schema change in #243)
+CREATE INDEX IF NOT EXISTS "Deal_organizationId_idx" ON "Deal"("organizationId");
 
--- CreateIndex
-CREATE INDEX "Document_dealId_idx" ON "Document"("dealId");
+-- CreateIndex (idempotent — may already exist from schema change in #243)
+CREATE INDEX IF NOT EXISTS "Document_dealId_idx" ON "Document"("dealId");
 
 -- AddForeignKey
 ALTER TABLE "OrgAvmLookup" ADD CONSTRAINT "OrgAvmLookup_parcelId_fkey" FOREIGN KEY ("parcelId") REFERENCES "Parcel"("id") ON DELETE CASCADE ON UPDATE CASCADE;
