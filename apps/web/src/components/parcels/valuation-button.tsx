@@ -21,13 +21,13 @@ export function ValuationButton({ parcel, onUpdated }: ValuationButtonProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function handleLookup() {
+  async function handleLookup(force = false) {
     setLoading(true);
     setError(null);
     try {
       const result = await apiCall(
         `/public-data/parcels/${parcel.bbl}/valuation`,
-        { method: "POST" },
+        { method: "POST", body: JSON.stringify({ force }) },
       );
       onUpdated?.({
         avmValue: result.avmValue,
@@ -98,7 +98,7 @@ export function ValuationButton({ parcel, onUpdated }: ValuationButtonProps) {
           {formatCurrency(parcel.avmHigh)}
         </div>
         <button
-          onClick={handleLookup}
+          onClick={() => handleLookup(true)}
           className="text-xs text-zinc-500 hover:text-zinc-400 underline"
         >
           Refresh

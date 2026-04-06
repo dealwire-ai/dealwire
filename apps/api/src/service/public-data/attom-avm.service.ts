@@ -55,6 +55,7 @@ export class AttomAvmService {
   async lookupByBbl(
     bbl: string,
     organizationId: string,
+    force = false,
   ): Promise<{
     avmValue: number | null;
     avmHigh: number | null;
@@ -72,22 +73,17 @@ export class AttomAvmService {
       throw new Error(`Parcel not found: ${bbl}`);
     }
 
-    // Return cached data if we already have a valuation (less than 90 days old)
-    if (parcel.avmValue != null && parcel.avmSyncedAt) {
-      const cacheExpiry = new Date();
-      cacheExpiry.setDate(cacheExpiry.getDate() - 90);
-      if (parcel.avmSyncedAt > cacheExpiry) {
-        // Still record org access (doesn't count toward quota if already looked up)
-        await this.recordOrgAccess(parcel.id, organizationId);
-        return {
-          avmValue: parcel.avmValue,
-          avmHigh: parcel.avmHigh,
-          avmLow: parcel.avmLow,
-          avmConfidence: parcel.avmConfidence,
-          avmDate: parcel.avmDate?.toISOString() ?? null,
-          cached: true,
-        };
-      }
+    // Return cached data if we already have a valuation (unless force refresh)
+    if (!force && parcel.avmValue != null && parcel.avmSyncedAt) {
+      await this.recordOrgAccess(parcel.id, organizationId);
+      return {
+        avmValue: parcel.avmValue,
+        avmHigh: parcel.avmHigh,
+        avmLow: parcel.avmLow,
+        avmConfidence: parcel.avmConfidence,
+        avmDate: parcel.avmDate?.toISOString() ?? null,
+        cached: true,
+      };
     }
 
     // Check org monthly quota

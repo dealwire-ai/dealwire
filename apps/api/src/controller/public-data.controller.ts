@@ -443,11 +443,16 @@ export class PublicDataController {
   async lookupValuation(
     @AuthUser('organizationId') organizationId: string,
     @Param('bbl') bbl: string,
+    @Body() body: { force?: boolean },
   ) {
     await this.assertParcelsEnabled(organizationId);
 
     try {
-      return await this.attomAvm.lookupByBbl(bbl, organizationId);
+      return await this.attomAvm.lookupByBbl(
+        bbl,
+        organizationId,
+        body.force ?? false,
+      );
     } catch (err) {
       const message = (err as Error).message;
       if (message.includes('limit reached')) {
