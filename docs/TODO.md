@@ -3,8 +3,6 @@
 ## General Ops
 - make a really strong, energetic e2e demo (deal screening, underwriting, (and optionally) IC report generation)
 - play around with pinchfin
-- Get back to Alex Gibson
-- Pay Taxes (4/15)
 
 ## Biz Dev
 
