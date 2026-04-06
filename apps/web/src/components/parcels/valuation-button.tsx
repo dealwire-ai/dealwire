@@ -61,7 +61,7 @@ export function ValuationButton({ parcel, onUpdated }: ValuationButtonProps) {
       <div className="flex items-center gap-2 text-xs">
         <span className="text-red-400">{error}</span>
         <button
-          onClick={handleLookup}
+          onClick={() => handleLookup()}
           className="text-zinc-400 hover:text-zinc-300 underline"
         >
           Retry
@@ -112,7 +112,7 @@ export function ValuationButton({ parcel, onUpdated }: ValuationButtonProps) {
     <Button
       size="sm"
       variant="outline"
-      onClick={handleLookup}
+      onClick={() => handleLookup()}
       className="h-7 text-xs"
     >
       <DollarSign className="w-3 h-3 mr-1" />
