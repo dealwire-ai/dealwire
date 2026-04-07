@@ -140,6 +140,17 @@ All project instructions live in `CLAUDE.md` (this file). `.cursorrules` points 
 
 Any time make changes to the Prisma schema, generate a dev migration using cd apps/api && npx prisma migrate dev
 
+### Database Access Rules
+
+**NEVER execute raw SQL against the Postgres database.** This includes:
+
+- No `psql` commands
+- No `prisma db execute` with raw SQL
+- No direct database connections via any tool or CLI
+- No `SELECT`, `INSERT`, `UPDATE`, `DELETE`, `DROP`, `ALTER`, or any other SQL statements run against the database
+
+All database interactions must go through **Prisma ORM only** (schema changes via migrations, data access via Prisma Client in application code). If you need to inspect or modify data, do it through the application's API endpoints or Prisma Studio — never by running SQL directly.
+
 ---
 
 ## Keeping Docs Up to Date
