@@ -555,8 +555,8 @@ export default function FroggyDemoPage() {
       )}
 
       <p className="text-[10px] text-zinc-700 font-mono mb-8">
-        {filtered.length} parcels // sorted by {sortField.replace("_", " ")} //
-        hover zoning for details
+        {filtered.length} parcels {"//"} sorted by {sortField.replace("_", " ")}{" "}
+        {"//"} hover zoning for details
       </p>
 
       {/* Section: Analyst */}
