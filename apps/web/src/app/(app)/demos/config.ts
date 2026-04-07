@@ -25,4 +25,13 @@ export const demos: Demo[] = [
     status: "active",
     createdAt: "2026-03-27",
   },
+  {
+    slug: "froggy",
+    client: "Froggy Companies",
+    domain: "Land Development Intelligence",
+    description:
+      "Parcel & zoning intelligence for Belknap & Carroll County, NH",
+    status: "active",
+    createdAt: "2026-04-06",
+  },
 ];
