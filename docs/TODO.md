@@ -2,11 +2,11 @@
 
 ## General Ops
 - make a really strong, energetic e2e demo (deal screening, underwriting, (and optionally) IC report generation)
-- play around with pinchfin
 
 ## Biz Dev
 
 ## Foxfield OS
+- send discovery doc by EOW
 - discovery phase (meeting 4/13)
 
 ## Deal Screener
@@ -18,11 +18,11 @@
   - Buttons to easily update screening criteria from digest email as well as "mute" deals that keep getting sent over and over
 
 ## Tax Lien Analyzer
-- weekly update + meeting time?
+- see last meeting's notes
   
 ## Frontstep
 - they need to finish setting shit up
-- send invoice for 2250
+- invoice is out
 - update pricing page
 
 ## Survey Platform
