@@ -1,7 +1,7 @@
 "use client";
 
 import { useChat } from "ai/react";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { X, Send, MessageCircle, Bot, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -13,10 +13,26 @@ import posthog from "posthog-js";
 
 export function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const { messages, input, handleInputChange, handleSubmit, isLoading, error } =
     useChat({
       api: "/api/chat",
     });
+
+  // Auto-scroll to bottom when messages change or while streaming
+  useEffect(() => {
+    const viewport = scrollRef.current?.querySelector(
+      "[data-radix-scroll-area-viewport]",
+    );
+    if (viewport) {
+      viewport.scrollTop = viewport.scrollHeight;
+    }
+  }, [messages, isLoading]);
+
+  // Filter out empty assistant messages (blank bubble during stream init)
+  const visibleMessages = messages.filter(
+    (m) => m.role === "user" || m.content.length > 0,
+  );
 
   const handleOpen = () => {
     posthog.capture("chat_opened");
@@ -86,9 +102,9 @@ export function Chatbot() {
             </div>
 
             {/* Messages */}
-            <ScrollArea className="flex-1 px-4">
+            <ScrollArea className="flex-1 px-4" ref={scrollRef}>
               <div className="py-4 space-y-4">
-                {messages.length === 0 && (
+                {visibleMessages.length === 0 && !isLoading && (
                   <div className="text-center text-zinc-400 py-12">
                     <div className="h-16 w-16 mx-auto mb-4 rounded-full bg-zinc-800 flex items-center justify-center">
                       <MessageCircle className="h-8 w-8 opacity-50" />
@@ -100,7 +116,7 @@ export function Chatbot() {
                   </div>
                 )}
 
-                {messages.map((message) => (
+                {visibleMessages.map((message) => (
                   <div
                     key={message.id}
                     className={cn(
