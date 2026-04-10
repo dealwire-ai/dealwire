@@ -1,7 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { DollarSign, RefreshCw } from "lucide-react";
+import { DollarSign, HelpCircle, RefreshCw } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { useApi } from "@/hooks/use-api";
 import type { Parcel } from "./parcel-table";
@@ -131,6 +137,19 @@ export function ValuationButton({ parcel, onUpdated }: ValuationButtonProps) {
           <span className="text-[10px] px-1 py-0 rounded bg-zinc-800 text-zinc-400">
             {headlineLabel}
           </span>
+          {headlineLabel === "AVM" && (
+            <TooltipProvider delayDuration={200}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="w-3 h-3 text-zinc-500 cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent side="top" className="max-w-[220px] text-xs">
+                  Automated Valuation Model — a statistical estimate of market
+                  value based on comparable sales and property data.
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
           {parcel.avmValue != null && parcel.avmConfidence != null && (
             <span
               className={`text-[10px] px-1 py-0 rounded ${
@@ -141,7 +160,7 @@ export function ValuationButton({ parcel, onUpdated }: ValuationButtonProps) {
                     : "bg-red-900/30 text-red-400"
               }`}
             >
-              {parcel.avmConfidence}% conf
+              {parcel.avmConfidence}% confidence
             </span>
           )}
         </div>
