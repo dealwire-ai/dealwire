@@ -405,6 +405,14 @@ model Parcel {
   lienMatchGroupSize    Int?      // How many records shared the match key (1 = exact)
   nyctlSyncedAt         DateTime?
 
+  // ATTOM AVM (Automated Valuation Model)
+  avmValue       Float?     // Estimated market value from ATTOM
+  avmHigh        Float?     // Upper bound of value range
+  avmLow         Float?     // Lower bound of value range
+  avmConfidence  Int?       // Confidence score 0-100 (100 minus FSD)
+  avmDate        DateTime?  // When ATTOM produced this valuation
+  avmSyncedAt    DateTime?  // When we last fetched AVM for this parcel
+
   // Sync tracking
   plutoSyncedAt       DateTime?
   liensSyncedAt       DateTime?
@@ -427,6 +435,9 @@ model Parcel {
 
   // Org-scoped skip trace access (tracks which orgs have "unlocked" this parcel's contact data)
   orgSkipTraces  OrgSkipTrace[]
+
+  // Org-scoped AVM lookup tracking
+  orgAvmLookups  OrgAvmLookup[]
 }
 
 enum ParcelListType {
@@ -459,6 +470,18 @@ model OrgSkipTrace {
 
   @@unique([parcelId, organizationId])
   @@index([organizationId, tracedAt])
+  @@index([parcelId])
+}
+
+model OrgAvmLookup {
+  id             String   @id @default(cuid())
+  parcelId       String
+  parcel         Parcel   @relation(fields: [parcelId], references: [id], onDelete: Cascade)
+  organizationId String
+  lookedUpAt     DateTime @default(now())
+
+  @@unique([parcelId, organizationId])
+  @@index([organizationId, lookedUpAt])
   @@index([parcelId])
 }
 

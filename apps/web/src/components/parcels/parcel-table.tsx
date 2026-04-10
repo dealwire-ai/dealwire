@@ -21,6 +21,7 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScoreBadge } from "./score-badge";
 import { SkipTraceButton } from "./skip-trace-button";
+import { ValuationButton } from "./valuation-button";
 import {
   ListAssignPopover,
   ListBadge,
@@ -91,6 +92,11 @@ export interface Parcel {
   lienTrustVintage: string | null;
   lienMatchConfidence: string | null;
   lienMatchGroupSize: number | null;
+  // ATTOM AVM (valuation)
+  avmValue: number | null;
+  avmHigh: number | null;
+  avmLow: number | null;
+  avmConfidence: number | null;
   // Skip tracing
   ownerPhones: OwnerPhone[] | null;
   ownerEmails: string[] | null;
@@ -642,6 +648,14 @@ export function ParcelTable({
                             )}
                             <div className="mt-2">
                               <SkipTraceButton
+                                parcel={parcel}
+                                onUpdated={(updates) =>
+                                  onParcelUpdated?.(parcel.bbl, updates)
+                                }
+                              />
+                            </div>
+                            <div className="mt-2">
+                              <ValuationButton
                                 parcel={parcel}
                                 onUpdated={(updates) =>
                                   onParcelUpdated?.(parcel.bbl, updates)
