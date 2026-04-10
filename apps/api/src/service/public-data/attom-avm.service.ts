@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
-interface AttomAvmResponse {
+interface AttomAllEventsResponse {
   status: {
     code: number;
     msg: string;
@@ -18,6 +18,27 @@ interface AttomAvmResponse {
       countrySubd?: string;
       postal1?: string;
     };
+    summary?: {
+      proptype?: string;
+      propertyType?: string;
+      yearbuilt?: number;
+    };
+    assessment?: {
+      assessed?: {
+        assdttlvalue?: number;
+        assdlandvalue?: number;
+        assdimprvalue?: number;
+      };
+      market?: {
+        mktttlvalue?: number;
+        mktlandvalue?: number;
+        mktimprvalue?: number;
+      };
+      tax?: {
+        taxamt?: number;
+        taxyear?: number;
+      };
+    };
     avm?: {
       eventDate?: string;
       amount?: {
@@ -25,18 +46,32 @@ interface AttomAvmResponse {
         high?: number;
         low?: number;
         scr?: number;
-        fsd?: number;
       };
     };
-    summary?: {
-      proptype?: string;
-      propertyType?: string;
-      yearbuilt?: number;
-    };
-    owner?: {
-      owner1?: { fullname?: string };
+    sale?: {
+      saleTransDate?: string;
+      amount?: {
+        saleamt?: number;
+        salerecdate?: string;
+        saletranstype?: string;
+      };
     };
   }>;
+}
+
+export interface ValuationResult {
+  avmValue: number | null;
+  avmHigh: number | null;
+  avmLow: number | null;
+  avmConfidence: number | null;
+  avmDate: string | null;
+  marketValue: number | null;
+  assessedValue: number | null;
+  lastSalePrice: number | null;
+  lastSaleDate: string | null;
+  taxAmount: number | null;
+  taxYear: number | null;
+  cached: boolean;
 }
 
 @Injectable()
@@ -51,19 +86,12 @@ export class AttomAvmService {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  /** Look up AVM for a parcel by BBL, store results, and track org usage */
+  /** Look up valuation for a parcel by BBL using ATTOM /allevents/detail */
   async lookupByBbl(
     bbl: string,
     organizationId: string,
     force = false,
-  ): Promise<{
-    avmValue: number | null;
-    avmHigh: number | null;
-    avmLow: number | null;
-    avmConfidence: number | null;
-    avmDate: string | null;
-    cached: boolean;
-  }> {
+  ): Promise<ValuationResult> {
     if (!this.apiKey) {
       throw new Error('ATTOM API is not configured on this server');
     }
@@ -73,8 +101,8 @@ export class AttomAvmService {
       throw new Error(`Parcel not found: ${bbl}`);
     }
 
-    // Return cached data if we already have a valuation (unless force refresh)
-    if (!force && parcel.avmValue != null && parcel.avmSyncedAt) {
+    // Return cached data if we already have valuation data (unless force refresh)
+    if (!force && parcel.avmSyncedAt) {
       await this.recordOrgAccess(parcel.id, organizationId);
       return {
         avmValue: parcel.avmValue,
@@ -82,6 +110,12 @@ export class AttomAvmService {
         avmLow: parcel.avmLow,
         avmConfidence: parcel.avmConfidence,
         avmDate: parcel.avmDate?.toISOString() ?? null,
+        marketValue: parcel.marketValue,
+        assessedValue: parcel.assessedValue,
+        lastSalePrice: parcel.lastSalePrice,
+        lastSaleDate: parcel.lastSaleDate?.toISOString() ?? null,
+        taxAmount: parcel.taxAmount,
+        taxYear: parcel.taxYear,
         cached: true,
       };
     }
@@ -90,7 +124,7 @@ export class AttomAvmService {
     const usage = await this.getOrgMonthlyUsage(organizationId);
     if (usage >= this.orgMonthlyLimit) {
       throw new Error(
-        `Monthly AVM lookup limit reached. Used: ${usage}/${this.orgMonthlyLimit}. ` +
+        `Monthly valuation lookup limit reached. Used: ${usage}/${this.orgMonthlyLimit}. ` +
           `Resets on the 1st of next month.`,
       );
     }
@@ -107,12 +141,12 @@ export class AttomAvmService {
     const zip = parcel.zipCode || '';
     const address2 = `${city}, NY ${zip}`.trim();
 
-    // Call ATTOM API
-    const url = new URL(`${this.baseUrl}/attomavm/detail`);
+    // Call ATTOM /allevents/detail — returns assessment + AVM + sale in one call
+    const url = new URL(`${this.baseUrl}/allevents/detail`);
     url.searchParams.set('address1', address1);
     url.searchParams.set('address2', address2);
 
-    this.logger.log(`Fetching AVM for ${bbl}: ${address1}, ${address2}`);
+    this.logger.log(`Fetching valuation for ${bbl}: ${address1}, ${address2}`);
 
     const response = await fetch(url.toString(), {
       headers: {
@@ -122,22 +156,24 @@ export class AttomAvmService {
     });
 
     // ATTOM returns HTTP 400 with "SuccessWithoutResult" when no data exists
-    // for an address — parse the body before deciding to throw.
     if (!response.ok && response.status !== 400) {
       throw new Error(
         `ATTOM API error: ${response.status} ${response.statusText}`,
       );
     }
 
-    const data = (await response.json()) as AttomAvmResponse;
+    const data = (await response.json()) as AttomAllEventsResponse;
 
     if (
       !data.property?.length ||
       data.status?.code === 400 ||
       data.status?.msg === 'SuccessWithoutResult'
     ) {
-      this.logger.warn(`No AVM data returned for ${bbl}`);
-      // Record that we tried (still counts toward quota)
+      this.logger.warn(`No ATTOM data returned for ${bbl}`);
+      await this.prisma.parcel.update({
+        where: { bbl },
+        data: { avmSyncedAt: new Date() },
+      });
       await this.recordOrgAccess(parcel.id, organizationId);
       return {
         avmValue: null,
@@ -145,45 +181,80 @@ export class AttomAvmService {
         avmLow: null,
         avmConfidence: null,
         avmDate: null,
+        marketValue: null,
+        assessedValue: null,
+        lastSalePrice: null,
+        lastSaleDate: null,
+        taxAmount: null,
+        taxYear: null,
         cached: false,
       };
     }
 
     const prop = data.property[0];
-    const avm = prop.avm?.amount;
+
+    // Extract AVM (only available for condos/SFR)
+    const avmAmt = prop.avm?.amount;
+    const hasAvm = avmAmt && avmAmt.value && avmAmt.value > 0;
     const avmDate = prop.avm?.eventDate ? new Date(prop.avm.eventDate) : null;
+
+    // Extract assessment
+    const market = prop.assessment?.market;
+    const assessed = prop.assessment?.assessed;
+    const tax = prop.assessment?.tax;
+
+    // Extract last sale
+    const sale = prop.sale;
+    const saleDate = sale?.saleTransDate ? new Date(sale.saleTransDate) : null;
+
+    const result: ValuationResult = {
+      avmValue: hasAvm ? (avmAmt.value ?? null) : null,
+      avmHigh: hasAvm ? (avmAmt.high ?? null) : null,
+      avmLow: hasAvm ? (avmAmt.low ?? null) : null,
+      avmConfidence: hasAvm ? (avmAmt.scr ?? null) : null,
+      avmDate: avmDate?.toISOString() ?? null,
+      marketValue: market?.mktttlvalue ?? null,
+      assessedValue: assessed?.assdttlvalue ?? null,
+      lastSalePrice: sale?.amount?.saleamt ?? null,
+      lastSaleDate: saleDate?.toISOString() ?? null,
+      taxAmount: tax?.taxamt ?? null,
+      taxYear: tax?.taxyear ?? null,
+      cached: false,
+    };
 
     // Store on parcel
     await this.prisma.parcel.update({
       where: { bbl },
       data: {
-        avmValue: avm?.value ?? null,
-        avmHigh: avm?.high ?? null,
-        avmLow: avm?.low ?? null,
-        avmConfidence: avm?.scr ?? null,
+        avmValue: result.avmValue,
+        avmHigh: result.avmHigh,
+        avmLow: result.avmLow,
+        avmConfidence: result.avmConfidence,
         avmDate,
+        marketValue: result.marketValue,
+        assessedValue: result.assessedValue,
+        lastSalePrice: result.lastSalePrice,
+        lastSaleDate: saleDate,
+        taxAmount: result.taxAmount,
+        taxYear: result.taxYear,
         avmSyncedAt: new Date(),
       },
     });
 
-    // Record org access
     await this.recordOrgAccess(parcel.id, organizationId);
 
+    const bestValue =
+      result.avmValue ?? result.marketValue ?? result.assessedValue;
     this.logger.log(
-      `AVM stored for ${bbl}: $${avm?.value?.toLocaleString()} (confidence: ${avm?.scr})`,
+      `Valuation stored for ${bbl}: best=$${bestValue?.toLocaleString() ?? 'N/A'}, ` +
+        `market=$${result.marketValue?.toLocaleString() ?? 'N/A'}, ` +
+        `lastSale=$${result.lastSalePrice?.toLocaleString() ?? 'N/A'}`,
     );
 
-    return {
-      avmValue: avm?.value ?? null,
-      avmHigh: avm?.high ?? null,
-      avmLow: avm?.low ?? null,
-      avmConfidence: avm?.scr ?? null,
-      avmDate: avmDate?.toISOString() ?? null,
-      cached: false,
-    };
+    return result;
   }
 
-  /** Count how many AVM lookups an org has used this month (non-cached only) */
+  /** Count how many valuation lookups an org has used this month */
   async getOrgMonthlyUsage(organizationId: string): Promise<number> {
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -196,7 +267,7 @@ export class AttomAvmService {
     });
   }
 
-  /** Get org AVM usage info for frontend display */
+  /** Get org usage info for frontend display */
   async getOrgUsageInfo(organizationId: string): Promise<{
     used: number;
     limit: number;

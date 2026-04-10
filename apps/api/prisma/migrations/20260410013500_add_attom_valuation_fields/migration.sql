@@ -1,0 +1,7 @@
+-- AlterTable
+ALTER TABLE "Parcel" ADD COLUMN     "marketValue" DOUBLE PRECISION,
+ADD COLUMN     "assessedValue" DOUBLE PRECISION,
+ADD COLUMN     "lastSalePrice" DOUBLE PRECISION,
+ADD COLUMN     "lastSaleDate" TIMESTAMP(3),
+ADD COLUMN     "taxAmount" DOUBLE PRECISION,
+ADD COLUMN     "taxYear" INTEGER;

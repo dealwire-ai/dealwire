@@ -16,6 +16,15 @@ function formatCurrency(val: number | null | undefined): string {
   return `$${val.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
 }
 
+function hasValuationData(p: Parcel): boolean {
+  return (
+    p.avmValue != null ||
+    p.marketValue != null ||
+    p.assessedValue != null ||
+    p.lastSalePrice != null
+  );
+}
+
 export function ValuationButton({ parcel, onUpdated }: ValuationButtonProps) {
   const { apiCall } = useApi();
   const [loading, setLoading] = useState(false);
@@ -31,7 +40,13 @@ export function ValuationButton({ parcel, onUpdated }: ValuationButtonProps) {
         `/public-data/parcels/${parcel.bbl}/valuation`,
         { method: "POST", body: JSON.stringify({ force }) },
       );
-      if (result.avmValue == null) {
+      // Check if any valuation data came back
+      if (
+        result.avmValue == null &&
+        result.marketValue == null &&
+        result.assessedValue == null &&
+        result.lastSalePrice == null
+      ) {
         setUnavailable(true);
         return;
       }
@@ -40,6 +55,12 @@ export function ValuationButton({ parcel, onUpdated }: ValuationButtonProps) {
         avmHigh: result.avmHigh,
         avmLow: result.avmLow,
         avmConfidence: result.avmConfidence,
+        marketValue: result.marketValue,
+        assessedValue: result.assessedValue,
+        lastSalePrice: result.lastSalePrice,
+        lastSaleDate: result.lastSaleDate,
+        taxAmount: result.taxAmount,
+        taxYear: result.taxYear,
       });
     } catch (err) {
       const msg = (err as Error).message;
@@ -85,15 +106,32 @@ export function ValuationButton({ parcel, onUpdated }: ValuationButtonProps) {
   }
 
   // Already have valuation data
-  if (parcel.avmValue != null) {
+  if (hasValuationData(parcel)) {
+    // Pick the best headline value: AVM > market value > last sale > assessed
+    const headlineValue =
+      parcel.avmValue ??
+      parcel.marketValue ??
+      parcel.lastSalePrice ??
+      parcel.assessedValue;
+    const headlineLabel = parcel.avmValue
+      ? "AVM"
+      : parcel.marketValue
+        ? "Market"
+        : parcel.lastSalePrice
+          ? "Last Sale"
+          : "Assessed";
+
     return (
       <div className="space-y-1">
         <div className="flex items-center gap-1.5">
           <DollarSign className="w-3.5 h-3.5 text-[#C8A96E]" />
           <span className="text-sm font-medium text-zinc-100">
-            {formatCurrency(parcel.avmValue)}
+            {formatCurrency(headlineValue)}
           </span>
-          {parcel.avmConfidence != null && (
+          <span className="text-[10px] px-1 py-0 rounded bg-zinc-800 text-zinc-400">
+            {headlineLabel}
+          </span>
+          {parcel.avmValue != null && parcel.avmConfidence != null && (
             <span
               className={`text-[10px] px-1 py-0 rounded ${
                 parcel.avmConfidence >= 80
@@ -107,9 +145,37 @@ export function ValuationButton({ parcel, onUpdated }: ValuationButtonProps) {
             </span>
           )}
         </div>
-        <div className="text-[11px] text-zinc-500">
-          Range: {formatCurrency(parcel.avmLow)} –{" "}
-          {formatCurrency(parcel.avmHigh)}
+        {/* Show secondary data points */}
+        <div className="text-[11px] text-zinc-500 space-y-0.5">
+          {parcel.avmValue != null && parcel.avmLow != null && (
+            <div>
+              AVM range: {formatCurrency(parcel.avmLow)} –{" "}
+              {formatCurrency(parcel.avmHigh)}
+            </div>
+          )}
+          {parcel.marketValue != null && parcel.avmValue != null && (
+            <div>Market: {formatCurrency(parcel.marketValue)}</div>
+          )}
+          {parcel.lastSalePrice != null && headlineLabel !== "Last Sale" && (
+            <div>
+              Last sale: {formatCurrency(parcel.lastSalePrice)}
+              {parcel.lastSaleDate && (
+                <span> ({new Date(parcel.lastSaleDate).getFullYear()})</span>
+              )}
+            </div>
+          )}
+          {headlineLabel === "Last Sale" && parcel.lastSaleDate && (
+            <div>Sold {new Date(parcel.lastSaleDate).getFullYear()}</div>
+          )}
+          {parcel.assessedValue != null && headlineLabel !== "Assessed" && (
+            <div>Assessed: {formatCurrency(parcel.assessedValue)}</div>
+          )}
+          {parcel.taxAmount != null && (
+            <div>
+              Tax: {formatCurrency(parcel.taxAmount)}
+              {parcel.taxYear ? ` (${parcel.taxYear})` : ""}
+            </div>
+          )}
         </div>
         <button
           onClick={() => handleLookup(true)}
