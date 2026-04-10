@@ -683,6 +683,10 @@ export function ParcelTable({
                               value={parcel.numFloors?.toString()}
                             />
                             <DetailRow
+                              label="Year Built"
+                              value={parcel.yearBuilt?.toString()}
+                            />
+                            <DetailRow
                               label="Residential Units"
                               value={parcel.unitsRes?.toString()}
                             />
