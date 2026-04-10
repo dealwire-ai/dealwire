@@ -121,7 +121,9 @@ export class AttomAvmService {
       },
     });
 
-    if (!response.ok) {
+    // ATTOM returns HTTP 400 with "SuccessWithoutResult" when no data exists
+    // for an address — parse the body before deciding to throw.
+    if (!response.ok && response.status !== 400) {
       throw new Error(
         `ATTOM API error: ${response.status} ${response.statusText}`,
       );
