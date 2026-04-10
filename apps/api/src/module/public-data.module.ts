@@ -34,6 +34,6 @@ import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
     AttomAvmService,
     ClerkAuthGuard,
   ],
-  exports: [ParcelQueryService],
+  exports: [ParcelQueryService, PropertyListService, PhoneNoteService],
 })
 export class PublicDataModule {}
