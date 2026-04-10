@@ -6,6 +6,7 @@
 ## Biz Dev
 - revision for Jim (Froggy Companies)
 - Proposal (no price yet) for Nick B (Terra Nova)
+- Turn on Apollo Sequence
 
 ## Foxfield OS
 - send discovery doc by EOW
