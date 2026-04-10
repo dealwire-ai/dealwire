@@ -93,11 +93,17 @@ export interface Parcel {
   lienTrustVintage: string | null;
   lienMatchConfidence: string | null;
   lienMatchGroupSize: number | null;
-  // ATTOM AVM (valuation)
+  // ATTOM valuation data
   avmValue: number | null;
   avmHigh: number | null;
   avmLow: number | null;
   avmConfidence: number | null;
+  marketValue: number | null;
+  assessedValue: number | null;
+  lastSalePrice: number | null;
+  lastSaleDate: string | null;
+  taxAmount: number | null;
+  taxYear: number | null;
   // Skip tracing
   ownerPhones: OwnerPhone[] | null;
   ownerEmails: string[] | null;
