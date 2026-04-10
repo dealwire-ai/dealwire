@@ -405,13 +405,19 @@ model Parcel {
   lienMatchGroupSize    Int?      // How many records shared the match key (1 = exact)
   nyctlSyncedAt         DateTime?
 
-  // ATTOM AVM (Automated Valuation Model)
-  avmValue       Float?     // Estimated market value from ATTOM
-  avmHigh        Float?     // Upper bound of value range
-  avmLow         Float?     // Lower bound of value range
-  avmConfidence  Int?       // Confidence score 0-100 (100 minus FSD)
-  avmDate        DateTime?  // When ATTOM produced this valuation
-  avmSyncedAt    DateTime?  // When we last fetched AVM for this parcel
+  // ATTOM valuation data (from /allevents/detail)
+  avmValue       Float?     // AVM estimated market value (condos/SFR only)
+  avmHigh        Float?     // AVM upper bound
+  avmLow         Float?     // AVM lower bound
+  avmConfidence  Int?       // AVM confidence score 0-100
+  avmDate        DateTime?  // When ATTOM produced the AVM
+  marketValue    Float?     // ATTOM market total value (broader coverage than AVM)
+  assessedValue  Float?     // Tax-assessed total value
+  lastSalePrice  Float?     // Most recent sale amount
+  lastSaleDate   DateTime?  // Most recent sale date
+  taxAmount      Float?     // Annual property tax
+  taxYear        Int?       // Tax year
+  avmSyncedAt    DateTime?  // When we last fetched valuation data from ATTOM
 
   // Sync tracking
   plutoSyncedAt       DateTime?
