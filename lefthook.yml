@@ -11,6 +11,13 @@ commit-msg:
 
 pre-push:
   commands:
+    no-push-to-main:
+      run: |
+        BRANCH=$(git rev-parse --abbrev-ref HEAD)
+        if [ "$BRANCH" = "main" ] || [ "$BRANCH" = "master" ]; then
+          echo "❌ Direct pushes to $BRANCH are not allowed. Create a feature branch and open a PR."
+          exit 1
+        fi
     check-pr-not-merged:
       run: |
         BRANCH=$(git rev-parse --abbrev-ref HEAD)
