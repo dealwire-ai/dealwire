@@ -6,8 +6,11 @@ import { PrismaService } from '../prisma/prisma.service';
 import { ScreeningPreferencesService } from '../preferences/screening-preferences.service';
 import { BrokerIntelligenceService } from '../deal/broker-intelligence.service';
 import { ParcelQueryService } from '../public-data/parcel-query.service';
+import { PropertyListService } from '../public-data/property-list.service';
+import { PhoneNoteService } from '../public-data/phone-note.service';
 import { dealGeneralModelName } from '../underwriting/model-config';
 import { BOROUGH_NAMES } from '../public-data/nyc-utils';
+import { ParcelListType, PhoneStatus } from '@prisma/client';
 
 const SYSTEM_PROMPT = `You are an AI acquisitions analyst for a real estate investment firm. You monitor their deal flow, track broker relationships, and help refine screening criteria. You communicate via email replies and web chat.
 
@@ -48,10 +51,29 @@ TOOL SELECTION:
 - Mute a specific deal (suppress future follow-ups) → mute_deal
 
 PUBLIC DATA (NYC PARCELS):
-- Search distressed parcels → query_parcels (filter by borough, score, liens, address)
-- Aggregate parcel stats → get_parcel_stats (counts, avg scores, by borough)
-- Parcels are public property records identified by BBL, enriched with PLUTO data, HPD violations, and tax lien status
+- Search distressed parcels → query_parcels (filter by borough, score, liens, tax bills, zip code, building class, list type, address)
+- Get full detail on one parcel → get_parcel_details (by BBL)
+- Aggregate parcel stats → get_parcel_stats (counts, avg scores, debt totals, by borough)
+- View parcels on a triage list → get_parcels_by_list (IMMEDIATE, LONG_TERM, NOT_INTERESTED)
+- Assign parcel to triage list → assign_parcel_list (or remove from list with null)
+- Get phone notes for a parcel → get_parcel_phone_notes
+- Add/update phone note → update_parcel_phone_note (record call outcomes)
+- Parcels are public property records identified by BBL (10-digit: 1 borough + 5 block + 4 lot)
+- Enriched with PLUTO building data, HPD violations, DOF tax charges, NYCTL lien sale data
 - Borough codes: 1=Manhattan, 2=Bronx, 3=Brooklyn, 4=Queens, 5=Staten Island
+- Building class groups: residential (A/B/C), commercial (E-Z), walkup (C1-C7)
+- List types: IMMEDIATE (hot leads), LONG_TERM (monitor), NOT_INTERESTED (pass)
+
+TOOL SELECTION — PARCELS:
+- "Show me distressed parcels in Brooklyn" → query_parcels
+- "Tell me about BBL 3012340001" → get_parcel_details
+- "How many parcels have liens?" → get_parcel_stats
+- "Show my immediate list" → get_parcels_by_list
+- "Add this to my immediate list" → assign_parcel_list
+- "Have we called the owner?" → get_parcel_phone_notes
+- "I called the owner, number was bad" → update_parcel_phone_note
+- "Parcels with tax bills over $50k" → query_parcels with minOutstandingTaxBill
+- "Parcels in zip 11201 with liens" → query_parcels with zipCode + hasActiveLien
 
 Never fetch all data by paginating through everything. Use targeted queries.
 Respond briefly and directly. No markdown formatting, plain text.`;
@@ -70,6 +92,8 @@ export class DealwireAgentService {
     private readonly screeningPreferences: ScreeningPreferencesService,
     private readonly brokerIntelligence: BrokerIntelligenceService,
     private readonly parcelQuery: ParcelQueryService,
+    private readonly propertyList: PropertyListService,
+    private readonly phoneNote: PhoneNoteService,
   ) {}
 
   /**
@@ -867,7 +891,7 @@ export class DealwireAgentService {
 
       query_parcels: tool({
         description:
-          'Search NYC parcels from public data. Filter by borough, distress score, lien status, address, building class. Use for "show me distressed parcels in Brooklyn", "top 10 parcels by score", "parcels with liens in Queens".',
+          'Search NYC parcels from public data. Filter by borough, distress score, lien status, tax bills, zip code, building class, list type, address. Use for "show me distressed parcels in Brooklyn", "top 10 parcels by score", "parcels with liens in Queens".',
         parameters: z.object({
           boroughs: z
             .array(z.string())
@@ -879,6 +903,10 @@ export class DealwireAgentService {
             .number()
             .optional()
             .describe('Minimum distress score (0-100)'),
+          maxDistressScore: z
+            .number()
+            .optional()
+            .describe('Maximum distress score (0-100)'),
           hasActiveLien: z
             .boolean()
             .optional()
@@ -891,27 +919,48 @@ export class DealwireAgentService {
           search: z
             .string()
             .optional()
-            .describe('Address or owner name search'),
+            .describe('Address, BBL, or owner name search'),
           minUnits: z.number().optional(),
           maxUnits: z.number().optional(),
+          minOutstandingTaxBill: z
+            .number()
+            .optional()
+            .describe('Minimum outstanding property tax bill ($)'),
+          maxOutstandingTaxBill: z
+            .number()
+            .optional()
+            .describe('Maximum outstanding property tax bill ($)'),
+          minLienSaleAmount: z
+            .number()
+            .optional()
+            .describe('Minimum lien sale amount ($)'),
+          maxLienSaleAmount: z
+            .number()
+            .optional()
+            .describe('Maximum lien sale amount ($)'),
+          zipCode: z.string().optional().describe('NYC zip code'),
+          buildingClassGroups: z
+            .array(z.enum(['residential', 'commercial', 'walkup']))
+            .optional()
+            .describe('Building class groups'),
+          listType: z
+            .enum(['IMMEDIATE', 'LONG_TERM', 'NOT_INTERESTED'])
+            .optional()
+            .describe('Filter by triage list assignment'),
+          hasNoList: z
+            .boolean()
+            .optional()
+            .describe('Only show parcels not on any list'),
           limit: z.number().optional().default(20),
+          page: z.number().optional().default(1),
           sort: z.string().optional().default('distressScore'),
           order: z.enum(['asc', 'desc']).optional().default('desc'),
         }),
         execute: async (params) =>
           this.safeTool('query_parcels', async () => {
             const result = await this.parcelQuery.queryParcels({
-              boroughs: params.boroughs,
-              minDistressScore: params.minDistressScore,
-              hasActiveLien: params.hasActiveLien,
-              excludeCoops: params.excludeCoops,
-              search: params.search,
-              minUnits: params.minUnits,
-              maxUnits: params.maxUnits,
-              limit: params.limit,
-              sort: params.sort,
-              order: params.order,
-              page: 1,
+              ...params,
+              organizationId,
             });
             return {
               parcels: result.data.map((p) => ({
@@ -936,8 +985,10 @@ export class DealwireAgentService {
                 lienRedemptiveValue: p.lienRedemptiveValue,
                 lienServicer: p.lienServicer,
                 lienMatchConfidence: p.lienMatchConfidence,
+                listType:
+                  (p as unknown as { _listType?: string })._listType || null,
               })),
-              total: result.pagination.total,
+              pagination: result.pagination,
             };
           }),
       }),
@@ -951,13 +1002,23 @@ export class DealwireAgentService {
             .optional()
             .describe('Borough codes to filter'),
           excludeCoops: z.boolean().optional().default(true),
+          hasActiveLien: z.boolean().optional(),
+          minDistressScore: z.number().optional(),
+          maxDistressScore: z.number().optional(),
+          minUnits: z.number().optional(),
+          maxUnits: z.number().optional(),
+          minOutstandingTaxBill: z.number().optional(),
+          maxOutstandingTaxBill: z.number().optional(),
+          minLienSaleAmount: z.number().optional(),
+          maxLienSaleAmount: z.number().optional(),
+          zipCode: z.string().optional(),
+          buildingClassGroups: z
+            .array(z.enum(['residential', 'commercial', 'walkup']))
+            .optional(),
         }),
         execute: async (params) =>
           this.safeTool('get_parcel_stats', async () => {
-            const stats = await this.parcelQuery.getStats({
-              boroughs: params.boroughs,
-              excludeCoops: params.excludeCoops,
-            });
+            const stats = await this.parcelQuery.getStats(params);
             return {
               ...stats,
               byBorough: stats.byBorough.map((b) => ({
@@ -965,6 +1026,147 @@ export class DealwireAgentService {
                 boroughName: BOROUGH_NAMES[b.borough] || b.borough,
               })),
             };
+          }),
+      }),
+
+      get_parcel_details: tool({
+        description:
+          'Get full details for a specific NYC parcel by BBL (Borough-Block-Lot). Use when user asks about a specific property, e.g. "tell me about 3012340001" or after seeing a parcel in query results.',
+        parameters: z.object({
+          bbl: z
+            .string()
+            .describe('10-digit BBL identifier (e.g. "3012340001")'),
+        }),
+        execute: async ({ bbl }) =>
+          this.safeTool('get_parcel_details', async () => {
+            const parcel = await this.parcelQuery.getParcelByBbl(
+              bbl,
+              organizationId,
+            );
+            if (!parcel) return { error: `Parcel not found: ${bbl}` };
+            return {
+              ...parcel,
+              borough: BOROUGH_NAMES[parcel.borough] || parcel.borough,
+            };
+          }),
+      }),
+
+      get_parcels_by_list: tool({
+        description:
+          'Get parcels on a specific triage list (IMMEDIATE, LONG_TERM, NOT_INTERESTED). Use for "show my immediate list", "what parcels am I tracking?", "show not-interested parcels".',
+        parameters: z.object({
+          listType: z.enum(['IMMEDIATE', 'LONG_TERM', 'NOT_INTERESTED']),
+          limit: z.number().optional().default(20),
+          sort: z.string().optional().default('distressScore'),
+          order: z.enum(['asc', 'desc']).optional().default('desc'),
+        }),
+        execute: async ({ listType, limit, sort, order }) =>
+          this.safeTool('get_parcels_by_list', async () => {
+            const result = await this.parcelQuery.queryParcels({
+              listType,
+              organizationId,
+              limit,
+              sort,
+              order,
+              page: 1,
+            });
+            return {
+              listType,
+              parcels: result.data.map((p) => ({
+                bbl: p.bbl,
+                address: p.address,
+                borough: BOROUGH_NAMES[p.borough] || p.borough,
+                distressScore: p.distressScore,
+                unitsTotal: p.unitsTotal,
+                buildingClass: p.buildingClass,
+                hasActiveLien: p.hasActiveLien,
+                outstandingTaxBill: p.outstandingTaxBill,
+                lienSaleAmount: p.lienSaleAmount,
+                ownerName: p.ownerName,
+              })),
+              total: result.pagination.total,
+            };
+          }),
+      }),
+
+      assign_parcel_list: tool({
+        description:
+          'Assign a parcel to a triage list (IMMEDIATE, LONG_TERM, NOT_INTERESTED) or remove from list. Use when user says "add this to my immediate list", "mark as not interested", "remove from list".',
+        parameters: z.object({
+          bbl: z.string().describe('10-digit BBL of the parcel'),
+          listType: z
+            .enum(['IMMEDIATE', 'LONG_TERM', 'NOT_INTERESTED'])
+            .nullable()
+            .describe('List to assign to, or null to remove from all lists'),
+        }),
+        execute: async ({ bbl, listType }) =>
+          this.safeTool('assign_parcel_list', async () => {
+            if (!context.userId)
+              return { error: 'userId required for list assignment' };
+            const result = await this.propertyList.assign({
+              bbl,
+              organizationId,
+              userId: context.userId,
+              listType: listType as ParcelListType | null,
+            });
+            return {
+              success: true,
+              bbl,
+              listType: listType || 'removed',
+              assignment: result,
+            };
+          }),
+      }),
+
+      get_parcel_phone_notes: tool({
+        description:
+          'Get phone notes/call log for a specific parcel. Use when user asks "what notes do we have on this parcel?", "have we called the owner of X?".',
+        parameters: z.object({
+          bbl: z.string().describe('10-digit BBL of the parcel'),
+        }),
+        execute: async ({ bbl }) =>
+          this.safeTool('get_parcel_phone_notes', async () => {
+            const parcel = await this.parcelQuery.getParcelByBbl(bbl);
+            if (!parcel) return { error: `Parcel not found: ${bbl}` };
+            const notes = await this.phoneNote.getNotesForParcel(
+              parcel.id,
+              organizationId,
+            );
+            return {
+              bbl,
+              address: parcel.address,
+              notes: notes.length > 0 ? notes : 'No phone notes recorded',
+            };
+          }),
+      }),
+
+      update_parcel_phone_note: tool({
+        description:
+          'Add or update a phone note for a parcel owner contact. Use when user says "I called the owner of X, number was disconnected" or "spoke with owner at BBL Y, they are interested".',
+        parameters: z.object({
+          bbl: z.string().describe('10-digit BBL of the parcel'),
+          phoneNumber: z.string().describe('Phone number the note is about'),
+          status: z
+            .enum(['GOOD', 'BAD', 'UNKNOWN'])
+            .optional()
+            .describe(
+              'Phone status: GOOD (reached owner), BAD (disconnected/wrong), UNKNOWN',
+            ),
+          note: z.string().optional().describe('Free text note about the call'),
+        }),
+        execute: async ({ bbl, phoneNumber, status, note }) =>
+          this.safeTool('update_parcel_phone_note', async () => {
+            if (!context.userId)
+              return { error: 'userId required for phone notes' };
+            const result = await this.phoneNote.upsertNote({
+              bbl,
+              phoneNumber,
+              organizationId,
+              userId: context.userId,
+              status: status as PhoneStatus | undefined,
+              note,
+            });
+            return { success: true, bbl, ...result };
           }),
       }),
     };
