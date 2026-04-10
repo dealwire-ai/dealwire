@@ -560,16 +560,10 @@ export class PublicDataController {
       throw new HttpException(message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    // Fire-and-forget polling (only if there are queued items)
-    if (result.queued.length > 0 && result.queueId !== 'cache') {
-      this.skipTrace.pollAndStore(result.queueId, result.queued);
-    }
-
     return {
       queued: result.queued.length,
       skipped: result.skipped,
       queueId: result.queueId,
-      estimatedCostUsd: +(result.queued.length * 0.02).toFixed(2),
     };
   }
 
