@@ -21,6 +21,7 @@ import { TableSkeleton } from "@/components/table-skeleton";
 import { useApi } from "@/hooks/use-api";
 import { useTableState } from "@/hooks/use-table-state";
 import { useFeatureFlags } from "@/hooks/use-feature-flags";
+import { useSkipTracePolling } from "@/hooks/use-skip-trace-polling";
 import { formatRelativeDate } from "@/lib/date-utils";
 
 interface Stats {
@@ -82,6 +83,14 @@ export default function ParcelsPage() {
     defaultFilters: { borough: "3,4" },
     defaultSort: "distressScore",
     defaultOrder: "desc",
+  });
+
+  // Poll for skip trace results and update parcels in-place
+  useSkipTracePolling(parcels, (updates) => {
+    setParcels((prev) =>
+      prev.map((p) => (updates[p.bbl] ? { ...p, ...updates[p.bbl] } : p)),
+    );
+    fetchSkipTraceUsage();
   });
 
   const fetchParcels = useCallback(async () => {
