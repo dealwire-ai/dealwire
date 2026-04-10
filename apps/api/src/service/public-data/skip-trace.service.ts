@@ -169,10 +169,6 @@ export class SkipTraceService {
 
       try {
         const result = await this.submitBatch(bbls, organizationId, force);
-        // Only poll if there are actual API-queued items
-        if (result.queued.length > 0 && result.queueId !== 'cache') {
-          this.pollAndStore(result.queueId, result.queued);
-        }
         for (const item of orgItems) {
           item.resolve(result);
         }
@@ -193,8 +189,8 @@ export class SkipTraceService {
       `submitBatch called: ${bbls.length} BBLs [${bbls.join(', ')}], org=${organizationId}, force=${force}`,
     );
 
-    if (!this.apiKey) {
-      throw new Error('TRACERFY_API_KEY is not configured');
+    if (!this.skipSherpaApiKey) {
+      throw new Error('SKIPSHERPA_API_KEY is not configured');
     }
 
     // Load parcels from DB
@@ -267,95 +263,33 @@ export class SkipTraceService {
       );
     }
 
-    // Mark all as pending before sending to Tracerfy
+    // Mark all as pending
     await this.prisma.parcel.updateMany({
       where: { bbl: { in: toQueue.map((p) => p.bbl) } },
       data: { skipTraceStatus: 'pending' },
     });
 
-    // Build Tracerfy json_data payload with all required fields
-    const jsonData = toQueue.map((parcel) => {
-      const nameParts = (parcel.ownerName || '').trim().split(/\s+/);
-      const firstName = nameParts[0] || '';
-      const lastName = nameParts.slice(1).join(' ') || '';
-      const city = BOROUGH_NAMES[parcel.borough] || 'New York';
-      const state = 'NY';
-      const address = parcel.address || '';
-      const zip = parcel.zipCode || '';
-
-      return {
-        first_name: firstName,
-        last_name: lastName,
-        address,
-        city,
-        state,
-        zip,
-        // Mirror property address for mailing (no separate mailing data available)
-        mail_address: address,
-        mail_city: city,
-        mail_state: state,
-        mailing_zip: zip,
-      };
-    });
-
-    // Submit to Tracerfy using multipart/form-data (required by their API)
-    this.logger.log(
-      `Submitting ${jsonData.length} records to Tracerfy POST /trace/`,
-    );
-
-    const formData = new FormData();
-    formData.append('json_data', JSON.stringify(jsonData));
-    formData.append('address_column', 'address');
-    formData.append('city_column', 'city');
-    formData.append('state_column', 'state');
-    formData.append('zip_column', 'zip');
-    formData.append('first_name_column', 'first_name');
-    formData.append('last_name_column', 'last_name');
-    formData.append('mail_address_column', 'mail_address');
-    formData.append('mail_city_column', 'mail_city');
-    formData.append('mail_state_column', 'mail_state');
-    formData.append('mailing_zip_column', 'mailing_zip');
-    formData.append('trace_type', 'normal');
-
-    const response = await fetch(`${this.baseUrl}/trace/`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${this.apiKey}` },
-      // Do NOT set Content-Type — fetch sets multipart boundary automatically
-      body: formData,
-    });
-
-    if (!response.ok) {
-      const text = await response.text().catch(() => response.statusText);
-      this.logger.error(
-        `Tracerfy POST /trace/ failed: status=${response.status}, body=${text}`,
-      );
-      // Unmark pending since we failed to submit
-      await this.prisma.parcel.updateMany({
-        where: { bbl: { in: toQueue.map((p) => p.bbl) } },
-        data: { skipTraceStatus: null },
-      });
-      throw new Error(`Tracerfy API error ${response.status}: ${text}`);
-    }
-
-    const data = (await response.json()) as { queue_id: string | number };
-    const queueId = String(data.queue_id);
-
-    // API call succeeded — now grant org access and store queue_id
+    // Grant org access
     await this.grantOrgAccess(
       toQueue.map((p) => p.id),
       organizationId,
     );
 
-    await this.prisma.parcel.updateMany({
-      where: { bbl: { in: toQueue.map((p) => p.bbl) } },
-      data: { skipTraceQueueId: queueId },
-    });
+    const queuedBbls = toQueue.map((p) => p.bbl);
 
     this.logger.log(
-      `Submitted skip trace batch: ${toQueue.length} records, queue_id=${queueId}, skipped=${skipped}`,
+      `Submitting ${queuedBbls.length} records to Skip Sherpa, skipped=${skipped}`,
     );
 
-    return { queueId, queued: toQueue.map((p) => p.bbl), skipped };
+    // Fire-and-forget: run Skip Sherpa in the background so the API responds immediately
+    this.skipSherpaFallback(queuedBbls).catch((err) => {
+      this.logger.error(
+        `Skip Sherpa batch failed: ${(err as Error).message}`,
+        (err as Error).stack,
+      );
+    });
+
+    return { queueId: 'skipsherpa', queued: queuedBbls, skipped };
   }
 
   /**
