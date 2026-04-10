@@ -26,6 +26,7 @@ import { ParcelQueryService } from '../service/public-data/parcel-query.service'
 import { SkipTraceService } from '../service/public-data/skip-trace.service';
 import { PhoneNoteService } from '../service/public-data/phone-note.service';
 import { PropertyListService } from '../service/public-data/property-list.service';
+import { AttomAvmService } from '../service/public-data/attom-avm.service';
 import { BOROUGH_NAMES } from '../service/public-data/nyc-utils';
 import { resolveFeatureFlags } from '../util/feature-flags';
 import { PhoneStatus, ParcelListType } from '@prisma/client';
@@ -44,6 +45,7 @@ export class PublicDataController {
     private readonly skipTrace: SkipTraceService,
     private readonly phoneNote: PhoneNoteService,
     private readonly propertyList: PropertyListService,
+    private readonly attomAvm: AttomAvmService,
   ) {}
 
   private async assertParcelsEnabled(organizationId: string) {
@@ -454,6 +456,48 @@ export class PublicDataController {
     }
 
     return this.skipTrace.getStatusForBbls(bbls);
+  }
+
+  @Get('parcels/valuation/usage')
+  async getValuationUsage(@AuthUser('organizationId') organizationId: string) {
+    await this.assertParcelsEnabled(organizationId);
+    return this.attomAvm.getOrgUsageInfo(organizationId);
+  }
+
+  @Post('parcels/:bbl/valuation')
+  async lookupValuation(
+    @AuthUser('organizationId') organizationId: string,
+    @Param('bbl') bbl: string,
+    @Body() body: { force?: boolean },
+  ) {
+    await this.assertParcelsEnabled(organizationId);
+
+    try {
+      return await this.attomAvm.lookupByBbl(
+        bbl,
+        organizationId,
+        body.force ?? false,
+      );
+    } catch (err) {
+      const message = (err as Error).message;
+      if (message.includes('limit reached')) {
+        throw new HttpException(message, HttpStatus.TOO_MANY_REQUESTS);
+      }
+      if (message.includes('not configured')) {
+        throw new HttpException(
+          'ATTOM API is not configured on this server',
+          HttpStatus.SERVICE_UNAVAILABLE,
+        );
+      }
+      if (message.includes('not found')) {
+        throw new HttpException(message, HttpStatus.NOT_FOUND);
+      }
+      this.logger.error(
+        `AVM lookup failed for BBL ${bbl}: ${message}`,
+        (err as Error).stack,
+      );
+      throw new HttpException(message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   @Get('parcels/:bbl')

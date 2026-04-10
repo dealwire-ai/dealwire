@@ -14,6 +14,7 @@ import { CareScraperService } from '../service/public-data/care-scraper.service'
 import { PhoneNoteService } from '../service/public-data/phone-note.service';
 import { PropertyListService } from '../service/public-data/property-list.service';
 import { PublicDataSchedulerService } from '../service/public-data/public-data-scheduler.service';
+import { AttomAvmService } from '../service/public-data/attom-avm.service';
 import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
 
 @Module({
@@ -30,6 +31,7 @@ import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
     PhoneNoteService,
     PropertyListService,
     PublicDataSchedulerService,
+    AttomAvmService,
     ClerkAuthGuard,
   ],
   exports: [ParcelQueryService],
