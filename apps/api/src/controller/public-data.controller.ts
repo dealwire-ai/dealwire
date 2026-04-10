@@ -431,6 +431,31 @@ export class PublicDataController {
     return this.skipTrace.getOrgUsageInfo(organizationId!);
   }
 
+  @Get('parcels/skip-trace/status')
+  async getSkipTraceStatus(
+    @AuthUser('organizationId') organizationId: string,
+    @Query('bbls') bblsParam: string,
+  ) {
+    await this.assertParcelsEnabled(organizationId);
+
+    if (!bblsParam) {
+      throw new HttpException(
+        'bbls query param is required',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const bbls = bblsParam.split(',').filter(Boolean);
+    if (bbls.length > 500) {
+      throw new HttpException(
+        'Maximum 500 BBLs per request',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    return this.skipTrace.getStatusForBbls(bbls);
+  }
+
   @Get('parcels/:bbl')
   async getParcel(
     @AuthUser('organizationId') organizationId: string,
