@@ -8,6 +8,7 @@ import {
   ChevronUp,
   Circle,
   Phone,
+  RefreshCw,
 } from "lucide-react";
 import {
   Table,
@@ -862,9 +863,12 @@ function PhoneCell({
 
   if (status === "pending") {
     return (
-      <span className="inline-flex items-center gap-1 text-xs text-zinc-400">
-        <span className="h-2 w-2 rounded-full bg-yellow-500 animate-pulse" />
-        Looking up...
+      <span className="inline-flex items-center gap-1.5 text-xs text-zinc-400">
+        <span className="relative flex h-2 w-2">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#C8A96E] opacity-75" />
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-[#C8A96E]" />
+        </span>
+        Queued...
       </span>
     );
   }
@@ -938,9 +942,9 @@ function InlineSkipTraceButton({
 
   if (loading) {
     return (
-      <span className="inline-flex items-center gap-1 text-xs text-zinc-400">
-        <span className="h-2 w-2 rounded-full bg-yellow-500 animate-pulse" />
-        Looking up...
+      <span className="inline-flex items-center gap-1.5 text-xs text-zinc-400">
+        <RefreshCw className="w-3 h-3 animate-spin" />
+        Submitting...
       </span>
     );
   }

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Phone } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -19,7 +20,7 @@ interface BatchSkipTraceButtonProps {
   quotaLimit?: number;
 }
 
-type ButtonState = "idle" | "confirming" | "loading" | "queued" | "error";
+type ButtonState = "idle" | "confirming" | "loading" | "error";
 
 export function BatchSkipTraceButton({
   selectedBbls,
@@ -29,10 +30,6 @@ export function BatchSkipTraceButton({
 }: BatchSkipTraceButtonProps) {
   const { apiCall } = useApi();
   const [state, setState] = useState<ButtonState>("idle");
-  const [resultInfo, setResultInfo] = useState<{
-    queued: number;
-    skipped: number;
-  } | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const count = selectedBbls.size;
@@ -45,27 +42,20 @@ export function BatchSkipTraceButton({
         method: "POST",
         body: JSON.stringify({ bbls: Array.from(selectedBbls) }),
       });
-      setResultInfo({ queued: result.queued, skipped: result.skipped });
-      setState("queued");
+      setState("idle");
+
+      const skippedMsg =
+        result.skipped > 0 ? ` (${result.skipped} cached)` : "";
+      toast.info(
+        `${result.queued} skip trace${result.queued === 1 ? "" : "s"} submitted${skippedMsg} — the table will update automatically`,
+        { duration: 5000 },
+      );
+
       onQueued();
     } catch (err) {
       setErrorMsg(err instanceof Error ? err.message : "Request failed");
       setState("error");
     }
-  }
-
-  if (state === "queued") {
-    return (
-      <span className="text-xs text-zinc-400">
-        Queued {resultInfo?.queued} — results in ~2 min
-        {(resultInfo?.skipped ?? 0) > 0 && (
-          <span className="text-zinc-600">
-            {" "}
-            ({resultInfo?.skipped} skipped — already traced)
-          </span>
-        )}
-      </span>
-    );
   }
 
   return (

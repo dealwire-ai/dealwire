@@ -820,6 +820,36 @@ export class SkipTraceService {
     });
   }
 
+  /** Return the skip trace status for a list of BBLs (used by frontend polling) */
+  async getStatusForBbls(
+    bbls: string[],
+  ): Promise<
+    Record<string, { status: string | null; phones: unknown; emails: unknown }>
+  > {
+    const parcels = await this.prisma.parcel.findMany({
+      where: { bbl: { in: bbls } },
+      select: {
+        bbl: true,
+        skipTraceStatus: true,
+        ownerPhones: true,
+        ownerEmails: true,
+      },
+    });
+
+    const result: Record<
+      string,
+      { status: string | null; phones: unknown; emails: unknown }
+    > = {};
+    for (const p of parcels) {
+      result[p.bbl] = {
+        status: p.skipTraceStatus,
+        phones: p.ownerPhones,
+        emails: p.ownerEmails,
+      };
+    }
+    return result;
+  }
+
   async getCreditBalance(): Promise<number> {
     if (!this.apiKey) return 0;
 
