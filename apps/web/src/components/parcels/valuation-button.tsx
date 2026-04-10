@@ -20,15 +20,21 @@ export function ValuationButton({ parcel, onUpdated }: ValuationButtonProps) {
   const { apiCall } = useApi();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [unavailable, setUnavailable] = useState(false);
 
   async function handleLookup(force = false) {
     setLoading(true);
     setError(null);
+    setUnavailable(false);
     try {
       const result = await apiCall(
         `/public-data/parcels/${parcel.bbl}/valuation`,
         { method: "POST", body: JSON.stringify({ force }) },
       );
+      if (result.avmValue == null) {
+        setUnavailable(true);
+        return;
+      }
       onUpdated?.({
         avmValue: result.avmValue,
         avmHigh: result.avmHigh,
@@ -66,6 +72,14 @@ export function ValuationButton({ parcel, onUpdated }: ValuationButtonProps) {
         >
           Retry
         </button>
+      </div>
+    );
+  }
+
+  if (unavailable) {
+    return (
+      <div className="text-xs text-zinc-500">
+        Valuation not available for this property
       </div>
     );
   }
