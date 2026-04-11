@@ -165,20 +165,6 @@ export class MicrosoftWebhookService {
         return;
       }
 
-      // Skip emails from our own sending domain (underwriting replies, digests, etc.)
-      if (emailEvent.from.toLowerCase().endsWith('@mail.dealwire.ai')) {
-        this.logger.log(
-          `Skipping Dealwire system email: ${emailEvent.messageId} from ${emailEvent.from} - "${emailEvent.subject}"`,
-        );
-        if (userEmail) {
-          this.metricsService.recordMicrosoftWebhookRequest(
-            userEmail,
-            'success',
-          );
-        }
-        return;
-      }
-
       // Skip all self-sent emails — commands go through screening@mail.dealwire.ai instead
       if (emailEvent.from.toLowerCase() === inboxOwner.email.toLowerCase()) {
         this.logger.debug(
