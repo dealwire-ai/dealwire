@@ -19,6 +19,7 @@ describe('MicrosoftSubscriptionService', () => {
             },
             user: {
               findFirst: jest.fn(),
+              findMany: jest.fn(),
             },
             microsoftSubscription: {
               findUnique: jest.fn(),
@@ -38,7 +39,9 @@ describe('MicrosoftSubscriptionService', () => {
       ],
     }).compile();
 
-    service = module.get<MicrosoftSubscriptionService>(MicrosoftSubscriptionService);
+    service = module.get<MicrosoftSubscriptionService>(
+      MicrosoftSubscriptionService,
+    );
     prismaService = module.get(PrismaService);
   });
 
@@ -46,80 +49,118 @@ describe('MicrosoftSubscriptionService', () => {
     jest.clearAllMocks();
   });
 
-  describe('resolveDesignatedMonitoringInboxEmailForOrganization', () => {
-    it('returns designated email when set and user has valid subscription', async () => {
-      (prismaService.screeningPreferences.findUnique as jest.Mock).mockResolvedValue({
-        designatedMonitoringInboxEmail: 'designated@example.com',
+  describe('resolveMonitoredInboxEmailsForOrganization', () => {
+    it('returns designated emails when set and users have valid subscriptions', async () => {
+      (
+        prismaService.screeningPreferences.findUnique as jest.Mock
+      ).mockResolvedValue({
+        designatedMonitoringInboxEmails: [
+          'alice@example.com',
+          'bob@example.com',
+        ],
       });
-      (prismaService.user.findFirst as jest.Mock).mockResolvedValueOnce({
-        email: 'designated@example.com',
-      });
+      (prismaService.user.findMany as jest.Mock).mockResolvedValueOnce([
+        { email: 'alice@example.com' },
+        { email: 'bob@example.com' },
+      ]);
 
-      const result = await service.resolveDesignatedMonitoringInboxEmailForOrganization('org1');
+      const result =
+        await service.resolveMonitoredInboxEmailsForOrganization('org1');
 
-      expect(result).toBe('designated@example.com');
+      expect(result).toEqual(['alice@example.com', 'bob@example.com']);
       // Should not call the fallback query
+      expect(prismaService.user.findFirst).not.toHaveBeenCalled();
+    });
+
+    it('returns only the designated users that have a live subscription', async () => {
+      (
+        prismaService.screeningPreferences.findUnique as jest.Mock
+      ).mockResolvedValue({
+        designatedMonitoringInboxEmails: [
+          'alice@example.com',
+          'bob@example.com',
+        ],
+      });
+      // DB filter drops bob — only alice has a subscription
+      (prismaService.user.findMany as jest.Mock).mockResolvedValueOnce([
+        { email: 'alice@example.com' },
+      ]);
+
+      const result =
+        await service.resolveMonitoredInboxEmailsForOrganization('org1');
+
+      expect(result).toEqual(['alice@example.com']);
+      expect(prismaService.user.findFirst).not.toHaveBeenCalled();
+    });
+
+    it('falls back to oldest user when none of the designated users have subscriptions', async () => {
+      (
+        prismaService.screeningPreferences.findUnique as jest.Mock
+      ).mockResolvedValue({
+        designatedMonitoringInboxEmails: ['missing@example.com'],
+      });
+      (prismaService.user.findMany as jest.Mock).mockResolvedValueOnce([]);
+      (prismaService.user.findFirst as jest.Mock).mockResolvedValueOnce({
+        email: 'oldest@example.com',
+      });
+
+      const result =
+        await service.resolveMonitoredInboxEmailsForOrganization('org1');
+
+      expect(result).toEqual(['oldest@example.com']);
       expect(prismaService.user.findFirst).toHaveBeenCalledTimes(1);
     });
 
-    it('falls back to oldest user when designated email is set but user has no subscription', async () => {
-      (prismaService.screeningPreferences.findUnique as jest.Mock).mockResolvedValue({
-        designatedMonitoringInboxEmail: 'missing@example.com',
-      });
-      // First call: designated user lookup — returns null (no subscription)
-      // Second call: fallback oldest user query
-      (prismaService.user.findFirst as jest.Mock)
-        .mockResolvedValueOnce(null)
-        .mockResolvedValueOnce({ email: 'oldest@example.com' });
-
-      const result = await service.resolveDesignatedMonitoringInboxEmailForOrganization('org1');
-
-      expect(result).toBe('oldest@example.com');
-      expect(prismaService.user.findFirst).toHaveBeenCalledTimes(2);
-    });
-
-    it('falls back to oldest user when no designated email is set in prefs', async () => {
-      (prismaService.screeningPreferences.findUnique as jest.Mock).mockResolvedValue({
-        designatedMonitoringInboxEmail: null,
+    it('falls back to oldest user when no designated emails are set in prefs', async () => {
+      (
+        prismaService.screeningPreferences.findUnique as jest.Mock
+      ).mockResolvedValue({
+        designatedMonitoringInboxEmails: [],
       });
       (prismaService.user.findFirst as jest.Mock).mockResolvedValueOnce({
         email: 'oldest@example.com',
       });
 
-      const result = await service.resolveDesignatedMonitoringInboxEmailForOrganization('org1');
+      const result =
+        await service.resolveMonitoredInboxEmailsForOrganization('org1');
 
-      expect(result).toBe('oldest@example.com');
-      // Only the fallback query should run — no designated user lookup
-      expect(prismaService.user.findFirst).toHaveBeenCalledTimes(1);
+      expect(result).toEqual(['oldest@example.com']);
+      // findMany should not be called when the list is empty
+      expect(prismaService.user.findMany).not.toHaveBeenCalled();
     });
 
-    it('returns null when no users in the org have a subscription', async () => {
-      (prismaService.screeningPreferences.findUnique as jest.Mock).mockResolvedValue({
-        designatedMonitoringInboxEmail: null,
+    it('returns an empty array when no users in the org have a subscription', async () => {
+      (
+        prismaService.screeningPreferences.findUnique as jest.Mock
+      ).mockResolvedValue({
+        designatedMonitoringInboxEmails: [],
       });
       (prismaService.user.findFirst as jest.Mock).mockResolvedValueOnce(null);
 
-      const result = await service.resolveDesignatedMonitoringInboxEmailForOrganization('org1');
+      const result =
+        await service.resolveMonitoredInboxEmailsForOrganization('org1');
 
-      expect(result).toBeNull();
+      expect(result).toEqual([]);
     });
 
-    it('handles case-insensitive match on designated email', async () => {
-      (prismaService.screeningPreferences.findUnique as jest.Mock).mockResolvedValue({
-        designatedMonitoringInboxEmail: 'DESIGNATED@EXAMPLE.COM',
+    it('passes the designated list to the DB with case-insensitive mode', async () => {
+      (
+        prismaService.screeningPreferences.findUnique as jest.Mock
+      ).mockResolvedValue({
+        designatedMonitoringInboxEmails: ['DESIGNATED@EXAMPLE.COM'],
       });
-      // Prisma mode: 'insensitive' handles the match on the DB side; simulate it returning the user
-      (prismaService.user.findFirst as jest.Mock).mockResolvedValueOnce({
-        email: 'designated@example.com',
-      });
+      (prismaService.user.findMany as jest.Mock).mockResolvedValueOnce([
+        { email: 'designated@example.com' },
+      ]);
 
-      const result = await service.resolveDesignatedMonitoringInboxEmailForOrganization('org1');
+      const result =
+        await service.resolveMonitoredInboxEmailsForOrganization('org1');
 
-      expect(result).toBe('designated@example.com');
-      expect(prismaService.user.findFirst).toHaveBeenCalledWith(
+      expect(result).toEqual(['designated@example.com']);
+      expect(prismaService.user.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({
-            email: { equals: 'DESIGNATED@EXAMPLE.COM', mode: 'insensitive' },
+            email: { in: ['DESIGNATED@EXAMPLE.COM'], mode: 'insensitive' },
           }),
         }),
       );
