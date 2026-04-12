@@ -558,6 +558,13 @@ model UnderwritingRun {
   durationMs     Int?
   error          String?             @db.Text
 
+  // LLM cost/token rollup — populated when the run completes.
+  // See docs/technical/GRAFANA_SETUP.md for the corresponding Prometheus metrics.
+  totalPromptTokens     Int?
+  totalCompletionTokens Int?
+  totalLlmCostUsd       Decimal? @db.Decimal(10, 6)
+  llmCostByStage        Json?    // { "extraction.om": 0.0234, "field_mapping": 0.0012, ... }
+
   startedAt      DateTime            @default(now())
   completedAt    DateTime?
 
