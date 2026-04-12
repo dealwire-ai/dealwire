@@ -233,40 +233,45 @@ export class MicrosoftSubscriptionService {
   }
 
   /**
-   * Resolve the designated monitoring inbox email for an organization.
+   * Resolve the set of monitored inbox emails for an organization.
    *
-   * If the org has a designatedMonitoringInboxEmail set and that user has a live
-   * Microsoft subscription, returns that email. Otherwise falls back to the oldest
-   * user in the org who has a live subscription.
+   * If the org has designatedMonitoringInboxEmails set, returns the emails of
+   * users in that list who also have a live Microsoft subscription. If none of
+   * the designated users have a subscription (or no designated list is set),
+   * falls back to the oldest user in the org with a live subscription.
    *
-   * Returns null if no users in the org have a subscription at all.
+   * Returns an empty array if no users in the org have a subscription at all.
    */
-  async resolveDesignatedMonitoringInboxEmailForOrganization(
+  async resolveMonitoredInboxEmailsForOrganization(
     organizationId: string,
-  ): Promise<string | null> {
-    if (!organizationId) return null;
+  ): Promise<string[]> {
+    if (!organizationId) return [];
 
-    // Load the designated email from preferences
+    // Load the designated emails from preferences
     const prefs = await this.prisma.screeningPreferences.findUnique({
       where: { organizationId },
-      select: { designatedMonitoringInboxEmail: true },
+      select: { designatedMonitoringInboxEmails: true },
     });
 
-    const designatedEmail = prefs?.designatedMonitoringInboxEmail;
+    const designatedEmails = prefs?.designatedMonitoringInboxEmails ?? [];
 
-    if (designatedEmail) {
-      // Verify a user with that email exists in this org and has a live subscription
-      const designatedUser = await this.prisma.user.findFirst({
+    if (designatedEmails.length > 0) {
+      // Return the designated users that have a live subscription
+      const designatedUsers = await this.prisma.user.findMany({
         where: {
           organizationId,
-          email: { equals: designatedEmail, mode: 'insensitive' },
+          email: { in: designatedEmails, mode: 'insensitive' },
           microsoftSubscription: { isNot: null },
         },
         select: { email: true },
       });
 
-      if (designatedUser?.email) {
-        return designatedUser.email;
+      const matched = designatedUsers
+        .map((u) => u.email)
+        .filter((e): e is string => !!e);
+
+      if (matched.length > 0) {
+        return matched;
       }
     }
 
@@ -280,7 +285,7 @@ export class MicrosoftSubscriptionService {
       select: { email: true },
     });
 
-    return fallbackUser?.email ?? null;
+    return fallbackUser?.email ? [fallbackUser.email] : [];
   }
 
   /**
