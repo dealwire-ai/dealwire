@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { DataExtractionService } from './data-extraction.service';
 import { PrismaService } from '../prisma/prisma.service';
-import { MetricsService } from '../metrics/metrics.service';
 
 // Mock OpenAI
 const mockCreate = jest.fn();
@@ -15,7 +14,6 @@ jest.mock('openai', () => ({
 describe('DataExtractionService', () => {
   let service: DataExtractionService;
   let prismaService: jest.Mocked<PrismaService>;
-  let metricsService: jest.Mocked<MetricsService>;
 
   beforeEach(async () => {
     mockCreate.mockReset();
@@ -29,46 +27,42 @@ describe('DataExtractionService', () => {
             deal: { update: jest.fn().mockResolvedValue({}) },
           },
         },
-        {
-          provide: MetricsService,
-          useValue: {
-            recordAICall: jest.fn(),
-          },
-        },
       ],
     }).compile();
 
     service = module.get(DataExtractionService);
     prismaService = module.get(PrismaService) as jest.Mocked<PrismaService>;
-    metricsService = module.get(MetricsService) as jest.Mocked<MetricsService>;
   });
 
   it('should extract real estate data and persist to deal', async () => {
     // Arrange
     const dealId = 'deal-123';
-    const extractedText = '200-unit multifamily in Dallas, TX. Asking $25M. 6.5% cap rate. 95% occupied.';
+    const extractedText =
+      '200-unit multifamily in Dallas, TX. Asking $25M. 6.5% cap rate. 95% occupied.';
 
     mockCreate.mockResolvedValue({
-      choices: [{
-        message: {
-          content: JSON.stringify({
-            dealType: 'real_estate',
-            extractedData: {
-              askingPrice: 25000000,
-              propertyType: 'multifamily',
-              capRate: 0.065,
-              occupancy: 0.95,
-              units: 200,
-              noi: null,
-              squareFeet: null,
-              yearBuilt: null,
-              pricePerUnit: 125000,
-              pricePerSqFt: null,
-              description: '200-unit multifamily property in Dallas, TX',
-            },
-          }),
+      choices: [
+        {
+          message: {
+            content: JSON.stringify({
+              dealType: 'real_estate',
+              extractedData: {
+                askingPrice: 25000000,
+                propertyType: 'multifamily',
+                capRate: 0.065,
+                occupancy: 0.95,
+                units: 200,
+                noi: null,
+                squareFeet: null,
+                yearBuilt: null,
+                pricePerUnit: 125000,
+                pricePerSqFt: null,
+                description: '200-unit multifamily property in Dallas, TX',
+              },
+            }),
+          },
         },
-      }],
+      ],
     });
 
     // Act
@@ -88,22 +82,21 @@ describe('DataExtractionService', () => {
         }),
       },
     });
-    expect(metricsService.recordAICall).toHaveBeenCalledWith(
-      'data-extraction', expect.any(String), expect.any(Number), 'success',
-    );
   });
 
   it('should handle unknown deal types', async () => {
     // Arrange
     mockCreate.mockResolvedValue({
-      choices: [{
-        message: {
-          content: JSON.stringify({
-            dealType: 'unknown',
-            extractedData: {},
-          }),
+      choices: [
+        {
+          message: {
+            content: JSON.stringify({
+              dealType: 'unknown',
+              extractedData: {},
+            }),
+          },
         },
-      }],
+      ],
     });
 
     // Act
@@ -121,9 +114,8 @@ describe('DataExtractionService', () => {
     mockCreate.mockRejectedValue(new Error('API rate limit'));
 
     // Act & Assert
-    await expect(service.extract('deal-789', 'some text')).rejects.toThrow('API rate limit');
-    expect(metricsService.recordAICall).toHaveBeenCalledWith(
-      'data-extraction', expect.any(String), expect.any(Number), 'error',
+    await expect(service.extract('deal-789', 'some text')).rejects.toThrow(
+      'API rate limit',
     );
     expect(prismaService.deal.update).not.toHaveBeenCalled();
   });
@@ -135,6 +127,8 @@ describe('DataExtractionService', () => {
     });
 
     // Act & Assert
-    await expect(service.extract('deal-000', 'some text')).rejects.toThrow('Empty response from OpenAI');
+    await expect(service.extract('deal-000', 'some text')).rejects.toThrow(
+      'Empty response from OpenAI',
+    );
   });
 });

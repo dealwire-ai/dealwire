@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ScreeningBucket } from '@prisma/client';
 import { InitialScreeningService } from './initial-screening.service';
-import { MetricsService } from '../metrics/metrics.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { AddressNormalizationService } from './address-normalization.service';
 import { ContactNormalizationService } from './contact-normalization.service';
@@ -69,7 +68,6 @@ const buckets: ScreeningBucket[] = [
 describe('InitialScreeningService', () => {
   let service: InitialScreeningService;
   let prismaService: jest.Mocked<PrismaService>;
-  let metricsService: jest.Mocked<MetricsService>;
   let addressNormalizationService: jest.Mocked<AddressNormalizationService>;
   let contactNormalizationService: jest.Mocked<ContactNormalizationService>;
 
@@ -79,12 +77,6 @@ describe('InitialScreeningService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         InitialScreeningService,
-        {
-          provide: MetricsService,
-          useValue: {
-            recordAICall: jest.fn(),
-          },
-        },
         {
           provide: PrismaService,
           useValue: {
@@ -110,7 +102,6 @@ describe('InitialScreeningService', () => {
 
     service = module.get<InitialScreeningService>(InitialScreeningService);
     prismaService = module.get(PrismaService);
-    metricsService = module.get(MetricsService);
     addressNormalizationService = module.get(AddressNormalizationService);
     contactNormalizationService = module.get(ContactNormalizationService);
   });
@@ -166,12 +157,6 @@ describe('InitialScreeningService', () => {
           screeningBucketId: 'bucket-yes',
         }),
       }),
-    );
-    expect(metricsService.recordAICall).toHaveBeenCalledWith(
-      'initial-screening',
-      'gpt-4.1',
-      expect.any(Number),
-      'success',
     );
   });
 
@@ -292,13 +277,6 @@ describe('InitialScreeningService', () => {
     ).rejects.toThrow(
       'Failed to perform initial screening: Empty response from OpenAI',
     );
-
-    expect(metricsService.recordAICall).toHaveBeenCalledWith(
-      'initial-screening',
-      'gpt-4.1',
-      expect.any(Number),
-      'error',
-    );
   });
 
   it('should throw on OpenAI error and record error metric', async () => {
@@ -310,13 +288,6 @@ describe('InitialScreeningService', () => {
       service.screen('deal-8', 'some text', buckets),
     ).rejects.toThrow(
       'Failed to perform initial screening: Rate limit exceeded',
-    );
-
-    expect(metricsService.recordAICall).toHaveBeenCalledWith(
-      'initial-screening',
-      'gpt-4.1',
-      expect.any(Number),
-      'error',
     );
   });
 

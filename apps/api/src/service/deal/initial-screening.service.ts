@@ -4,8 +4,8 @@ import OpenAI from 'openai';
 import { aiConfig } from '../../config/ai.config';
 import { dealScreeningModelName } from '../underwriting/model-config';
 import { InitialScreeningResult } from '../../model/initial-screening.model';
-import { MetricsService } from '../metrics/metrics.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { trackLlmOpenAI } from '../llm/tracked-llm';
 import { AddressNormalizationService } from './address-normalization.service';
 import { ContactNormalizationService } from './contact-normalization.service';
 
@@ -16,7 +16,6 @@ export class InitialScreeningService {
   private openai: OpenAI;
 
   constructor(
-    private readonly metricsService: MetricsService,
     private readonly prismaService: PrismaService,
     private readonly addressNormalizationService: AddressNormalizationService,
     private readonly contactNormalizationService: ContactNormalizationService,
@@ -46,7 +45,6 @@ export class InitialScreeningService {
     senderName?: string,
     structuredData?: Record<string, unknown>,
   ): Promise<InitialScreeningResult> {
-    const start = Date.now();
     const modelName = dealScreeningModelName();
     try {
       const systemPrompt = this.buildPrompt(buckets, !!structuredData);
@@ -64,16 +62,18 @@ export class InitialScreeningService {
       }
       userContent += `Raw Extracted Text:\n\n${extractedText}`;
 
-      const response = await this.openai.chat.completions.create({
-        model: modelName,
-        temperature: this.aiConfig.openaiTemperature,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userContent },
-        ],
-        response_format: { type: 'json_object' },
-        user: 'initial-screening',
-      });
+      const response = await trackLlmOpenAI('initial_screening', () =>
+        this.openai.chat.completions.create({
+          model: modelName,
+          temperature: this.aiConfig.openaiTemperature,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userContent },
+          ],
+          response_format: { type: 'json_object' },
+          user: 'initial-screening',
+        }),
+      );
 
       const content = response.choices[0]?.message?.content;
 
@@ -154,27 +154,12 @@ export class InitialScreeningService {
         },
       });
 
-      const duration = (Date.now() - start) / 1000;
-      this.metricsService.recordAICall(
-        'initial-screening',
-        modelName,
-        duration,
-        'success',
-      );
-
       this.logger.log(
         `Initial screening completed: ${decision} bucket="${matchedBucket.name}" (model: ${modelName}) for deal ${dealId}${assetId ? ` with asset ${assetId}` : ' (no asset)'}${contactId ? ` with contact ${contactId}` : ' (no contact)'}`,
       );
 
       return result;
     } catch (error) {
-      const duration = (Date.now() - start) / 1000;
-      this.metricsService.recordAICall(
-        'initial-screening',
-        modelName,
-        duration,
-        'error',
-      );
       const errorMessage =
         error instanceof Error ? error.message : String(error);
       const errorType =

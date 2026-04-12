@@ -3,8 +3,8 @@ import OpenAI from 'openai';
 import { z } from 'zod';
 import { aiConfig } from '../../config/ai.config';
 import { dealDetectionModelName } from '../underwriting/model-config';
-import { MetricsService } from '../metrics/metrics.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { trackLlmOpenAI } from '../llm/tracked-llm';
 
 const DealDetectionSchema = z.object({
   isDeal: z
@@ -24,10 +24,7 @@ export class DealDetectionService {
   private readonly aiConfig = aiConfig();
   private openai: OpenAI;
 
-  constructor(
-    private readonly metricsService: MetricsService,
-    private readonly prisma: PrismaService,
-  ) {
+  constructor(private readonly prisma: PrismaService) {
     this.openai = new OpenAI({
       apiKey: this.aiConfig.openaiApiKey,
       maxRetries: 3,
@@ -46,7 +43,6 @@ export class DealDetectionService {
     userId?: string,
     organizationId?: string | null,
   ): Promise<DealDetection> {
-    const start = Date.now();
     const modelName = dealDetectionModelName();
     try {
       // Load preferences if organizationId is provided
@@ -103,50 +99,38 @@ Consider attachments: PDFs may indicate deal memos or OMs, but only if the email
         systemPrompt += `\n\nCRITICAL SKIP RULE: If this email mentions, references, or is about "${alwaysSkip.trim()}", you MUST return isDeal: false with reason indicating it matches the alwaysSkip criteria (e.g., "Matches alwaysSkip criteria: ${alwaysSkip.trim()}"). This takes precedence over all other classification rules.`;
       }
 
-      const response = await this.openai.chat.completions.create({
-        model: modelName,
-        temperature: 0,
-        messages: [
-          {
-            role: 'system',
-            content: systemPrompt,
-          },
-          {
-            role: 'user',
-            content: `Subject: ${subject}
+      const response = await trackLlmOpenAI('deal_detection', () =>
+        this.openai.chat.completions.create({
+          model: modelName,
+          temperature: 0,
+          messages: [
+            {
+              role: 'system',
+              content: systemPrompt,
+            },
+            {
+              role: 'user',
+              content: `Subject: ${subject}
 
 Body preview (first 500 chars):
 ${bodyPreview.slice(0, 500)}
 
 Has attachments: ${hasAttachments ? 'Yes' : 'No'}`,
-          },
-        ],
-        response_format: { type: 'json_object' },
-        user: 'deal-detection',
-      });
+            },
+          ],
+          response_format: { type: 'json_object' },
+          user: 'deal-detection',
+        }),
+      );
 
       const content = response.choices[0]?.message?.content;
       if (!content) {
-        const duration = (Date.now() - start) / 1000;
-        this.metricsService.recordAICall(
-          'detection',
-          modelName,
-          duration,
-          'error',
-        );
         this.logger.warn('No content from deal detection');
         return { isDeal: false, confidence: 'low', reason: 'No response' };
       }
 
       const result = DealDetectionSchema.safeParse(JSON.parse(content));
       if (!result.success) {
-        const duration = (Date.now() - start) / 1000;
-        this.metricsService.recordAICall(
-          'detection',
-          modelName,
-          duration,
-          'error',
-        );
         this.logger.warn(
           `Invalid deal detection response: ${result.error.message}`,
         );
@@ -158,13 +142,6 @@ Has attachments: ${hasAttachments ? 'Yes' : 'No'}`,
       }
 
       const parsed = result.data;
-      const duration = (Date.now() - start) / 1000;
-      this.metricsService.recordAICall(
-        'detection',
-        modelName,
-        duration,
-        'success',
-      );
 
       this.logger.log(
         `Deal detection: isDeal=${parsed.isDeal}, confidence=${parsed.confidence}, reason="${parsed.reason}"`,
@@ -172,13 +149,6 @@ Has attachments: ${hasAttachments ? 'Yes' : 'No'}`,
 
       return parsed;
     } catch (error) {
-      const duration = (Date.now() - start) / 1000;
-      this.metricsService.recordAICall(
-        'detection',
-        modelName,
-        duration,
-        'error',
-      );
       const msg = error instanceof Error ? error.message : String(error);
       this.logger.error(`Deal detection failed: ${msg}`);
       // Default to false on error - conservative approach to avoid false positives
