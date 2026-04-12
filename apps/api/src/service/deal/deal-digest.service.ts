@@ -298,18 +298,20 @@ export class DealDigestService implements OnModuleInit {
         return;
       }
 
-      // Pick the sender: prefer the designated monitoring inbox user, then fall back
-      // to the oldest user with a subscription (same priority as inbox monitoring).
+      // Pick the sender: prefer any designated monitoring inbox user, then fall
+      // back to the oldest user with a subscription (same priority as inbox monitoring).
       type UserType = (typeof org.users)[0];
-      const designatedEmail = preferences?.designatedMonitoringInboxEmail;
+      const designatedEmails = (
+        preferences?.designatedMonitoringInboxEmails ?? []
+      ).map((e) => e.toLowerCase());
       const usersWithSub = org.users.filter(
         (u: UserType) => u.microsoftSubscription !== null,
       );
       const userWithMicrosoft =
-        (designatedEmail
+        (designatedEmails.length > 0
           ? usersWithSub.find(
               (u: UserType) =>
-                u.email?.toLowerCase() === designatedEmail.toLowerCase(),
+                !!u.email && designatedEmails.includes(u.email.toLowerCase()),
             )
           : undefined) ||
         usersWithSub[0] || // oldest user with subscription (already ordered by createdAt asc)
