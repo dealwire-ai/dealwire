@@ -48,7 +48,7 @@ INSERT INTO "ScreeningPreferences" (
   "companyName", "brandColor", "passedFolderName",
   "dealCriteria", "alwaysSkip",
   "digestSchedule", "digestTimeZone",
-  "designatedMonitoringInboxEmail",
+  "designatedMonitoringInboxEmails",
   "createdAt", "updatedAt"
 )
 SELECT
@@ -60,7 +60,7 @@ SELECT
   sp."companyName", sp."brandColor", sp."passedFolderName",
   sp."dealCriteria", sp."alwaysSkip",
   sp."digestSchedule", sp."digestTimeZone",
-  sp."designatedMonitoringInboxEmail",
+  sp."designatedMonitoringInboxEmails",
   sp."createdAt", now()
 FROM "ScreeningPreferences" sp
 WHERE sp."organizationId" = 'org_38GzT8lJmP5Xawh9orhrbO1yJkA'
@@ -72,7 +72,7 @@ ON CONFLICT ("organizationId") DO UPDATE SET
   "alwaysSkip"                     = EXCLUDED."alwaysSkip",
   "digestSchedule"                 = EXCLUDED."digestSchedule",
   "digestTimeZone"                 = EXCLUDED."digestTimeZone",
-  "designatedMonitoringInboxEmail" = EXCLUDED."designatedMonitoringInboxEmail",
+  "designatedMonitoringInboxEmails" = EXCLUDED."designatedMonitoringInboxEmails",
   "updatedAt"                      = now();
 
 -- ============================================================

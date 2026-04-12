@@ -15,8 +15,8 @@ export interface ScreeningPreferences {
   digestSchedule?: string;
   /** Timezone for digest schedule (default: "America/New_York") */
   digestTimeZone?: string;
-  /** If set, only this user's inbox is monitored; falls back to oldest connected user */
-  designatedMonitoringInboxEmail?: string;
+  /** If non-empty, only these users' inboxes are monitored; falls back to oldest connected user */
+  designatedMonitoringInboxEmails?: string[];
 }
 
 export const DEFAULT_PASSED_FOLDER = 'Passed Deals';
@@ -32,9 +32,13 @@ export class ScreeningPreferencesService {
    * @param organizationId - The organization ID
    * @returns ScreeningPreferences or empty object if not found
    */
-  async getPreferences(organizationId: string | null | undefined): Promise<ScreeningPreferences> {
+  async getPreferences(
+    organizationId: string | null | undefined,
+  ): Promise<ScreeningPreferences> {
     if (!organizationId) {
-      this.logger.debug('No organizationId provided, returning empty preferences');
+      this.logger.debug(
+        'No organizationId provided, returning empty preferences',
+      );
       return {};
     }
 
@@ -51,7 +55,9 @@ export class ScreeningPreferencesService {
       });
 
       if (!prefs) {
-        this.logger.warn(`No preferences found for organization ${organizationId}`);
+        this.logger.warn(
+          `No preferences found for organization ${organizationId}`,
+        );
         return {};
       }
 
@@ -64,10 +70,14 @@ export class ScreeningPreferencesService {
         alwaysSkip: prefs.alwaysSkip || undefined,
         digestSchedule: prefs.digestSchedule || undefined,
         digestTimeZone: prefs.digestTimeZone || undefined,
-        designatedMonitoringInboxEmail: prefs.designatedMonitoringInboxEmail || undefined,
+        designatedMonitoringInboxEmails:
+          prefs.designatedMonitoringInboxEmails.length > 0
+            ? prefs.designatedMonitoringInboxEmails
+            : undefined,
       };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       this.logger.error(
         `Failed to load preferences for organization ${organizationId}: ${errorMessage}`,
       );
@@ -92,7 +102,7 @@ export class ScreeningPreferencesService {
         | 'digestTimeZone'
         | 'companyName'
         | 'brandColor'
-        | 'designatedMonitoringInboxEmail'
+        | 'designatedMonitoringInboxEmails'
       >
     >,
   ): Promise<ScreeningPreferences> {
@@ -101,7 +111,8 @@ export class ScreeningPreferencesService {
     }
 
     const data: Record<string, unknown> = {};
-    if (partial.dealCriteria !== undefined) data.dealCriteria = partial.dealCriteria;
+    if (partial.dealCriteria !== undefined)
+      data.dealCriteria = partial.dealCriteria;
     if (partial.alwaysSkip !== undefined) data.alwaysSkip = partial.alwaysSkip;
     if (partial.passedFolderName !== undefined)
       data.passedFolderName = partial.passedFolderName;
@@ -110,20 +121,26 @@ export class ScreeningPreferencesService {
         try {
           CronExpressionParser.parse(partial.digestSchedule);
         } catch {
-          throw new Error(`Invalid CRON expression: "${partial.digestSchedule}"`);
+          throw new Error(
+            `Invalid CRON expression: "${partial.digestSchedule}"`,
+          );
         }
       }
       data.digestSchedule = partial.digestSchedule;
     }
     if (partial.digestTimeZone !== undefined)
       data.digestTimeZone = partial.digestTimeZone;
-    if (partial.companyName !== undefined) data.companyName = partial.companyName;
+    if (partial.companyName !== undefined)
+      data.companyName = partial.companyName;
     if (partial.brandColor !== undefined) data.brandColor = partial.brandColor;
-    if (partial.designatedMonitoringInboxEmail !== undefined)
-      data.designatedMonitoringInboxEmail = partial.designatedMonitoringInboxEmail;
+    if (partial.designatedMonitoringInboxEmails !== undefined)
+      data.designatedMonitoringInboxEmails =
+        partial.designatedMonitoringInboxEmails;
 
     if (Object.keys(data).length === 0) {
-      return this.getPreferences(organizationId) as Promise<ScreeningPreferences>;
+      return this.getPreferences(
+        organizationId,
+      ) as Promise<ScreeningPreferences>;
     }
 
     const updated = await this.prisma.screeningPreferences.upsert({
@@ -147,7 +164,10 @@ export class ScreeningPreferencesService {
       alwaysSkip: updated.alwaysSkip || undefined,
       digestSchedule: updated.digestSchedule || undefined,
       digestTimeZone: updated.digestTimeZone || undefined,
-      designatedMonitoringInboxEmail: updated.designatedMonitoringInboxEmail || undefined,
+      designatedMonitoringInboxEmails:
+        updated.designatedMonitoringInboxEmails.length > 0
+          ? updated.designatedMonitoringInboxEmails
+          : undefined,
     };
   }
 }

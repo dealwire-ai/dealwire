@@ -26,7 +26,9 @@ describe('MicrosoftWebhookService', () => {
         {
           provide: MicrosoftGraphService,
           useValue: {
-            getMicrosoftOAuthTokenFromClerk: jest.fn().mockResolvedValue('access-token'),
+            getMicrosoftOAuthTokenFromClerk: jest
+              .fn()
+              .mockResolvedValue('access-token'),
             toNormalizedEvent: jest.fn(),
             getAttachmentContent: jest.fn(),
           },
@@ -35,7 +37,9 @@ describe('MicrosoftWebhookService', () => {
           provide: MicrosoftSubscriptionService,
           useValue: {
             getUserBySubscriptionId: jest.fn().mockResolvedValue('user123'),
-            resolveDesignatedMonitoringInboxEmailForOrganization: jest.fn().mockResolvedValue(null),
+            resolveMonitoredInboxEmailsForOrganization: jest
+              .fn()
+              .mockResolvedValue([]),
           },
         },
         {
@@ -121,14 +125,17 @@ describe('MicrosoftWebhookService', () => {
       resourceData: {
         id: 'msg123',
         '@odata.type': '#Microsoft.Graph.Message',
-        '@odata.id': 'https://graph.microsoft.com/v1.0/users/user123/messages/msg123',
+        '@odata.id':
+          'https://graph.microsoft.com/v1.0/users/user123/messages/msg123',
         '@odata.etag': 'W/"etag123"',
       },
       clientState: 'secret',
       tenantId: 'tenant123',
     };
 
-    (microsoftGraphService.toNormalizedEvent as jest.Mock).mockResolvedValue(emailEvent);
+    (microsoftGraphService.toNormalizedEvent as jest.Mock).mockResolvedValue(
+      emailEvent,
+    );
     (dealDetectionService.isDealEmail as jest.Mock).mockResolvedValue({
       isDeal: false,
       confidence: 'high',
@@ -148,7 +155,9 @@ describe('MicrosoftWebhookService', () => {
     );
     expect(s3Service.uploadDealAttachment).not.toHaveBeenCalled();
     expect(sqsService.enqueueNormalizedEmail).not.toHaveBeenCalled();
-    expect(metricsService.recordDealSkipped).toHaveBeenCalledWith('Not a deal email');
+    expect(metricsService.recordDealSkipped).toHaveBeenCalledWith(
+      'Not a deal email',
+    );
   });
 
   it('should upload to S3 and enqueue if deal detection returns true', async () => {
@@ -179,14 +188,17 @@ describe('MicrosoftWebhookService', () => {
       resourceData: {
         id: 'msg123',
         '@odata.type': '#Microsoft.Graph.Message',
-        '@odata.id': 'https://graph.microsoft.com/v1.0/users/user123/messages/msg123',
+        '@odata.id':
+          'https://graph.microsoft.com/v1.0/users/user123/messages/msg123',
         '@odata.etag': 'W/"etag123"',
       },
       clientState: 'secret',
       tenantId: 'tenant123',
     };
 
-    (microsoftGraphService.toNormalizedEvent as jest.Mock).mockResolvedValue(emailEvent);
+    (microsoftGraphService.toNormalizedEvent as jest.Mock).mockResolvedValue(
+      emailEvent,
+    );
     (dealDetectionService.isDealEmail as jest.Mock).mockResolvedValue({
       isDeal: true,
       confidence: 'high',

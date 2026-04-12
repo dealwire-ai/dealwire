@@ -148,21 +148,25 @@ export class MicrosoftWebhookService {
 
       userEmail = inboxOwner.email;
 
-      // Check if this inbox is the designated monitoring inbox for the org
-      const designatedInboxEmail =
-        await this.subscriptionService.resolveDesignatedMonitoringInboxEmailForOrganization(
+      // Check if this inbox is in the set of monitored inboxes for the org
+      const monitoredInboxEmails =
+        await this.subscriptionService.resolveMonitoredInboxEmailsForOrganization(
           inboxOwner.organizationId ?? '',
         );
 
-      if (
-        designatedInboxEmail &&
-        inboxOwner.email.toLowerCase() !== designatedInboxEmail.toLowerCase()
-      ) {
-        this.logger.log(
-          `Skipping notification from non-designated inbox ${inboxOwner.email} ` +
-            `(designated: ${designatedInboxEmail}) for org ${inboxOwner.organizationId}`,
+      if (monitoredInboxEmails.length > 0) {
+        const ownerEmailLower = inboxOwner.email.toLowerCase();
+        const isMonitored = monitoredInboxEmails.some(
+          (email) => email.toLowerCase() === ownerEmailLower,
         );
-        return;
+
+        if (!isMonitored) {
+          this.logger.log(
+            `Skipping notification from non-monitored inbox ${inboxOwner.email} ` +
+              `(monitored: ${monitoredInboxEmails.join(', ')}) for org ${inboxOwner.organizationId}`,
+          );
+          return;
+        }
       }
 
       // Skip all self-sent emails — commands go through screening@mail.dealwire.ai instead
