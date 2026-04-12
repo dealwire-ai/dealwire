@@ -988,9 +988,23 @@ export default function Home() {
               Dealwire
             </span>
           </div>
-          <p className="text-xs font-mono text-white/15 tracking-wider">
-            © {new Date().getFullYear()} · Frontstep AI, LLC.
-          </p>
+          <div className="flex max-md:flex-col items-center gap-x-6 gap-y-2">
+            <Link
+              href="/terms-of-use"
+              className="text-xs font-mono text-white/40 hover:text-white/80 tracking-wider transition-colors"
+            >
+              Terms of Use
+            </Link>
+            <Link
+              href="/privacy-policy"
+              className="text-xs font-mono text-white/40 hover:text-white/80 tracking-wider transition-colors"
+            >
+              Privacy Policy
+            </Link>
+            <p className="text-xs font-mono text-white/15 tracking-wider">
+              © {new Date().getFullYear()} · Frontstep AI, LLC.
+            </p>
+          </div>
         </div>
       </footer>
     </div>
