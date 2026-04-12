@@ -7,6 +7,7 @@ import {
 } from './agentic-types';
 import { excelToTextWithCellRefs } from '../extractors/extraction-types';
 import { validatorModel } from '../model-config';
+import { trackLlm } from '../../llm/tracked-llm';
 
 const SYSTEM_PROMPT = `You are a QA reviewer for commercial real estate pro forma models. You are given:
 
@@ -67,18 +68,20 @@ export class ProformaValidatorService {
 
     const analysisJson = JSON.stringify(analysis, null, 2);
 
-    const { object } = await generateObject({
-      model: validatorModel(),
-      schema: ValidationResultSchema,
-      system: SYSTEM_PROMPT,
-      messages: [
-        {
-          role: 'user',
-          content: `## Deal Analysis (source of truth)\n\n\`\`\`json\n${analysisJson}\n\`\`\`\n\n## Filled Pro Forma Template\n\n${templateText}\n\nValidate this filled pro forma against the deal analysis. Check for stale data from prior deals, incorrect values, hallucinations, and missing fills. Return corrections for anything that needs fixing.`,
-        },
-      ],
-      maxRetries: 2,
-    });
+    const { object } = await trackLlm('agentic.validation', () =>
+      generateObject({
+        model: validatorModel(),
+        schema: ValidationResultSchema,
+        system: SYSTEM_PROMPT,
+        messages: [
+          {
+            role: 'user',
+            content: `## Deal Analysis (source of truth)\n\n\`\`\`json\n${analysisJson}\n\`\`\`\n\n## Filled Pro Forma Template\n\n${templateText}\n\nValidate this filled pro forma against the deal analysis. Check for stale data from prior deals, incorrect values, hallucinations, and missing fills. Return corrections for anything that needs fixing.`,
+          },
+        ],
+        maxRetries: 2,
+      }),
+    );
 
     const errorCount = object.issues.filter(
       (i) => i.severity === 'error',
