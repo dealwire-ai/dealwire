@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { generateObject } from 'ai';
 import { S3Service } from '../../s3/s3.service';
+import { trackLlm } from '../../llm/tracked-llm';
 import { extractorModel, pdfExtractorModel } from '../model-config';
 import { ClassifiedDocument } from './document-classifier.service';
 import {
@@ -82,12 +83,14 @@ export class T12ExtractorService {
         },
       ];
 
-      const { object } = await generateObject({
-        model: pdfExtractorModel(),
-        schema: T12ExtractionSchema,
-        system: SYSTEM_PROMPT,
-        messages: [{ role: 'user', content: content as any }],
-      });
+      const { object } = await trackLlm('extraction.t12', () =>
+        generateObject({
+          model: pdfExtractorModel(),
+          schema: T12ExtractionSchema,
+          system: SYSTEM_PROMPT,
+          messages: [{ role: 'user', content: content as any }],
+        }),
+      );
 
       this.logger.log(
         `[t12-extractor] Done: noi=${object.noi} expenseRatio=${object.expenseRatio} confidence=${object.confidence?.toFixed(2)}`,
@@ -100,17 +103,19 @@ export class T12ExtractorService {
     const buffer = await this.s3Service.downloadDealAttachment(doc.s3Key);
     const text = excelToText(buffer);
 
-    const { object } = await generateObject({
-      model: extractorModel(),
-      schema: T12ExtractionSchema,
-      system: SYSTEM_PROMPT,
-      messages: [
-        {
-          role: 'user',
-          content: `Filename: "${doc.filename}"\n\n${text}\n\nExtract all T-12 income and expense figures.${fieldHint}`,
-        },
-      ],
-    });
+    const { object } = await trackLlm('extraction.t12', () =>
+      generateObject({
+        model: extractorModel(),
+        schema: T12ExtractionSchema,
+        system: SYSTEM_PROMPT,
+        messages: [
+          {
+            role: 'user',
+            content: `Filename: "${doc.filename}"\n\n${text}\n\nExtract all T-12 income and expense figures.${fieldHint}`,
+          },
+        ],
+      }),
+    );
 
     this.logger.log(
       `[t12-extractor] Done: noi=${object.noi} expenseRatio=${object.expenseRatio} confidence=${object.confidence?.toFixed(2)}`,

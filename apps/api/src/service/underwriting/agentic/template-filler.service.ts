@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { generateObject } from 'ai';
 import { CellMappingSchema, CellMappings, DealAnalysis } from './agentic-types';
 import { templateFillerModel } from '../model-config';
+import { trackLlm } from '../../llm/tracked-llm';
 
 const SYSTEM_PROMPT = `You are mapping commercial real estate deal data into a pro forma Excel template.
 
@@ -56,18 +57,20 @@ export class TemplateFillerService {
 
     const analysisJson = JSON.stringify(analysis, null, 2);
 
-    const { object } = await generateObject({
-      model: templateFillerModel(),
-      schema: CellMappingSchema,
-      system: SYSTEM_PROMPT,
-      messages: [
-        {
-          role: 'user',
-          content: `## Deal Analysis Data\n\n\`\`\`json\n${analysisJson}\n\`\`\`\n\n## Pro Forma Template\n\n${templateText}\n\nMap the deal data to the appropriate input cells in this template. Return only cells where you have a confident match.`,
-        },
-      ],
-      maxRetries: 2,
-    });
+    const { object } = await trackLlm('agentic.template_fill', () =>
+      generateObject({
+        model: templateFillerModel(),
+        schema: CellMappingSchema,
+        system: SYSTEM_PROMPT,
+        messages: [
+          {
+            role: 'user',
+            content: `## Deal Analysis Data\n\n\`\`\`json\n${analysisJson}\n\`\`\`\n\n## Pro Forma Template\n\n${templateText}\n\nMap the deal data to the appropriate input cells in this template. Return only cells where you have a confident match.`,
+          },
+        ],
+        maxRetries: 2,
+      }),
+    );
 
     this.logger.log(
       `[${dealId}] Template fill: ${object.mappings.length} cell mappings produced`,
