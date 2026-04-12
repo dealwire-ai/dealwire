@@ -6,6 +6,7 @@ import { AppService } from './service/app.service';
 import { ClerkAuthGuard } from './guard/clerk-auth.guard';
 import { PrismaModule } from './module/prisma.module';
 import { MetricsModule } from './module/metrics.module';
+import { LlmObservabilityModule } from './module/llm-observability.module';
 import { PreferencesModule } from './module/preferences.module';
 import { DealModule } from './module/deal.module';
 import { ContactModule } from './module/contact.module';
@@ -27,6 +28,7 @@ import { CorrelationIdMiddleware } from './middleware/correlation-id.middleware'
     SqsRegistrationModule,
     PrismaModule,
     MetricsModule,
+    LlmObservabilityModule,
     PreferencesModule,
     DealModule,
     ContactModule,
