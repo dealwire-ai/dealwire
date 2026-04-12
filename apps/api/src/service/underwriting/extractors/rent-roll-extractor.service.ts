@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { generateObject } from 'ai';
 import { S3Service } from '../../s3/s3.service';
+import { trackLlm } from '../../llm/tracked-llm';
 import { extractorModel, pdfExtractorModel } from '../model-config';
 import { ClassifiedDocument } from './document-classifier.service';
 import {
@@ -66,13 +67,15 @@ export class RentRollExtractorService {
         },
       ];
 
-      const { object } = await generateObject({
-        model: pdfExtractorModel(),
-        schema: RentRollExtractionSchema,
-        system: SYSTEM_PROMPT,
-        messages: [{ role: 'user', content: content as any }],
-        maxTokens: 16000,
-      });
+      const { object } = await trackLlm('extraction.rent_roll', () =>
+        generateObject({
+          model: pdfExtractorModel(),
+          schema: RentRollExtractionSchema,
+          system: SYSTEM_PROMPT,
+          messages: [{ role: 'user', content: content as any }],
+          maxTokens: 16000,
+        }),
+      );
 
       this.logger.log(
         `[rent-roll-extractor] Done: totalUnits=${object.totalUnits} vacancyRate=${object.vacancyRate} confidence=${object.confidence?.toFixed(2)}`,
@@ -86,13 +89,15 @@ export class RentRollExtractorService {
     const text = excelToText(buffer);
     userText = `Filename: "${doc.filename}"\n\n${text}\n\nExtract every unit from this Rent Roll.${fieldHint}`;
 
-    const { object } = await generateObject({
-      model: extractorModel(),
-      schema: RentRollExtractionSchema,
-      system: SYSTEM_PROMPT,
-      messages: [{ role: 'user', content: userText }],
-      maxTokens: 16000,
-    });
+    const { object } = await trackLlm('extraction.rent_roll', () =>
+      generateObject({
+        model: extractorModel(),
+        schema: RentRollExtractionSchema,
+        system: SYSTEM_PROMPT,
+        messages: [{ role: 'user', content: userText }],
+        maxTokens: 16000,
+      }),
+    );
 
     this.logger.log(
       `[rent-roll-extractor] Done: totalUnits=${object.totalUnits} vacancyRate=${object.vacancyRate} confidence=${object.confidence?.toFixed(2)}`,

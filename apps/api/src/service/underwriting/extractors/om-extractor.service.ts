@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { generateObject } from 'ai';
 import { S3Service } from '../../s3/s3.service';
+import { trackLlm } from '../../llm/tracked-llm';
 import { extractorModel, pdfExtractorModel } from '../model-config';
 import { ClassifiedDocument } from './document-classifier.service';
 import {
@@ -69,12 +70,14 @@ export class OMExtractorService {
       };
     }
 
-    const { object } = await generateObject({
-      model: isPdf ? pdfExtractorModel() : extractorModel(),
-      schema: OMExtractionSchema,
-      system: SYSTEM_PROMPT,
-      messages: [{ role: 'user', content: content as any }],
-    });
+    const { object } = await trackLlm('extraction.om', () =>
+      generateObject({
+        model: isPdf ? pdfExtractorModel() : extractorModel(),
+        schema: OMExtractionSchema,
+        system: SYSTEM_PROMPT,
+        messages: [{ role: 'user', content: content as any }],
+      }),
+    );
 
     this.logger.log(
       `[om-extractor] Done: askingPrice=${object.askingPrice} capRate=${object.capRate} noi=${object.noi} confidence=${object.confidence?.toFixed(2)}`,

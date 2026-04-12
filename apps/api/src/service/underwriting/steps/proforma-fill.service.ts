@@ -3,6 +3,7 @@ import { generateObject } from 'ai';
 import { z } from 'zod';
 import { mapperModel } from '../model-config';
 import { S3Service } from '../../s3/s3.service';
+import { trackLlm } from '../../llm/tracked-llm';
 import {
   ExtractionResults,
   RentRollExtraction,
@@ -470,11 +471,12 @@ export class ProformaFillService {
 
     for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
       try {
-        const { object } = await generateObject({
-          model: mapperModel(),
-          maxRetries: 0,
-          schema: MappingSchema,
-          system: `You are mapping real estate deal data to pro forma input fields.
+        const { object } = await trackLlm('field_mapping', () =>
+          generateObject({
+            model: mapperModel(),
+            maxRetries: 0,
+            schema: MappingSchema,
+            system: `You are mapping real estate deal data to pro forma input fields.
 For each field, find the best matching value from the extraction data.
 Return null if no confident match exists. Use numbers for numeric fields (not strings).
 Do not invent values — only use what's present in the extraction data.
@@ -485,13 +487,14 @@ from deal documents. These include: loan terms (interest rates, amortization, LT
 closing costs, fee percentages, growth rates, discount rates, exit cap rates, stabilization timelines,
 disposition years, CAPEX reserves, and any field about future projections. Only map fields where the
 extraction data contains a clear, factual match.`,
-          messages: [
-            {
-              role: 'user',
-              content: `Pro forma fields:\n${fieldList}\n\nExtraction data:\n${extractionJson}\n\nMap each field to the best available value. Return null for any field without a confident match.`,
-            },
-          ],
-        });
+            messages: [
+              {
+                role: 'user',
+                content: `Pro forma fields:\n${fieldList}\n\nExtraction data:\n${extractionJson}\n\nMap each field to the best available value. Return null for any field without a confident match.`,
+              },
+            ],
+          }),
+        );
 
         return object.mappings as Array<{
           name: string;

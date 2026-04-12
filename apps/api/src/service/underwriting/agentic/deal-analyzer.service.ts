@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { generateObject } from 'ai';
 import { S3Service } from '../../s3/s3.service';
+import { trackLlm } from '../../llm/tracked-llm';
 import { analyzerModel } from '../model-config';
 import { excelToText } from '../extractors/extraction-types';
 import { DealAnalysisSchema, DealAnalysis } from './agentic-types';
@@ -66,13 +67,15 @@ export class DealAnalyzerService {
 
     this.logger.log(`[${dealId}] Running deal analysis (single-pass)`);
 
-    const { object } = await generateObject({
-      model: analyzerModel(),
-      schema: DealAnalysisSchema,
-      system: SYSTEM_PROMPT,
-      messages,
-      maxRetries: 2,
-    });
+    const { object } = await trackLlm('agentic.deal_analysis', () =>
+      generateObject({
+        model: analyzerModel(),
+        schema: DealAnalysisSchema,
+        system: SYSTEM_PROMPT,
+        messages,
+        maxRetries: 2,
+      }),
+    );
 
     this.logger.log(
       `[${dealId}] Analysis complete: confidence=${object.confidence.toFixed(2)} flags=${object.flags.length} missing=${object.missingDocs.length}`,

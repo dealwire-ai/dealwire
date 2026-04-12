@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { generateObject } from 'ai';
 import { z } from 'zod';
 import { S3Service } from '../../s3/s3.service';
+import { trackLlm } from '../../llm/tracked-llm';
 import { classifierModel } from '../model-config';
 import { UnderwritingDocument } from '../underwriting-orchestrator.service';
 
@@ -84,12 +85,14 @@ export class DocumentClassifierService {
         }
       }
 
-      const { object } = await generateObject({
-        model: classifierModel(),
-        schema: ClassificationSchema,
-        system: SYSTEM_PROMPT,
-        messages: [{ role: 'user', content: content as any }],
-      });
+      const { object } = await trackLlm('classification', () =>
+        generateObject({
+          model: classifierModel(),
+          schema: ClassificationSchema,
+          system: SYSTEM_PROMPT,
+          messages: [{ role: 'user', content: content as any }],
+        }),
+      );
 
       this.logger.log(
         `[classifier] "${doc.filename}" → ${object.documentType} (confidence=${object.confidence.toFixed(2)}) — ${object.reasoning}`,

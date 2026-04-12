@@ -8,6 +8,8 @@ import {
 import { AgenticUnderwritingService } from './agentic/agentic-underwriting.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma } from '@prisma/client';
+import { LlmContextStore, withLlmContext } from '../llm/llm-context';
+import { MetricsService } from '../metrics/metrics.service';
 
 export interface UnderwritingJobMessage {
   type: 'underwriting-job';
@@ -31,6 +33,7 @@ export class UnderwritingListenerService {
     private readonly pipeline: UnderwritingOrchestratorService,
     private readonly agenticPipeline: AgenticUnderwritingService,
     private readonly prisma: PrismaService,
+    private readonly metrics: MetricsService,
   ) {}
 
   @SqsMessageHandler('underwriting', false)
@@ -121,9 +124,15 @@ export class UnderwritingListenerService {
         }
       }
 
-      const result = useAgentic
-        ? await this.agenticPipeline.run(ctx)
-        : await this.pipeline.run(ctx);
+      const llmStore: LlmContextStore = {
+        runId: parsed.dealId,
+        dealId: parsed.dealId,
+        organizationId: parsed.orgId,
+      };
+      const result = await withLlmContext(llmStore, () =>
+        useAgentic ? this.agenticPipeline.run(ctx) : this.pipeline.run(ctx),
+      );
+      const acc = llmStore.accumulator;
 
       // Persist completed result
       if (parsed.orgId) {
@@ -139,11 +148,42 @@ export class UnderwritingListenerService {
             durationMs: result.durationMs,
             proformaId: result.proformaId,
             completedAt: new Date(),
+            ...(acc && {
+              totalPromptTokens: acc.totalPromptTokens,
+              totalCompletionTokens: acc.totalCompletionTokens,
+              totalLlmCostUsd: new Prisma.Decimal(acc.totalCostUsd.toFixed(6)),
+              llmCostByStage: acc.costByStage as Prisma.InputJsonValue,
+            }),
           },
         });
         this.logger.log(
           `[${parsed.dealId}] Underwriting result persisted to DB`,
         );
+
+        if (acc) {
+          this.metrics.recordUnderwritingRunLlmTotals({
+            organizationId: parsed.orgId,
+            totalPromptTokens: acc.totalPromptTokens,
+            totalCompletionTokens: acc.totalCompletionTokens,
+            totalCostUsd: acc.totalCostUsd,
+          });
+          this.logger.log(
+            `llm.run.summary ${JSON.stringify({
+              runId: parsed.dealId,
+              organizationId: parsed.orgId,
+              totalCostUsd: Number(acc.totalCostUsd.toFixed(6)),
+              totalPromptTokens: acc.totalPromptTokens,
+              totalCompletionTokens: acc.totalCompletionTokens,
+              callCount: acc.callCount,
+              costByStage: Object.fromEntries(
+                Object.entries(acc.costByStage).map(([k, v]) => [
+                  k,
+                  Number(v.toFixed(6)),
+                ]),
+              ),
+            })}`,
+          );
+        }
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
