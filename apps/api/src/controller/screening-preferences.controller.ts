@@ -48,6 +48,7 @@ export class ScreeningPreferencesController {
       digestTimeZone?: string;
       companyName?: string;
       brandColor?: string;
+      designatedMonitoringInboxEmails?: string[];
     },
   ) {
     return this.screeningPreferencesService.updatePreferences(
