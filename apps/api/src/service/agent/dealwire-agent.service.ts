@@ -11,6 +11,7 @@ import { PhoneNoteService } from '../public-data/phone-note.service';
 import { dealGeneralModelName } from '../underwriting/model-config';
 import { BOROUGH_NAMES } from '../public-data/nyc-utils';
 import { ParcelListType, PhoneStatus } from '@prisma/client';
+import { trackLlm, trackLlmStream } from '../llm/tracked-llm';
 
 const SYSTEM_PROMPT = `You are an AI acquisitions analyst for a real estate investment firm. You monitor their deal flow, track broker relationships, and help refine screening criteria. You communicate via email replies and web chat.
 
@@ -122,32 +123,34 @@ export class DealwireAgentService {
 
     const messages: CoreMessage[] = [{ role: 'user', content: userMessage }];
 
-    const result = await generateText({
-      model: openai(dealGeneralModelName()),
-      system: systemWithContext,
-      messages,
-      tools,
-      maxSteps: 5,
-      onStepFinish: ({ toolCalls, toolResults }) => {
-        if (toolCalls && toolCalls.length > 0) {
-          for (const call of toolCalls) {
-            this.logger.log(
-              `Tool call: ${call.toolName}(${JSON.stringify(call.args)})`,
-            );
+    const result = await trackLlm('chat_agent', () =>
+      generateText({
+        model: openai(dealGeneralModelName()),
+        system: systemWithContext,
+        messages,
+        tools,
+        maxSteps: 5,
+        onStepFinish: ({ toolCalls, toolResults }) => {
+          if (toolCalls && toolCalls.length > 0) {
+            for (const call of toolCalls) {
+              this.logger.log(
+                `Tool call: ${call.toolName}(${JSON.stringify(call.args)})`,
+              );
+            }
           }
-        }
-        if (toolResults && toolResults.length > 0) {
-          for (const res of toolResults) {
-            const resultStr = JSON.stringify(res.result);
-            const truncated =
-              resultStr.length > 500
-                ? resultStr.slice(0, 500) + '...'
-                : resultStr;
-            this.logger.log(`Tool result [${res.toolName}]: ${truncated}`);
+          if (toolResults && toolResults.length > 0) {
+            for (const res of toolResults) {
+              const resultStr = JSON.stringify(res.result);
+              const truncated =
+                resultStr.length > 500
+                  ? resultStr.slice(0, 500) + '...'
+                  : resultStr;
+              this.logger.log(`Tool result [${res.toolName}]: ${truncated}`);
+            }
           }
-        }
-      },
-    });
+        },
+      }),
+    );
 
     return result.text || '';
   }
@@ -176,13 +179,16 @@ export class DealwireAgentService {
       ? `${SYSTEM_PROMPT}\n\nCURRENT PREFERENCES:\n${prefsContext}`
       : SYSTEM_PROMPT;
 
-    return streamText({
-      model: openai(dealGeneralModelName()),
-      system: systemWithContext,
-      messages,
-      tools,
-      maxSteps: 5,
-    });
+    return trackLlmStream(
+      'chat_agent',
+      streamText({
+        model: openai(dealGeneralModelName()),
+        system: systemWithContext,
+        messages,
+        tools,
+        maxSteps: 5,
+      }),
+    );
   }
 
   /**

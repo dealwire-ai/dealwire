@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import OpenAI from 'openai';
 import { aiConfig } from '../../config/ai.config';
 import { imageOcrModelName } from '../underwriting/model-config';
-import { MetricsService } from '../metrics/metrics.service';
+import { trackLlmOpenAI } from '../llm/tracked-llm';
 
 @Injectable()
 export class ImageProcessorService {
@@ -10,7 +10,7 @@ export class ImageProcessorService {
   private readonly aiConfig = aiConfig();
   private openai: OpenAI;
 
-  constructor(private readonly metricsService: MetricsService) {
+  constructor() {
     this.openai = new OpenAI({
       apiKey: this.aiConfig.openaiApiKey,
       maxRetries: 3,
@@ -25,7 +25,6 @@ export class ImageProcessorService {
     buffer: Buffer,
     filename: string,
   ): Promise<string> {
-    const start = Date.now();
     const modelName = imageOcrModelName();
     try {
       // Convert buffer to base64
@@ -41,59 +40,39 @@ export class ImageProcessorService {
         'For example, if you see "Purchase Price" or "Asking Price" above or below a dollar amount, ' +
         'associate them together. Include all financial metrics, property details, addresses, and contact information.';
 
-      const response = await this.openai.chat.completions.create({
-        model: modelName,
-        temperature: 0,
-        messages: [
-          {
-            role: 'user',
-            content: [
-              { type: 'text', text: prompt },
-              {
-                type: 'image_url',
-                image_url: { url: dataUrl },
-              },
-            ],
-          },
-        ],
-        user: 'image-ocr',
-      });
+      const response = await trackLlmOpenAI('image_ocr', () =>
+        this.openai.chat.completions.create({
+          model: modelName,
+          temperature: 0,
+          messages: [
+            {
+              role: 'user',
+              content: [
+                { type: 'text', text: prompt },
+                {
+                  type: 'image_url',
+                  image_url: { url: dataUrl },
+                },
+              ],
+            },
+          ],
+          user: 'image-ocr',
+        }),
+      );
 
       const extractedText = response.choices[0]?.message?.content || '';
 
       if (!extractedText) {
         this.logger.warn(`No text extracted from image: ${filename}`);
-        const duration = (Date.now() - start) / 1000;
-        this.metricsService.recordAICall(
-          'image-ocr',
-          modelName,
-          duration,
-          'error',
-        );
         return '';
       }
 
-      const duration = (Date.now() - start) / 1000;
-      this.metricsService.recordAICall(
-        'image-ocr',
-        modelName,
-        duration,
-        'success',
-      );
-
       this.logger.log(
-        `Extracted ${extractedText.length} characters from image: ${filename} (${duration.toFixed(2)}s)`,
+        `Extracted ${extractedText.length} characters from image: ${filename}`,
       );
 
       return extractedText;
     } catch (error) {
-      const duration = (Date.now() - start) / 1000;
-      this.metricsService.recordAICall(
-        'image-ocr',
-        modelName,
-        duration,
-        'error',
-      );
       const errorMessage =
         error instanceof Error ? error.message : String(error);
       const errorType =
@@ -137,7 +116,6 @@ export class ImageProcessorService {
       }
     }
 
-    const start = Date.now();
     const modelName = imageOcrModelName();
     try {
       const content: OpenAI.Chat.Completions.ChatCompletionContentPart[] = [
@@ -159,37 +137,24 @@ export class ImageProcessorService {
         });
       }
 
-      const response = await this.openai.chat.completions.create({
-        model: modelName,
-        temperature: 0,
-        messages: [{ role: 'user', content }],
-        max_tokens: 4096,
-        user: 'image-ocr-multi',
-      });
-
-      const extractedText = response.choices[0]?.message?.content || '';
-      const duration = (Date.now() - start) / 1000;
-
-      this.metricsService.recordAICall(
-        'image-ocr-multi',
-        modelName,
-        duration,
-        extractedText ? 'success' : 'error',
+      const response = await trackLlmOpenAI('image_ocr', () =>
+        this.openai.chat.completions.create({
+          model: modelName,
+          temperature: 0,
+          messages: [{ role: 'user', content }],
+          max_tokens: 4096,
+          user: 'image-ocr-multi',
+        }),
       );
 
+      const extractedText = response.choices[0]?.message?.content || '';
+
       this.logger.log(
-        `Extracted ${extractedText.length} chars from ${images.length} images (${duration.toFixed(2)}s)`,
+        `Extracted ${extractedText.length} chars from ${images.length} images`,
       );
 
       return extractedText;
     } catch (error) {
-      const duration = (Date.now() - start) / 1000;
-      this.metricsService.recordAICall(
-        'image-ocr-multi',
-        modelName,
-        duration,
-        'error',
-      );
       const errorMessage =
         error instanceof Error ? error.message : String(error);
       this.logger.error(`Multi-image processing failed: ${errorMessage}`);
