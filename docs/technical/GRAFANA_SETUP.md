@@ -91,6 +91,64 @@ sum(emails_received_total)
 4. In Grafana, check **Explore** → Select Prometheus → Run query: `up`
 5. Should show `up{job="dealwire-api"} 1` if scraping is working
 
+## LLM Cost Observability
+
+The API emits Prometheus metrics for every LLM call (both Vercel AI SDK and raw OpenAI SDK sites), plus per-run totals for underwriting runs. Use these queries to build a dashboard.
+
+### Metrics emitted
+
+| Metric                          | Type      | Labels                                           | What it is                                       |
+| ------------------------------- | --------- | ------------------------------------------------ | ------------------------------------------------ |
+| `llm_tokens_total`              | Counter   | `stage`, `model`, `direction`, `organization_id` | Tokens consumed per call, in/out                 |
+| `llm_cost_usd_total`            | Counter   | `stage`, `model`, `organization_id`              | USD cost per call (incremented by dollar amount) |
+| `llm_call_duration_seconds`     | Histogram | `stage`, `model`, `status`                       | Wall-clock latency per LLM call                  |
+| `underwriting_run_llm_cost_usd` | Histogram | `organization_id`                                | Total USD cost of a completed underwriting run   |
+| `underwriting_run_llm_tokens`   | Histogram | `organization_id`, `direction`                   | Total tokens in/out per underwriting run         |
+
+`stage` values include `classification`, `extraction.om`, `extraction.rent_roll`, `extraction.t12`, `extraction.generic`, `field_mapping`, `agentic.deal_analysis`, `agentic.template_fill`, `agentic.validation`, `proforma_scan`, `deal_detection`, `initial_screening`, `data_extraction`, `summary`, `broker_reply_draft`, `deal_decision`, `image_ocr`, `chat_agent`.
+
+### Queries
+
+```promql
+# Cost rate ($/hour)
+sum(rate(llm_cost_usd_total[5m])) * 3600
+
+# Cost by stage ($/hour)
+sum by (stage) (rate(llm_cost_usd_total[1h])) * 3600
+
+# Cost by model ($/hour)
+sum by (model) (rate(llm_cost_usd_total[1h])) * 3600
+
+# Average cost per completed underwriting run (last 1h)
+sum(rate(underwriting_run_llm_cost_usd_sum[1h]))
+  / sum(rate(underwriting_run_llm_cost_usd_count[1h]))
+
+# p95 cost per underwriting run
+histogram_quantile(
+  0.95,
+  sum by (le) (rate(underwriting_run_llm_cost_usd_bucket[1h]))
+)
+
+# Tokens per hour, split by stage and direction
+sum by (stage, direction) (rate(llm_tokens_total[1h])) * 3600
+
+# p95 LLM latency by stage
+histogram_quantile(
+  0.95,
+  sum by (stage, le) (rate(llm_call_duration_seconds_bucket[5m]))
+)
+
+# Top 5 most expensive stages (last 24h)
+topk(5, sum by (stage) (rate(llm_cost_usd_total[24h])))
+
+# Cost by organization (last 24h)
+sum by (organization_id) (rate(llm_cost_usd_total[24h])) * 86400
+```
+
+### Per-run cost — Postgres
+
+Prometheus gives you trends; for "what did run X cost?" query the `UnderwritingRun` row directly. The columns `totalPromptTokens`, `totalCompletionTokens`, `totalLlmCostUsd`, and `llmCostByStage` (JSON) are populated at the end of every run. Every run also logs a single `llm.run.summary` structured log line with the same data for grep-based lookups.
+
 ## Troubleshooting
 
 **No metrics showing?**

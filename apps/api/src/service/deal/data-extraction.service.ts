@@ -2,8 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import OpenAI from 'openai';
 import { aiConfig } from '../../config/ai.config';
 import { dealGeneralModelName } from '../underwriting/model-config';
-import { MetricsService } from '../metrics/metrics.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { trackLlmOpenAI } from '../llm/tracked-llm';
 import { DealType, ExtractedData } from '../../model/extracted-data.model';
 import { Prisma } from '@prisma/client';
 
@@ -18,10 +18,7 @@ export class DataExtractionService {
   private readonly aiConfig = aiConfig();
   private openai: OpenAI;
 
-  constructor(
-    private readonly metricsService: MetricsService,
-    private readonly prismaService: PrismaService,
-  ) {
+  constructor(private readonly prismaService: PrismaService) {
     this.openai = new OpenAI({
       apiKey: this.aiConfig.openaiApiKey,
       maxRetries: 3,
@@ -38,7 +35,6 @@ export class DataExtractionService {
     dealId: string,
     extractedText: string,
   ): Promise<DataExtractionResult> {
-    const start = Date.now();
     const modelName = dealGeneralModelName();
 
     try {
@@ -70,16 +66,21 @@ export class DataExtractionService {
         '{"dealType": "real_estate"|"debt"|"business"|"unknown", "extractedData": { ...fields... }}\n\n' +
         'For non-real_estate deal types, still return extractedData as an empty object {} — we will add type-specific fields later.';
 
-      const response = await this.openai.chat.completions.create({
-        model: modelName,
-        temperature: this.aiConfig.openaiTemperature,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: `Raw Extracted Text:\n\n${extractedText}` },
-        ],
-        response_format: { type: 'json_object' },
-        user: 'data-extraction',
-      });
+      const response = await trackLlmOpenAI('data_extraction', () =>
+        this.openai.chat.completions.create({
+          model: modelName,
+          temperature: this.aiConfig.openaiTemperature,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            {
+              role: 'user',
+              content: `Raw Extracted Text:\n\n${extractedText}`,
+            },
+          ],
+          response_format: { type: 'json_object' },
+          user: 'data-extraction',
+        }),
+      );
 
       const content = response.choices[0]?.message?.content;
       if (!content) {
@@ -96,16 +97,8 @@ export class DataExtractionService {
         data: { dealType, extractedData },
       });
 
-      const duration = (Date.now() - start) / 1000;
-      this.metricsService.recordAICall(
-        'data-extraction',
-        modelName,
-        duration,
-        'success',
-      );
-
       this.logger.log(
-        `Data extraction completed for deal ${dealId}: type=${dealType} (${duration.toFixed(2)}s)`,
+        `Data extraction completed for deal ${dealId}: type=${dealType}`,
       );
 
       return {
@@ -113,13 +106,6 @@ export class DataExtractionService {
         extractedData: (parsed.extractedData || {}) as ExtractedData,
       };
     } catch (error) {
-      const duration = (Date.now() - start) / 1000;
-      this.metricsService.recordAICall(
-        'data-extraction',
-        modelName,
-        duration,
-        'error',
-      );
       const errorMessage =
         error instanceof Error ? error.message : String(error);
       this.logger.error(

@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { generateObject } from 'ai';
 import { z } from 'zod';
 import { S3Service } from '../../s3/s3.service';
+import { trackLlm } from '../../llm/tracked-llm';
 import { ClassifiedDocument } from './document-classifier.service';
 import { excelToText, GenericExtraction } from './extraction-types';
 import { extractorModel, pdfExtractorModel } from '../model-config';
@@ -65,12 +66,14 @@ Rules:
         },
       ];
 
-      const { object } = await generateObject({
-        model: pdfExtractorModel(),
-        schema: GenericExtractionSchema,
-        system,
-        messages: [{ role: 'user', content: content as any }],
-      });
+      const { object } = await trackLlm('extraction.generic', () =>
+        generateObject({
+          model: pdfExtractorModel(),
+          schema: GenericExtractionSchema,
+          system,
+          messages: [{ role: 'user', content: content as any }],
+        }),
+      );
 
       this.logger.log(
         `[generic-extractor] Done: ${object.fields.filter((f) => f.value !== null).length}/${neededFields.length} fields found`,
@@ -87,17 +90,19 @@ Rules:
         ? rawText.slice(0, MAX_CHARS) + '\n\n[... truncated ...]'
         : rawText;
 
-    const { object } = await generateObject({
-      model: extractorModel(),
-      schema: GenericExtractionSchema,
-      system,
-      messages: [
-        {
-          role: 'user',
-          content: `Filename: "${doc.filename}"\n\n${text}\n\nExtract values for each of these fields:\n${fieldList}`,
-        },
-      ],
-    });
+    const { object } = await trackLlm('extraction.generic', () =>
+      generateObject({
+        model: extractorModel(),
+        schema: GenericExtractionSchema,
+        system,
+        messages: [
+          {
+            role: 'user',
+            content: `Filename: "${doc.filename}"\n\n${text}\n\nExtract values for each of these fields:\n${fieldList}`,
+          },
+        ],
+      }),
+    );
 
     this.logger.log(
       `[generic-extractor] Done: ${object.fields.filter((f) => f.value !== null).length}/${neededFields.length} fields found`,

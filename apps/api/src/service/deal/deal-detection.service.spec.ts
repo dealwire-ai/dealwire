@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { DealDetectionService } from './deal-detection.service';
 import { PrismaService } from '../prisma/prisma.service';
-import { MetricsService } from '../metrics/metrics.service';
 
 // Mock OpenAI
 const mockCreate = jest.fn();
@@ -19,7 +18,6 @@ jest.mock('../underwriting/model-config', () => ({
 describe('DealDetectionService', () => {
   let service: DealDetectionService;
   let prismaService: jest.Mocked<PrismaService>;
-  let metricsService: jest.Mocked<MetricsService>;
 
   beforeEach(async () => {
     mockCreate.mockReset();
@@ -35,18 +33,11 @@ describe('DealDetectionService', () => {
             },
           },
         },
-        {
-          provide: MetricsService,
-          useValue: {
-            recordAICall: jest.fn(),
-          },
-        },
       ],
     }).compile();
 
     service = module.get(DealDetectionService);
     prismaService = module.get(PrismaService) as jest.Mocked<PrismaService>;
-    metricsService = module.get(MetricsService) as jest.Mocked<MetricsService>;
   });
 
   afterEach(() => {
@@ -80,12 +71,6 @@ describe('DealDetectionService', () => {
     expect(result.isDeal).toBe(true);
     expect(result.confidence).toBe('high');
     expect(result.reason).toBe('Broker blast with specific property details');
-    expect(metricsService.recordAICall).toHaveBeenCalledWith(
-      'detection',
-      'gpt-4.1-mini',
-      expect.any(Number),
-      'success',
-    );
   });
 
   it('should return isDeal=false for a non-deal email', async () => {
@@ -115,12 +100,6 @@ describe('DealDetectionService', () => {
     expect(result.isDeal).toBe(false);
     expect(result.confidence).toBe('high');
     expect(result.reason).toBe('SaaS platform offering, not a property deal');
-    expect(metricsService.recordAICall).toHaveBeenCalledWith(
-      'detection',
-      'gpt-4.1-mini',
-      expect.any(Number),
-      'success',
-    );
   });
 
   it('should return isDeal=false when alwaysSkip criteria matches', async () => {
@@ -180,12 +159,6 @@ describe('DealDetectionService', () => {
     expect(result.isDeal).toBe(false);
     expect(result.confidence).toBe('low');
     expect(result.reason).toBe('No response');
-    expect(metricsService.recordAICall).toHaveBeenCalledWith(
-      'detection',
-      'gpt-4.1-mini',
-      expect.any(Number),
-      'error',
-    );
   });
 
   it('should return isDeal=false when JSON parse fails', async () => {
@@ -205,12 +178,6 @@ describe('DealDetectionService', () => {
     expect(result.isDeal).toBe(false);
     expect(result.confidence).toBe('low');
     expect(result.reason).toBe('Detection failed, defaulting to skip');
-    expect(metricsService.recordAICall).toHaveBeenCalledWith(
-      'detection',
-      'gpt-4.1-mini',
-      expect.any(Number),
-      'error',
-    );
   });
 
   it('should return isDeal=false when Zod validation fails', async () => {
@@ -240,12 +207,6 @@ describe('DealDetectionService', () => {
     expect(result.isDeal).toBe(false);
     expect(result.confidence).toBe('low');
     expect(result.reason).toBe('Parse failed, defaulting to skip');
-    expect(metricsService.recordAICall).toHaveBeenCalledWith(
-      'detection',
-      'gpt-4.1-mini',
-      expect.any(Number),
-      'error',
-    );
   });
 
   it('should return isDeal=false when OpenAI throws an error', async () => {
@@ -259,12 +220,6 @@ describe('DealDetectionService', () => {
     expect(result.isDeal).toBe(false);
     expect(result.confidence).toBe('low');
     expect(result.reason).toBe('Detection failed, defaulting to skip');
-    expect(metricsService.recordAICall).toHaveBeenCalledWith(
-      'detection',
-      'gpt-4.1-mini',
-      expect.any(Number),
-      'error',
-    );
   });
 
   it('should load preferences when organizationId is provided', async () => {
@@ -337,12 +292,6 @@ describe('DealDetectionService', () => {
     // Assert - should still succeed despite preferences load failure
     expect(result.isDeal).toBe(true);
     expect(result.confidence).toBe('high');
-    expect(metricsService.recordAICall).toHaveBeenCalledWith(
-      'detection',
-      'gpt-4.1-mini',
-      expect.any(Number),
-      'success',
-    );
   });
 
   it('should not load preferences when organizationId is not provided', async () => {

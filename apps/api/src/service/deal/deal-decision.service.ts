@@ -3,7 +3,7 @@ import OpenAI from 'openai';
 import { aiConfig } from '../../config/ai.config';
 import { dealGeneralModelName } from '../underwriting/model-config';
 import { DealDecision } from '../../model/deal-decision.model';
-import { MetricsService } from '../metrics/metrics.service';
+import { trackLlmOpenAI } from '../llm/tracked-llm';
 
 @Injectable()
 export class DealDecisionService {
@@ -11,7 +11,7 @@ export class DealDecisionService {
   private readonly aiConfig = aiConfig();
   private openai: OpenAI;
 
-  constructor(private readonly metricsService: MetricsService) {
+  constructor() {
     this.openai = new OpenAI({
       apiKey: this.aiConfig.openaiApiKey,
       maxRetries: 3,
@@ -28,7 +28,6 @@ export class DealDecisionService {
     extractedText: string,
     dealCriteria?: string,
   ): Promise<DealDecision> {
-    const start = Date.now();
     const modelName = dealGeneralModelName();
     try {
       // Build prompt based on whether criteria is provided
@@ -75,16 +74,21 @@ export class DealDecisionService {
           'Respond with JSON in the format: {"decision": "yes" or "no", "reason": "your reason"}.';
       }
 
-      const response = await this.openai.chat.completions.create({
-        model: modelName,
-        temperature: this.aiConfig.openaiTemperature,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: `Raw Extracted Text:\n\n${extractedText}` },
-        ],
-        response_format: { type: 'json_object' },
-        user: 'deal-decision',
-      });
+      const response = await trackLlmOpenAI('deal_decision', () =>
+        this.openai.chat.completions.create({
+          model: modelName,
+          temperature: this.aiConfig.openaiTemperature,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            {
+              role: 'user',
+              content: `Raw Extracted Text:\n\n${extractedText}`,
+            },
+          ],
+          response_format: { type: 'json_object' },
+          user: 'deal-decision',
+        }),
+      );
 
       const content = response.choices[0]?.message?.content;
 
@@ -98,27 +102,12 @@ export class DealDecisionService {
         reason: parsedContent.reason,
       };
 
-      const duration = (Date.now() - start) / 1000;
-      this.metricsService.recordAICall(
-        'initial-screening',
-        modelName,
-        duration,
-        'success',
-      );
-
       this.logger.log(
         `Deal decision made: ${decision.decision} (model: ${modelName}) for deal criteria: ${dealCriteria}`,
       );
 
       return decision;
     } catch (error) {
-      const duration = (Date.now() - start) / 1000;
-      this.metricsService.recordAICall(
-        'initial-screening',
-        modelName,
-        duration,
-        'error',
-      );
       const errorMessage =
         error instanceof Error ? error.message : String(error);
       const errorType =

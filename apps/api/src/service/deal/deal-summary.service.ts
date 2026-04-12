@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import OpenAI from 'openai';
 import { aiConfig } from '../../config/ai.config';
 import { dealGeneralModelName } from '../underwriting/model-config';
-import { MetricsService } from '../metrics/metrics.service';
+import { trackLlmOpenAI } from '../llm/tracked-llm';
 
 @Injectable()
 export class DealSummaryService {
@@ -10,7 +10,7 @@ export class DealSummaryService {
   private readonly aiConfig = aiConfig();
   private openai: OpenAI;
 
-  constructor(private readonly metricsService: MetricsService) {
+  constructor() {
     this.openai = new OpenAI({
       apiKey: this.aiConfig.openaiApiKey,
       maxRetries: 3,
@@ -39,7 +39,6 @@ export class DealSummaryService {
     },
     extractedData?: Record<string, unknown>,
   ): Promise<string> {
-    const start = Date.now();
     const modelName = dealGeneralModelName();
     try {
       // Build relationship context for the prompt
@@ -99,40 +98,28 @@ ${companyName ? `- The user works at ${companyName}` : ''}${relationshipContext}
 Do NOT include a subject line. Do NOT include a greeting or sign-off. Just the body text.
 Keep it concise — 2-3 sentences max.`;
 
-      const response = await this.openai.chat.completions.create({
-        model: modelName,
-        temperature: 0.7,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          {
-            role: 'user',
-            content: `Deal text:\n\n${extractedText.slice(0, 3000)}`,
-          },
-        ],
-        user: 'broker-reply-draft',
-      });
+      const response = await trackLlmOpenAI('broker_reply_draft', () =>
+        this.openai.chat.completions.create({
+          model: modelName,
+          temperature: 0.7,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            {
+              role: 'user',
+              content: `Deal text:\n\n${extractedText.slice(0, 3000)}`,
+            },
+          ],
+          user: 'broker-reply-draft',
+        }),
+      );
 
       const draft = response.choices[0]?.message?.content || '';
-      const duration = (Date.now() - start) / 1000;
-      this.metricsService.recordAICall(
-        'broker-reply-draft',
-        modelName,
-        duration,
-        'success',
-      );
 
       this.logger.log(
         `Broker reply draft generated (decision: ${decision}, length: ${draft.length}, hasContext: ${!!brokerContext})`,
       );
       return draft;
     } catch (error) {
-      const duration = (Date.now() - start) / 1000;
-      this.metricsService.recordAICall(
-        'broker-reply-draft',
-        modelName,
-        duration,
-        'error',
-      );
       const errorMessage =
         error instanceof Error ? error.message : String(error);
       this.logger.error(
@@ -151,7 +138,6 @@ Keep it concise — 2-3 sentences max.`;
     dealCriteria?: string,
     structuredData?: Record<string, unknown>,
   ): Promise<{ summary: string; narrative: string }> {
-    const start = Date.now();
     const modelName = dealGeneralModelName();
     try {
       let systemPrompt =
@@ -192,16 +178,18 @@ Keep it concise — 2-3 sentences max.`;
 
       userPrompt += `Extracted text:\n\n${extractedText}`;
 
-      const response = await this.openai.chat.completions.create({
-        model: modelName,
-        temperature: this.aiConfig.openaiTemperature,
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt },
-        ],
-        response_format: { type: 'json_object' },
-        user: 'summary-and-narrative',
-      });
+      const response = await trackLlmOpenAI('summary', () =>
+        this.openai.chat.completions.create({
+          model: modelName,
+          temperature: this.aiConfig.openaiTemperature,
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userPrompt },
+          ],
+          response_format: { type: 'json_object' },
+          user: 'summary-and-narrative',
+        }),
+      );
 
       const content = response.choices[0]?.message?.content || '';
       if (!content) {
@@ -219,27 +207,12 @@ Keep it concise — 2-3 sentences max.`;
         throw new Error('Missing summary in OpenAI response');
       }
 
-      const duration = (Date.now() - start) / 1000;
-      this.metricsService.recordAICall(
-        'summary-and-narrative',
-        modelName,
-        duration,
-        'success',
-      );
-
       this.logger.log(
         `Deal summary+narrative generated (summary: ${summary.length}, narrative: ${narrative.length}, model: ${modelName})`,
       );
 
       return { summary, narrative };
     } catch (error) {
-      const duration = (Date.now() - start) / 1000;
-      this.metricsService.recordAICall(
-        'summary-and-narrative',
-        modelName,
-        duration,
-        'error',
-      );
       const errorMessage =
         error instanceof Error ? error.message : String(error);
       const errorType =
