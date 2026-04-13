@@ -2,10 +2,13 @@
 
 ## General Ops
 - make a really strong, energetic e2e demo (deal screening, underwriting, (and optionally) IC report generation)
+- 
 
 ## Biz Dev
 - revision for Jim (Froggy Companies)
 - Proposal (no price yet) for Nick B (Terra Nova)
+- record data platform demo
+- Re-engage older prospects
 - Turn on Apollo Sequence
 - Enterprise landing page
 
