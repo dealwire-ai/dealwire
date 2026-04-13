@@ -20,6 +20,7 @@
 - set time to meet this or next week
   
 ## Frontstep
+- get yashavi headshots/pics
 - they need to finish setting shit up
 - invoice is out
 - update pricing page
