@@ -7,6 +7,7 @@
 - revision for Jim (Froggy Companies)
 - Proposal (no price yet) for Nick B (Terra Nova)
 - Turn on Apollo Sequence
+- Enterprise landing page
 
 ## Foxfield OS
 - send discovery doc by EOW
