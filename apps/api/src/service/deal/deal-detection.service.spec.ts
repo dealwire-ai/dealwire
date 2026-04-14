@@ -142,6 +142,100 @@ describe('DealDetectionService', () => {
     });
   });
 
+  it('deterministic alwaysSkip: matches token in body and skips LLM call', async () => {
+    (
+      prismaService.screeningPreferences.findUnique as jest.Mock
+    ).mockResolvedValue({
+      alwaysSkip: '1006 S Michigan',
+    });
+
+    const result = await service.isDealEmail(
+      'Re: Commission - 1006',
+      'Listing agreement for 1006 S Michigan Avenue, asking $8.5MM...',
+      true,
+      'user-1',
+      'org-jk',
+    );
+
+    expect(result.isDeal).toBe(false);
+    expect(result.confidence).toBe('high');
+    expect(result.reason).toBe('Matches alwaysSkip token: "1006 S Michigan"');
+    expect(mockCreate).not.toHaveBeenCalled();
+  });
+
+  it('deterministic alwaysSkip: matches token in subject only', async () => {
+    (
+      prismaService.screeningPreferences.findUnique as jest.Mock
+    ).mockResolvedValue({
+      alwaysSkip: '1006 S Michigan',
+    });
+
+    const result = await service.isDealEmail(
+      'Update on 1006 S Michigan',
+      'Unrelated body content here.',
+      false,
+      'user-1',
+      'org-jk',
+    );
+
+    expect(result.isDeal).toBe(false);
+    expect(result.reason).toContain('1006 S Michigan');
+    expect(mockCreate).not.toHaveBeenCalled();
+  });
+
+  it('deterministic alwaysSkip: matches second token in multi-token list', async () => {
+    (
+      prismaService.screeningPreferences.findUnique as jest.Mock
+    ).mockResolvedValue({
+      alwaysSkip: '1006 S Michigan, 200 Main Street',
+    });
+
+    const result = await service.isDealEmail(
+      'New listing',
+      'Property at 200 Main Street is now available...',
+      false,
+      'user-1',
+      'org-jk',
+    );
+
+    expect(result.isDeal).toBe(false);
+    expect(result.reason).toBe('Matches alwaysSkip token: "200 Main Street"');
+    expect(mockCreate).not.toHaveBeenCalled();
+  });
+
+  it('deterministic alwaysSkip: short tokens (<4 chars) are filtered out', async () => {
+    (
+      prismaService.screeningPreferences.findUnique as jest.Mock
+    ).mockResolvedValue({
+      alwaysSkip: 'abc',
+    });
+
+    mockCreate.mockResolvedValue({
+      choices: [
+        {
+          message: {
+            content: JSON.stringify({
+              isDeal: true,
+              confidence: 'high',
+              reason: 'Deal email',
+            }),
+          },
+        },
+      ],
+    });
+
+    const result = await service.isDealEmail(
+      'Subject mentions abc',
+      'Body also mentions abc.',
+      false,
+      'user-1',
+      'org-jk',
+    );
+
+    expect(mockCreate).toHaveBeenCalled();
+    expect(result.isDeal).toBe(true);
+  });
+
   it('should return isDeal=false with low confidence when OpenAI returns no content', async () => {
     // Arrange
     mockCreate.mockResolvedValue({

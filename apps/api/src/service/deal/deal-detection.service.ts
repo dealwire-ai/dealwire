@@ -62,6 +62,28 @@ export class DealDetectionService {
         }
       }
 
+      // Deterministic alwaysSkip pre-check — short-circuit before the LLM call
+      // so skip rules can't be overridden by a confidently-wrong classifier.
+      if (alwaysSkip && alwaysSkip.trim()) {
+        const haystack = `${subject}\n${bodyPreview}`.toLowerCase();
+        const tokens = alwaysSkip
+          .split(/[\n,;]+/)
+          .map((t) => t.trim())
+          .filter((t) => t.length >= 4);
+        for (const token of tokens) {
+          if (haystack.includes(token.toLowerCase())) {
+            this.logger.log(
+              `Deal detection: isDeal=false, confidence=high, reason="Matches alwaysSkip token (deterministic): \\"${token}\\""`,
+            );
+            return {
+              isDeal: false,
+              confidence: 'high',
+              reason: `Matches alwaysSkip token: "${token}"`,
+            };
+          }
+        }
+      }
+
       // Build system prompt
       let systemPrompt = `You are a classifier that determines if an email is about a real estate deal offering for a SPECIFIC PROPERTY or LOAN.
 You must respond with valid JSON matching this schema: { "isDeal": boolean, "confidence": "high"|"medium"|"low", "reason": string }
