@@ -147,7 +147,8 @@ Fields:
 - `brandColor` - Hex color code for email branding
 - `passedFolderName` - Folder name for passed/rejected deals (default: "Passed Deals")
 - `dealCriteria` - Criteria for AI to evaluate deals against
-- `alwaysSkip` - Criteria for deals to always skip
+- `skipCriteria` - Free-text criteria for the LLM to interpret for skipping emails (e.g. "retail deals", "deals under 40 units")
+- `knownProperties` - Structured list of property names/addresses to skip via regex (one per line)
 - Logo comes from Organization `imageUrl` (not stored on ScreeningPreferences) (checked via AI in deal detection)
 
 Preferences are automatically created when an Organization is created via Clerk webhooks. The `ScreeningPreferencesService` loads preferences by `organizationId`.
@@ -307,8 +308,8 @@ This allows the API to start successfully locally without configuring AWS.
 ### Unified Agent (Web + Email)
 
 - Same agent powers web chat and email replies. Extract from chat route into shared `DealwireAgentService`.
-- Write tools: update_always_skip, update_deal_criteria, update_buy_box. No forward_deal_to.
-- **Agent must understand:** alwaysSkip = skip entirely (not a deal, no analysis, no move); dealCriteria = yes/no evaluation (no = moved to Passed Deals).
+- Write tools: update_skip_criteria, update_known_properties, update_deal_criteria, update_buy_box. No forward_deal_to.
+- **Agent must understand:** skipCriteria = LLM-interpreted skip rules (deal types/categories); knownProperties = deterministic regex skip (property names/addresses the org owns); dealCriteria = yes/no evaluation (no = moved to Passed Deals).
 
 ### Deduplication
 

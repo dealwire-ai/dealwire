@@ -289,7 +289,8 @@ model ScreeningPreferences {
   brandColor      String? // Hex code
   passedFolderName String?
   dealCriteria    String?       @db.Text
-  alwaysSkip      String?       @db.Text // Criteria for deals to always skip
+  skipCriteria    String?       @db.Text // Free-text criteria for the LLM to interpret (e.g. "retail deals", "deals under 40 units")
+  knownProperties String?       @db.Text // Structured list of property names/addresses to skip via regex (one per line)
   digestSchedule  String? // CRON expression (e.g., "0 12 * * *" for daily at noon)
   digestTimeZone  String?  @default("America/New_York") // Timezone for schedule
   designatedMonitoringInboxEmails String[] @default([]) // If non-empty, only these users' inboxes are monitored; falls back to oldest connected user
