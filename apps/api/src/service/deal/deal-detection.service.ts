@@ -32,9 +32,12 @@ export class DealDetectionService {
   }
 
   /**
-   * Quickly determine if an email is about a real estate deal offering
-   * Uses structured output for fast, reliable classification
-   * Also checks alwaysSkip criteria if provided
+   * Quickly determine if an email is about a real estate deal offering.
+   * Uses structured output for fast, reliable classification.
+   *
+   * Two skip mechanisms:
+   * 1. knownProperties — deterministic regex match (property names/addresses the org already owns)
+   * 2. skipCriteria — LLM-interpreted free-text rules (semantic criteria like "retail deals")
    */
   async isDealEmail(
     subject: string,
@@ -46,14 +49,16 @@ export class DealDetectionService {
     const modelName = dealDetectionModelName();
     try {
       // Load preferences if organizationId is provided
-      let alwaysSkip: string | null = null;
+      let skipCriteria: string | null = null;
+      let knownProperties: string | null = null;
       if (organizationId) {
         try {
           const prefs = await this.prisma.screeningPreferences.findUnique({
             where: { organizationId },
-            select: { alwaysSkip: true },
+            select: { skipCriteria: true, knownProperties: true },
           });
-          alwaysSkip = prefs?.alwaysSkip || null;
+          skipCriteria = prefs?.skipCriteria || null;
+          knownProperties = prefs?.knownProperties || null;
         } catch (error) {
           const msg = error instanceof Error ? error.message : String(error);
           this.logger.warn(
@@ -62,23 +67,25 @@ export class DealDetectionService {
         }
       }
 
-      // Deterministic alwaysSkip pre-check — short-circuit before the LLM call
-      // so skip rules can't be overridden by a confidently-wrong classifier.
-      if (alwaysSkip && alwaysSkip.trim()) {
+      // Deterministic knownProperties pre-check — short-circuit before the LLM call.
+      // Each line is a property name/address. We build a regex that matches the core
+      // identifier with word boundaries, handling common abbreviations (S/South, N/North, etc.).
+      if (knownProperties && knownProperties.trim()) {
         const haystack = `${subject}\n${bodyPreview}`.toLowerCase();
-        const tokens = alwaysSkip
-          .split(/[\n,;]+/)
-          .map((t) => t.trim())
-          .filter((t) => t.length >= 4);
-        for (const token of tokens) {
-          if (haystack.includes(token.toLowerCase())) {
+        const properties = knownProperties
+          .split(/\n/)
+          .map((line) => line.replace(/^[-•*]\s*/, '').trim())
+          .filter((line) => line.length >= 4);
+        for (const property of properties) {
+          const pattern = this.buildPropertyRegex(property);
+          if (pattern.test(haystack)) {
             this.logger.log(
-              `Deal detection: isDeal=false, confidence=high, reason="Matches alwaysSkip token (deterministic): \\"${token}\\""`,
+              `Deal detection: isDeal=false, confidence=high, reason="Matches known property (deterministic): \\"${property}\\""`,
             );
             return {
               isDeal: false,
               confidence: 'high',
-              reason: `Matches alwaysSkip token: "${token}"`,
+              reason: `Matches known property: "${property}"`,
             };
           }
         }
@@ -116,9 +123,18 @@ Examples of NOT A DEAL:
 
 Consider attachments: PDFs may indicate deal memos or OMs, but only if the email content also mentions a specific property.`;
 
-      // Add alwaysSkip check if configured
-      if (alwaysSkip && alwaysSkip.trim()) {
-        systemPrompt += `\n\nCRITICAL SKIP RULE: If this email mentions, references, or is about "${alwaysSkip.trim()}", you MUST return isDeal: false with reason indicating it matches the alwaysSkip criteria (e.g., "Matches alwaysSkip criteria: ${alwaysSkip.trim()}"). This takes precedence over all other classification rules.`;
+      // Add skipCriteria for LLM interpretation if configured
+      if (skipCriteria && skipCriteria.trim()) {
+        systemPrompt = `BEFORE classifying this email, check these SKIP CRITERIA. If ANY match, return isDeal: false immediately — do not evaluate deal quality.
+
+Skip criteria:
+${skipCriteria.trim()}
+
+If the email matches any of the above criteria, return isDeal: false with a reason like "Matches skip criteria: <which criterion matched>". This takes precedence over all deal classification rules below.
+
+---
+
+${systemPrompt}`;
       }
 
       const response = await trackLlmOpenAI('deal_detection', () =>
@@ -180,5 +196,36 @@ Has attachments: ${hasAttachments ? 'Yes' : 'No'}`,
         reason: 'Detection failed, defaulting to skip',
       };
     }
+  }
+
+  /**
+   * Build a case-insensitive regex for a property name/address that handles
+   * common real estate abbreviations (S/South, N/North, Ave/Avenue, St/Street, etc.)
+   * and matches with word boundaries so "1006 S Michigan" catches
+   * "1006 South Michigan Avenue" but not "21006 Smith".
+   */
+  private buildPropertyRegex(property: string): RegExp {
+    const abbreviations: Record<string, string> = {
+      s: 's(?:outh)?',
+      n: 'n(?:orth)?',
+      e: 'e(?:ast)?',
+      w: 'w(?:est)?',
+      ave: 'ave(?:nue)?',
+      st: 'st(?:reet)?',
+      blvd: 'b(?:ou)?l(?:e)?v(?:ar)?d',
+      dr: 'dr(?:ive)?',
+      rd: 'r(?:oa)?d',
+      pl: 'pl(?:ace)?',
+      ct: 'c(?:our)?t',
+      ln: 'l(?:a)?n(?:e)?',
+    };
+
+    const words = property.toLowerCase().split(/\s+/);
+    const patternParts = words.map((word) => {
+      const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      return abbreviations[word] || escaped;
+    });
+
+    return new RegExp(`\\b${patternParts.join('\\s+')}\\b`, 'i');
   }
 }

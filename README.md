@@ -55,7 +55,8 @@ Configure per-organization preferences in the database:
 - `dealCriteria` - AI evaluates deals against these requirements
 - `logoUrl`, `companyName`, `brandColor` - Email branding
 - `passedFolderName` - Folder name for passed/rejected deals
-- `alwaysSkip` - Criteria for deals to always skip (checked via AI in deal detection)
+- `skipCriteria` - Free-text criteria for the LLM to interpret for skipping emails
+- `knownProperties` - Property names/addresses to skip via deterministic regex matching
 
 Preferences are automatically created when an Organization is created via Clerk webhooks.
 

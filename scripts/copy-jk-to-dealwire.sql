@@ -46,7 +46,7 @@ JOIN bucket_id_map m ON sb.id = m.old_id;
 INSERT INTO "ScreeningPreferences" (
   id, "organizationId",
   "companyName", "brandColor", "passedFolderName",
-  "dealCriteria", "alwaysSkip",
+  "dealCriteria", "skipCriteria", "knownProperties",
   "digestSchedule", "digestTimeZone",
   "designatedMonitoringInboxEmails",
   "createdAt", "updatedAt"
@@ -58,7 +58,7 @@ SELECT
   ),
   'org_3Ap6kgg5BJHR1YA8YLxKPr6l7Kk',
   sp."companyName", sp."brandColor", sp."passedFolderName",
-  sp."dealCriteria", sp."alwaysSkip",
+  sp."dealCriteria", sp."skipCriteria", sp."knownProperties",
   sp."digestSchedule", sp."digestTimeZone",
   sp."designatedMonitoringInboxEmails",
   sp."createdAt", now()
@@ -69,7 +69,8 @@ ON CONFLICT ("organizationId") DO UPDATE SET
   "brandColor"                     = EXCLUDED."brandColor",
   "passedFolderName"               = EXCLUDED."passedFolderName",
   "dealCriteria"                   = EXCLUDED."dealCriteria",
-  "alwaysSkip"                     = EXCLUDED."alwaysSkip",
+  "skipCriteria"                   = EXCLUDED."skipCriteria",
+  "knownProperties"                = EXCLUDED."knownProperties",
   "digestSchedule"                 = EXCLUDED."digestSchedule",
   "digestTimeZone"                 = EXCLUDED."digestTimeZone",
   "designatedMonitoringInboxEmails" = EXCLUDED."designatedMonitoringInboxEmails",
