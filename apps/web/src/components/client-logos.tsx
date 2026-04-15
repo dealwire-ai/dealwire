@@ -24,8 +24,8 @@ export function ClientLogos() {
   return (
     <section className="relative z-10 px-6 lg:px-16 py-14 border-t border-white/[0.04]">
       <div className="max-w-7xl mx-auto">
-        <p className="text-xs font-mono text-white/20 tracking-widest uppercase text-center mb-10">
-          Trusted by top operators
+        <p className="text-xs font-mono text-white/30 tracking-widest uppercase text-center mb-10">
+          Trusted by firms with $5B+ in AUM
         </p>
         <div className="flex flex-wrap items-center justify-center gap-x-14 gap-y-8">
           {CLIENT_LOGOS.map(({ file, alt, height }) => (
