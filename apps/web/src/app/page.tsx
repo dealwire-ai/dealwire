@@ -1,55 +1,19 @@
 "use client";
 
-import React, { useRef } from "react";
+import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ClientLogos } from "@/components/client-logos";
-import { motion, useInView } from "framer-motion";
-import {
-  Workflow,
-  Sparkles,
-  Linkedin,
-  Mail,
-  TrendingUp,
-  ArrowRight,
-} from "lucide-react";
-import { Building2 } from "lucide-react";
-import { Button } from "../components/ui/button";
-import { DealFlowTicker } from "../components/deal-flow-ticker";
-import { useAuth, useClerk } from "@clerk/nextjs";
+import { motion } from "framer-motion";
+import { Linkedin, Mail, Sparkles, ArrowRight } from "lucide-react";
 import posthog from "posthog-js";
 
-import { SignalMark } from "@/components/signal-mark";
-
-const FadeInSection = ({
-  children,
-  delay = 0,
-  className,
-}: {
-  children: React.ReactNode;
-  delay?: number;
-  className?: string;
-}) => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
-
-  return (
-    <motion.div
-      ref={ref}
-      className={className}
-      initial={{ opacity: 0, y: 40 }}
-      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
-      transition={{ duration: 0.8, delay, ease: [0.25, 0.4, 0.25, 1] }}
-    >
-      {children}
-    </motion.div>
-  );
-};
+import { ClientLogos } from "@/components/client-logos";
+import { Button } from "@/components/ui/button";
+import { MarketingNav } from "@/components/marketing/marketing-nav";
+import { MarketingFooter } from "@/components/marketing/marketing-footer";
+import { FadeInSection } from "@/components/marketing/fade-in-section";
 
 export default function Home() {
-  const { isSignedIn } = useAuth();
-  const { signOut } = useClerk();
-
   return (
     <div className="min-h-screen bg-[#080808] text-white overflow-x-hidden font-sans">
       {/* Ambient Background */}
@@ -58,100 +22,11 @@ export default function Home() {
         <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-[#C8A96E]/6 rounded-full blur-[140px] translate-y-1/2 -translate-x-1/3" />
       </div>
 
-      {/* Navigation */}
-      <nav className="relative z-50 px-6 lg:px-16 py-6">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <SignalMark />
-            <span className="text-base font-medium tracking-tight text-white/90">
-              Dealwire
-            </span>
-          </div>
-          <div className="hidden md:flex items-center gap-8">
-            {[
-              { label: "Services", id: "services" },
-              { label: "How It Works", id: "how-it-works" },
-              { label: "About", id: "about" },
-            ].map(({ label, id }) => (
-              <button
-                key={id}
-                onClick={() => {
-                  posthog.capture("nav_section_clicked", { section: id });
-                  document
-                    .getElementById(id)
-                    ?.scrollIntoView({ behavior: "smooth" });
-                }}
-                className="text-xs font-mono tracking-widest uppercase text-white/40 hover:text-white/80 transition-colors cursor-pointer"
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-          <div className="flex items-center gap-2 md:gap-3">
-            {isSignedIn ? (
-              <>
-                <Link
-                  href="/dashboard"
-                  onClick={() =>
-                    posthog.capture("cta_clicked", {
-                      cta_type: "go_to_dashboard",
-                      location: "header",
-                    })
-                  }
-                >
-                  <Button className="bg-white/5 hover:bg-white/8 border border-white/10 text-white font-medium px-3 md:px-5 text-xs md:text-sm">
-                    Dashboard
-                  </Button>
-                </Link>
-                <Button
-                  className="hidden md:inline-flex bg-white/5 hover:bg-white/8 border border-white/10 text-white font-medium px-3 md:px-5 text-xs md:text-sm"
-                  onClick={() => {
-                    posthog.capture("cta_clicked", {
-                      cta_type: "sign_out",
-                      location: "header",
-                    });
-                    posthog.reset();
-                    signOut();
-                  }}
-                >
-                  Sign Out
-                </Button>
-              </>
-            ) : (
-              <Link
-                href="/sign-in"
-                onClick={() =>
-                  posthog.capture("cta_clicked", {
-                    cta_type: "sign_in",
-                    location: "header",
-                  })
-                }
-              >
-                <Button className="bg-white/5 hover:bg-white/8 border border-white/10 text-white font-medium px-3 md:px-5 text-xs md:text-sm">
-                  Sign In
-                </Button>
-              </Link>
-            )}
-            <Link
-              href="/book"
-              onClick={() =>
-                posthog.capture("cta_clicked", {
-                  cta_type: "lets_talk",
-                  location: "header",
-                })
-              }
-            >
-              <Button className="bg-[#C8A96E] hover:bg-[#b8952a] text-black font-semibold px-3 md:px-5 text-xs md:text-sm">
-                Request Access
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </nav>
+      <MarketingNav variant="home" />
 
-      {/* Hero Section */}
+      {/* Hero */}
       <section
-        className="relative z-10 px-6 lg:px-16 pt-16 pb-24 lg:pt-24 lg:pb-36"
+        className="relative z-10 px-6 lg:px-16 pt-20 pb-28 lg:pt-28 lg:pb-40"
         style={{
           backgroundImage: `
           linear-gradient(to right, rgba(200, 169, 110, 0.04) 1px, transparent 1px),
@@ -160,364 +35,133 @@ export default function Home() {
           backgroundSize: "80px 80px",
         }}
       >
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            {/* Left: Copy */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1, ease: [0.25, 0.4, 0.25, 1] }}
+        <div className="max-w-5xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, ease: [0.25, 0.4, 0.25, 1] }}
+          >
+            <h1 className="text-5xl md:text-6xl lg:text-[4.5rem] font-normal tracking-tight leading-[1.05] mb-8">
+              We build your firm&apos;s
+              <br />
+              <span className="text-[#C8A96E]">private intelligence</span>{" "}
+              layer.
+            </h1>
+
+            <p className="text-lg md:text-xl text-white/50 max-w-2xl leading-relaxed mb-12">
+              Every deal your firm has ever seen, every memo ever written, every
+              broker relationship ever formed &mdash; connected, queryable, and
+              working for your team the moment a new deal lands. Your
+              institutional knowledge stops being something only a handful of
+              senior partners carry, and starts being something your whole firm
+              operates on.
+            </p>
+
+            <Link
+              href="/book"
+              onClick={() =>
+                posthog.capture("cta_clicked", {
+                  cta_type: "talk_to_founders",
+                  location: "hero",
+                })
+              }
             >
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#C8A96E]/8 border border-[#C8A96E]/20 rounded-sm mb-8">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#C8A96E] animate-pulse" />
-                <span className="text-xs font-mono text-[#C8A96E]/80 tracking-wider uppercase">
-                  Live · Monitoring active inboxes
-                </span>
-              </div>
-
-              <h1 className="text-5xl md:text-6xl lg:text-[4.5rem] font-normal tracking-tight leading-[1.0] mb-6">
-                Deal intelligence.
-                <br />
-                <span className="text-[#C8A96E]">From inbox</span>
-                <br />
-                to IC memo.
-              </h1>
-
-              <p className="text-lg text-white/45 max-w-lg leading-relaxed mb-10">
-                A deal hits your inbox. Our system reads the OM, screens against
-                your buy box, and fires the right action: skip it, draft a
-                broker reply, or run a full underwriting that populates your
-                Excel pro forma. Every morning, a digest of overnight deal flow.
-                All configurable.
-              </p>
-
-              <Link
-                href="/book"
-                onClick={() =>
-                  posthog.capture("cta_clicked", {
-                    cta_type: "request_access",
-                    location: "hero",
-                  })
-                }
-              >
-                <Button
-                  size="lg"
-                  className="bg-[#C8A96E] hover:bg-[#b8952a] text-black font-semibold px-8 h-14 text-base"
-                >
-                  Request Access
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              </Link>
-
-              <div className="mt-8">
-                <DealFlowTicker />
-              </div>
-            </motion.div>
-
-            {/* Right: Terminal widget */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{
-                duration: 1,
-                delay: 0.3,
-                ease: [0.25, 0.4, 0.25, 1],
-              }}
-              className="hidden lg:block"
-            >
-              <div
-                className="relative p-[1px] rounded-sm"
-                style={{
-                  background:
-                    "linear-gradient(135deg, rgba(200,169,110,0.25), rgba(200,169,110,0.04))",
-                }}
-              >
-                <div className="bg-[#050505] rounded-sm p-6 font-mono text-xs">
-                  {/* Terminal header bar */}
-                  <div className="flex items-center justify-between mb-5 pb-4 border-b border-[#C8A96E]/10">
-                    <div className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#C8A96E] animate-pulse" />
-                      <span className="text-[#C8A96E]/50 tracking-widest uppercase text-[10px]">
-                        Deal Screener · Active
-                      </span>
-                    </div>
-                    <span className="text-white/15 text-[10px]">
-                      03/01/2026 · 06:42 AM
-                    </span>
-                  </div>
-
-                  {/* Deal header */}
-                  <p className="text-white/40 mb-1 tracking-wider">
-                    INCOMING OM
-                  </p>
-                  <p className="text-white/85 mb-5">
-                    84,500 SF Retail Strip · Salt Lake City, UT
-                  </p>
-
-                  {/* Metrics grid */}
-                  <div className="space-y-2.5 mb-5">
-                    {[
-                      {
-                        label: "Cap Rate (In-Place)",
-                        value: "7.1%",
-                        flag: "↑ Above market",
-                        flagColor: "text-[#C8A96E]",
-                      },
-                      {
-                        label: "NOI (T-12, extracted)",
-                        value: "$452,000",
-                        flag: "✓ Reconciled",
-                        flagColor: "text-[#C8A96E]",
-                      },
-                      {
-                        label: "Occupancy (rent roll)",
-                        value: "94.2%",
-                        flag: "✓ Stable",
-                        flagColor: "text-[#C8A96E]",
-                      },
-                      {
-                        label: "WALT",
-                        value: "3.2 yrs",
-                        flag: "⚠ Near-term rollover",
-                        flagColor: "text-amber-400",
-                      },
-                      {
-                        label: "Levered IRR (5-yr)",
-                        value: "14.8%",
-                        flag: "✓ Clears hurdle",
-                        flagColor: "text-[#C8A96E]",
-                      },
-                      {
-                        label: "Equity Multiple",
-                        value: "1.87×",
-                        flag: "─ Model sensitivity",
-                        flagColor: "text-white/25",
-                      },
-                      {
-                        label: "DSCR",
-                        value: "1.31×",
-                        flag: "✓ Passes threshold",
-                        flagColor: "text-[#C8A96E]",
-                      },
-                    ].map(({ label, value, flag, flagColor }) => (
-                      <div
-                        key={label}
-                        className="grid grid-cols-[1fr_auto_auto] gap-x-4 items-baseline"
-                      >
-                        <span className="text-white/35">{label}</span>
-                        <span className="text-white/80 tabular-nums">
-                          {value}
-                        </span>
-                        <span className={`${flagColor} text-[10px] text-right`}>
-                          {flag}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Decision */}
-                  <div className="pt-4 border-t border-[#C8A96E]/10">
-                    <p className="text-[#C8A96E] font-medium mb-1">
-                      → PRO FORMA POPULATED · PROCEED TO IC
-                    </p>
-                    <p className="text-white/20">
-                      Broker reply sent · IC memo drafted · 4m 12s
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </div>
+              <Button className="bg-[#C8A96E] hover:bg-[#b8952a] text-black font-semibold px-6 py-6 text-sm tracking-wide">
+                Talk to founders
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </Link>
+          </motion.div>
         </div>
       </section>
 
-      {/* Logos Section */}
+      {/* Logos — directly under hero */}
       <ClientLogos />
 
-      {/* The Problem Section */}
-      <section
-        id="problem"
-        className="relative z-10 px-6 lg:px-16 py-20 lg:py-28 border-t border-white/[0.04]"
-      >
-        <div className="max-w-7xl mx-auto">
+      {/* The asset nobody is using */}
+      <section className="relative z-10 px-6 lg:px-16 py-24 lg:py-32 border-t border-white/[0.04]">
+        <div className="max-w-4xl mx-auto">
           <FadeInSection>
-            <p className="text-[#C8A96E] text-xs font-mono tracking-widest uppercase mb-4">
-              The Reality
+            <p className="text-[#C8A96E] text-xs font-mono tracking-widest uppercase mb-6">
+              The asset nobody is using
             </p>
-            <h2 className="text-4xl md:text-5xl font-normal tracking-tight mb-6 max-w-3xl">
-              Broker blasts go to 200 firms.
-              <br />
-              <span className="text-white/30">You have 48 hours.</span>
+            <h2 className="text-4xl md:text-5xl font-normal tracking-tight mb-10 leading-[1.1]">
+              Your firm&apos;s most valuable asset is already{" "}
+              <span className="text-white/30">inside your firm.</span>
             </h2>
           </FadeInSection>
 
-          <div className="grid md:grid-cols-2 gap-3 mt-12">
-            {[
-              {
-                num: "01",
-                title: "Analysts buried in OMs",
-                body: "Your $150K analysts spend 3+ hours per OM extracting T-12s and rebuilding rent rolls. That's table stakes work. It shouldn't require a senior hire.",
-              },
-              {
-                num: "02",
-                title: "Speed wins deals",
-                body: "By the time your team manually screens an OM, a faster firm has already toured the asset. The LOI window closes faster than most shops open a spreadsheet.",
-              },
-              {
-                num: "03",
-                title: "Scaling means hiring",
-                body: "Evaluating 3x the deal flow means 3x the headcount. Months of recruiting and onboarding. The unit economics don't work.",
-              },
-              {
-                num: "04",
-                title: "The edge is already moving",
-                body: "Top GP shops already have AI in production. They're not announcing it. They're sending LOIs while everyone else reads page one.",
-              },
-            ].map(({ num, title, body }, index) => (
-              <FadeInSection key={num} delay={index * 0.1}>
-                <div className="p-8 bg-white/[0.015] border border-white/[0.06] rounded-sm hover:border-[#C8A96E]/20 transition-colors duration-300">
-                  <div className="text-4xl font-mono text-white/8 mb-4">
-                    {num}
-                  </div>
-                  <h3 className="text-base font-medium mb-3 text-white/90">
-                    {title}
-                  </h3>
-                  <p className="text-white/40 leading-relaxed text-sm">
-                    {body}
-                  </p>
-                </div>
-              </FadeInSection>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Value Proposition Section */}
-      <section className="relative z-10 px-6 lg:px-16 py-20 lg:py-28 border-t border-white/[0.04]">
-        <div className="max-w-7xl mx-auto">
-          <FadeInSection>
-            <div className="max-w-3xl">
-              <h2 className="text-4xl md:text-5xl font-normal tracking-tight mb-6">
-                Full-stack acquisition intelligence.
-                <br />
-                <span className="text-white/30">End to end.</span>
-              </h2>
-              <p className="text-white/40 text-lg leading-relaxed mb-12">
-                Not a screening tool. Not a dashboard. A custom AI analyst that
-                handles the entire job: from inbox to populated pro forma.
-                Without you touching it.
+          <div className="space-y-8 text-lg text-white/55 leading-relaxed max-w-3xl">
+            <FadeInSection delay={0.05}>
+              <p>
+                Twenty years of deal flow. Every memo, every IC discussion,
+                every broker relationship, every rent roll, every comp, every
+                call that was right, every call that was wrong. It sits in
+                Outlook threads, PDF attachments, SharePoint folders, and the
+                heads of your longest-tenured partners.
               </p>
-            </div>
-          </FadeInSection>
-
-          <div className="grid md:grid-cols-3 gap-3 mt-8">
-            {[
-              {
-                value: "< 20 min",
-                label: "OM to decision",
-                desc: "Inbox to screened decision, pro forma populated, broker reply sent.",
-              },
-              {
-                value: "24 / 7",
-                label: "Always running",
-                desc: "Deal flow doesn't stop on weekends. Neither does it.",
-              },
-              {
-                value: "Hours",
-                label: "Time to deploy",
-                desc: "Custom-built, tested against your deal history, live in hours.",
-              },
-            ].map((stat, index) => (
-              <FadeInSection key={index} delay={index * 0.1} className="h-full">
-                <div className="h-full p-7 bg-white/[0.015] border border-white/[0.06] rounded-sm hover:border-[#C8A96E]/20 transition-colors duration-300">
-                  <div className="text-4xl font-mono text-white/85 mb-2 tracking-tight">
-                    {stat.value}
-                  </div>
-                  <div className="text-[#C8A96E] text-xs font-mono tracking-widest uppercase mb-3">
-                    {stat.label}
-                  </div>
-                  <div className="text-white/35 text-sm leading-relaxed">
-                    {stat.desc}
-                  </div>
-                </div>
-              </FadeInSection>
-            ))}
+            </FadeInSection>
+            <FadeInSection delay={0.1}>
+              <p>
+                When a senior partner retires, most of it walks out the door.
+                When a new deal lands on a Tuesday morning, the firm reinvents
+                context it already paid to learn. The knowledge exists. The firm
+                just can&apos;t reach it.
+              </p>
+            </FadeInSection>
+            <FadeInSection delay={0.15}>
+              <p>
+                Generic AI tools don&apos;t fix this. Plugging a chatbot into
+                one inbox, one CRM, or one data room produces toy answers
+                &mdash; because none of those systems, on their own, contains
+                what your firm actually knows. The institutional intelligence
+                only appears once the whole corpus is unified.
+              </p>
+            </FadeInSection>
+            <FadeInSection delay={0.2}>
+              <p className="text-white/80 text-xl">
+                That&apos;s what we build.
+              </p>
+            </FadeInSection>
           </div>
         </div>
       </section>
 
-      {/* Services Section */}
-      <section
-        id="services"
-        className="relative z-10 px-6 lg:px-16 py-20 lg:py-28 border-t border-white/[0.04]"
-      >
-        <div className="max-w-7xl mx-auto">
+      {/* What your firm gets */}
+      <section className="relative z-10 px-6 lg:px-16 py-24 lg:py-32 border-t border-white/[0.04]">
+        <div className="max-w-5xl mx-auto">
           <FadeInSection>
-            <p className="text-[#C8A96E] text-xs font-mono tracking-widest uppercase mb-4">
-              What We Build
+            <p className="text-[#C8A96E] text-xs font-mono tracking-widest uppercase mb-6">
+              What your firm gets
             </p>
-            <h2 className="text-4xl md:text-5xl font-normal tracking-tight mb-6">
-              One platform. Every function
-              <br />
-              <span className="text-white/30">in the acquisition stack.</span>
+            <h2 className="text-4xl md:text-5xl font-normal tracking-tight mb-16 leading-[1.1] max-w-3xl">
+              Capabilities your firm{" "}
+              <span className="text-white/30">did not have before.</span>
             </h2>
           </FadeInSection>
 
-          <div className="space-y-2 mt-12">
+          <div className="space-y-16">
             {[
               {
-                icon: TrendingUp,
-                title: "Off-Market Deal Sourcing",
-                tagline: "Deals your competitors will never see.",
-                description:
-                  "Monitors public records, delinquent tax filings, CMBS watchlists, and ownership transfers daily. Surfaces distressed and pre-market opportunities ranked by fit against your buy box. Before they hit CoStar.",
+                title: "Your firm's memory, on call.",
+                body: "Ask, in plain English, any question about any deal your firm has ever touched. Which broker showed you this asset in 2019, and what did you pass on. How your firm has historically underwritten distress in this submarket. Which LP questions came up the last time you raised a fund with this strategy. This used to live only in the heads of your longest-tenured partners. Now the whole firm can reach it.",
               },
               {
-                icon: Building2,
-                title: "Deal Screening & Full Underwriting",
-                tagline: "Inbox to populated pro forma in under 5 minutes.",
-                description:
-                  "Reads every OM and teaser in your inbox, screens against your buy box, and for deals worth pursuing, extracts the T-12, rent roll, and opex detail. Runs your acquisition model end-to-end: levered IRR, CoC, equity multiple, sensitivity tables. Drafts the IC memo and broker reply. Configurable: documents, model, assumptions.",
+                title: "Patterns across your own deal flow.",
+                body: "Fifteen years of deals, sitting in PDFs and inboxes, becomes a queryable record of what your firm has seen, priced, and passed. The next time a teaser lands, your team sees every comparable your firm has ever underwritten, every broker relationship you have with the seller's side, and every reason you'd have to move faster than the other twenty firms on the blast. These are analyses your team cannot currently run, at any speed.",
               },
               {
-                icon: Workflow,
-                title: "Operations",
-                tagline: "Back office that runs itself.",
-                description:
-                  "CAM reconciliations, lease abstract extraction, SNDA tracking, tenant notices. NOI reporting that stays current without a spreadsheet. Your ops team handles exceptions, not data entry.",
+                title: "Screening and memo drafting, operationalized.",
+                body: "Inbound deal flow \u2014 OMs, rent rolls, teasers \u2014 gets read against your buy box the moment it lands, and first-pass memos get drafted from the underlying documents in minutes. Your team stops triaging and starts deciding. Senior time stops going to first drafts and starts going to judgment.",
               },
-              {
-                icon: Sparkles,
-                title: "Market Intelligence",
-                tagline: "Know what others don't.",
-                description:
-                  "Tracks cap rate compression by submarket, flags SOFR-driven distress and loan maturities, surfaces comp sales before publication. Feeds live going-in yields, exit caps, and rent growth into your underwriting assumptions. Every model starts from ground truth, not a broker's pitch deck.",
-              },
-              {
-                icon: Building2,
-                title: "Deal History & Broker Intelligence",
-                tagline: "Every deal you've ever seen. Every broker ranked.",
-                description:
-                  "Every OM and teaser that flows through gets indexed. Search your full deal history in seconds. Comp a live deal against everything you've screened in the same submarket. Over time: a broker intelligence layer showing which reps send quality deals, which blast noise, and where your best opportunities actually come from.",
-              },
-            ].map((service, index) => (
-              <FadeInSection key={index} delay={index * 0.05}>
-                <div className="group flex max-md:flex-col items-center max-md:items-start gap-6 p-6 md:p-8 bg-white/[0.015] border border-white/[0.06] rounded-sm hover:bg-white/[0.025] hover:border-[#C8A96E]/20 transition-all duration-500">
-                  <div className="flex items-center gap-5 md:w-80 shrink-0">
-                    <div className="w-10 h-10 bg-[#C8A96E]/8 border border-[#C8A96E]/15 rounded-sm flex items-center justify-center group-hover:bg-[#C8A96E]/15 transition-colors shrink-0">
-                      <service.icon className="w-4 h-4 text-[#C8A96E]" />
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-medium text-white/90">
-                        {service.title}
-                      </h3>
-                      <p className="text-[#C8A96E]/70 text-xs font-mono mt-0.5">
-                        {service.tagline}
-                      </p>
-                    </div>
-                  </div>
-                  <p className="text-white/38 leading-relaxed text-sm">
-                    {service.description}
+            ].map((pillar, i) => (
+              <FadeInSection key={pillar.title} delay={i * 0.1}>
+                <div className="grid md:grid-cols-[1fr_2fr] gap-6 md:gap-16 items-start">
+                  <h3 className="text-2xl md:text-3xl font-normal tracking-tight text-white/90 leading-[1.2]">
+                    {pillar.title}
+                  </h3>
+                  <p className="text-base md:text-lg text-white/50 leading-relaxed">
+                    {pillar.body}
                   </p>
                 </div>
               </FadeInSection>
@@ -526,184 +170,58 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Automated Triage Section */}
-      <section className="relative z-10 px-6 lg:px-16 py-20 lg:py-28 border-t border-white/[0.04]">
-        <div className="max-w-7xl mx-auto">
-          <FadeInSection>
-            <p className="text-[#C8A96E] text-xs font-mono tracking-widest uppercase mb-4">
-              Automated Triage
-            </p>
-            <h2 className="text-4xl md:text-5xl font-normal tracking-tight mb-4">
-              Your buy box becomes
-              <br />
-              <span className="text-white/30">a set of automatic rules.</span>
-            </h2>
-            <p className="text-white/40 text-lg leading-relaxed max-w-2xl mb-12">
-              Every deal in your inbox is assessed in real time. The right
-              action fires automatically. You set the criteria. The system runs
-              it.
-            </p>
-          </FadeInSection>
-
-          <div className="space-y-1.5">
-            {[
-              {
-                label: "SKIP INBOX",
-                labelColor: "text-white/25",
-                rowBg: "bg-white/[0.015]",
-                rowBorder: "border-white/[0.06]",
-                condition: "Doesn't fit your buy box",
-                action:
-                  "Moved to a designated Outlook folder. Logged and searchable. Never touches your inbox or digest.",
-              },
-              {
-                label: "FLAG IN DIGEST",
-                labelColor: "text-amber-400",
-                rowBg: "bg-amber-500/[0.03]",
-                rowBorder: "border-amber-500/15",
-                condition: "In range, worth a look",
-                action:
-                  "Moved to your review folder and surfaced in your morning digest with a summary. Broker reply drafted and queued.",
-              },
-              {
-                label: "FULL UNDERWRITING",
-                labelColor: "text-[#C8A96E]",
-                rowBg: "bg-[#C8A96E]/[0.04]",
-                rowBorder: "border-[#C8A96E]/20",
-                condition: "Matches your target profile",
-                action:
-                  "T-12 and rent roll extracted. Excel pro forma populated end-to-end. IC memo drafted. Broker reply sent. You open your laptop to a completed analysis.",
-              },
-            ].map(
-              (
-                { label, labelColor, rowBg, rowBorder, condition, action },
-                i,
-              ) => (
-                <FadeInSection key={i} delay={i * 0.1}>
-                  <div
-                    className={`flex max-md:flex-col items-center max-md:items-start gap-4 md:gap-0 p-5 md:p-6 ${rowBg} border ${rowBorder} rounded-sm`}
-                  >
-                    <div className="md:w-52 shrink-0">
-                      <span
-                        className={`text-xs font-mono tracking-widest ${labelColor}`}
-                      >
-                        {label}
-                      </span>
-                    </div>
-                    <div className="flex-1 flex max-md:flex-col gap-4 items-center max-md:items-start">
-                      <div className="md:w-52 shrink-0">
-                        <span className="text-white/35 text-sm">
-                          {condition}
-                        </span>
-                      </div>
-                      <div className="flex-1 md:border-l md:border-white/[0.06] md:pl-6">
-                        <span className="text-white/45 text-sm leading-relaxed">
-                          {action}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </FadeInSection>
-              ),
-            )}
-          </div>
-
-          {/* Deal digest + configurable callouts */}
-          <div className="grid md:grid-cols-2 gap-3 mt-3">
-            <FadeInSection delay={0.3}>
-              <div className="h-full p-6 bg-[#C8A96E]/[0.05] border border-[#C8A96E]/15 rounded-sm">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-8 h-8 bg-[#C8A96E]/10 border border-[#C8A96E]/20 rounded-sm flex items-center justify-center shrink-0">
-                    <span className="text-[#C8A96E] text-[10px] font-mono font-medium">
-                      6AM
-                    </span>
-                  </div>
-                  <h3 className="text-sm font-medium text-white/85">
-                    Daily Deal Digest
-                  </h3>
-                </div>
-                <p className="text-white/40 text-sm leading-relaxed">
-                  Every morning, a digest of the last 24 hours lands in your
-                  inbox. Best deals at the top, ranked by fit. One-click actions
-                  on each. Nothing slips. Nothing wastes your time.
-                </p>
-              </div>
-            </FadeInSection>
-
-            <FadeInSection delay={0.35}>
-              <div className="h-full p-6 bg-white/[0.015] border border-white/[0.06] rounded-sm">
-                <p className="text-xs font-mono text-white/25 tracking-widest uppercase mb-4">
-                  Fully Configurable
-                </p>
-                <div className="space-y-2.5">
-                  {[
-                    "Buy box criteria and fit thresholds",
-                    "Action rules per tier: skip, reply, or underwrite",
-                    "Digest schedule and format (daily, real-time, weekly)",
-                    "Excel model, underwriting assumptions, and output fields",
-                  ].map((item, i) => (
-                    <div key={i} className="flex items-start gap-2">
-                      <span className="text-[#C8A96E]/60 text-xs mt-0.5 shrink-0">
-                        →
-                      </span>
-                      <span className="text-white/38 text-sm">{item}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </FadeInSection>
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works Section */}
+      {/* How an engagement runs */}
       <section
-        id="how-it-works"
-        className="relative z-10 px-6 lg:px-16 py-20 lg:py-28 border-t border-white/[0.04]"
+        id="engagements"
+        className="relative z-10 px-6 lg:px-16 py-24 lg:py-32 border-t border-white/[0.04]"
       >
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           <FadeInSection>
-            <p className="text-[#C8A96E] text-xs font-mono tracking-widest uppercase mb-4">
-              The Process
+            <p className="text-[#C8A96E] text-xs font-mono tracking-widest uppercase mb-6">
+              Engagements
             </p>
-            <h2 className="text-4xl md:text-5xl font-normal tracking-tight mb-16">
-              From call to deployed.
-              <br />
-              <span className="text-white/30">In hours, not weeks.</span>
+            <h2 className="text-4xl md:text-5xl font-normal tracking-tight mb-16 leading-[1.1]">
+              How an engagement runs.
             </h2>
           </FadeInSection>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
             {[
               {
                 step: "01",
-                title: "Discovery Call",
-                description:
-                  "30 minutes. We map your buy box, your model, and where deals slip. You leave knowing exactly what we'll build and what it costs. No pitch deck.",
+                title: "Mapping",
+                body: "We spend the first week inside your firm \u2014 reading memos, sitting on IC, shadowing acquisitions. You walk away with a concrete plan naming the intelligence gaps that are costing your team deals, and what we\u2019ll build to close them.",
               },
               {
                 step: "02",
-                title: "We Configure & Build",
-                description:
-                  "We wire your AI analyst into your inbox and Excel model. Configure buy box rules, action thresholds, and digest schedule. You define what a great deal looks like. We make sure the system knows it.",
+                title: "Unification",
+                body: "We provision your private data layer and ingest the sources that matter: email, CRM, diligence archives, underwriting models, market data, public records. Within weeks, your firm\u2019s full corpus becomes searchable for the first time.",
               },
               {
                 step: "03",
-                title: "Live in Hours",
-                description:
-                  "Live in hours. Every incoming deal is read, underwritten, and returned as a populated model with a go/no-go. We monitor, refine, and improve. ROI within 90 days or we keep working.",
+                title: "Agents",
+                body: "We build the first agents against your workflows \u2014 deal screening, memo drafting, relationship recall, market queries \u2014 and deploy them where your team already works. Analysts start answering questions the firm could not previously answer at all.",
               },
-            ].map((item, index) => (
-              <FadeInSection key={index} delay={index * 0.1}>
-                <div>
-                  <div className="text-5xl font-mono text-[#C8A96E]/15 mb-5 tracking-tight">
-                    {item.step}
-                  </div>
-                  <h3 className="text-base font-medium mb-3 text-white/85">
-                    {item.title}
+              {
+                step: "04",
+                title: "Operation",
+                body: "We stay embedded. New questions, new data sources, new capabilities ship continuously. Every month your firm\u2019s intelligence layer gets sharper, and the compounding advantage it produces is one your competitors can\u2019t buy off a shelf.",
+              },
+            ].map((phase, i) => (
+              <FadeInSection
+                key={phase.step}
+                delay={i * 0.08}
+                className="h-full"
+              >
+                <div className="h-full flex flex-col">
+                  <p className="text-[#C8A96E]/60 text-xs font-mono tracking-widest mb-4">
+                    {phase.step}
+                  </p>
+                  <h3 className="text-xl font-medium mb-4 text-white/90">
+                    {phase.title}
                   </h3>
-                  <p className="text-white/38 leading-relaxed text-sm">
-                    {item.description}
+                  <p className="text-white/45 leading-relaxed text-sm">
+                    {phase.body}
                   </p>
                 </div>
               </FadeInSection>
@@ -712,7 +230,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* About Section */}
+      {/* Who builds this — preserved founder + advisor section */}
       <section
         id="about"
         className="relative z-10 px-6 lg:px-16 py-20 lg:py-28 border-t border-white/[0.04]"
@@ -720,7 +238,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <FadeInSection>
             <p className="text-[#C8A96E] text-xs font-mono tracking-widest uppercase mb-4">
-              Who We Are
+              Who builds this
             </p>
             <h2 className="text-4xl md:text-5xl font-normal tracking-tight mb-6">
               Built by engineers.
@@ -921,92 +439,71 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Final CTA Section */}
-      <section
-        id="contact"
-        className="relative z-10 px-6 lg:px-16 py-20 lg:py-28 border-t border-white/[0.04]"
-      >
-        <div className="max-w-7xl mx-auto">
+      {/* Security trust band */}
+      <section className="relative z-10 px-6 lg:px-16 py-20 lg:py-24 border-t border-white/[0.04]">
+        <div className="max-w-4xl mx-auto">
           <FadeInSection>
-            <div
-              className="relative overflow-hidden rounded-sm bg-[#0a0a0a] border border-[#C8A96E]/15"
-              style={{
-                backgroundImage: `
-                linear-gradient(to right, rgba(200, 169, 110, 0.04) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(200, 169, 110, 0.04) 1px, transparent 1px)
-              `,
-                backgroundSize: "60px 60px",
-              }}
+            <p className="text-[#C8A96E] text-xs font-mono tracking-widest uppercase mb-6">
+              Security
+            </p>
+            <h2 className="text-3xl md:text-4xl font-normal tracking-tight mb-6 leading-[1.15]">
+              Your firm&apos;s data{" "}
+              <span className="text-white/30">stays your firm&apos;s.</span>
+            </h2>
+            <p className="text-lg text-white/50 leading-relaxed mb-8 max-w-2xl">
+              Every Dealwire deployment runs on infrastructure provisioned for
+              your firm alone. Your data is never mingled with another
+              client&apos;s, and it is never used to train an AI model.
+            </p>
+            <Link
+              href="/security"
+              onClick={() =>
+                posthog.capture("cta_clicked", {
+                  cta_type: "security_link",
+                  location: "trust_band",
+                })
+              }
+              className="inline-flex items-center gap-2 text-sm font-mono tracking-wider text-[#C8A96E] hover:text-[#d9bb80] transition-colors"
             >
-              <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#C8A96E]/6 rounded-full blur-[150px] -translate-y-1/2 translate-x-1/4" />
-
-              <div className="relative px-8 py-16 lg:p-20">
-                <div className="max-w-2xl">
-                  <div className="flex items-center gap-2 mb-6">
-                    <SignalMark className="opacity-60" />
-                  </div>
-                  <h2 className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight mb-6">
-                    See what a fully underwritten
-                    <br />
-                    deal looks like in 20 minutes.
-                  </h2>
-                  <p className="text-white/40 text-lg mb-10 leading-relaxed">
-                    30 minutes. No pitch deck. Show us a deal. We&apos;ll show
-                    you the output: T-12 extracted, rent roll reconciled, pro
-                    forma populated, IC memo drafted.
-                  </p>
-                  <Link
-                    href="/book"
-                    onClick={() =>
-                      posthog.capture("cta_clicked", {
-                        cta_type: "request_access",
-                        location: "final_cta",
-                      })
-                    }
-                  >
-                    <Button
-                      size="lg"
-                      className="bg-[#C8A96E] hover:bg-[#b8952a] text-black font-semibold px-8 h-14 text-base"
-                    >
-                      Request Access
-                      <ArrowRight className="w-4 h-4 ml-2" />
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            </div>
+              Read our security commitments
+              <ArrowRight className="w-4 h-4" />
+            </Link>
           </FadeInSection>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="relative z-10 px-6 lg:px-16 py-10 border-t border-white/[0.04]">
-        <div className="max-w-7xl mx-auto flex max-md:flex-col items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <SignalMark />
-            <span className="text-sm text-white/30 font-mono tracking-wide">
-              Dealwire
-            </span>
-          </div>
-          <div className="flex max-md:flex-col items-center gap-x-6 gap-y-2">
-            <Link
-              href="/terms-of-use"
-              className="text-xs font-mono text-white/40 hover:text-white/80 tracking-wider transition-colors"
-            >
-              Terms of Use
-            </Link>
-            <Link
-              href="/privacy-policy"
-              className="text-xs font-mono text-white/40 hover:text-white/80 tracking-wider transition-colors"
-            >
-              Privacy Policy
-            </Link>
-            <p className="text-xs font-mono text-white/15 tracking-wider">
-              © {new Date().getFullYear()} · Frontstep AI, LLC.
+      {/* Closing CTA */}
+      <section className="relative z-10 px-6 lg:px-16 py-24 lg:py-32 border-t border-white/[0.04]">
+        <div className="max-w-4xl mx-auto">
+          <FadeInSection>
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight mb-8 leading-[1.1]">
+              Build your firm&apos;s{" "}
+              <span className="text-[#C8A96E]">intelligence layer.</span>
+            </h2>
+            <p className="text-lg text-white/50 leading-relaxed mb-12 max-w-2xl">
+              We take on a small number of engagements each quarter. If your
+              firm is evaluating what AI can actually do inside institutional
+              private markets, we&apos;d like to talk.
             </p>
-          </div>
+            <Link
+              href="/book"
+              onClick={() =>
+                posthog.capture("cta_clicked", {
+                  cta_type: "talk_to_founders",
+                  location: "closing_cta",
+                })
+              }
+            >
+              <Button className="bg-[#C8A96E] hover:bg-[#b8952a] text-black font-semibold px-6 py-6 text-sm tracking-wide">
+                Talk to founders
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </Link>
+          </FadeInSection>
         </div>
-      </footer>
+      </section>
+
+      <MarketingFooter />
     </div>
   );
 }
