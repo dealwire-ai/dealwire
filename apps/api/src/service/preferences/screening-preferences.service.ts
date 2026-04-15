@@ -9,8 +9,10 @@ export interface ScreeningPreferences {
   brandColor?: string;
   /** Folder name for passed/rejected deals (default: "Passed Deals") */
   passedFolderName?: string;
-  /** Criteria for deals to always skip */
-  alwaysSkip?: string;
+  /** Free-text criteria for the LLM to interpret (e.g. "retail deals", "deals under 40 units") */
+  skipCriteria?: string;
+  /** Structured list of property names/addresses to skip via regex (one per line) */
+  knownProperties?: string;
   /** CRON expression for digest schedule (e.g., "0 12 * * *" for daily at noon) */
   digestSchedule?: string;
   /** Timezone for digest schedule (default: "America/New_York") */
@@ -67,7 +69,8 @@ export class ScreeningPreferencesService {
         companyName: prefs.companyName || undefined,
         brandColor: prefs.brandColor || undefined,
         passedFolderName: prefs.passedFolderName || undefined,
-        alwaysSkip: prefs.alwaysSkip || undefined,
+        skipCriteria: prefs.skipCriteria || undefined,
+        knownProperties: prefs.knownProperties || undefined,
         digestSchedule: prefs.digestSchedule || undefined,
         digestTimeZone: prefs.digestTimeZone || undefined,
         designatedMonitoringInboxEmails:
@@ -88,7 +91,7 @@ export class ScreeningPreferencesService {
   /**
    * Update preferences for an organization (partial update)
    * @param organizationId - The organization ID
-   * @param partial - Partial preferences to update (dealCriteria, alwaysSkip, passedFolderName, digestSchedule, digestTimeZone, companyName, brandColor)
+   * @param partial - Partial preferences to update (dealCriteria, skipCriteria, passedFolderName, digestSchedule, digestTimeZone, companyName, brandColor)
    */
   async updatePreferences(
     organizationId: string,
@@ -96,7 +99,8 @@ export class ScreeningPreferencesService {
       Pick<
         ScreeningPreferences,
         | 'dealCriteria'
-        | 'alwaysSkip'
+        | 'skipCriteria'
+        | 'knownProperties'
         | 'passedFolderName'
         | 'digestSchedule'
         | 'digestTimeZone'
@@ -113,7 +117,10 @@ export class ScreeningPreferencesService {
     const data: Record<string, unknown> = {};
     if (partial.dealCriteria !== undefined)
       data.dealCriteria = partial.dealCriteria;
-    if (partial.alwaysSkip !== undefined) data.alwaysSkip = partial.alwaysSkip;
+    if (partial.skipCriteria !== undefined)
+      data.skipCriteria = partial.skipCriteria;
+    if (partial.knownProperties !== undefined)
+      data.knownProperties = partial.knownProperties;
     if (partial.passedFolderName !== undefined)
       data.passedFolderName = partial.passedFolderName;
     if (partial.digestSchedule !== undefined) {
@@ -161,7 +168,8 @@ export class ScreeningPreferencesService {
       companyName: updated.companyName || undefined,
       brandColor: updated.brandColor || undefined,
       passedFolderName: updated.passedFolderName || undefined,
-      alwaysSkip: updated.alwaysSkip || undefined,
+      skipCriteria: updated.skipCriteria || undefined,
+      knownProperties: updated.knownProperties || undefined,
       digestSchedule: updated.digestSchedule || undefined,
       digestTimeZone: updated.digestTimeZone || undefined,
       designatedMonitoringInboxEmails:

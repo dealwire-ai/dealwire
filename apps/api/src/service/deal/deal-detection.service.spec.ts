@@ -102,12 +102,13 @@ describe('DealDetectionService', () => {
     expect(result.reason).toBe('SaaS platform offering, not a property deal');
   });
 
-  it('should return isDeal=false when alwaysSkip criteria matches', async () => {
+  it('should pass skipCriteria to LLM prompt when configured', async () => {
     // Arrange
     (
       prismaService.screeningPreferences.findUnique as jest.Mock
     ).mockResolvedValue({
-      alwaysSkip: 'retail properties',
+      skipCriteria: 'retail deals, deals under 40 units',
+      knownProperties: null,
     });
 
     mockCreate.mockResolvedValue({
@@ -117,7 +118,7 @@ describe('DealDetectionService', () => {
             content: JSON.stringify({
               isDeal: false,
               confidence: 'high',
-              reason: 'Matches alwaysSkip criteria: retail properties',
+              reason: 'Matches skip criteria: retail deals',
             }),
           },
         },
@@ -135,18 +136,19 @@ describe('DealDetectionService', () => {
 
     // Assert
     expect(result.isDeal).toBe(false);
-    expect(result.reason).toContain('alwaysSkip');
-    expect(prismaService.screeningPreferences.findUnique).toHaveBeenCalledWith({
-      where: { organizationId: 'org-123' },
-      select: { alwaysSkip: true },
-    });
+    expect(result.reason).toContain('skip criteria');
+    // Verify the LLM was called (skipCriteria is LLM-interpreted, not deterministic)
+    expect(mockCreate).toHaveBeenCalled();
+    const systemPrompt = mockCreate.mock.calls[0][0].messages[0].content;
+    expect(systemPrompt).toContain('retail deals, deals under 40 units');
   });
 
-  it('deterministic alwaysSkip: matches token in body and skips LLM call', async () => {
+  it('knownProperties: matches property name in body and skips LLM call', async () => {
     (
       prismaService.screeningPreferences.findUnique as jest.Mock
     ).mockResolvedValue({
-      alwaysSkip: '1006 S Michigan',
+      skipCriteria: null,
+      knownProperties: '1006 S Michigan',
     });
 
     const result = await service.isDealEmail(
@@ -159,21 +161,22 @@ describe('DealDetectionService', () => {
 
     expect(result.isDeal).toBe(false);
     expect(result.confidence).toBe('high');
-    expect(result.reason).toBe('Matches alwaysSkip token: "1006 S Michigan"');
+    expect(result.reason).toBe('Matches known property: "1006 S Michigan"');
     expect(mockCreate).not.toHaveBeenCalled();
   });
 
-  it('deterministic alwaysSkip: matches token in subject only', async () => {
+  it('knownProperties: handles S/South abbreviation variations', async () => {
     (
       prismaService.screeningPreferences.findUnique as jest.Mock
     ).mockResolvedValue({
-      alwaysSkip: '1006 S Michigan',
+      skipCriteria: null,
+      knownProperties: '1006 S Michigan',
     });
 
     const result = await service.isDealEmail(
-      'Update on 1006 S Michigan',
-      'Unrelated body content here.',
-      false,
+      'New listing at 1006 South Michigan',
+      'Property details...',
+      true,
       'user-1',
       'org-jk',
     );
@@ -183,11 +186,33 @@ describe('DealDetectionService', () => {
     expect(mockCreate).not.toHaveBeenCalled();
   });
 
-  it('deterministic alwaysSkip: matches second token in multi-token list', async () => {
+  it('knownProperties: matches property in subject only', async () => {
     (
       prismaService.screeningPreferences.findUnique as jest.Mock
     ).mockResolvedValue({
-      alwaysSkip: '1006 S Michigan, 200 Main Street',
+      skipCriteria: null,
+      knownProperties: 'Bryant Plaza in Roslyn',
+    });
+
+    const result = await service.isDealEmail(
+      'Update on Bryant Plaza in Roslyn',
+      'Unrelated body content here.',
+      false,
+      'user-1',
+      'org-jk',
+    );
+
+    expect(result.isDeal).toBe(false);
+    expect(result.reason).toContain('Bryant Plaza in Roslyn');
+    expect(mockCreate).not.toHaveBeenCalled();
+  });
+
+  it('knownProperties: matches second property in multi-line list', async () => {
+    (
+      prismaService.screeningPreferences.findUnique as jest.Mock
+    ).mockResolvedValue({
+      skipCriteria: null,
+      knownProperties: '1006 S Michigan\n200 Main Street',
     });
 
     const result = await service.isDealEmail(
@@ -199,15 +224,37 @@ describe('DealDetectionService', () => {
     );
 
     expect(result.isDeal).toBe(false);
-    expect(result.reason).toBe('Matches alwaysSkip token: "200 Main Street"');
+    expect(result.reason).toBe('Matches known property: "200 Main Street"');
     expect(mockCreate).not.toHaveBeenCalled();
   });
 
-  it('deterministic alwaysSkip: short tokens (<4 chars) are filtered out', async () => {
+  it('knownProperties: strips markdown bullet prefixes', async () => {
     (
       prismaService.screeningPreferences.findUnique as jest.Mock
     ).mockResolvedValue({
-      alwaysSkip: 'abc',
+      skipCriteria: null,
+      knownProperties: '- Vesta Lofts\n- RKO Theatre',
+    });
+
+    const result = await service.isDealEmail(
+      'Google Alert - Vesta Lofts',
+      'News about Vesta Lofts in Chicago...',
+      false,
+      'user-1',
+      'org-jk',
+    );
+
+    expect(result.isDeal).toBe(false);
+    expect(result.reason).toContain('Vesta Lofts');
+    expect(mockCreate).not.toHaveBeenCalled();
+  });
+
+  it('knownProperties: short entries (<4 chars) are filtered out', async () => {
+    (
+      prismaService.screeningPreferences.findUnique as jest.Mock
+    ).mockResolvedValue({
+      skipCriteria: null,
+      knownProperties: 'abc',
     });
 
     mockCreate.mockResolvedValue({
@@ -321,7 +368,8 @@ describe('DealDetectionService', () => {
     (
       prismaService.screeningPreferences.findUnique as jest.Mock
     ).mockResolvedValue({
-      alwaysSkip: 'ground leases',
+      skipCriteria: 'ground leases',
+      knownProperties: null,
     });
 
     mockCreate.mockResolvedValue({
@@ -350,7 +398,7 @@ describe('DealDetectionService', () => {
     // Assert
     expect(prismaService.screeningPreferences.findUnique).toHaveBeenCalledWith({
       where: { organizationId: 'org-456' },
-      select: { alwaysSkip: true },
+      select: { skipCriteria: true, knownProperties: true },
     });
   });
 

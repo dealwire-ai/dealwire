@@ -21,17 +21,19 @@ CORE CAPABILITIES:
 3. Update screening preferences based on user feedback
 
 SCREENING PREFERENCES (understand the difference):
-- **alwaysSkip**: Criteria for emails to NEVER process. No analysis, no reply, no folder move. Use for: "skip all emails from X", "ignore retail deals", "don't process newsletters".
+- **skipCriteria**: Free-text criteria for emails to NEVER process. No analysis, no reply, no folder move. Use for: "skip retail deals", "ignore deals under 40 units", "don't process newsletters". Interpreted by the LLM.
+- **knownProperties**: List of property names/addresses the org already owns or has invested in. Matched deterministically via regex — any email about these properties is auto-skipped. Use for: "we own 1006 S Michigan", "add Bryant Plaza to known properties".
 - **dealCriteria**: Hard requirements for YES/NO evaluation. Fails → moved to "Passed Deals" folder. Passes → stays in inbox with analysis. Use for: "New York only", "min 5% cap rate", "no office".
 - **screening buckets**: Fine-grained classification tiers (Hot Deal, Good Fit, Pass, etc.) with customizable actions per bucket.
 
 INTERPRETING USER FEEDBACK AS CRITERIA UPDATES:
 When a user gives feedback about deals, interpret it as a criteria change:
 - "Too big for us" or "we don't do deals this large" → update dealCriteria to add a size cap
-- "Not interested in warehouse" or "skip warehouse deals" → update dealCriteria or alwaysSkip depending on severity
+- "Not interested in warehouse" or "skip warehouse deals" → update dealCriteria or skipCriteria depending on severity
 - "Actually this looks interesting" or "we'd consider this type" → suggest expanding criteria
-- "Stop sending me deals like this" → update alwaysSkip
-- "I don't care about ones from [broker]" → update alwaysSkip with sender filter
+- "Stop sending me deals like this" → update skipCriteria
+- "I don't care about ones from [broker]" → update skipCriteria with sender filter
+- "We own [property]" / "that's our building" / "already invested in [property]" → update knownProperties
 - "I already passed on this" / "mute this deal" / "don't show this again" → mute_deal
 
 After any criteria update, ALWAYS confirm back what you changed and ask if the user wants to adjust further. Be specific about what changed.
@@ -111,8 +113,11 @@ export class DealwireAgentService {
       prefs.dealCriteria
         ? `Current deal criteria: ${prefs.dealCriteria}`
         : null,
-      prefs.alwaysSkip
-        ? `Current always-skip rules: ${prefs.alwaysSkip}`
+      prefs.skipCriteria
+        ? `Current skip criteria: ${prefs.skipCriteria}`
+        : null,
+      prefs.knownProperties
+        ? `Current known properties: ${prefs.knownProperties}`
         : null,
     ]
       .filter(Boolean)
@@ -169,8 +174,11 @@ export class DealwireAgentService {
       prefs.dealCriteria
         ? `Current deal criteria: ${prefs.dealCriteria}`
         : null,
-      prefs.alwaysSkip
-        ? `Current always-skip rules: ${prefs.alwaysSkip}`
+      prefs.skipCriteria
+        ? `Current skip criteria: ${prefs.skipCriteria}`
+        : null,
+      prefs.knownProperties
+        ? `Current known properties: ${prefs.knownProperties}`
         : null,
     ]
       .filter(Boolean)
@@ -572,34 +580,63 @@ export class DealwireAgentService {
           }),
       }),
 
-      update_always_skip: tool({
+      update_skip_criteria: tool({
         description:
-          'Update criteria for emails to always skip (not consider as deals). No analysis, no reply. Use when user says "skip X" or "ignore Y".',
+          'Update free-text criteria for emails to always skip (not consider as deals). No analysis, no reply. Use when user says "skip X" or "ignore Y" for deal TYPES or categories.',
         parameters: z.object({
           criteria: z
             .string()
             .describe(
-              'The criteria to always skip (e.g. "retail deals", "emails from @broker.com")',
+              'The criteria to always skip (e.g. "retail deals", "deals under 40 units", "emails from @broker.com")',
             ),
         }),
         execute: async ({ criteria }) =>
-          this.safeTool('update_always_skip', async () => {
+          this.safeTool('update_skip_criteria', async () => {
             const current =
               await this.screeningPreferences.getPreferences(organizationId);
             this.logger.log(
-              `[update_always_skip] before="${current.alwaysSkip ?? ''}" appending="${criteria}"`,
+              `[update_skip_criteria] before="${current.skipCriteria ?? ''}" appending="${criteria}"`,
             );
-            const merged = current.alwaysSkip
-              ? `${current.alwaysSkip}, ${criteria}`
+            const merged = current.skipCriteria
+              ? `${current.skipCriteria}, ${criteria}`
               : criteria;
             const updated = await this.screeningPreferences.updatePreferences(
               organizationId,
-              { alwaysSkip: merged },
+              { skipCriteria: merged },
             );
             this.logger.log(
-              `[update_always_skip] after="${updated.alwaysSkip}"`,
+              `[update_skip_criteria] after="${updated.skipCriteria}"`,
             );
-            return { success: true, alwaysSkip: updated.alwaysSkip };
+            return { success: true, skipCriteria: updated.skipCriteria };
+          }),
+      }),
+
+      update_known_properties: tool({
+        description:
+          'Add a property name/address to the known properties list. Emails about these properties are auto-skipped via regex. Use when user says "we own X", "that\'s our building", or "add X to known properties".',
+        parameters: z.object({
+          property: z
+            .string()
+            .describe(
+              'The property name or address to add (e.g. "1006 S Michigan", "Bryant Plaza in Roslyn")',
+            ),
+        }),
+        execute: async ({ property }) =>
+          this.safeTool('update_known_properties', async () => {
+            const current =
+              await this.screeningPreferences.getPreferences(organizationId);
+            this.logger.log(`[update_known_properties] adding="${property}"`);
+            const merged = current.knownProperties
+              ? `${current.knownProperties}\n${property}`
+              : property;
+            const updated = await this.screeningPreferences.updatePreferences(
+              organizationId,
+              { knownProperties: merged },
+            );
+            this.logger.log(
+              `[update_known_properties] after="${updated.knownProperties}"`,
+            );
+            return { success: true, knownProperties: updated.knownProperties };
           }),
       }),
 
@@ -839,7 +876,8 @@ export class DealwireAgentService {
             });
             return {
               dealCriteria: prefs.dealCriteria || 'Not set',
-              alwaysSkip: prefs.alwaysSkip || 'Not set',
+              skipCriteria: prefs.skipCriteria || 'Not set',
+              knownProperties: prefs.knownProperties || 'Not set',
               passedFolderName: prefs.passedFolderName || 'Passed Deals',
               buckets: buckets.map((b) => ({
                 name: b.name,

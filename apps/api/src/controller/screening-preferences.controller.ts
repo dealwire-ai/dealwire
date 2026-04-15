@@ -42,7 +42,8 @@ export class ScreeningPreferencesController {
     @Body()
     body: {
       dealCriteria?: string;
-      alwaysSkip?: string;
+      skipCriteria?: string;
+      knownProperties?: string;
       passedFolderName?: string;
       digestSchedule?: string;
       digestTimeZone?: string;
