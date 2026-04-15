@@ -151,6 +151,15 @@ Any time make changes to the Prisma schema, generate a dev migration using cd ap
 
 All database interactions must go through **Prisma ORM only** (schema changes via migrations, data access via Prisma Client in application code). If you need to inspect or modify data, do it through the application's API endpoints or Prisma Studio — never by running SQL directly.
 
+### Database Users
+
+Two Postgres roles exist on Supabase (project ref: `icujkrafywivakbfrerg`):
+
+- **`postgres`** (default) — full read-write access. Used by the application via `DATABASE_URL`.
+- **`claude_readonly`** — read-only (`SELECT` only). Used by the Supabase MCP server in `.mcp.json` so Claude Code can query the DB without risk of accidental mutations.
+
+If you need to write data, do it through application code / Prisma — never through the MCP connection.
+
 ---
 
 ## Keeping Docs Up to Date
