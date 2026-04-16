@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { MarketingNav } from "@/components/marketing/marketing-nav";
 import { MarketingFooter } from "@/components/marketing/marketing-footer";
 import { FadeInSection } from "@/components/marketing/fade-in-section";
+import { IntelligenceDemo } from "@/components/marketing/intelligence-demo";
 
 export default function Home() {
   return (
@@ -26,7 +27,7 @@ export default function Home() {
 
       {/* Hero */}
       <section
-        className="relative z-10 px-6 lg:px-16 pt-20 pb-28 lg:pt-28 lg:pb-40"
+        className="relative z-10 px-6 lg:px-16 pt-20 pb-20 lg:pt-28 lg:pb-32"
         style={{
           backgroundImage: `
           linear-gradient(to right, rgba(200, 169, 110, 0.04) 1px, transparent 1px),
@@ -35,47 +36,60 @@ export default function Home() {
           backgroundSize: "80px 80px",
         }}
       >
-        <div className="max-w-5xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, ease: [0.25, 0.4, 0.25, 1] }}
-          >
-            <h1 className="text-5xl md:text-6xl lg:text-[4.5rem] font-normal tracking-tight leading-[1.05] mb-8">
-              We build your firm&apos;s
-              <br />
-              <span className="text-[#C8A96E]">private intelligence</span>{" "}
-              layer.
-            </h1>
-
-            <p className="text-lg md:text-xl text-white/50 max-w-2xl leading-relaxed mb-12">
-              Every deal your firm has ever seen, every memo ever written, every
-              broker relationship ever formed &mdash; connected, queryable, and
-              working for your team the moment a new deal lands. Your
-              institutional knowledge stops being something only a handful of
-              senior partners carry, and starts being something your whole firm
-              operates on.
-            </p>
-
-            <Link
-              href="/book"
-              onClick={() =>
-                posthog.capture("cta_clicked", {
-                  cta_type: "talk_to_founders",
-                  location: "hero",
-                })
-              }
+        <div className="max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            {/* Left: Copy */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, ease: [0.25, 0.4, 0.25, 1] }}
             >
-              <Button className="bg-[#C8A96E] hover:bg-[#b8952a] text-black font-semibold px-6 py-6 text-sm tracking-wide">
-                Talk to founders
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </Link>
-          </motion.div>
+              <h1 className="text-5xl md:text-6xl lg:text-[4.5rem] font-normal tracking-tight leading-[1.05] mb-8">
+                Your firm&apos;s
+                <br />
+                <span className="text-[#C8A96E]">private brain.</span>
+              </h1>
+
+              <p className="text-lg md:text-xl text-white/50 max-w-xl leading-relaxed mb-12">
+                Every deal your firm has ever seen. Every relationship. Every
+                decision. Captured, structured, and working for your team around
+                the clock. No new software to learn &mdash; just email your
+                firm&apos;s brain, and it responds.
+              </p>
+
+              <Link
+                href="/book"
+                onClick={() =>
+                  posthog.capture("cta_clicked", {
+                    cta_type: "talk_to_founders",
+                    location: "hero",
+                  })
+                }
+              >
+                <Button className="bg-[#C8A96E] hover:bg-[#b8952a] text-black font-semibold px-6 py-6 text-sm tracking-wide">
+                  Talk to founders
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </Link>
+            </motion.div>
+
+            {/* Right: Intelligence Demo */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                duration: 0.8,
+                delay: 0.3,
+                ease: [0.25, 0.4, 0.25, 1],
+              }}
+            >
+              <IntelligenceDemo />
+            </motion.div>
+          </div>
         </div>
       </section>
 
-      {/* Logos — directly under hero */}
+      {/* Logos */}
       <ClientLogos />
 
       {/* The asset nobody is using */}
@@ -105,17 +119,15 @@ export default function Home() {
               <p>
                 When a senior partner retires, most of it walks out the door.
                 When a new deal lands on a Tuesday morning, the firm reinvents
-                context it already paid to learn. The knowledge exists. The firm
-                just can&apos;t reach it.
+                context it already paid to learn.
               </p>
             </FadeInSection>
             <FadeInSection delay={0.15}>
               <p>
                 Generic AI tools don&apos;t fix this. Plugging a chatbot into
-                one inbox, one CRM, or one data room produces toy answers
-                &mdash; because none of those systems, on their own, contains
-                what your firm actually knows. The institutional intelligence
-                only appears once the whole corpus is unified.
+                one inbox or one data room produces toy answers &mdash; because
+                the institutional intelligence only appears once the whole
+                corpus is unified.
               </p>
             </FadeInSection>
             <FadeInSection delay={0.2}>
@@ -127,46 +139,137 @@ export default function Home() {
         </div>
       </section>
 
-      {/* What your firm gets */}
+      {/* The Intelligence Layer — Five Layers */}
       <section className="relative z-10 px-6 lg:px-16 py-24 lg:py-32 border-t border-white/[0.04]">
         <div className="max-w-5xl mx-auto">
           <FadeInSection>
             <p className="text-[#C8A96E] text-xs font-mono tracking-widest uppercase mb-6">
-              What your firm gets
+              The intelligence layer
             </p>
-            <h2 className="text-4xl md:text-5xl font-normal tracking-tight mb-16 leading-[1.1] max-w-3xl">
-              Capabilities your firm{" "}
-              <span className="text-white/30">did not have before.</span>
+            <h2 className="text-4xl md:text-5xl font-normal tracking-tight mb-16 leading-[1.1] max-w-4xl">
+              Everything an analyst does.{" "}
+              <span className="text-white/30">Nothing an analyst forgets.</span>
             </h2>
           </FadeInSection>
 
-          <div className="space-y-16">
+          <div className="space-y-12">
             {[
               {
-                title: "Your firm's memory, on call.",
-                body: "Ask, in plain English, any question about any deal your firm has ever touched. Which broker showed you this asset in 2019, and what did you pass on. How your firm has historically underwritten distress in this submarket. Which LP questions came up the last time you raised a fund with this strategy. This used to live only in the heads of your longest-tenured partners. Now the whole firm can reach it.",
+                num: "01",
+                title: "Captures everything.",
+                body: "Every deal, every email, every broker interaction, every market data point, every screening decision, every underwriting run. Automatically. Zero data entry. From the day your firm starts, every piece of institutional knowledge flows in.",
               },
               {
-                title: "Patterns across your own deal flow.",
-                body: "Fifteen years of deals, sitting in PDFs and inboxes, becomes a queryable record of what your firm has seen, priced, and passed. The next time a teaser lands, your team sees every comparable your firm has ever underwritten, every broker relationship you have with the seller's side, and every reason you'd have to move faster than the other twenty firms on the blast. These are analyses your team cannot currently run, at any speed.",
+                num: "02",
+                title: "Structures everything.",
+                body: "Raw emails become structured deals. Attachments become extracted financials. Broker patterns emerge from email history. Market trends emerge from deal flow. All queryable, all searchable \u2014 your firm\u2019s complete history in one system for the first time.",
               },
               {
-                title: "Screening and memo drafting, operationalized.",
-                body: "Inbound deal flow \u2014 OMs, rent rolls, teasers \u2014 gets read against your buy box the moment it lands, and first-pass memos get drafted from the underlying documents in minutes. Your team stops triaging and starts deciding. Senior time stops going to first drafts and starts going to judgment.",
+                num: "03",
+                title: "Connects everything.",
+                body: "\u201CThis deal is in the same submarket where you closed 3 deals last year. The broker has sent you 12 deals \u2014 2 made it to LOI. Your investor Group B expressed interest in this market. Cap rates have compressed 30bps since Q3.\u201D Cross-references your entire deal history, relationship graph, and market intelligence automatically.",
               },
-            ].map((pillar, i) => (
-              <FadeInSection key={pillar.title} delay={i * 0.1}>
-                <div className="grid md:grid-cols-[1fr_2fr] gap-6 md:gap-16 items-start">
-                  <h3 className="text-2xl md:text-3xl font-normal tracking-tight text-white/90 leading-[1.2]">
-                    {pillar.title}
-                  </h3>
-                  <p className="text-base md:text-lg text-white/50 leading-relaxed">
-                    {pillar.body}
+              {
+                num: "04",
+                title: "Acts autonomously.",
+                body: "Screens inbound flow against your buy box. Underwrites opportunities. Drafts IC memos. Composes broker replies. Follows up, reminds, alerts. Your team operates at 10x velocity because the system is doing the analyst work around the clock.",
+              },
+              {
+                num: "05",
+                title: "Gets smarter over time.",
+                body: "Every deal screened, every decision made, every outcome recorded makes the system sharper. After 1,000 deals, it knows your firm\u2019s preferences better than any new hire ever could. The intelligence compounds with every interaction.",
+              },
+            ].map((layer, i) => (
+              <FadeInSection key={layer.num} delay={i * 0.06}>
+                <div className="grid md:grid-cols-[1fr_2fr] gap-4 md:gap-12 items-baseline">
+                  <div className="flex items-baseline gap-4">
+                    <span className="text-[#C8A96E]/50 font-mono text-xs">
+                      {layer.num}
+                    </span>
+                    <h3 className="text-xl md:text-2xl font-normal tracking-tight text-white/90 leading-[1.2]">
+                      {layer.title}
+                    </h3>
+                  </div>
+                  <p className="text-base text-white/45 leading-relaxed">
+                    {layer.body}
                   </p>
                 </div>
               </FadeInSection>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Compounding Intelligence */}
+      <section className="relative z-10 px-6 lg:px-16 py-24 lg:py-32 border-t border-white/[0.04]">
+        <div className="max-w-6xl mx-auto">
+          <FadeInSection>
+            <p className="text-[#C8A96E] text-xs font-mono tracking-widest uppercase mb-6">
+              Compounding intelligence
+            </p>
+            <h2 className="text-4xl md:text-5xl font-normal tracking-tight mb-6 leading-[1.1]">
+              Your proprietary{" "}
+              <span className="text-white/30">data asset.</span>
+            </h2>
+            <p className="text-lg text-white/50 leading-relaxed mb-16 max-w-2xl">
+              Every month your firm uses Dealwire, the intelligence deepens.
+              After 12 months, you&apos;ve built something no competitor can
+              buy, copy, or replicate.
+            </p>
+          </FadeInSection>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
+            {[
+              {
+                label: "Month 1",
+                body: "Your firm\u2019s complete deal history and email archive become searchable for the first time.",
+              },
+              {
+                label: "Month 3",
+                body: "Agents autonomously screen, underwrite, and respond to inbound deal flow. First-pass memos draft themselves.",
+              },
+              {
+                label: "Month 6",
+                body: "Your institutional knowledge \u2014 every deal, relationship, and decision \u2014 is a queryable competitive advantage.",
+              },
+              {
+                label: "Month 12",
+                body: "Your firm has built a proprietary data asset no competitor can replicate. Your deal history, relationship graph, market intelligence, and screening patterns all live in one system. Switching costs are astronomical.",
+                final: true,
+              },
+            ].map((milestone, i) => (
+              <FadeInSection
+                key={milestone.label}
+                delay={i * 0.08}
+                className="h-full"
+              >
+                <div className="h-full flex flex-col">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div
+                      className={`w-2 h-2 rounded-full ${
+                        (milestone as { final?: boolean }).final
+                          ? "bg-[#C8A96E]"
+                          : "bg-[#C8A96E]/40"
+                      }`}
+                    />
+                    <span className="text-sm font-mono text-[#C8A96E]/60">
+                      {milestone.label}
+                    </span>
+                  </div>
+                  <p className="text-sm text-white/45 leading-relaxed">
+                    {milestone.body}
+                  </p>
+                </div>
+              </FadeInSection>
+            ))}
+          </div>
+
+          <FadeInSection delay={0.4}>
+            <p className="text-xl text-white/65 max-w-2xl mt-16 leading-relaxed">
+              This isn&apos;t software your firm subscribes to. It&apos;s
+              infrastructure your firm cannot operate without.
+            </p>
+          </FadeInSection>
         </div>
       </section>
 
@@ -200,7 +303,7 @@ export default function Home() {
               {
                 step: "03",
                 title: "Agents",
-                body: "We build the first agents against your workflows \u2014 deal screening, memo drafting, relationship recall, market queries \u2014 and deploy them where your team already works. Analysts start answering questions the firm could not previously answer at all.",
+                body: "We build the first agents against your workflows \u2014 deal screening, underwriting, memo drafting, relationship recall, market queries \u2014 and deploy them where your team already works. Analysts start answering questions the firm could not previously answer at all.",
               },
               {
                 step: "04",
@@ -230,7 +333,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Who builds this — preserved founder + advisor section */}
+      {/* Who builds this */}
       <section
         id="about"
         className="relative z-10 px-6 lg:px-16 py-20 lg:py-28 border-t border-white/[0.04]"
@@ -428,7 +531,7 @@ export default function Home() {
                         key={tag}
                         className="text-xs font-mono text-[#C8A96E]/45 tracking-wider"
                       >
-                        → {tag}
+                        &rarr; {tag}
                       </span>
                     ))}
                   </div>
@@ -478,12 +581,12 @@ export default function Home() {
           <FadeInSection>
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight mb-8 leading-[1.1]">
               Build your firm&apos;s{" "}
-              <span className="text-[#C8A96E]">intelligence layer.</span>
+              <span className="text-[#C8A96E]">institutional brain.</span>
             </h2>
             <p className="text-lg text-white/50 leading-relaxed mb-12 max-w-2xl">
               We take on a small number of engagements each quarter. If your
-              firm is evaluating what AI can actually do inside institutional
-              private markets, we&apos;d like to talk.
+              firm is ready to turn decades of institutional knowledge into a
+              permanent competitive advantage, we&apos;d like to talk.
             </p>
             <Link
               href="/book"
