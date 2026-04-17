@@ -164,28 +164,28 @@ export default function Home() {
               {[
                 {
                   num: "01",
-                  title: "Captures everything.",
-                  body: "Every deal, every email, every broker interaction, every market data point, every screening decision, every underwriting run. Automatically. Zero data entry. From the day your firm starts, every piece of institutional knowledge flows in.",
+                  title: "Captures the firm.",
+                  body: "Every deal, every email, every broker interaction, every screening decision, every underwriting run \u2014 ingested automatically. Zero data entry. Within weeks of deployment, your firm\u2019s complete institutional knowledge lives in one system.",
                 },
                 {
                   num: "02",
-                  title: "Structures everything.",
-                  body: "Raw emails become structured deals. Attachments become extracted financials. Broker patterns emerge from email history. Market trends emerge from deal flow. All queryable, all searchable \u2014 your firm\u2019s complete history in one system for the first time.",
+                  title: "Connects the dots.",
+                  body: "Every new opportunity is cross-referenced against your firm\u2019s full corpus. \u201CThis deal is in the same submarket where you closed 3 deals last year. The broker has sent you 12 deals \u2014 2 made it to LOI. Your investor Group B expressed interest in this market. Cap rates have compressed 30bps since Q3.\u201D The context a senior partner would surface, surfaced automatically.",
                 },
                 {
                   num: "03",
-                  title: "Connects everything.",
-                  body: "\u201CThis deal is in the same submarket where you closed 3 deals last year. The broker has sent you 12 deals \u2014 2 made it to LOI. Your investor Group B expressed interest in this market. Cap rates have compressed 30bps since Q3.\u201D Cross-references your entire deal history, relationship graph, and market intelligence automatically.",
+                  title: "Acts on your pipeline.",
+                  body: "Screens inbound flow against your buy box. Underwrites opportunities. Drafts IC memos. Composes broker replies. Follows up, reminds, alerts. The analyst work happens around the clock \u2014 freeing your team for the decisions only they can make.",
                 },
                 {
                   num: "04",
-                  title: "Acts autonomously.",
-                  body: "Screens inbound flow against your buy box. Underwrites opportunities. Drafts IC memos. Composes broker replies. Follows up, reminds, alerts. Your team operates at 10x velocity because the system is doing the analyst work around the clock.",
+                  title: "Sources what others can\u2019t see.",
+                  body: "Tax lien lists, lis pendens filings, code violations, distress signals buried in public records. Properties surface before they\u2019re listed; owners surface before they\u2019re sellers. Your team lands first in line on deals the rest of the market never sees.",
                 },
                 {
                   num: "05",
-                  title: "Gets smarter over time.",
-                  body: "Every deal screened, every decision made, every outcome recorded makes the system sharper. After 1,000 deals, it knows your firm\u2019s preferences better than any new hire ever could. The intelligence compounds with every interaction.",
+                  title: "Compounds with use.",
+                  body: "Every screened deal, every decision, every outcome sharpens the system \u2014 until it reads your firm\u2019s taste better than any new hire ever could.",
                 },
               ].map((layer, i) => (
                 <FadeInSection key={layer.num} delay={i * 0.06}>
