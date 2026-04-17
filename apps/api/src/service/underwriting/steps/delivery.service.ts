@@ -55,7 +55,7 @@ export class DeliveryService {
       subject,
       html,
       from: this.config.underwritingInboundEmail
-        ? `AI Underwriting Analyst <${this.config.underwritingInboundEmail}>`
+        ? `Dealwire <${this.config.underwritingInboundEmail}>`
         : undefined,
       replyToMessageId: inReplyToMessageId,
       attachments: [
