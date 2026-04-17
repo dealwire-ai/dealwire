@@ -61,6 +61,10 @@ export interface Parcel {
   unitsRes: number | null;
   buildingArea: number | null;
   lotArea: number | null;
+  lotFront: number | null;
+  lotDepth: number | null;
+  bldgFront: number | null;
+  bldgDepth: number | null;
   numFloors: number | null;
   yearBuilt: number | null;
   ownerName: string | null;
@@ -202,8 +206,16 @@ export const COLUMNS: ColumnDef[] = [
   },
   {
     key: "buildingArea",
-    label: "Sqft",
+    label: "Bldg Sqft",
     field: "buildingArea",
+    align: "right",
+    defaultVisible: true,
+    sortable: true,
+  },
+  {
+    key: "lotArea",
+    label: "Lot Sqft",
+    field: "lotArea",
     align: "right",
     defaultVisible: false,
     sortable: true,
@@ -314,6 +326,20 @@ function formatNumber(value: number | null | undefined): string {
   return new Intl.NumberFormat("en-US").format(value);
 }
 
+function formatDimensions(
+  front: number | null,
+  depth: number | null,
+  area: number | null,
+): string | null {
+  const hasDims = front && depth;
+  const dimStr = hasDims
+    ? `${Math.round(front!)}' × ${Math.round(depth!)}'`
+    : null;
+  const areaStr = area ? `${formatNumber(area)} sqft` : null;
+  if (dimStr && areaStr) return `${dimStr} (${areaStr})`;
+  return dimStr || areaStr;
+}
+
 function renderCell(
   key: string,
   parcel: Parcel,
@@ -336,6 +362,8 @@ function renderCell(
       return parcel.unitsTotal ?? "-";
     case "buildingArea":
       return parcel.buildingArea ? formatNumber(parcel.buildingArea) : "-";
+    case "lotArea":
+      return parcel.lotArea ? formatNumber(parcel.lotArea) : "-";
     case "estimatedMarketValue":
       return formatCurrency(parcel.estimatedMarketValue);
     case "yearBuilt":
@@ -678,12 +706,20 @@ export function ParcelTable({
                               value={parcel.taxClass}
                             />
                             <DetailRow
-                              label="Lot Area"
-                              value={
-                                parcel.lotArea
-                                  ? `${formatNumber(parcel.lotArea)} sqft`
-                                  : null
-                              }
+                              label="Lot"
+                              value={formatDimensions(
+                                parcel.lotFront,
+                                parcel.lotDepth,
+                                parcel.lotArea,
+                              )}
+                            />
+                            <DetailRow
+                              label="Building"
+                              value={formatDimensions(
+                                parcel.bldgFront,
+                                parcel.bldgDepth,
+                                parcel.buildingArea,
+                              )}
                             />
                             <DetailRow
                               label="Floors"
