@@ -13,6 +13,7 @@ import { MarketingNav } from "@/components/marketing/marketing-nav";
 import { MarketingFooter } from "@/components/marketing/marketing-footer";
 import { FadeInSection } from "@/components/marketing/fade-in-section";
 import { IntelligenceDemo } from "@/components/marketing/intelligence-demo";
+import { NeuralFabric } from "@/components/marketing/neural-fabric";
 
 export default function Home() {
   return (
@@ -27,7 +28,7 @@ export default function Home() {
 
       {/* Hero */}
       <section
-        className="relative z-10 px-6 lg:px-16 pt-20 pb-20 lg:pt-28 lg:pb-32"
+        className="relative z-10 px-6 lg:px-16 pt-20 pb-20 lg:pt-28 lg:pb-32 overflow-hidden"
         style={{
           backgroundImage: `
           linear-gradient(to right, rgba(200, 169, 110, 0.04) 1px, transparent 1px),
@@ -36,7 +37,8 @@ export default function Home() {
           backgroundSize: "80px 80px",
         }}
       >
-        <div className="max-w-7xl mx-auto">
+        <NeuralFabric />
+        <div className="relative z-10 max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             {/* Left: Copy */}
             <motion.div
