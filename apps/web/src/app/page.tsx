@@ -53,10 +53,11 @@ export default function Home() {
               </h1>
 
               <p className="text-lg md:text-xl text-white/50 max-w-xl leading-relaxed mb-12">
-                Every deal your firm has ever seen. Every relationship. Every
-                decision. Captured, structured, and working for your team around
-                the clock. No new software to learn &mdash; just email your
-                firm&apos;s brain, and it responds.
+                Every deal, every relationship, every decision &mdash; unified
+                with the outside data that makes them readable. Specialized
+                agents screen inbound flow, underwrite, draft memos, and surface
+                deals before the rest of the market sees them &mdash; each
+                reading from your firm&apos;s full history. All through email.
               </p>
 
               <Link
@@ -97,7 +98,7 @@ export default function Home() {
       {/* The asset nobody is using */}
       <section className="relative z-10 px-6 lg:px-16 py-24 lg:py-32 border-t border-white/[0.04]">
         <div className="max-w-7xl mx-auto">
-          <div className="max-w-4xl">
+          <div className="max-w-5xl mx-auto">
             <FadeInSection>
               <p className="text-[#C8A96E] text-xs font-mono tracking-widest uppercase mb-6">
                 The asset nobody is using
@@ -146,7 +147,7 @@ export default function Home() {
       {/* The Intelligence Layer — Five Layers */}
       <section className="relative z-10 px-6 lg:px-16 py-24 lg:py-32 border-t border-white/[0.04]">
         <div className="max-w-7xl mx-auto">
-          <div className="max-w-5xl">
+          <div className="max-w-5xl mx-auto">
             <FadeInSection>
               <p className="text-[#C8A96E] text-xs font-mono tracking-widest uppercase mb-6">
                 The intelligence layer
@@ -211,7 +212,7 @@ export default function Home() {
       {/* Compounding Intelligence */}
       <section className="relative z-10 px-6 lg:px-16 py-24 lg:py-32 border-t border-white/[0.04]">
         <div className="max-w-7xl mx-auto">
-          <div className="max-w-6xl">
+          <div className="max-w-5xl mx-auto">
             <FadeInSection>
               <p className="text-[#C8A96E] text-xs font-mono tracking-widest uppercase mb-6">
                 Compounding intelligence
@@ -289,7 +290,7 @@ export default function Home() {
         className="relative z-10 px-6 lg:px-16 py-24 lg:py-32 border-t border-white/[0.04]"
       >
         <div className="max-w-7xl mx-auto">
-          <div className="max-w-6xl">
+          <div className="max-w-5xl mx-auto">
             <FadeInSection>
               <p className="text-[#C8A96E] text-xs font-mono tracking-widest uppercase mb-6">
                 Engagements
@@ -351,213 +352,215 @@ export default function Home() {
         className="relative z-10 px-6 lg:px-16 py-20 lg:py-28 border-t border-white/[0.04]"
       >
         <div className="max-w-7xl mx-auto">
-          <FadeInSection>
-            <p className="text-[#C8A96E] text-xs font-mono tracking-widest uppercase mb-4">
-              Team
-            </p>
-            <h2 className="text-4xl md:text-5xl font-normal tracking-tight mb-6">
-              Software engineers backed by
-              <br />
-              <span className="text-white/30">veteran CRE operators.</span>
-            </h2>
-          </FadeInSection>
+          <div className="max-w-5xl mx-auto">
+            <FadeInSection>
+              <p className="text-[#C8A96E] text-xs font-mono tracking-widest uppercase mb-4">
+                Team
+              </p>
+              <h2 className="text-4xl md:text-5xl font-normal tracking-tight mb-6">
+                Engineers backed by
+                <br />
+                <span className="text-white/30">veteran CRE operators.</span>
+              </h2>
+            </FadeInSection>
 
-          <div className="grid md:grid-cols-2 gap-4">
-            {[
-              {
-                name: "Isaac Levine",
-                role: "Co-Founder",
-                bio: "Software Engineer at CarGurus (NASDAQ: CARG), where he builds high-throughput data systems processing hundreds of millions of inventory updates daily. Computer Science at Northeastern. Co-founded and sold frontstep.ai.",
-                linkedin: "https://www.linkedin.com/in/isaac-levine/",
-                email: "isaac@dealwire.ai",
-                headshot: "/headshots/isaac.webp",
-              },
-              {
-                name: "Noah Weinstein",
-                role: "Co-Founder",
-                bio: "Former Software Engineer at Flexcar and Technical Product Manager at Siphox, a venture-backed health tech startup. Computer Science at Northeastern. Co-founded and sold frontstep.ai.",
-                linkedin: "https://www.linkedin.com/in/noahweinstein/",
-                email: "noah@dealwire.ai",
-                headshot: "/headshots/noah.webp",
-              },
-            ].map((founder, index) => (
-              <FadeInSection
-                key={index}
-                delay={index * 0.15}
-                className="h-full"
-              >
-                <div className="relative group h-full">
-                  <div className="absolute inset-0 bg-gradient-to-br from-[#C8A96E]/8 to-transparent rounded-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <div className="relative h-full p-8 lg:p-10 bg-white/[0.015] border border-white/[0.06] rounded-sm group-hover:border-[#C8A96E]/20 transition-colors duration-300">
-                    <div className="flex items-start justify-between mb-6">
-                      <div className="relative w-14 h-14 rounded-sm overflow-hidden border border-[#C8A96E]/15">
-                        <Image
-                          src={founder.headshot}
-                          alt={founder.name}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                      <div className="flex gap-2">
-                        <a
-                          href={founder.linkedin}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={() =>
-                            posthog.capture("founder_linkedin_clicked", {
-                              founder_name: founder.name,
-                            })
-                          }
-                          className="p-2 bg-white/[0.04] rounded-sm hover:bg-white/8 transition-colors"
-                        >
-                          <Linkedin className="w-4 h-4 text-white/40" />
-                        </a>
-                        <a
-                          href={`mailto:${founder.email}`}
-                          onClick={() =>
-                            posthog.capture("founder_email_clicked", {
-                              founder_name: founder.name,
-                              email: founder.email,
-                            })
-                          }
-                          className="p-2 bg-white/[0.04] rounded-sm hover:bg-white/8 transition-colors"
-                        >
-                          <Mail className="w-4 h-4 text-white/40" />
-                        </a>
-                      </div>
-                    </div>
-                    <h3 className="text-lg font-medium mb-1 text-white/90">
-                      {founder.name}
-                    </h3>
-                    <p className="text-[#C8A96E] text-xs font-mono tracking-widest uppercase mb-4">
-                      {founder.role}
-                    </p>
-                    <p className="text-white/38 leading-relaxed text-sm">
-                      {founder.bio}
-                    </p>
-                  </div>
-                </div>
-              </FadeInSection>
-            ))}
-          </div>
-
-          {/* Strategic Advisors */}
-          <FadeInSection delay={0.3}>
-            <p className="text-[#C8A96E] text-xs font-mono tracking-widest uppercase mb-4 mt-20">
-              Strategic Advisors
-            </p>
-            <div className="grid md:grid-cols-2 gap-3">
+            <div className="grid md:grid-cols-2 gap-4">
               {[
                 {
-                  name: "David Shorenstein",
-                  role: "Advisor",
-                  headshot: "/headshots/david.png",
-                  linkedin: "https://www.linkedin.com/in/davidshorenstein/",
-                  bio: "Principal at Hildreth Real Estate Advisors. Co-founded Silvershore Properties, assembling a $300M+ NYC portfolio across 250+ assets. Former CIO at Forrest Shorenstein Capital Partners. $250M+ in sales at Marcus & Millichap.",
+                  name: "Isaac Levine",
+                  role: "Co-Founder",
+                  bio: "Software Engineer at CarGurus (NASDAQ: CARG), where he builds high-throughput data systems processing hundreds of millions of inventory updates daily. Computer Science at Northeastern. Co-founded and sold frontstep.ai.",
+                  linkedin: "https://www.linkedin.com/in/isaac-levine/",
+                  email: "isaac@dealwire.ai",
+                  headshot: "/headshots/isaac.webp",
                 },
                 {
-                  name: "Jordan Karlik",
-                  role: "Advisor",
-                  headshot: "/headshots/jordan.jpeg",
-                  linkedin:
-                    "https://www.linkedin.com/in/jordan-karlik-b546b83/",
-                  bio: "Principal at JK Equities. Started at Deutsche Bank and Ernst & Young in CMBS. JK Equities has owned, operated, and developed nearly $2B in property across 15+ states.",
+                  name: "Noah Weinstein",
+                  role: "Co-Founder",
+                  bio: "Former Software Engineer at Flexcar and Technical Product Manager at Siphox, a venture-backed health tech startup. Computer Science at Northeastern. Co-founded and sold frontstep.ai.",
+                  linkedin: "https://www.linkedin.com/in/noahweinstein/",
+                  email: "noah@dealwire.ai",
+                  headshot: "/headshots/noah.webp",
                 },
-              ].map((advisor, index) => (
-                <div key={index} className="relative group h-full">
-                  <div className="absolute inset-0 bg-gradient-to-br from-[#C8A96E]/6 to-transparent rounded-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <div className="relative h-full p-6 bg-white/[0.015] border border-white/[0.06] rounded-sm group-hover:border-[#C8A96E]/20 transition-colors duration-300">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-4">
-                        <div className="relative w-11 h-11 rounded-sm overflow-hidden border border-[#C8A96E]/15 shrink-0">
+              ].map((founder, index) => (
+                <FadeInSection
+                  key={index}
+                  delay={index * 0.15}
+                  className="h-full"
+                >
+                  <div className="relative group h-full">
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#C8A96E]/8 to-transparent rounded-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="relative h-full p-8 lg:p-10 bg-white/[0.015] border border-white/[0.06] rounded-sm group-hover:border-[#C8A96E]/20 transition-colors duration-300">
+                      <div className="flex items-start justify-between mb-6">
+                        <div className="relative w-14 h-14 rounded-sm overflow-hidden border border-[#C8A96E]/15">
                           <Image
-                            src={advisor.headshot}
-                            alt={advisor.name}
+                            src={founder.headshot}
+                            alt={founder.name}
                             fill
                             className="object-cover"
                           />
                         </div>
-                        <div>
-                          <h3 className="text-sm font-medium text-white/90">
-                            {advisor.name}
-                          </h3>
-                          <p className="text-[#C8A96E] text-xs font-mono tracking-widest uppercase">
-                            {advisor.role}
-                          </p>
+                        <div className="flex gap-2">
+                          <a
+                            href={founder.linkedin}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={() =>
+                              posthog.capture("founder_linkedin_clicked", {
+                                founder_name: founder.name,
+                              })
+                            }
+                            className="p-2 bg-white/[0.04] rounded-sm hover:bg-white/8 transition-colors"
+                          >
+                            <Linkedin className="w-4 h-4 text-white/40" />
+                          </a>
+                          <a
+                            href={`mailto:${founder.email}`}
+                            onClick={() =>
+                              posthog.capture("founder_email_clicked", {
+                                founder_name: founder.name,
+                                email: founder.email,
+                              })
+                            }
+                            className="p-2 bg-white/[0.04] rounded-sm hover:bg-white/8 transition-colors"
+                          >
+                            <Mail className="w-4 h-4 text-white/40" />
+                          </a>
                         </div>
                       </div>
-                      <a
-                        href={advisor.linkedin}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={() =>
-                          posthog.capture("founder_linkedin_clicked", {
-                            founder_name: advisor.name,
-                            role: "advisor",
-                          })
-                        }
-                        className="p-2 bg-white/[0.04] rounded-sm hover:bg-white/8 transition-colors shrink-0"
-                      >
-                        <Linkedin className="w-4 h-4 text-white/35" />
-                      </a>
+                      <h3 className="text-lg font-medium mb-1 text-white/90">
+                        {founder.name}
+                      </h3>
+                      <p className="text-[#C8A96E] text-xs font-mono tracking-widest uppercase mb-4">
+                        {founder.role}
+                      </p>
+                      <p className="text-white/38 leading-relaxed text-sm">
+                        {founder.bio}
+                      </p>
                     </div>
-                    <p className="text-white/35 text-sm leading-relaxed">
-                      {advisor.bio}
-                    </p>
                   </div>
-                </div>
+                </FadeInSection>
               ))}
             </div>
-          </FadeInSection>
 
-          <FadeInSection delay={0.4}>
-            <div className="mt-10 p-8 lg:p-10 bg-[#C8A96E]/[0.04] border border-[#C8A96E]/12 rounded-sm">
-              <div className="flex max-lg:flex-col items-center max-lg:items-start gap-6 lg:gap-12">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-[#C8A96E]/10 border border-[#C8A96E]/20 rounded-sm flex items-center justify-center">
-                    <Sparkles className="w-4 h-4 text-[#C8A96E]" />
+            {/* Strategic Advisors */}
+            <FadeInSection delay={0.3}>
+              <p className="text-[#C8A96E] text-xs font-mono tracking-widest uppercase mb-4 mt-20">
+                Strategic Advisors
+              </p>
+              <div className="grid md:grid-cols-2 gap-3">
+                {[
+                  {
+                    name: "David Shorenstein",
+                    role: "Advisor",
+                    headshot: "/headshots/david.png",
+                    linkedin: "https://www.linkedin.com/in/davidshorenstein/",
+                    bio: "Principal at Hildreth Real Estate Advisors. Co-founded Silvershore Properties, assembling a $300M+ NYC portfolio across 250+ assets. Former CIO at Forrest Shorenstein Capital Partners. $250M+ in sales at Marcus & Millichap.",
+                  },
+                  {
+                    name: "Jordan Karlik",
+                    role: "Advisor",
+                    headshot: "/headshots/jordan.jpeg",
+                    linkedin:
+                      "https://www.linkedin.com/in/jordan-karlik-b546b83/",
+                    bio: "Principal at JK Equities. Started at Deutsche Bank and Ernst & Young in CMBS. JK Equities has owned, operated, and developed nearly $2B in property across 15+ states.",
+                  },
+                ].map((advisor, index) => (
+                  <div key={index} className="relative group h-full">
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#C8A96E]/6 to-transparent rounded-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="relative h-full p-6 bg-white/[0.015] border border-white/[0.06] rounded-sm group-hover:border-[#C8A96E]/20 transition-colors duration-300">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-4">
+                          <div className="relative w-11 h-11 rounded-sm overflow-hidden border border-[#C8A96E]/15 shrink-0">
+                            <Image
+                              src={advisor.headshot}
+                              alt={advisor.name}
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                          <div>
+                            <h3 className="text-sm font-medium text-white/90">
+                              {advisor.name}
+                            </h3>
+                            <p className="text-[#C8A96E] text-xs font-mono tracking-widest uppercase">
+                              {advisor.role}
+                            </p>
+                          </div>
+                        </div>
+                        <a
+                          href={advisor.linkedin}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={() =>
+                            posthog.capture("founder_linkedin_clicked", {
+                              founder_name: advisor.name,
+                              role: "advisor",
+                            })
+                          }
+                          className="p-2 bg-white/[0.04] rounded-sm hover:bg-white/8 transition-colors shrink-0"
+                        >
+                          <Linkedin className="w-4 h-4 text-white/35" />
+                        </a>
+                      </div>
+                      <p className="text-white/35 text-sm leading-relaxed">
+                        {advisor.bio}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-xs text-white/25 font-mono tracking-wider uppercase mb-0.5">
-                      Previously built
-                    </p>
-                    <p className="text-base font-medium text-white/85">
-                      frontstep.ai
-                    </p>
+                ))}
+              </div>
+            </FadeInSection>
+
+            <FadeInSection delay={0.4}>
+              <div className="mt-10 p-8 lg:p-10 bg-[#C8A96E]/[0.04] border border-[#C8A96E]/12 rounded-sm">
+                <div className="flex max-lg:flex-col items-center max-lg:items-start gap-6 lg:gap-12">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 bg-[#C8A96E]/10 border border-[#C8A96E]/20 rounded-sm flex items-center justify-center">
+                      <Sparkles className="w-4 h-4 text-[#C8A96E]" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-white/25 font-mono tracking-wider uppercase mb-0.5">
+                        Previously built
+                      </p>
+                      <p className="text-base font-medium text-white/85">
+                        frontstep.ai
+                      </p>
+                    </div>
                   </div>
-                </div>
-                <div className="lg:border-l lg:border-white/[0.06] lg:pl-12">
-                  <p className="text-white/38 leading-relaxed text-sm mb-4">
-                    Built in 3 months. Won a cash prize at Northeastern&apos;s
-                    startup competition. Acquired within months of launch. The
-                    platform automatically qualified thousands of renters.
-                  </p>
-                  <div className="flex flex-wrap gap-x-6 gap-y-1">
-                    {[
-                      "Built in 3 months",
-                      "Northeastern startup prize winner",
-                      "Acquired post-launch",
-                      "Thousands of renters qualified",
-                    ].map((tag) => (
-                      <span
-                        key={tag}
-                        className="text-xs font-mono text-[#C8A96E]/45 tracking-wider"
-                      >
-                        &rarr; {tag}
-                      </span>
-                    ))}
+                  <div className="lg:border-l lg:border-white/[0.06] lg:pl-12">
+                    <p className="text-white/38 leading-relaxed text-sm mb-4">
+                      Built in 3 months. Won a cash prize at Northeastern&apos;s
+                      startup competition. Acquired within months of launch. The
+                      platform automatically qualified thousands of renters.
+                    </p>
+                    <div className="flex flex-wrap gap-x-6 gap-y-1">
+                      {[
+                        "Built in 3 months",
+                        "Northeastern startup prize winner",
+                        "Acquired post-launch",
+                        "Thousands of renters qualified",
+                      ].map((tag) => (
+                        <span
+                          key={tag}
+                          className="text-xs font-mono text-[#C8A96E]/45 tracking-wider"
+                        >
+                          &rarr; {tag}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </FadeInSection>
+            </FadeInSection>
+          </div>
         </div>
       </section>
 
       {/* Security trust band */}
       <section className="relative z-10 px-6 lg:px-16 py-20 lg:py-24 border-t border-white/[0.04]">
         <div className="max-w-7xl mx-auto">
-          <div className="max-w-4xl">
+          <div className="max-w-5xl mx-auto">
             <FadeInSection>
               <p className="text-[#C8A96E] text-xs font-mono tracking-widest uppercase mb-6">
                 Security
@@ -592,7 +595,7 @@ export default function Home() {
       {/* Closing CTA */}
       <section className="relative z-10 px-6 lg:px-16 py-24 lg:py-32 border-t border-white/[0.04]">
         <div className="max-w-7xl mx-auto">
-          <div className="max-w-4xl">
+          <div className="max-w-5xl mx-auto">
             <FadeInSection>
               <h2 className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight mb-8 leading-[1.1]">
                 Build your firm&apos;s{" "}
