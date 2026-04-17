@@ -248,6 +248,7 @@ export class ParcelQueryService {
       'buildingClass',
       'unitsTotal',
       'buildingArea',
+      'lotArea',
       'estimatedMarketValue',
       'yearBuilt',
       'violationsOpen',

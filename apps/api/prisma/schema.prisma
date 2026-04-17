@@ -349,6 +349,10 @@ model Parcel {
   unitsRes          Int?
   buildingArea      Int?      // sqft
   lotArea           Int?      // sqft
+  lotFront          Float?    // ft (PLUTO lotfront)
+  lotDepth          Float?    // ft (PLUTO lotdepth)
+  bldgFront         Float?    // ft (PLUTO bldgfront)
+  bldgDepth         Float?    // ft (PLUTO bldgdepth)
   numFloors         Float?
   yearBuilt         Int?
   ownerName         String?
