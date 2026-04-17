@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "Parcel" ADD COLUMN     "lotFront" DOUBLE PRECISION,
+ADD COLUMN     "lotDepth" DOUBLE PRECISION,
+ADD COLUMN     "bldgFront" DOUBLE PRECISION,
+ADD COLUMN     "bldgDepth" DOUBLE PRECISION;
