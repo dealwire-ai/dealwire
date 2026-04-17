@@ -180,7 +180,11 @@ POST /public-data/parcels/skip-trace (or /:bbl/skip-trace)
 
 **Agent tools:** `query_parcels`, `get_parcel_stats` (in `DealwireAgentService`)
 
-**Default ingestion boroughs:** Brooklyn (3) + Queens (4)
+**Default ingestion boroughs:** Manhattan (1) + Brooklyn (3) + Queens (4) — same default for both manual `POST /public-data/ingest` and the scheduled cron.
+
+**Auto-schedule:** `PublicDataSchedulerService` runs `@Cron(PUBLIC_DATA_REFRESH_CRON)`, default `0 3 * * 0` = Sunday 3am UTC. Gated by `PUBLIC_DATA_AUTO_REFRESH_ENABLED=true` (currently on in prod, off locally). Each source has its own freshness model — tax liens pull only the latest cycle, HPD pulls full history per parcel — see `docs/product/PUBLIC_DATA_PLATFORM.md` → Orchestration for the per-source breakdown.
+
+**Ingestion is in-process and not durable.** `NycIngestionService.ingestAll()` and `CareScraperService.scrapeAll()` run as unawaited Promises on the API server with an in-memory `running` flag. A server restart (e.g. Railway redeploy) kills the run mid-flight — the `IngestionRun` row stays at `status: 'running'` and blocks the next trigger until manually flipped to `failed`. No queue, retry, or resumption — this is the Phase 1 limitation that BullMQ in Phase 2 is meant to fix. See `docs/product/PUBLIC_DATA_PLATFORM.md` → Orchestration for full operational details.
 
 ---
 
