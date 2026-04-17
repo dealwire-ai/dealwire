@@ -30,6 +30,7 @@ import {
 } from "./list-assign-popover";
 import { formatBuildingClass } from "@/lib/building-class-labels";
 import { StreetViewImage } from "./street-view-image";
+import { BblDisplay } from "./bbl-display";
 import { useApi } from "@/hooks/use-api";
 
 const BOROUGH_NAMES: Record<string, string> = {
@@ -349,10 +350,12 @@ function renderCell(
     case "distressScore":
       return <ScoreBadge score={parcel.distressScore} />;
     case "address":
-      return (
+      return parcel.address ? (
         <span className="font-medium max-w-[200px] truncate block">
-          {parcel.address || parcel.bbl}
+          {parcel.address}
         </span>
+      ) : (
+        <BblDisplay bbl={parcel.bbl} className="font-medium" />
       );
     case "borough":
       return BOROUGH_NAMES[parcel.borough] || parcel.borough;
@@ -653,7 +656,13 @@ export function ParcelTable({
                             Property Details
                           </div>
                           <div className="space-y-1">
-                            <DetailRow label="BBL" value={parcel.bbl} />
+                            <div>
+                              <span className="text-zinc-500">BBL: </span>
+                              <BblDisplay
+                                bbl={parcel.bbl}
+                                className="text-zinc-300"
+                              />
+                            </div>
                             <DetailRow label="Address" value={parcel.address} />
                             <DetailRow label="Zip" value={parcel.zipCode} />
                             <DetailRow label="Owner" value={parcel.ownerName} />
