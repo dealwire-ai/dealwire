@@ -12,26 +12,26 @@ Public real estate data (tax liens, zoning, permits, assessments, deed transfers
 
 Most US property data is accessible without scraping. The access pattern hierarchy, from cleanest to most brittle:
 
-| Priority | Adapter Type | Coverage | API Pattern | Examples |
-|----------|-------------|----------|-------------|----------|
-| **1** | **Socrata (SODA API)** | City/county open data portals | `GET /resource/{id}.json?$where=...&$limit=50000&$offset=0` | NYC, Chicago, SF, LA County, Cook County, **CT (all 169 towns)**, NY State, MD, CO |
-| **2** | **ArcGIS REST** | GIS/parcel/zoning maps (~80% of US municipalities) | `GET /FeatureServer/{layer}/query?where=1=1&outFields=*&f=geojson` | Most cities' zoning, parcels, flood zones; **MA MassGIS statewide parcels** |
-| **3** | **Bulk file download** | State DOT/DOA bulk exports | Direct HTTP download (CSV, shapefile, GeoJSON) | FL statewide parcel export, many state DOT shapefiles |
-| **4** | **SFTP / FTP** | County data feeds | File transfer | Some county assessors publish quarterly CSV drops |
-| **5** | **Playwright scraper** | Last resort — CAMA web portals | HTML parsing, browser automation | Individual assessor lookups (Tyler iasWorld, VGSI portals) |
+| Priority | Adapter Type           | Coverage                                           | API Pattern                                                        | Examples                                                                           |
+| -------- | ---------------------- | -------------------------------------------------- | ------------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
+| **1**    | **Socrata (SODA API)** | City/county open data portals                      | `GET /resource/{id}.json?$where=...&$limit=50000&$offset=0`        | NYC, Chicago, SF, LA County, Cook County, **CT (all 169 towns)**, NY State, MD, CO |
+| **2**    | **ArcGIS REST**        | GIS/parcel/zoning maps (~80% of US municipalities) | `GET /FeatureServer/{layer}/query?where=1=1&outFields=*&f=geojson` | Most cities' zoning, parcels, flood zones; **MA MassGIS statewide parcels**        |
+| **3**    | **Bulk file download** | State DOT/DOA bulk exports                         | Direct HTTP download (CSV, shapefile, GeoJSON)                     | FL statewide parcel export, many state DOT shapefiles                              |
+| **4**    | **SFTP / FTP**         | County data feeds                                  | File transfer                                                      | Some county assessors publish quarterly CSV drops                                  |
+| **5**    | **Playwright scraper** | Last resort — CAMA web portals                     | HTML parsing, browser automation                                   | Individual assessor lookups (Tyler iasWorld, VGSI portals)                         |
 
 ### CAMA Vendor Landscape
 
 Most US counties run their assessment data on commercial **CAMA (Computer-Assisted Mass Appraisal)** software. Understanding the vendor landscape explains why so much data sits behind web portals — these vendors don't expose public APIs.
 
-| Vendor | Market Share | Portal Style | Access Path |
-|--------|-------------|--------------|-------------|
-| **Tyler Technologies (iasWorld)** | ~40% | Web portal, no public API | State aggregators, ArcGIS exports |
-| **Vision Government Solutions (VGSI)** | ~20% | Per-town web portal (e.g. `gis.vgsi.com/web/WestHartford`) | State aggregator (if available) or scraper |
-| **BS&A Software** | ~15% | Web portal | ArcGIS layers often published separately |
-| **Patriot Properties** | ~10% | Web portal | State aggregator preferred |
-| **Harris Govern (PACS)** | ~8% | Web portal | State aggregator preferred |
-| **Vanguard CAMAvision** | ~5% | Web portal | State aggregator preferred |
+| Vendor                                 | Market Share | Portal Style                                               | Access Path                                |
+| -------------------------------------- | ------------ | ---------------------------------------------------------- | ------------------------------------------ |
+| **Tyler Technologies (iasWorld)**      | ~40%         | Web portal, no public API                                  | State aggregators, ArcGIS exports          |
+| **Vision Government Solutions (VGSI)** | ~20%         | Per-town web portal (e.g. `gis.vgsi.com/web/WestHartford`) | State aggregator (if available) or scraper |
+| **BS&A Software**                      | ~15%         | Web portal                                                 | ArcGIS layers often published separately   |
+| **Patriot Properties**                 | ~10%         | Web portal                                                 | State aggregator preferred                 |
+| **Harris Govern (PACS)**               | ~8%          | Web portal                                                 | State aggregator preferred                 |
+| **Vanguard CAMAvision**                | ~5%          | Web portal                                                 | State aggregator preferred                 |
 
 **Key insight**: For any given county running Tyler or VGSI, the better access path is almost always a **state-level aggregator** that normalizes the data across all counties. Only fall back to scraping the CAMA portal if no state portal exists.
 
@@ -39,20 +39,20 @@ Most US counties run their assessment data on commercial **CAMA (Computer-Assist
 
 Many states publish normalized statewide parcel data, bypassing CAMA vendors entirely. This is the best path for covering entire states in one adapter config:
 
-| State | Platform | Dataset / URL | Notes |
-|-------|----------|---------------|-------|
-| **Connecticut** | Socrata (`data.ct.gov`) | `pqrn-qghw` | All 169 towns including West Hartford. Same `SodaAdapter` — zero new code. |
-| **New York State** | Socrata (`data.ny.gov`) | `xkwy-kqbc` | Statewide assessment roll. Complements NYC PLUTO. |
-| **Maryland** | Socrata (`opendata.maryland.gov`) | SDAT dataset | Statewide assessments. |
-| **Colorado** | Socrata (`data.colorado.gov`) | Per-county datasets | County-by-county, many on Socrata. |
-| **Massachusetts** | ArcGIS REST | MassGIS Level 3 Parcels FeatureService | Statewide, quarterly updates. ~3.5M parcels. |
-| **Florida** | ArcGIS + bulk CSV | DOR parcel data + county ArcGIS | Statewide CSV download + ArcGIS for boundaries. |
-| **New Jersey** | State MOD-IV | Annual CSV via NJ Division of Taxation | Free bulk download, all 566 municipalities. |
-| **North Carolina** | ArcGIS REST | NC OneMap FeatureService | Statewide parcel layer. |
-| **Washington** | ArcGIS REST | WA Dept. of Revenue parcels | Statewide. |
-| **Oregon** | ArcGIS REST | ORMAP statewide parcel layer | Statewide. |
-| **Virginia** | ArcGIS REST | VITA statewide parcel fabric | Statewide. |
-| **Wisconsin** | ArcGIS REST | Wisconsin Parcel Initiative | Statewide. |
+| State              | Platform                          | Dataset / URL                          | Notes                                                                      |
+| ------------------ | --------------------------------- | -------------------------------------- | -------------------------------------------------------------------------- |
+| **Connecticut**    | Socrata (`data.ct.gov`)           | `pqrn-qghw`                            | All 169 towns including West Hartford. Same `SodaAdapter` — zero new code. |
+| **New York State** | Socrata (`data.ny.gov`)           | `xkwy-kqbc`                            | Statewide assessment roll. Complements NYC PLUTO.                          |
+| **Maryland**       | Socrata (`opendata.maryland.gov`) | SDAT dataset                           | Statewide assessments.                                                     |
+| **Colorado**       | Socrata (`data.colorado.gov`)     | Per-county datasets                    | County-by-county, many on Socrata.                                         |
+| **Massachusetts**  | ArcGIS REST                       | MassGIS Level 3 Parcels FeatureService | Statewide, quarterly updates. ~3.5M parcels.                               |
+| **Florida**        | ArcGIS + bulk CSV                 | DOR parcel data + county ArcGIS        | Statewide CSV download + ArcGIS for boundaries.                            |
+| **New Jersey**     | State MOD-IV                      | Annual CSV via NJ Division of Taxation | Free bulk download, all 566 municipalities.                                |
+| **North Carolina** | ArcGIS REST                       | NC OneMap FeatureService               | Statewide parcel layer.                                                    |
+| **Washington**     | ArcGIS REST                       | WA Dept. of Revenue parcels            | Statewide.                                                                 |
+| **Oregon**         | ArcGIS REST                       | ORMAP statewide parcel layer           | Statewide.                                                                 |
+| **Virginia**       | ArcGIS REST                       | VITA statewide parcel fabric           | Statewide.                                                                 |
+| **Wisconsin**      | ArcGIS REST                       | Wisconsin Parcel Initiative            | Statewide.                                                                 |
 
 **Rule of thumb**: Before writing a scraper for any county, check if the state publishes a statewide aggregator. For Socrata states (CT, NY, MD, CO) this means literally zero new code — just a new `SourceConfig` record pointing to the dataset ID.
 
@@ -80,6 +80,7 @@ GET {serviceUrl}/FeatureServer/{layerId}/query
 ```
 
 **Critical gotchas:**
+
 - **Use `exceededTransferLimit`** to detect end of results — not comparing `features.length === pageSize`. Some services return fewer than `resultRecordCount` records on intermediate pages (not just the last one), causing premature termination if you use length comparison.
 - **Always include `orderByFields: OBJECTID`** to guarantee stable pagination. Without a stable sort, records can shift between pages as data changes.
 - **Max `resultRecordCount`** varies by server — some cap at 1000, others allow 10000. Discover via `GET /FeatureServer/{layerId}?f=json` → `maxRecordCount` field.
@@ -96,25 +97,25 @@ GET {serviceUrl}/FeatureServer/{layerId}/query
 
 ### Federal Sources (enrichment layers)
 
-| Source | What | Access |
-|--------|------|--------|
-| Census ACS | Demographics, income, housing | `api.census.gov` — free API key |
-| FEMA NFHL | Flood zones | ArcGIS REST services at `hazards.fema.gov` |
-| EPA Envirofacts | Environmental contamination, brownfields | REST API |
-| HUD | Fair market rents, subsidized housing, vacancy rates | API at huduser.gov |
-| Opportunity Zones | QOZ Census tract designations | CSV/shapefile from CDFI Fund |
+| Source            | What                                                 | Access                                     |
+| ----------------- | ---------------------------------------------------- | ------------------------------------------ |
+| Census ACS        | Demographics, income, housing                        | `api.census.gov` — free API key            |
+| FEMA NFHL         | Flood zones                                          | ArcGIS REST services at `hazards.fema.gov` |
+| EPA Envirofacts   | Environmental contamination, brownfields             | REST API                                   |
+| HUD               | Fair market rents, subsidized housing, vacancy rates | API at huduser.gov                         |
+| Opportunity Zones | QOZ Census tract designations                        | CSV/shapefile from CDFI Fund               |
 
 ### Commercial Aggregators (gap-filling, not primary)
 
 Only consider these after exhausting free government sources. They're expensive and create vendor dependency.
 
-| Provider | Coverage | Cost | When to Use |
-|----------|----------|------|-------------|
-| **Regrid** | 159M parcels, 3,229 counties, standardized schema | $2-50K/yr; **30-day free sandbox** | Best first choice for gap-filling — standardized schema, REST API, good for parcel spine across sources |
-| **ATTOM** | 158M properties, 9,000 attributes, deed chains, foreclosures | $10-100K/yr | Deep enrichment where free sources don't reach; AVM, pre-foreclosure signals |
-| **Reonomy** | CRE ownership, LLC piercing, debt data | $10-50K/yr | Owner identification behind entities; CRE-specific |
-| **CoreLogic** | Deep mortgage/lien/MLS data | $100K+/yr | Enterprise-grade, overkill for Phase 1-2 |
-| ~~ZTRAX~~ | ~~Zillow transaction data~~ | ~~Discontinued 2023~~ | ~~No longer available~~ |
+| Provider      | Coverage                                                     | Cost                               | When to Use                                                                                             |
+| ------------- | ------------------------------------------------------------ | ---------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| **Regrid**    | 159M parcels, 3,229 counties, standardized schema            | $2-50K/yr; **30-day free sandbox** | Best first choice for gap-filling — standardized schema, REST API, good for parcel spine across sources |
+| **ATTOM**     | 158M properties, 9,000 attributes, deed chains, foreclosures | $10-100K/yr                        | Deep enrichment where free sources don't reach; AVM, pre-foreclosure signals                            |
+| **Reonomy**   | CRE ownership, LLC piercing, debt data                       | $10-50K/yr                         | Owner identification behind entities; CRE-specific                                                      |
+| **CoreLogic** | Deep mortgage/lien/MLS data                                  | $100K+/yr                          | Enterprise-grade, overkill for Phase 1-2                                                                |
+| ~~ZTRAX~~     | ~~Zillow transaction data~~                                  | ~~Discontinued 2023~~              | ~~No longer available~~                                                                                 |
 
 **Regrid recommendation**: Start here for any jurisdiction not covered by free state portals. Their `parcel` API returns standardized fields (`ll_uuid`, `parcelnumb`, `owner`, `address`, `zoning`, `parval`) across all 3,229 counties — the same field names regardless of the source county. The 30-day free sandbox is enough to validate a new market before committing.
 
@@ -126,22 +127,22 @@ NYC has the best public data infrastructure of any US city. All accessible via S
 
 ### Tax Liens & Delinquency
 
-| Dataset | Socrata ID | What It Contains | Key Fields |
-|---------|-----------|------------------|------------|
-| **Tax Lien Sale Lists** | `9rz4-mjek` | Properties eligible for upcoming lien sale | borough, block, lot, tax_class_code, building_class, zip_code, water_debt_only |
-| **Property Charges Balance** | `scjx-j6np` | Outstanding tax balances per property (28 fields) — best "distress signal" dataset | parid (BBL), sum_liab, sum_coll, sum_bal, due_date, taxyear |
+| Dataset                      | Socrata ID  | What It Contains                                                                   | Key Fields                                                                     |
+| ---------------------------- | ----------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| **Tax Lien Sale Lists**      | `9rz4-mjek` | Properties eligible for upcoming lien sale                                         | borough, block, lot, tax_class_code, building_class, zip_code, water_debt_only |
+| **Property Charges Balance** | `scjx-j6np` | Outstanding tax balances per property (28 fields) — best "distress signal" dataset | parid (BBL), sum_liab, sum_coll, sum_bal, due_date, taxyear                    |
 
 ### Property Records (ACRIS)
 
 All recorded documents — deeds, federal liens, lis pendens, UCC filings, mechanic's liens.
 
-| Dataset | Socrata ID | Purpose |
-|---------|-----------|---------|
-| Real Property Master | `bnx9-e6tj` | Document index (type, date, amount, parties) |
-| Real Property Legals | `8h5j-fqxa` | BBL linkage for each document |
-| Real Property Parties | `636b-3b5g` | Grantor/grantee names |
+| Dataset                | Socrata ID  | Purpose                                            |
+| ---------------------- | ----------- | -------------------------------------------------- |
+| Real Property Master   | `bnx9-e6tj` | Document index (type, date, amount, parties)       |
+| Real Property Legals   | `8h5j-fqxa` | BBL linkage for each document                      |
+| Real Property Parties  | `636b-3b5g` | Grantor/grantee names                              |
 | Document Control Codes | `7isb-wh4c` | Decode document type codes (29 lien-related types) |
-| Property Types Codes | `94g4-w6xz` | Property type classification |
+| Property Types Codes   | `94g4-w6xz` | Property type classification                       |
 
 Lien-related document codes: `FL` (federal lien), `FTL` (federal tax lien), `NTXL` (estate tax lien), `UCC1`/`UCC3`, lis pendens, mechanic's liens, satisfactions.
 
@@ -217,12 +218,14 @@ Every adapter — SODA, ArcGIS, Playwright scraper, PDF extractor — implements
 #### Generic vs Custom Adapters
 
 **Generic adapters** (written once, configured per-source):
+
 - `SodaAdapter` ✅ built — any Socrata dataset. Config: base URL, dataset ID, SoQL filter.
 - `ArcGisAdapter` — any ArcGIS FeatureServer/MapServer layer. Config: service URL, layer ID, spatial/attribute filters. See ArcGIS technical reference above for pagination pattern.
 - `BulkFileAdapter` — CSV/shapefile downloads. Config: download URL, file format, column mapping.
 - `SftpAdapter` — SFTP/FTP file drops. Config: host, credentials, remote path, file format.
 
 **Custom adapters** (bespoke code per source):
+
 - Extend a base class, override fetch logic for sources that need browser automation, multi-step auth, or unusual pagination.
 - Still implement the same interface, so the pipeline doesn't change.
 
@@ -234,31 +237,31 @@ Each source is a DB record (or config file) that specifies which generic adapter
 
 ```typescript
 interface SourceConfig {
-  id: string;                    // 'nyc-tax-liens'
-  name: string;                  // 'NYC Tax Lien Sale Lists'
-  adapterType: 'soda' | 'arcgis' | 'scraper' | 'bulk_file' | 'custom';
-  jurisdiction: string;          // FIPS code or 'nyc', 'cook-county', etc.
+  id: string; // 'nyc-tax-liens'
+  name: string; // 'NYC Tax Lien Sale Lists'
+  adapterType: "soda" | "arcgis" | "scraper" | "bulk_file" | "custom";
+  jurisdiction: string; // FIPS code or 'nyc', 'cook-county', etc.
 
   // Adapter-specific config
   connection: {
-    baseUrl: string;             // API endpoint
-    datasetId?: string;          // Socrata dataset ID
-    layerId?: number;            // ArcGIS layer number
-    filter?: string;             // SoQL or SQL WHERE clause
-    appToken?: string;           // Socrata app token
+    baseUrl: string; // API endpoint
+    datasetId?: string; // Socrata dataset ID
+    layerId?: number; // ArcGIS layer number
+    filter?: string; // SoQL or SQL WHERE clause
+    appToken?: string; // Socrata app token
   };
 
   // How source fields map to canonical schema
   fieldMap: Record<string, string | FieldTransform>;
 
   // Schedule
-  schedule: string;              // cron expression
-  refreshType: 'full' | 'incremental';
-  incrementalField?: string;     // field to use for incremental (e.g., 'modified_date')
+  schedule: string; // cron expression
+  refreshType: "full" | "incremental";
+  incrementalField?: string; // field to use for incremental (e.g., 'modified_date')
 
   // Monitoring
-  expectedRecordCount?: number;  // alert if actual deviates >50%
-  stalenessThreshold?: string;   // alert if no successful run in this window
+  expectedRecordCount?: number; // alert if actual deviates >50%
+  stalenessThreshold?: string; // alert if no successful run in this window
 }
 ```
 
@@ -311,6 +314,7 @@ Each sub-table:
 ### Schema Normalization Challenge
 
 **The hardest part of the entire system.** Every jurisdiction uses different:
+
 - Property type codes ("MULTI-FAMILY RESIDENTIAL" vs "APT 5+" vs code "1040")
 - Address formats ("123 N Main St Apt 4" vs "123 North Main Street #4")
 - Parcel ID formats (dashes, dots, zero-padding, book/page)
@@ -340,9 +344,46 @@ This composite key enables cross-source joins (e.g. matching a Regrid parcel to 
 
 ### Orchestration
 
-**Phase 1**: Manual trigger via API endpoint. Simple NestJS controller that runs the adapter → normalize → store pipeline synchronously.
+**Phase 1 (current)**: In-process pipeline (lien list → PLUTO → HPD → charges → scoring → optional NYCTL → optional CARE), typically 5-30 min depending on borough scope. Two trigger paths:
+
+- **Manual:** `POST /public-data/ingest` with optional `boroughs` body. Default boroughs: `['1', '3', '4']` (Manhattan + Brooklyn + Queens). Returns immediately; ingestion runs as an unawaited Promise.
+- **Scheduled:** `PublicDataSchedulerService` runs `@Cron(PUBLIC_DATA_REFRESH_CRON)` — default `0 3 * * 0` (**Sunday 3am UTC** = Saturday 11pm EDT / 10pm EST). Gated by `PUBLIC_DATA_AUTO_REFRESH_ENABLED=true`. Hardcoded boroughs `['1', '3', '4']`. Skips if `isRunning`. **Currently enabled in prod**, off locally by default.
+
+#### What each source actually fetches
+
+The pipeline is **not** a rolling window — each source has its own freshness model. Re-running weekly does not pull "the last week of data." It pulls:
+
+| Source                                     | Date window                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Tax lien sale list (`9rz4-mjek`)**       | **Latest cycle only.** `ingestTaxLiens()` runs `$order: 'month DESC', $limit: 1` first to find the newest `month` value, then fetches all parcels from that single cycle. The `month` field is the lien sale cycle date — NYC publishes ~annually (sometimes after multi-year gaps; 2017-2020 had no sale). Re-running between cycles produces no new parcels. Parcels from prior cycles persist in `Parcel` but `liensSyncedAt` won't update for them. |
+| **PLUTO (`64uk-42ks`)**                    | Snapshot — current attributes for every BBL that came in from the lien cycle above. No date filter.                                                                                                                                                                                                                                                                                                                                                     |
+| **HPD violations (`wvxf-dwi5`)**           | **Full history** per parcel (no date filter). Aggregated into open/closed totals + class A/B/C counts. Queried in batches of 50 block+lot pairs to avoid pulling 5M+ records per borough.                                                                                                                                                                                                                                                               |
+| **Property Charges Balance (`scjx-j6np`)** | Current balance snapshot per parcel.                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| **NYCTL quarterly (XLSX)**                 | One-shot — only runs if `NYCTL_REPORT_DATE` env var is set, fetches that exact quarterly report.                                                                                                                                                                                                                                                                                                                                                        |
+| **CARE portal scraper**                    | Scrapes per-BBL lien details for all active-lien BBLs in `Parcel`. No date window — current state.                                                                                                                                                                                                                                                                                                                                                      |
+
+**Bottom line:** the platform tracks "the active cohort of distressed properties from NYC's most recent lien sale list." When NYC publishes a new cycle, the next scheduled run picks up the new cohort and creates new Parcel rows. Old parcels from prior cycles stay in the DB indefinitely.
+
+#### Operational reality (and why Phase 2 matters)
+
+- **In-memory concurrency lock.** `NycIngestionService` and `CareScraperService` each have a private `running = false` flag. A second trigger while one is in flight returns HTTP 409 ("already running"). The flag is per-process, so two API replicas could each start one simultaneously.
+- **Server restart kills the run.** The ingestion is just an in-process Promise — there is no queue, no checkpointing, no resumption. A Railway redeploy mid-ingestion stops the work where it stands. Already-upserted rows persist; everything not yet processed is simply lost. **Avoid triggering ingestion right before any deploy.**
+- **Stale `IngestionRun` rows block retries.** Each run inserts an `IngestionRun` row with `status: 'running'`, transitioned to `success`/`failed` only by the `finally` blocks in `ingestAll()`. If the process dies before that runs, the row stays at `status: 'running'` forever and the next manual trigger is rejected with "Ingestion is already running" by the in-memory lock as soon as the same server restarts. **Recovery:** update the stuck `IngestionRun` row to `status: 'failed'` via Prisma (DB write — no raw SQL) before re-triggering. The in-memory lock resets on its own when the process restarts; the DB row does not.
+- **No retry/backoff.** A transient SODA timeout in the middle of the PLUTO loop fails the whole run. Re-trigger by hand.
+- **Notifications.** On completion or failure, `notifyIngestionComplete`/`notifyIngestionFailed` emails admins. If the process dies, no notification fires.
+
+Pre-deploy checklist: `GET /public-data/ingestion-runs` (or check `IngestionRun` table) — if anything is `status: 'running'`, hold the deploy or accept that it'll die.
+
+**Env vars governing schedule:**
+
+| Var                                | Default     | Purpose                                                               |
+| ---------------------------------- | ----------- | --------------------------------------------------------------------- |
+| `PUBLIC_DATA_AUTO_REFRESH_ENABLED` | `false`     | Master switch for the cron. Must be `"true"` (string) to enable.      |
+| `PUBLIC_DATA_REFRESH_CRON`         | `0 3 * * 0` | Cron expression. Default = Sunday 3am UTC.                            |
+| `NYCTL_REPORT_DATE`                | (unset)     | If set (e.g. `9-30-2025`), full ingest also runs NYCTL for that date. |
 
 **Phase 2+**: BullMQ job queue (already in NestJS ecosystem via `@nestjs/bullmq`). Each source = a repeatable job with its own cron schedule. Benefits over NestJS `@Cron`:
+
 - Jobs survive server restarts (persisted in Redis)
 - Automatic retry with exponential backoff
 - Concurrency control (don't run 50 sources simultaneously)
@@ -354,6 +395,7 @@ This composite key enables cross-source joins (e.g. matching a Regrid parcel to 
 ### Monitoring & Quality
 
 Per-source tracking:
+
 - Last successful run, last run status, duration
 - Record count vs expected (alert on >50% deviation)
 - Staleness detection (no successful run in N days)
@@ -384,6 +426,7 @@ Per-source tracking:
 - [x] Feature flag: `parcels` (org-level, off by default)
 
 **What was deferred to Phase 2:**
+
 - `DataSource` / `RawIngestion` DB models (source registry) — used hardcoded TS constants instead
 - `ArcGisAdapter` — not needed for Phase 1 datasets (all Socrata)
 - Raw JSONB storage / record hashing — data goes directly to `Parcel` table
@@ -392,6 +435,7 @@ Per-source tracking:
 - Individual violation records — only aggregates stored (total, open, by class)
 
 **SODA API lessons learned:**
+
 - Tax lien dataset has years of historical data. Must filter by `month` field (query `$order: 'month DESC', $limit: 1` first) to get only the latest cycle
 - PLUTO stores BBL as a float (`3001850041.00000000`). String comparison fails. Use numeric comparison: `bbl=3001850041 OR bbl=...`
 - HPD violations has 5M+ records per borough. Must batch-query by specific block+lot pairs (50 per request), not fetch entire borough
@@ -414,17 +458,20 @@ Per-source tracking:
 New jurisdictions are roughly ordered by effort: **Socrata states first** (zero new adapter code — just a new SourceConfig), then **ArcGIS states**, then bulk file, then scrapers last.
 
 **Quick wins (Socrata — same SodaAdapter, new config only):**
+
 - [ ] Connecticut (`data.ct.gov`, dataset `pqrn-qghw`) — all 169 towns including West Hartford, Hartford County
 - [ ] New York State (`data.ny.gov`, dataset `xkwy-kqbc`) — statewide assessment roll
 - [ ] Chicago (`data.cityofchicago.org`) — Cook County + city datasets
 - [ ] Maryland (`opendata.maryland.gov`) — SDAT statewide assessments
 
 **ArcGIS states (need ArcGisAdapter, then config-only per county):**
+
 - [ ] Massachusetts (MassGIS Level 3 FeatureService — ~3.5M statewide parcels)
 - [ ] Miami-Dade (county ArcGIS FeatureServer)
 - [ ] North Carolina (NC OneMap statewide parcel layer)
 
 **Other:**
+
 - [ ] Source registry CRUD API + frontend config UI
 - [ ] Per-jurisdiction field mapping management
 - [ ] Federal enrichment layers (Census ACS, FEMA flood zones)
@@ -446,6 +493,7 @@ New jurisdictions are roughly ordered by effort: **Socrata states first** (zero 
 ## Legal Position
 
 **Scraping public government data is on strong legal ground:**
+
 - Government works not copyrightable (17 U.S.C. 105)
 - Facts not copyrightable (Feist v. Rural Telephone, 1991 SCOTUS)
 - Scraping public websites doesn't violate CFAA (hiQ v. LinkedIn, 2022 9th Circuit)
@@ -458,6 +506,7 @@ New jurisdictions are roughly ordered by effort: **Socrata states first** (zero 
 ## Key Insight
 
 The moat is NOT the scraping — it's the **normalization layer and source registry**. Anyone can hit NYC's SODA API. The value is in:
+
 1. Mapping heterogeneous schemas into a unified property model
 2. Maintaining those mappings as sources change
 3. Making adding a new jurisdiction a config task instead of an engineering project
