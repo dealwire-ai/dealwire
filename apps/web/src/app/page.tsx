@@ -357,7 +357,7 @@ export default function Home() {
               {
                 name: "Isaac Levine",
                 role: "Co-Founder",
-                bio: "Software Engineer at CarGurus (NASDAQ: CARG), where he architects agentic AI systems at scale. Computer Science at Northeastern. Co-founded and sold frontstep.ai.",
+                bio: "Software Engineer at CarGurus (NASDAQ: CARG), where he builds high-throughput data systems processing hundreds of millions of inventory updates daily. Computer Science at Northeastern. Co-founded and sold frontstep.ai.",
                 linkedin: "https://www.linkedin.com/in/isaac-levine/",
                 email: "isaac@dealwire.ai",
                 headshot: "/headshots/isaac.webp",
