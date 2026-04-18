@@ -146,6 +146,38 @@ describe('ParcelQueryService', () => {
       );
     });
 
+    it('should accept lienSaleDate as a sort field', async () => {
+      // Arrange
+      prisma.parcel.findMany.mockResolvedValue([]);
+      prisma.parcel.count.mockResolvedValue(0);
+
+      // Act
+      await service.queryParcels({ sort: 'lienSaleDate', order: 'asc' });
+
+      // Assert
+      expect(prisma.parcel.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          orderBy: { lienSaleDate: { sort: 'asc', nulls: 'last' } },
+        }),
+      );
+    });
+
+    it('should fall back to default sort for invalid sort fields', async () => {
+      // Arrange
+      prisma.parcel.findMany.mockResolvedValue([]);
+      prisma.parcel.count.mockResolvedValue(0);
+
+      // Act
+      await service.queryParcels({ sort: 'notAField', order: 'asc' });
+
+      // Assert
+      expect(prisma.parcel.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          orderBy: { distressScore: { sort: 'desc', nulls: 'last' } },
+        }),
+      );
+    });
+
     it('should calculate pagination correctly for page 2', async () => {
       // Arrange
       prisma.parcel.findMany.mockResolvedValue([]);

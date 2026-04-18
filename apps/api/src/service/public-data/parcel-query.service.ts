@@ -259,6 +259,7 @@ export class ParcelQueryService {
       'outstandingTaxBill',
       'totalOutstandingBalance',
       'lienSaleAmount',
+      'lienSaleDate',
       'lienRedemptiveValue',
       'createdAt',
       'updatedAt',
