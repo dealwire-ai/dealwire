@@ -14,7 +14,6 @@ import { MarketingFooter } from "@/components/marketing/marketing-footer";
 import { FadeInSection } from "@/components/marketing/fade-in-section";
 import { IntelligenceDemo } from "@/components/marketing/intelligence-demo";
 import { NeuralFabric } from "@/components/marketing/neural-fabric";
-import { ScrollRail } from "@/components/marketing/scroll-rail";
 import { CursorGlow } from "@/components/marketing/cursor-glow";
 
 export default function Home() {
@@ -26,7 +25,6 @@ export default function Home() {
         <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-[#C8A96E]/6 rounded-full blur-[140px] translate-y-1/2 -translate-x-1/3" />
       </div>
 
-      <ScrollRail />
       <CursorGlow />
 
       <MarketingNav variant="home" />

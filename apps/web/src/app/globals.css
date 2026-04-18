@@ -10,7 +10,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-space-grotesk);
   --font-mono: var(--font-ibm-plex-mono), ui-monospace, monospace;
-  --color-gold: #C8A96E;
+  --color-gold: #c8a96e;
   --color-gold-dim: #9a7e4f;
 }
 
@@ -25,4 +25,29 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(200, 169, 110, 0.25);
+  border-radius: 4px;
+  border: 2px solid #0a0a0a;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(200, 169, 110, 0.55);
+}
+::-webkit-scrollbar-corner {
+  background: #0a0a0a;
+}
+
+html {
+  scrollbar-color: rgba(200, 169, 110, 0.35) #0a0a0a;
+  scrollbar-width: thin;
 }
