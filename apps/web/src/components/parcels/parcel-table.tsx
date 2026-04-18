@@ -4,6 +4,7 @@ import { Fragment, useState } from "react";
 import {
   ArrowDown,
   ArrowUp,
+  ArrowUpDown,
   ChevronDown,
   ChevronUp,
   Circle,
@@ -176,6 +177,13 @@ export const COLUMNS: ColumnDef[] = [
     sortable: true,
   },
   {
+    key: "lienSaleDate",
+    label: "Sale Date",
+    field: "lienSaleDate",
+    defaultVisible: true,
+    sortable: true,
+  },
+  {
     key: "totalOutstandingBalance",
     label: "Total Owed",
     field: "totalOutstandingBalance",
@@ -327,6 +335,16 @@ function formatNumber(value: number | null | undefined): string {
   return new Intl.NumberFormat("en-US").format(value);
 }
 
+function formatSaleDate(value: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
 function formatDimensions(
   front: number | null,
   depth: number | null,
@@ -414,6 +432,8 @@ function renderCell(
       ) : (
         "-"
       );
+    case "lienSaleDate":
+      return parcel.lienSaleDate ? formatSaleDate(parcel.lienSaleDate) : "-";
     case "outstandingTaxBill":
       return formatCurrency(parcel.outstandingTaxBill);
     case "totalOutstandingBalance":
@@ -525,20 +545,27 @@ export function ParcelTable({
                   </TableHead>
                 )}
                 <TableHead
-                  className={
-                    col.align === "right"
-                      ? "text-right cursor-pointer hover:text-white select-none"
-                      : "cursor-pointer hover:text-white select-none"
-                  }
+                  className={[
+                    col.align === "right" ? "text-right" : "",
+                    col.sortable
+                      ? "group cursor-pointer hover:text-white select-none"
+                      : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
                   onClick={() => col.sortable && onSortChange?.(col.field)}
                 >
                   <span className="inline-flex items-center gap-1">
                     {col.label}
-                    {isActive &&
-                      (order === "desc" ? (
-                        <ArrowDown className="h-3.5 w-3.5" />
+                    {col.sortable &&
+                      (isActive ? (
+                        order === "desc" ? (
+                          <ArrowDown className="h-3.5 w-3.5 text-[#C8A96E]" />
+                        ) : (
+                          <ArrowUp className="h-3.5 w-3.5 text-[#C8A96E]" />
+                        )
                       ) : (
-                        <ArrowUp className="h-3.5 w-3.5" />
+                        <ArrowUpDown className="h-3.5 w-3.5 opacity-30 group-hover:opacity-60" />
                       ))}
                   </span>
                 </TableHead>
