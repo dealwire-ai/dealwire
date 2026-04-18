@@ -32,6 +32,7 @@ import {
 import { formatBuildingClass } from "@/lib/building-class-labels";
 import { StreetViewImage } from "./street-view-image";
 import { BblDisplay } from "./bbl-display";
+import { buildDobBisUrl, getDobNowSearchUrl } from "@/lib/nyc-external-links";
 import { useApi } from "@/hooks/use-api";
 
 const BOROUGH_NAMES: Record<string, string> = {
@@ -777,6 +778,10 @@ export function ParcelTable({
                               label="Is Coop"
                               value={parcel.isCoopExcluded ? "Yes" : "No"}
                             />
+                            <DobLinks
+                              borough={parcel.borough}
+                              address={parcel.address}
+                            />
                           </div>
                         </div>
 
@@ -1036,6 +1041,50 @@ function InlineSkipTraceButton({
       <Phone className="w-3 h-3" />
       <span>Trace</span>
     </button>
+  );
+}
+
+function DobLinks({
+  borough,
+  address,
+}: {
+  borough: string;
+  address: string | null;
+}) {
+  const bisUrl = buildDobBisUrl(borough, address);
+  const dobNowUrl = getDobNowSearchUrl();
+
+  return (
+    <div className="pt-1">
+      <span className="text-zinc-500">NYC DOB: </span>
+      {bisUrl ? (
+        <a
+          href={bisUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[#C8A96E] hover:underline"
+          onClick={(e) => e.stopPropagation()}
+          title="Old BIS — pre-2022 permits, violations, complaints"
+        >
+          BIS
+        </a>
+      ) : (
+        <span className="text-zinc-600" title="Address required for BIS lookup">
+          BIS
+        </span>
+      )}
+      <span className="text-zinc-600"> · </span>
+      <a
+        href={dobNowUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-[#C8A96E] hover:underline"
+        onClick={(e) => e.stopPropagation()}
+        title="DOB NOW — current permits (search by BBL or address)"
+      >
+        DOB NOW
+      </a>
+    </div>
   );
 }
 
