@@ -7,7 +7,7 @@ import posthog from "posthog-js";
 
 import { Button } from "@/components/ui/button";
 import { IntelligenceDemo } from "@/components/marketing/intelligence-demo";
-import { NeuralFabric } from "@/components/marketing/neural-fabric";
+import { ShaderBackdrop } from "@/components/marketing/shader-backdrop";
 
 const GRID_BACKGROUND = {
   backgroundImage: `
@@ -26,7 +26,7 @@ export function HeroSection() {
       className="relative z-10 px-6 lg:px-16 pt-20 pb-20 lg:pt-28 lg:pb-32 overflow-hidden"
       style={GRID_BACKGROUND}
     >
-      <NeuralFabric />
+      <ShaderBackdrop variant="hero" />
       <div className="relative z-10 max-w-7xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <motion.div
