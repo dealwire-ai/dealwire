@@ -6,7 +6,7 @@ import posthog from "posthog-js";
 
 import { Button } from "@/components/ui/button";
 import { FadeInSection } from "@/components/marketing/fade-in-section";
-import { NeuralFabric } from "@/components/marketing/neural-fabric";
+import { ShaderBackdrop } from "@/components/marketing/shader-backdrop";
 
 const GRID_BACKGROUND = {
   backgroundImage: `
@@ -23,7 +23,7 @@ export function ClosingCtaSection() {
       className="relative z-10 px-6 lg:px-16 py-28 lg:py-40 border-t border-white/[0.04] overflow-hidden"
       style={GRID_BACKGROUND}
     >
-      <NeuralFabric />
+      <ShaderBackdrop variant="closing" />
 
       {/* Soften the transition from the section above */}
       <div className="pointer-events-none absolute inset-x-0 top-0 h-56 bg-gradient-to-b from-[#080808] via-[#080808]/80 to-transparent z-[1]" />
