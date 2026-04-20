@@ -19,26 +19,26 @@ model User {
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
-  microsoftSubscription  MicrosoftSubscription?
-  receivedDeals          Deal[]                 @relation("ReceivedDeals")
-  triggeredIngestions    HistoricalIngestion[]   @relation("TriggeredIngestions")
+  microsoftSubscription MicrosoftSubscription?
+  receivedDeals         Deal[]                 @relation("ReceivedDeals")
+  triggeredIngestions   HistoricalIngestion[]  @relation("TriggeredIngestions")
 }
 
 model Organization {
-  id                  String                @id
-  name                String
-  slug                String?                @unique
-  imageUrl            String?
-  featureFlags        Json?                  // { parcels?: boolean, ... } — merged with defaults at app layer
-  users                 User[]
-  deals                 Deal[]
-  screeningPreferences  ScreeningPreferences?
-  screeningBuckets      ScreeningBucket[]
-  historicalIngestions   HistoricalIngestion[]
-  proformas             Proforma[]
-  underwritingRuns      UnderwritingRun[]
-  createdAt             DateTime               @default(now())
-  updatedAt             DateTime               @updatedAt
+  id                   String                @id
+  name                 String
+  slug                 String?               @unique
+  imageUrl             String?
+  featureFlags         Json? // { parcels?: boolean, ... } — merged with defaults at app layer
+  users                User[]
+  deals                Deal[]
+  screeningPreferences ScreeningPreferences?
+  screeningBuckets     ScreeningBucket[]
+  historicalIngestions HistoricalIngestion[]
+  proformas            Proforma[]
+  underwritingRuns     UnderwritingRun[]
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
 }
 
 model MicrosoftSubscription {
@@ -85,20 +85,20 @@ model Deal {
   // Action card data (captured at processing time for digest)
   sourceWebLink  String? // Outlook Web link to original email
   sourceEntryId  String? // MAPI entry ID (hex) for outlook: protocol deep link
-  extractedLinks Json?   // { dealRoomLinks: string[], caLinks: string[], listingLinks: string[] }
+  extractedLinks Json? // { dealRoomLinks: string[], caLinks: string[], listingLinks: string[] }
 
   // Relationships
-  asset             Asset?             @relation(fields: [assetId], references: [id])
-  assetId           String?
-  contact           Contact?           @relation(fields: [contactId], references: [id])
-  contactId         String?
-  documents         Document[]
-  initialScreening  InitialScreening?
-  underwritingRuns  UnderwritingRun[]
+  asset            Asset?            @relation(fields: [assetId], references: [id])
+  assetId          String?
+  contact          Contact?          @relation(fields: [contactId], references: [id])
+  contactId        String?
+  documents        Document[]
+  initialScreening InitialScreening?
+  underwritingRuns UnderwritingRun[]
 
-  isMuted           Boolean   @default(false)
-  mutedAt           DateTime?
-  mutedReason       String?   @db.Text
+  isMuted     Boolean   @default(false)
+  mutedAt     DateTime?
+  mutedReason String?   @db.Text
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -154,18 +154,18 @@ model InitialScreening {
 // SCREENING BUCKET - Customizable deal classification tier
 // ============================================
 model ScreeningBucket {
-  id              String       @id @default(cuid())
-  organizationId  String
-  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
-  name            String       // "Hot Deal", "Good Fit", "Pass"
-  description     String       @db.Text  // Criteria for AI classification
-  rank            Int          // 1 = highest priority
-  isPass          Boolean      // true = Decision.YES, false = Decision.NO
+  name            String // "Hot Deal", "Good Fit", "Pass"
+  description     String       @db.Text // Criteria for AI classification
+  rank            Int // 1 = highest priority
+  isPass          Boolean // true = Decision.YES, false = Decision.NO
   action          BucketAction @default(NONE)
-  folderName      String?      // For MOVE_TO_FOLDER action
+  folderName      String? // For MOVE_TO_FOLDER action
   generateSummary Boolean      @default(false)
-  color           String?      // Hex color for UI/email
+  color           String? // Hex color for UI/email
 
   initialScreenings InitialScreening[]
 
@@ -188,9 +188,9 @@ model Asset {
 
   normalizedAddress String? @unique // Normalized address for matching (e.g., "123 MAIN ST, NEW YORK, NY, USA")
 
-  deals            Deal[]
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  deals     Deal[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([normalizedAddress])
 }
@@ -201,7 +201,7 @@ model Asset {
 model Contact {
   id String @id @default(cuid())
 
-  email String @unique // Normalized email (lowercase, trimmed) - used as unique key
+  email     String   @unique // Normalized email (lowercase, trimmed) - used as unique key
   firstName String?
   lastName  String?
   notes     String?  @db.Text // Freeform broker notes (e.g., "just had a baby, likes the Knicks")
@@ -248,54 +248,54 @@ enum IngestionStatus {
 }
 
 model HistoricalIngestion {
-  id                     String          @id @default(cuid())
-  organizationId         String
-  organization           Organization    @relation(fields: [organizationId], references: [id])
-  triggeredByUserId      String
-  triggeredByUser        User            @relation("TriggeredIngestions", fields: [triggeredByUserId], references: [id])
+  id                String       @id @default(cuid())
+  organizationId    String
+  organization      Organization @relation(fields: [organizationId], references: [id])
+  triggeredByUserId String
+  triggeredByUser   User         @relation("TriggeredIngestions", fields: [triggeredByUserId], references: [id])
 
   // Config
-  startDate              DateTime?
-  endDate                DateTime?
-  folderName             String          @default("Inbox")
+  startDate  DateTime?
+  endDate    DateTime?
+  folderName String    @default("Inbox")
 
   // Progress
-  status                 IngestionStatus @default(PENDING)
-  totalMessages          Int?
-  scannedCount           Int             @default(0)
-  detectedCount          Int             @default(0)
-  processedCount         Int             @default(0)
-  skippedCount           Int             @default(0)
-  errorCount             Int             @default(0)
+  status         IngestionStatus @default(PENDING)
+  totalMessages  Int?
+  scannedCount   Int             @default(0)
+  detectedCount  Int             @default(0)
+  processedCount Int             @default(0)
+  skippedCount   Int             @default(0)
+  errorCount     Int             @default(0)
 
   // Resumability
-  nextLink               String?         @db.Text
+  nextLink               String? @db.Text
   lastProcessedMessageId String?
-  lastError              String?         @db.Text
+  lastError              String? @db.Text
 
-  startedAt              DateTime?
-  completedAt            DateTime?
-  createdAt              DateTime        @default(now())
-  updatedAt              DateTime        @updatedAt
+  startedAt   DateTime?
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   @@index([organizationId, status])
 }
 
 model ScreeningPreferences {
-  id              String       @id @default(cuid())
-  organizationId  String       @unique
-  organization    Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  companyName     String?
-  brandColor      String? // Hex code
-  passedFolderName String?
-  dealCriteria    String?       @db.Text
-  skipCriteria    String?       @db.Text // Free-text criteria for the LLM to interpret (e.g. "retail deals", "deals under 40 units")
-  knownProperties String?       @db.Text // Structured list of property names/addresses to skip via regex (one per line)
-  digestSchedule  String? // CRON expression (e.g., "0 12 * * *" for daily at noon)
-  digestTimeZone  String?  @default("America/New_York") // Timezone for schedule
-  designatedMonitoringInboxEmails String[] @default([]) // If non-empty, only these users' inboxes are monitored; falls back to oldest connected user
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
+  id                              String       @id @default(cuid())
+  organizationId                  String       @unique
+  organization                    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  companyName                     String?
+  brandColor                      String? // Hex code
+  passedFolderName                String?
+  dealCriteria                    String?      @db.Text
+  skipCriteria                    String?      @db.Text // Free-text criteria for the LLM to interpret (e.g. "retail deals", "deals under 40 units")
+  knownProperties                 String?      @db.Text // Structured list of property names/addresses to skip via regex (one per line)
+  digestSchedule                  String? // CRON expression (e.g., "0 12 * * *" for daily at noon)
+  digestTimeZone                  String?      @default("America/New_York") // Timezone for schedule
+  designatedMonitoringInboxEmails String[]     @default([]) // If non-empty, only these users' inboxes are monitored; falls back to oldest connected user
+  createdAt                       DateTime     @default(now())
+  updatedAt                       DateTime     @updatedAt
 }
 
 // ============================================
@@ -306,21 +306,21 @@ model Proforma {
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
-  name           String       // e.g. "Standard Multifamily Model"
-  s3Key          String       // S3 path to the .xlsx template file
+  name  String // e.g. "Standard Multifamily Model"
+  s3Key String // S3 path to the .xlsx template file
 
   // Cell mapping: array of { extractedField, sheet, cell, label }
   // extractedField keys match the canonical extraction output schema.
   // e.g. [{ "extractedField": "om.askingPrice", "sheet": "Assumptions", "cell": "B5", "label": "Purchase Price" }]
-  fieldMap       Json         @default("[]")
+  fieldMap Json @default("[]")
 
-  isDefault      Boolean      @default(false) // Pipeline uses this template when org has multiple
-  isReady        Boolean      @default(false) // False until fieldMap is confirmed via onboarding
+  isDefault Boolean @default(false) // Pipeline uses this template when org has multiple
+  isReady   Boolean @default(false) // False until fieldMap is confirmed via onboarding
 
   underwritingRuns UnderwritingRun[]
 
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([organizationId])
 }
@@ -329,126 +329,126 @@ model Proforma {
 // PARCEL - Public data record for a tax parcel (by BBL)
 // ============================================
 model Parcel {
-  id        String @id @default(cuid())
+  id String @id @default(cuid())
 
   // BBL (Borough-Block-Lot) — unique tax parcel identifier
-  borough   String   // "1"=Manhattan, "2"=Bronx, "3"=Brooklyn, "4"=Queens, "5"=Staten Island
-  block     String
-  lot       String
-  bbl       String   @unique // Composite 10-char: borough(1) + block(5, zero-padded) + lot(4, zero-padded)
+  borough String // "1"=Manhattan, "2"=Bronx, "3"=Brooklyn, "4"=Queens, "5"=Staten Island
+  block   String
+  lot     String
+  bbl     String @unique // Composite 10-char: borough(1) + block(5, zero-padded) + lot(4, zero-padded)
 
   // Address
-  address   String?
-  zipCode   String?
-  city      String?   // Derived from borough for NYC (e.g. "Brooklyn")
-  state     String?   // "NY" for all NYC parcels
+  address String?
+  zipCode String?
+  city    String? // Derived from borough for NYC (e.g. "Brooklyn")
+  state   String? // "NY" for all NYC parcels
 
   // PLUTO data (property characteristics from NYC Dept of City Planning)
-  buildingClass     String?
-  unitsTotal        Int?
-  unitsRes          Int?
-  buildingArea      Int?      // sqft
-  lotArea           Int?      // sqft
-  lotFront          Float?    // ft (PLUTO lotfront)
-  lotDepth          Float?    // ft (PLUTO lotdepth)
-  bldgFront         Float?    // ft (PLUTO bldgfront)
-  bldgDepth         Float?    // ft (PLUTO bldgdepth)
-  numFloors         Float?
-  yearBuilt         Int?
-  ownerName         String?
-  zoneDist1         String?
-  landUse           String?
-  assessTotal       Float?    // Total assessed value (from DOF)
-  taxClass          String?
+  buildingClass String?
+  unitsTotal    Int?
+  unitsRes      Int?
+  buildingArea  Int? // sqft
+  lotArea       Int? // sqft
+  lotFront      Float? // ft (PLUTO lotfront)
+  lotDepth      Float? // ft (PLUTO lotdepth)
+  bldgFront     Float? // ft (PLUTO bldgfront)
+  bldgDepth     Float? // ft (PLUTO bldgdepth)
+  numFloors     Float?
+  yearBuilt     Int?
+  ownerName     String?
+  zoneDist1     String?
+  landUse       String?
+  assessTotal   Float? // Total assessed value (from DOF)
+  taxClass      String?
 
   // Computed / enriched
-  estimatedMarketValue  Float?   // assessTotal / rate (0.06 for class 1, 0.45 for class 2-4)
-  isCoopExcluded        Boolean @default(false) // True if buildingClass in coop exclusion list
+  estimatedMarketValue Float? // assessTotal / rate (0.06 for class 1, 0.45 for class 2-4)
+  isCoopExcluded       Boolean @default(false) // True if buildingClass in coop exclusion list
 
   // Tax lien data (from NYC DOF lien sale list)
-  hasActiveLien    Boolean  @default(false)
-  lienCycle        String?  // e.g., "90 Day Notice"
-  waterDebtOnly    Boolean  @default(false)
+  hasActiveLien Boolean @default(false)
+  lienCycle     String? // e.g., "90 Day Notice"
+  waterDebtOnly Boolean @default(false)
 
   // Property charges (from DOF Property Charges Balance — Socrata scjx-j6np)
-  outstandingTaxBill       Float?    // Sum of CHG (property tax) balances
-  totalOutstandingBalance  Float?    // Sum of ALL outstanding balances (CHG+SAC+SAF+SAT)
-  chargesSyncedAt          DateTime? // When charges data was last synced
+  outstandingTaxBill      Float? // Sum of CHG (property tax) balances
+  totalOutstandingBalance Float? // Sum of ALL outstanding balances (CHG+SAC+SAF+SAT)
+  chargesSyncedAt         DateTime? // When charges data was last synced
 
   // HPD Violations (aggregated counts per parcel)
-  violationsTotal    Int    @default(0)
-  violationsOpen     Int    @default(0)
-  violationsClassA   Int    @default(0)  // Non-hazardous
-  violationsClassB   Int    @default(0)  // Hazardous
-  violationsClassC   Int    @default(0)  // Immediately hazardous
-  violationsPerUnit  Float?              // violationsOpen / unitsTotal
+  violationsTotal   Int    @default(0)
+  violationsOpen    Int    @default(0)
+  violationsClassA  Int    @default(0) // Non-hazardous
+  violationsClassB  Int    @default(0) // Hazardous
+  violationsClassC  Int    @default(0) // Immediately hazardous
+  violationsPerUnit Float? // violationsOpen / unitsTotal
 
   // Distress score (0-100, higher = more distressed)
-  distressScore   Float?
+  distressScore Float?
 
   // Skip tracing (owner contact lookup via Tracerfy)
-  ownerPhones      Json?     // [{ number: string, type: string, rank: number }]
-  ownerEmails      Json?     // string[]
+  ownerPhones      Json? // [{ number: string, type: string, rank: number }]
+  ownerEmails      Json? // string[]
   skipTracedAt     DateTime?
-  skipTraceStatus  String?   // 'pending' | 'found' | 'not_found' | 'error'
-  skipTraceQueueId String?   // Tracerfy async queue_id, cleared after completion
+  skipTraceStatus  String? // 'pending' | 'found' | 'not_found' | 'error'
+  skipTraceQueueId String? // Tracerfy async queue_id, cleared after completion
 
   // CARE portal scraper (exact per-BBL lien data)
-  lienStatus            String?   // Raw CARE status: "S Sold", "R Post Sale Redeemed"
-  lienRedemptionDate    String?   // Date redeemed (if applicable)
-  careSyncedAt          DateTime? // When CARE scraper last updated this parcel
+  lienStatus         String? // Raw CARE status: "S Sold", "R Post Sale Redeemed"
+  lienRedemptionDate String? // Date redeemed (if applicable)
+  careSyncedAt       DateTime? // When CARE scraper last updated this parcel
 
   // NYCTL lien sale data (from quarterly status reports, crosswalk matched)
-  lienSaleAmount        Float?    // "Balance Sold" — $$ sold to NYCTL Trust
-  lienRedemptiveValue   Float?    // Current payoff amount (principal + interest + fees)
-  lienServicer          String?   // "MTAG" or "Tower"
-  lienRedeemed          Boolean?  // Has owner paid off the lien?
-  lienForeclosureStatus String?   // e.g., "Referred", "Active", null
-  lienSaleDate          String?   // When lien was sold
-  lienTrustVintage      String?   // e.g., "2025-A", "1998-2"
-  lienMatchConfidence   String?   // "exact", "group_small", "group_large", "estimated"
-  lienMatchGroupSize    Int?      // How many records shared the match key (1 = exact)
+  lienSaleAmount        Float? // "Balance Sold" — $$ sold to NYCTL Trust
+  lienRedemptiveValue   Float? // Current payoff amount (principal + interest + fees)
+  lienServicer          String? // "MTAG" or "Tower"
+  lienRedeemed          Boolean? // Has owner paid off the lien?
+  lienForeclosureStatus String? // e.g., "Referred", "Active", null
+  lienSaleDate          String? // When lien was sold
+  lienTrustVintage      String? // e.g., "2025-A", "1998-2"
+  lienMatchConfidence   String? // "exact", "group_small", "group_large", "estimated"
+  lienMatchGroupSize    Int? // How many records shared the match key (1 = exact)
   nyctlSyncedAt         DateTime?
 
   // ATTOM valuation data (from /allevents/detail)
-  avmValue       Float?     // AVM estimated market value (condos/SFR only)
-  avmHigh        Float?     // AVM upper bound
-  avmLow         Float?     // AVM lower bound
-  avmConfidence  Int?       // AVM confidence score 0-100
-  avmDate        DateTime?  // When ATTOM produced the AVM
-  marketValue    Float?     // ATTOM market total value (broader coverage than AVM)
-  assessedValue  Float?     // Tax-assessed total value
-  lastSalePrice  Float?     // Most recent sale amount
-  lastSaleDate   DateTime?  // Most recent sale date
-  taxAmount      Float?     // Annual property tax
-  taxYear        Int?       // Tax year
-  avmSyncedAt    DateTime?  // When we last fetched valuation data from ATTOM
+  avmValue      Float? // AVM estimated market value (condos/SFR only)
+  avmHigh       Float? // AVM upper bound
+  avmLow        Float? // AVM lower bound
+  avmConfidence Int? // AVM confidence score 0-100
+  avmDate       DateTime? // When ATTOM produced the AVM
+  marketValue   Float? // ATTOM market total value (broader coverage than AVM)
+  assessedValue Float? // Tax-assessed total value
+  lastSalePrice Float? // Most recent sale amount
+  lastSaleDate  DateTime? // Most recent sale date
+  taxAmount     Float? // Annual property tax
+  taxYear       Int? // Tax year
+  avmSyncedAt   DateTime? // When we last fetched valuation data from ATTOM
 
   // Sync tracking
-  plutoSyncedAt       DateTime?
-  liensSyncedAt       DateTime?
-  violationsSyncedAt  DateTime?
+  plutoSyncedAt      DateTime?
+  liensSyncedAt      DateTime?
+  violationsSyncedAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // Contact tracking (org-specific phone notes)
+  phoneNotes PhoneNote[]
+
+  // Property list assignments (org-specific categorization)
+  listAssignments ParcelListAssignment[]
+
+  // Org-scoped skip trace access (tracks which orgs have "unlocked" this parcel's contact data)
+  orgSkipTraces OrgSkipTrace[]
+
+  // Org-scoped AVM lookup tracking
+  orgAvmLookups OrgAvmLookup[]
 
   @@index([borough])
   @@index([buildingClass])
   @@index([distressScore(sort: Desc)])
   @@index([hasActiveLien])
   @@index([borough, hasActiveLien])
-
-  // Contact tracking (org-specific phone notes)
-  phoneNotes  PhoneNote[]
-
-  // Property list assignments (org-specific categorization)
-  listAssignments  ParcelListAssignment[]
-
-  // Org-scoped skip trace access (tracks which orgs have "unlocked" this parcel's contact data)
-  orgSkipTraces  OrgSkipTrace[]
-
-  // Org-scoped AVM lookup tracking
-  orgAvmLookups  OrgAvmLookup[]
 }
 
 enum ParcelListType {
@@ -463,7 +463,7 @@ model ParcelListAssignment {
   parcel         Parcel         @relation(fields: [parcelId], references: [id], onDelete: Cascade)
   organizationId String
   listType       ParcelListType
-  assignedBy     String         // userId who assigned
+  assignedBy     String // userId who assigned
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
 
@@ -506,12 +506,12 @@ model PhoneNote {
   id             String      @id @default(cuid())
   parcelId       String
   parcel         Parcel      @relation(fields: [parcelId], references: [id], onDelete: Cascade)
-  phoneNumber    String      // Exact string from ownerPhones[].number
+  phoneNumber    String // Exact string from ownerPhones[].number
   organizationId String
   status         PhoneStatus @default(UNKNOWN)
   note           String?     @db.Text
   userId         String
-  userInitials   String      // Denormalized "DS", "DG" for display
+  userInitials   String // Denormalized "DS", "DG" for display
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
 
@@ -520,13 +520,13 @@ model PhoneNote {
 }
 
 model IngestionRun {
-  id          String   @id @default(cuid())
-  trigger     String   // "manual" | "scheduled"
-  status      String   // "running" | "success" | "failed"
+  id          String    @id @default(cuid())
+  trigger     String // "manual" | "scheduled"
+  status      String // "running" | "success" | "failed"
   boroughs    String[] // ["1", "3", "4"]
-  results     Json?    // IngestionResult[] on completion
-  error       String?  @db.Text
-  startedAt   DateTime @default(now())
+  results     Json? // IngestionResult[] on completion
+  error       String?   @db.Text
+  startedAt   DateTime  @default(now())
   completedAt DateTime?
 
   @@index([status])
@@ -535,48 +535,89 @@ model IngestionRun {
 
 enum UnderwritingStatus {
   RUNNING
+  WAITING_FOR_ASSUMPTIONS
+  WAITING_FOR_CLARIFICATION
   COMPLETED
   FAILED
 }
 
+enum UnderwritingMessageDirection {
+  INBOUND
+  OUTBOUND
+}
+
+enum UnderwritingMessagePhase {
+  ASK
+  CLARIFY
+  DELIVER
+  REPLY
+}
+
 model UnderwritingRun {
-  id             String              @id @default(cuid())
+  id             String       @id @default(cuid())
   organizationId String
-  organization   Organization        @relation(fields: [organizationId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id])
 
   // Domain relations (all optional — populated as data becomes available)
-  dealId         String?
-  deal           Deal?               @relation(fields: [dealId], references: [id])
-  proformaId     String?
-  proforma       Proforma?           @relation(fields: [proformaId], references: [id])
+  dealId     String?
+  deal       Deal?     @relation(fields: [dealId], references: [id])
+  proformaId String?
+  proforma   Proforma? @relation(fields: [proformaId], references: [id])
 
-  jobId          String              @unique  // uw_ prefixed ID for S3 partitioning & SQS idempotency
-  senderEmail    String                       // Keep — runs can exist without a Deal
-  emailSubject   String?
+  // Iteration chain: re-runs triggered by follow-up email replies link to the
+  // original run via parentRunId. Each iteration is its own row for audit trail.
+  parentRunId String?
+  parent      UnderwritingRun?  @relation("RunIterations", fields: [parentRunId], references: [id])
+  children    UnderwritingRun[] @relation("RunIterations")
 
-  status         UnderwritingStatus  @default(RUNNING)
+  jobId        String  @unique // uw_ prefixed ID for S3 partitioning & SQS idempotency
+  senderEmail  String // Keep — runs can exist without a Deal
+  emailSubject String?
 
-  analysisData   Json?
-  filledProformaModelS3Key String?    // Filled proforma output (distinct from proforma.s3Key which is the template)
-  humanReviewFlags String[]          @default([])
-  confidence     Float?
-  durationMs     Int?
-  error          String?             @db.Text
+  status UnderwritingStatus @default(RUNNING)
+
+  analysisData             Json?
+  filledProformaModelS3Key String? // Filled proforma output (distinct from proforma.s3Key which is the template)
+  humanReviewFlags         String[] @default([])
+  confidence               Float?
+  durationMs               Int?
+  error                    String?  @db.Text
+
+  // Interactive assumption loop state — populated when the pipeline pauses to
+  // ask the user for investor assumptions and resumes after they reply.
+  extractionSnapshot  Json? // Frozen DealAnalysis so the fill phase/re-runs skip re-analysis
+  askedAssumptions    Json? // AssumptionQuestion[] sent in the ASK email
+  receivedAssumptions Json? // UserAssumptions parsed from the reply
 
   // LLM cost/token rollup — populated when the run completes.
   // See docs/technical/GRAFANA_SETUP.md for the corresponding Prometheus metrics.
   totalPromptTokens     Int?
   totalCompletionTokens Int?
   totalLlmCostUsd       Decimal? @db.Decimal(10, 6)
-  llmCostByStage        Json?    // { "extraction.om": 0.0234, "field_mapping": 0.0012, ... }
+  llmCostByStage        Json? // { "extraction.om": 0.0234, "field_mapping": 0.0012, ... }
 
-  startedAt      DateTime            @default(now())
-  completedAt    DateTime?
+  startedAt   DateTime  @default(now())
+  completedAt DateTime?
 
-  createdAt      DateTime            @default(now())
-  updatedAt      DateTime            @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  messages UnderwritingRunMessage[]
 
   @@index([organizationId, status])
   @@index([organizationId, completedAt(sort: Desc)])
   @@index([dealId])
+  @@index([parentRunId])
+}
+
+model UnderwritingRunMessage {
+  id        String                       @id @default(cuid())
+  runId     String
+  run       UnderwritingRun              @relation(fields: [runId], references: [id], onDelete: Cascade)
+  messageId String                       @unique // RFC 5322 Message-ID we generated (OUTBOUND) or received (INBOUND)
+  direction UnderwritingMessageDirection
+  phase     UnderwritingMessagePhase
+  sentAt    DateTime                     @default(now())
+
+  @@index([runId, phase])
 }
