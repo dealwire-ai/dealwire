@@ -52,6 +52,37 @@ jobs:
           CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY || 'dummy-clerk-key' }}
           CLERK_WEBHOOK_SECRET: ${{ secrets.CLERK_WEBHOOK_SECRET || 'dummy-webhook-secret' }}
 
+  prisma-migration-present:
+    name: Prisma Migration Present
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify migration exists when schema.prisma changed
+        run: |
+          BASE="${{ github.event.pull_request.base.sha }}"
+          HEAD="${{ github.event.pull_request.head.sha }}"
+          CHANGED=$(git diff --name-only "$BASE"..."$HEAD")
+          echo "Files changed in PR:"
+          echo "$CHANGED"
+          SCHEMA_TOUCHED=$(echo "$CHANGED" | grep -E '^apps/api/prisma/schema\.prisma$' || true)
+          if [ -z "$SCHEMA_TOUCHED" ]; then
+            echo "schema.prisma untouched — nothing to check."
+            exit 0
+          fi
+          MIGRATION_TOUCHED=$(echo "$CHANGED" | grep -E '^apps/api/prisma/migrations/' || true)
+          if [ -z "$MIGRATION_TOUCHED" ]; then
+            echo "::error file=apps/api/prisma/schema.prisma::schema.prisma changed but no file under apps/api/prisma/migrations/ was added/modified. Run: cd apps/api && npx prisma migrate dev --name <short_description>"
+            exit 1
+          fi
+          echo "schema.prisma change paired with migration file(s):"
+          echo "$MIGRATION_TOUCHED"
+
   lint:
     name: Lint & Typecheck
     runs-on: ubuntu-latest
