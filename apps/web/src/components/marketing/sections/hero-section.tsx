@@ -57,9 +57,9 @@ export function HeroSection() {
                 })
               }
             >
-              <Button className="bg-[#C8A96E] hover:bg-[#b8952a] text-black font-semibold px-6 py-6 text-sm tracking-wide">
+              <Button className="group bg-[#C8A96E] hover:bg-[#d9bb80] text-black font-semibold px-6 py-6 text-sm tracking-wide">
                 Talk to founders
-                <ArrowRight className="w-4 h-4 ml-2" />
+                <ArrowRight className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-1" />
               </Button>
             </Link>
           </motion.div>

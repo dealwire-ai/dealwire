@@ -58,9 +58,9 @@ export function ClosingCtaSection() {
               className="relative inline-block group"
             >
               <span className="absolute -inset-3 rounded-md bg-[#C8A96E]/25 blur-xl opacity-70 group-hover:opacity-100 transition-opacity duration-500" />
-              <Button className="relative bg-[#C8A96E] hover:bg-[#b8952a] text-black font-semibold px-6 py-6 text-sm tracking-wide shadow-[0_0_30px_rgba(200,169,110,0.35)]">
+              <Button className="relative bg-[#C8A96E] hover:bg-[#d9bb80] text-black font-semibold px-6 py-6 text-sm tracking-wide shadow-[0_0_30px_rgba(200,169,110,0.35)]">
                 Talk to founders
-                <ArrowRight className="w-4 h-4 ml-2" />
+                <ArrowRight className="w-4 h-4 ml-2 transition-transform duration-200 group-hover:translate-x-1" />
               </Button>
             </Link>
           </FadeInSection>
