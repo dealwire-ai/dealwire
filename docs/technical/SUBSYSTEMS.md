@@ -56,61 +56,65 @@ Graph webhook → MicrosoftWebhookService
 
 ---
 
-## 2. Underwriting Pipeline
+## 2. Underwriting Pipeline (Interactive)
 
-**What it does:** Email-triggered autonomous underwriting. User forwards deal docs (OM, rent roll, T-12) to the underwriting inbound address with "underwrite this" in subject. System classifies, extracts, normalizes, fills the org's Excel pro forma template, and emails back the filled spreadsheet with a key-metrics summary.
+**What it does:** Email-triggered interactive underwriting. The investor forwards deal docs (OM, rent roll, T-12). The agent analyzes the documents, replies with the specific underwriting assumptions it needs (interest rate, LTV, hold, exit cap, reno budget, …), and waits. When the investor replies with values, the agent fills the org's pro forma and emails back the Excel. Follow-up replies to the filled model ("what if rate drops to 5.5%") trigger a re-run with the new assumptions.
+
+The agent **never** runs a pro forma on the first email — insufficient inputs produce garbage. Assumptions are always elicited before fill.
 
 **Key files:**
 
 ```
 src/service/underwriting/
-  underwriting-inbound.service.ts      # Resend inbound handler: download attachments → S3 → SQS
-  underwriting-listener.service.ts     # SQS consumer for 'underwriting' queue
-  underwriting-orchestrator.service.ts # Pipeline runner (Steps 1-7)
+  underwriting-inbound.service.ts      # Resend inbound handler: new job vs. reply correlation
+  underwriting-listener.service.ts     # SQS consumer: dispatches new-job / reply-job
+  underwriting-types.ts                # UnderwritingJobContext / UnderwritingResult
 
-  extractors/
-    document-classifier.service.ts     # Step 1: classify by filename — Haiku
-    om-extractor.service.ts            # Step 2: OM extraction — Sonnet-4-6
-    rent-roll-extractor.service.ts     # Step 2: rent roll extraction — Sonnet-4-6
-    t12-extractor.service.ts           # Step 2: T-12 extraction — Sonnet-4-6
-    generic-extractor.service.ts       # Step 2: unclassified docs — Sonnet-4-6
-    extraction-types.ts                # Shared types (ExtractionResults, etc.)
+  agentic/
+    agentic-underwriting.service.ts    # runAnalysisPhase / runFillPhase / runRerunPhase
+    deal-analyzer.service.ts           # Single-pass OM + rent roll + T-12 analysis (Sonnet-4-6)
+    assumption-asker.service.ts        # Prune canonical questions to what this template needs
+    assumption-email.service.ts        # Outbound ASK / CLARIFY emails (deterministic Message-ID)
+    assumption-reply-parser.service.ts # Parse investor reply → UserAssumptions (gpt-4.1-mini)
+    template-filler.service.ts         # Cell mapper: analysis + assumptions → CellMappings
+    proforma-validator.service.ts      # Second-pass QA on filled model
+    agentic-delivery.service.ts        # Outbound DELIVER email with deterministic Message-ID
+    workbook-serializer.ts             # Shared blue-input-cell detection + serialization
+    assumption-types.ts                # UserAssumptions, AssumptionQuestion, CANONICAL_ASSUMPTIONS
 
-  steps/
-    normalizer.service.ts              # Steps 3+4: derive fields + reconcile cross-doc conflicts (pure code)
-    proforma-fill.service.ts           # Step 6: AI field mapper (Sonnet) + xlsx-populate write
-    delivery.service.ts                # Step 7: format HTML + send via Resend with attachment
-
-src/service/underwriting/proforma.service.ts  # Template CRUD + field map management
+src/service/underwriting/proforma.service.ts  # Template CRUD (blue-cell scan)
 src/controller/underwriting/proforma.controller.ts  # /underwriting/proforma REST endpoints
 src/module/underwriting.module.ts
 ```
 
-**Pipeline steps:**
+**State machine:**
 
 ```
-Email → UnderwritingInboundService (Resend webhook)
-  → S3 upload of attachments
-  → SQS enqueue (underwriting queue)
-  → UnderwritingListenerService.handleMessage()
-  → UnderwritingOrchestratorService.run()
-      Step 1: DocumentClassifierService.classify()    [Haiku — classify by filename]
-      Step 2: Promise.all([om, rentRoll, t12, generic].extract())  [Sonnet-4-6]
-      Steps 3+4: NormalizerService.normalize()        [pure code — derive + reconcile]
-      Step 5: Confidence gate                         [pure code — flag low-confidence]
-      Step 6: ProformaFillService.fill()              [Sonnet-4-6 AI mapper + xlsx-populate]
-      Step 7: DeliveryService.deliver()               [Resend, from: underwritingInboundEmail]
+Inbound email
+  → In-Reply-To matches an OUTBOUND UnderwritingRunMessage?
+     ├─ NO  → new UnderwritingRun (RUNNING)
+     │        → runAnalysisPhase(ctx): analyze docs, ask assumptions
+     │        → status=WAITING_FOR_ASSUMPTIONS
+     │
+     └─ YES → parent status?
+              ├─ WAITING_FOR_ASSUMPTIONS → parse reply
+              │     ├─ unparseable → sendClarificationEmail, status=WAITING_FOR_CLARIFICATION
+              │     └─ clean      → optimistic-lock RUNNING, runFillPhase → COMPLETED
+              ├─ WAITING_FOR_CLARIFICATION → same as above
+              └─ COMPLETED → runRerunPhase: new child UnderwritingRun with parentRunId,
+                             inherits extractionSnapshot + askedAssumptions,
+                             merges new over prior receivedAssumptions
 ```
 
-**Env vars:** `AWS_UNDERWRITING_QUEUE_URL`, `ANTHROPIC_API_KEY`, `UNDERWRITING_INBOUND_EMAIL`
+**Threading:** every outbound email has a deterministic Message-ID (`<uw-{runId}-{ask|clarify|deliver}-{uuid}@mail.dealwire.ai>`) persisted to `UnderwritingRunMessage`. Inbound replies are correlated by `In-Reply-To`, with a subject-token fallback (`[UW-{runId-short}]`). Auto-replies are dropped via `Auto-Submitted` / `Precedence` / `X-Autoreply` headers. Duplicate inbounds are deduped on the inbound Message-ID.
+
+**Env vars:** `AWS_UNDERWRITING_QUEUE_URL`, `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `UNDERWRITING_INBOUND_EMAIL`, optional `UW_ANALYZER_MODEL` / `UW_TEMPLATE_FILLER_MODEL` / `UW_VALIDATOR_MODEL` / `UW_ASSUMPTION_ASKER_MODEL` / `UW_ASSUMPTION_PARSER_MODEL`.
 
 **Notes:**
 
-- No BullMQ — uses SQS directly (same pattern as email pipeline)
-- Rate limit retry in ProformaFillService: 65s → 90s backoff (Sonnet 10k TPM limit)
-- `EmailSenderService.sendEmail()` accepts optional `from` override — used here to send from `underwritingInboundEmail` with display name "AI Underwriting Analyst"
-- Delivery skipped if no filled pro forma (e.g., no org template configured)
-- Web pro forma rendering (dashboard view) is NOT yet implemented
+- No BullMQ — uses SQS directly. Two message types on the `underwriting` queue: `underwriting-job` (new) and `underwriting-reply-job` (reply).
+- Legacy (extractor-per-doc-type) pipeline is removed; the agentic pipeline is the only path.
+- Web pro forma rendering (dashboard view) is NOT yet implemented — delivery is via email attachment.
 
 ---
 
