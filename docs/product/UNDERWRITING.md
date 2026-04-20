@@ -1,25 +1,24 @@
 # Acquisition Underwriting Platform
 
-## Implementation Status (as of Mar 2026)
+## Implementation Status (as of Apr 2026)
 
-The email-trigger → Excel delivery pipeline is **end-to-end working in production**.
+The pipeline is now **interactive**. On a new deal email the agent analyzes the docs but does NOT run the pro forma — it replies asking for the investor's underwriting assumptions. Once the investor replies with values, the agent runs the pro forma and emails back the filled Excel. Follow-up replies to the filled model (e.g. "what if rate drops to 5.5%") re-run with updated assumptions, with the prior values carried forward.
 
-| Step | Status | Notes |
-|------|--------|-------|
-| Email trigger + inbound handling | ✅ Built | Resend inbound webhook → `UnderwritingInboundService` |
-| Document classification | ✅ Built | Haiku, by filename |
-| Parallel extraction (OM, rent roll, T-12) | ✅ Built | Sonnet-4-6, `Promise.all` |
-| Normalize + reconcile | ✅ Built | Pure code in `NormalizerService` (not Opus) |
-| Confidence gate | ✅ Built | Flags low/moderate confidence fields |
-| Pro forma fill + AI mapper | ✅ Built | Sonnet-4-6 mapper + xlsx-populate write |
-| Email delivery | ✅ Built | Resend from `UNDERWRITING_INBOUND_EMAIL`, "AI Underwriting Analyst" |
-| Web pro forma rendering | ❌ Not built | Dashboard view of filled pro forma |
+This replaces the previous "run the pro forma immediately from documents alone" flow, which was producing unusable output (negative returns, zero reno assumed) because it was filling investor-assumption cells with defaults.
 
-**Key divergences from original plan (below):**
-- Reconciler (Step 4) is **pure code** in `NormalizerService`, NOT Opus + extended thinking
-- Step 7 (Delivery) was added — not in original plan
-- AI mapper sub-step is in `ProformaFillService` — not in original plan
-- No BullMQ — uses SQS directly (same pattern as email pipeline)
+| Step                                           | Status | Notes                                                                               |
+| ---------------------------------------------- | ------ | ----------------------------------------------------------------------------------- |
+| Email inbound + reply correlation              | ✅     | `UnderwritingInboundService` — In-Reply-To + subject-token fallback                 |
+| Deal analysis (single-pass)                    | ✅     | `DealAnalyzerService`, Sonnet-4-6                                                   |
+| Assumption ask (tailored per template)         | ✅     | `AssumptionAskerService`, Sonnet-4-6 prunes canonical list against blue input cells |
+| Assumption reply parser                        | ✅     | `AssumptionReplyParserService`, gpt-4.1-mini, `<user_reply>` sandbox + Zod          |
+| Template fill (analysis + assumptions)         | ✅     | `TemplateFillerService`, Sonnet-4-6 + xlsx-populate                                 |
+| QA validator + auto-corrections                | ✅     | `ProformaValidatorService`                                                          |
+| Email delivery (with deterministic Message-ID) | ✅     | `AgenticDeliveryService`                                                            |
+| Re-run on reply to COMPLETED                   | ✅     | `runRerunPhase` creates child `UnderwritingRun` via `parentRunId`                   |
+| Web pro forma rendering                        | ❌     | Dashboard view of filled pro forma                                                  |
+
+**Legacy pipeline removed:** the extractor-per-doc-type orchestrator (classifier → OM/rent-roll/T-12 extractors → reconciler) has been deleted. The agentic pipeline is the only path. `AGENTIC_UNDERWRITING_ENABLED` no longer exists.
 
 ---
 
@@ -40,6 +39,7 @@ None of them do email-native autonomous intake. Every product requires a human t
 ## User Workflow (Target State)
 
 ### Setup (once per user)
+
 1. User uploads their Excel pro forma template to the dashboard
 2. System reads the template structure — Claude Opus infers which cells are inputs vs. formulas and maps field names to cell references (e.g. `"grossPotentialRent" → "Assumptions!B12"`)
 3. FieldMap stored in DB per org, reused for every subsequent deal run
@@ -47,16 +47,19 @@ None of them do email-native autonomous intake. Every product requires a human t
 ### Per Deal (two intake paths)
 
 **Path A — Email trigger (primary, agentic-first)**
+
 - User forwards OM + rent roll + T-12 to `underwrite@analyzer.ai` with "underwrite this" in subject/body
 - System detects trigger, extracts all attachments, runs extraction pipeline
 - System fills the stored template with extracted data
 - System emails back: summary + "View Pro Forma" link + filled Excel attached
 
 **Path B — Dashboard upload (fallback)**
+
 - User navigates to deal page → uploads documents → clicks "Run Underwriting"
 - Same pipeline, UI-initiated instead of email-triggered
 
 ### Output
+
 - Interactive pro forma rendered in the web dashboard (editable cells, auto-recalculates)
 - Excel export button always available
 - Summary section in email (key metrics: CoC, DSCR, equity required, IRR estimate)
@@ -189,6 +192,7 @@ apps/api/src/
 Sonnet-4-6 has a 10k TPM limit on lower-tier plans. The extraction step runs multiple Sonnet calls in parallel (`Promise.all`), and the AI mapper in Step 6 also uses Sonnet.
 
 `ProformaFillService.mapFieldsWithAI()` handles rate limits with a retry loop:
+
 - Attempt 1 fails with 429 → wait 65s → retry
 - Attempt 2 fails with 429 → wait 90s → retry
 - Attempt 3 fails → return all-null mappings (pro forma fill skipped)
@@ -200,34 +204,40 @@ If rate limiting is a persistent issue in production, the extractors may need se
 ## Build Order
 
 ### Step 1 — Email trigger + document intake
+
 - Detect "underwrite this" trigger phrase in incoming emails
 - Extract and queue all attachments for processing
 - Route to underwriting pipeline vs. standard deal screening pipeline
 - Most of the email intake infrastructure already exists
 
 ### Step 2 — Rent roll structured extraction (hardest, highest-value)
+
 - Handle variable formats: clean spreadsheets (Excel → SheetJS → JSON), digital PDFs (document block), scanned PDFs (existing vision path), image tables embedded in OMs
 - Vercel AI SDK `generateObject` + Zod schema → typed output, auto-retry on validation failure
 - Per-field confidence + sourceText on every value
 - This is the core moat — extraction quality determines whether the output is actually useful
 
 ### Step 3 — T-12 / trailing financial extraction
+
 - Same approach: Vercel AI SDK + Zod schema + claude-sonnet-4-6
 - Map line items to canonical expense schema regardless of source format
 - Cross-reference extracted NOI against deal-level NOI from screening (sanity check)
 
 ### Step 4 — Template onboarding + cell mapping
+
 - SheetJS reads the user's uploaded template, serializes non-formula cells with coordinates and surrounding label context
 - Claude Opus analyzes the serialized structure once → produces FieldMap
 - Human reviews and confirms; stored in DB as `OrgTemplate { orgId, templateS3Key, fieldMap }`
 - Never re-derived per deal — only updated when user uploads a new template
 
 ### Step 5 — Template filling + Excel export
+
 - xlsx-populate reads template from S3, writes extracted values to mapped input cells
 - Formula cells untouched; user opens in Excel and formulas recalculate natively
 - Filled file → S3 (`deals/{dealId}/proforma_filled.xlsx`) + Resend email attachment
 
 ### Step 6 — Web pro forma rendering
+
 - Render filled pro forma in the dashboard (Handsontable or Luckysheet)
 - Allow cell editing with recalculation
 - Export to Excel at any time
@@ -238,39 +248,45 @@ If rate limiting is a persistent issue in production, the extractors may need se
 ## Key Technical Decisions
 
 ### Extraction SDK: Vercel AI SDK + claude-sonnet-4-6
+
 - `generateObject` with Zod schemas handles schema enforcement and auto-retry
 - Claude is the underlying model for all extractors — the SDK is just plumbing
 - Model routing: haiku-4-5 for classifier, sonnet-4-6 for extractors + AI mapper
 - ⚠ Opus is NOT used in the production path — reconciliation is pure code
 
 ### Document format handling
+
 - **PDF (digital):** Send as Claude `document` block (base64). 100-page limit — most rent rolls and T-12s are well under. Large OMs: use Files API and split if needed.
 - **Excel (.xlsx):** SheetJS parses to JSON rows → passed as text to Claude. Column layouts are inconsistent; Claude maps them to the schema.
 - **Scanned PDF:** Existing pdftoppm + Vision API path, unchanged.
 
 ### Template write: xlsx-populate, not SheetJS
-SheetJS deserializes the full workbook and re-serializes on write — it silently drops charts, advanced styles, and formula dependencies it doesn't understand. xlsx-populate manipulates raw OOXML XML directly and never touches markup it doesn't own. Input cells get written; everything else survives intact. Use SheetJS only for *reading* the template at setup time.
+
+SheetJS deserializes the full workbook and re-serializes on write — it silently drops charts, advanced styles, and formula dependencies it doesn't understand. xlsx-populate manipulates raw OOXML XML directly and never touches markup it doesn't own. Input cells get written; everything else survives intact. Use SheetJS only for _reading_ the template at setup time.
 
 ### Orchestration: plain TypeScript + dedicated SQS queue
+
 No LangChain, no agent frameworks. The pipeline is `Promise.all` for parallel extraction and a `while` loop for the reconciler.
 
 A **dedicated underwriting queue** keeps it fully separate from deal screening — independent visibility timeout, independent error handling, no risk of a slow underwriting job affecting email pipeline throughput.
 
-| | Email pipeline | Underwriting pipeline |
-|---|---|---|
-| Queue name | `normalized-email` | `underwriting` |
-| Visibility timeout | 300s (5 min) | 600s (10 min) |
-| Listener | `NormalizedEmailListenerService` | `UnderwritingListenerService` |
-| Processor | `EmailProcessorService` | `UnderwritingPipelineService` |
-| Module | `EmailProcessorModule` | `UnderwritingModule` |
-| Queue URL env var | `AWS_NORMALIZED_EMAIL_QUEUE_URL` | `AWS_UNDERWRITING_QUEUE_URL` |
+|                    | Email pipeline                   | Underwriting pipeline         |
+| ------------------ | -------------------------------- | ----------------------------- |
+| Queue name         | `normalized-email`               | `underwriting`                |
+| Visibility timeout | 300s (5 min)                     | 600s (10 min)                 |
+| Listener           | `NormalizedEmailListenerService` | `UnderwritingListenerService` |
+| Processor          | `EmailProcessorService`          | `UnderwritingPipelineService` |
+| Module             | `EmailProcessorModule`           | `UnderwritingModule`          |
+| Queue URL env var  | `AWS_NORMALIZED_EMAIL_QUEUE_URL` | `AWS_UNDERWRITING_QUEUE_URL`  |
 
 `UnderwritingListenerService` is the orchestrator — it receives the SQS message and calls `UnderwritingPipelineService.run()`, which executes all pipeline steps sequentially/in parallel and awaits the result before the message is acknowledged. Same pattern as `NormalizedEmailListenerService` calling `EmailProcessorService.process()` today.
 
 ### Extraction accuracy fallback
+
 Start with Claude native. If rent roll extraction accuracy is a problem on real documents, Docsumo (CRE-specific pre-trained models, 98-99% claimed) or Reducto (highest accuracy on scanned tables, per-field citations) can replace the Claude call at the extraction step. The interface — document in, typed JSON out — stays the same.
 
 ### Template approach: fill user's template first, build web-native second
+
 - **Phase 1:** Parse and fill JK's existing Excel template. He gets his own model back, pre-filled. No workflow change for him.
 - **Phase 2:** Build a web-native interactive pro forma we control. More defensible as a product. Export to Excel anytime.
 
@@ -278,16 +294,16 @@ Start with Claude native. If rent roll extraction accuracy is a problem on real 
 
 ## Library Choices
 
-| Purpose | Library |
-|---------|---------|
-| Extraction API | Vercel AI SDK (`ai` + `@ai-sdk/anthropic`) |
-| Schema enforcement | Zod (via `generateObject`) |
-| Read Excel templates | SheetJS (`xlsx`) |
-| Write Excel templates | xlsx-populate (`@xlsx/xlsx-populate` fork) |
-| Browser spreadsheet rendering | Handsontable or Luckysheet |
-| Async job queue | SQS (existing pattern in codebase) |
-| PDF (digital) | Claude document block (native) |
-| PDF (scanned) | Existing pdftoppm + Vision API |
+| Purpose                       | Library                                    |
+| ----------------------------- | ------------------------------------------ |
+| Extraction API                | Vercel AI SDK (`ai` + `@ai-sdk/anthropic`) |
+| Schema enforcement            | Zod (via `generateObject`)                 |
+| Read Excel templates          | SheetJS (`xlsx`)                           |
+| Write Excel templates         | xlsx-populate (`@xlsx/xlsx-populate` fork) |
+| Browser spreadsheet rendering | Handsontable or Luckysheet                 |
+| Async job queue               | SQS (existing pattern in codebase)         |
+| PDF (digital)                 | Claude document block (native)             |
+| PDF (scanned)                 | Existing pdftoppm + Vision API             |
 
 ---
 
@@ -301,6 +317,7 @@ Start with Claude native. If rent roll extraction accuracy is a problem on real 
 ## Relationship to Existing Roadmap
 
 This feature spans multiple existing roadmap items:
+
 - **Phase 1 — Attachment intelligence** (rent rolls, T-12 extraction) is the prerequisite
 - **Phase 4 — Underwriting automation** is the pro forma generation
 - **Phase 4 — Document management** is the storage layer for uploaded deal docs

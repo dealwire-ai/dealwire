@@ -3,9 +3,9 @@ import { generateObject } from 'ai';
 import { S3Service } from '../../s3/s3.service';
 import { trackLlm } from '../../llm/tracked-llm';
 import { analyzerModel } from '../model-config';
-import { excelToText } from '../extractors/extraction-types';
+import { excelToText } from '../excel-utils';
 import { DealAnalysisSchema, DealAnalysis } from './agentic-types';
-import { UnderwritingDocument } from '../underwriting-orchestrator.service';
+import { UnderwritingDocument } from '../underwriting-types';
 
 interface PreparedDocument {
   filename: string;

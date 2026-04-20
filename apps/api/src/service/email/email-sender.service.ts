@@ -16,7 +16,9 @@ export class EmailSenderService {
     }
 
     this.resend = new Resend(this.config.resendApiKey);
-    this.logger.log(`Resend initialized with from email: ${this.config.fromEmail}`);
+    this.logger.log(
+      `Resend initialized with from email: ${this.config.fromEmail}`,
+    );
   }
 
   async sendEmail(params: {
@@ -27,6 +29,7 @@ export class EmailSenderService {
     cc?: string[];
     text?: string;
     replyToMessageId?: string;
+    messageId?: string;
     attachments?: Array<{ filename: string; content: string }>;
   }): Promise<string | null> {
     try {
@@ -45,11 +48,16 @@ export class EmailSenderService {
         emailParams.text = params.text;
       }
 
+      const headers: Record<string, string> = {};
       if (params.replyToMessageId) {
-        emailParams.headers = {
-          'In-Reply-To': params.replyToMessageId,
-          References: params.replyToMessageId,
-        };
+        headers['In-Reply-To'] = params.replyToMessageId;
+        headers['References'] = params.replyToMessageId;
+      }
+      if (params.messageId) {
+        headers['Message-ID'] = params.messageId;
+      }
+      if (Object.keys(headers).length > 0) {
+        emailParams.headers = headers;
       }
 
       if (params.attachments?.length) {
@@ -66,7 +74,8 @@ export class EmailSenderService {
 
       return emailId;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       const errorStack = error instanceof Error ? error.stack : undefined;
       this.logger.error(
         `Failed to send email to ${params.to.join(', ')}: ${errorMessage}`,
@@ -80,4 +89,3 @@ export class EmailSenderService {
     return this.config.resendApiKey;
   }
 }
-

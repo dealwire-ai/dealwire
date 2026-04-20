@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Post,
   Query,
@@ -13,24 +14,23 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 import { ClerkAuthGuard } from '../../guard/clerk-auth.guard';
 import { AuthUser } from '../../decorator/auth-user.decorator';
 import { S3Service } from '../../service/s3/s3.service';
-import { UnderwritingOrchestratorService } from '../../service/underwriting/underwriting-orchestrator.service';
+import { PrismaService } from '../../service/prisma/prisma.service';
 import { AgenticUnderwritingService } from '../../service/underwriting/agentic/agentic-underwriting.service';
+import {
+  UserAssumptions,
+  UserAssumptionsSchema,
+} from '../../service/underwriting/agentic/assumption-types';
 
 /**
- * Endpoint for testing the underwriting pipeline.
- * Bypasses email → SQS intake — upload files directly and run the pipeline.
+ * Dev endpoint for testing the interactive underwriting pipeline.
+ * Bypasses email intake — upload docs and (optionally) post assumptions.
  *
- * Protected by Clerk auth in all environments.
+ * Without assumptions: runs analysis phase only → emails the investor with
+ * the assumption question list and returns `{ runId, status: 'waiting_for_assumptions' }`.
  *
- * Usage:
- *   curl -X POST https://api.dealwire.ai/underwriting/dev/run \
- *     -H "Authorization: Bearer <clerk-token>" \
- *     -F "files=@rent_roll.xlsx" \
- *     -F "files=@t12.pdf" \
- *     -F "files=@om.pdf"
+ * With assumptions: runs analysis then fill, returns the filled run.
  *
- * Optional query params:
- *   ?deliver=you@example.com  — also send the delivery email
+ * Protected by Clerk auth.
  */
 @Controller('underwriting/dev')
 @UseGuards(ClerkAuthGuard)
@@ -39,7 +39,7 @@ export class UnderwritingDevController {
 
   constructor(
     private readonly s3: S3Service,
-    private readonly orchestrator: UnderwritingOrchestratorService,
+    private readonly prisma: PrismaService,
     private readonly agenticOrchestrator: AgenticUnderwritingService,
   ) {}
 
@@ -55,6 +55,7 @@ export class UnderwritingDevController {
     @AuthUser('organizationId') orgId: string | null,
     @UploadedFiles() files: Express.Multer.File[],
     @Query('deliver') deliverTo?: string,
+    @Body('assumptions') assumptionsJson?: string,
   ) {
     if (!files?.length) {
       throw new HttpException(
@@ -65,12 +66,12 @@ export class UnderwritingDevController {
 
     const dealId = `dev_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
     const effectiveOrgId = orgId ?? 'dev-org';
+    const senderEmail = deliverTo ?? '';
 
     this.logger.log(
       `Dev run: dealId=${dealId} orgId=${effectiveOrgId} files=${files.map((f) => f.originalname).join(', ')}`,
     );
 
-    // Upload files to S3 (same path as real pipeline — extractors pull from S3)
     const documents: Array<{
       s3Key: string;
       filename: string;
@@ -89,32 +90,65 @@ export class UnderwritingDevController {
       });
     }
 
-    const useAgentic = process.env.AGENTIC_UNDERWRITING_ENABLED === 'true';
+    // Parse optional inline assumptions (so a dev run can go end-to-end)
+    let assumptions: UserAssumptions | null = null;
+    if (assumptionsJson) {
+      try {
+        const parsed = JSON.parse(assumptionsJson);
+        assumptions = UserAssumptionsSchema.parse(parsed);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        throw new HttpException(
+          `Invalid assumptions JSON: ${msg}`,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    }
 
-    const pipeline = useAgentic ? this.agenticOrchestrator : this.orchestrator;
+    const run = await this.prisma.underwritingRun.create({
+      data: {
+        jobId: dealId,
+        organizationId: effectiveOrgId,
+        senderEmail,
+        status: 'RUNNING',
+      },
+    });
 
-    this.logger.log(
-      `Dev run: using ${useAgentic ? 'agentic' : 'legacy'} pipeline`,
-    );
-
-    const result = await pipeline.run({
+    await this.agenticOrchestrator.runAnalysisPhase({
       dealId,
       orgId: effectiveOrgId,
-      senderEmail: deliverTo ?? '',
+      senderEmail,
       documents,
     });
 
-    // Generate a presigned download URL for the filled pro forma if produced
+    if (!assumptions) {
+      return {
+        runId: run.id,
+        status: 'waiting_for_assumptions',
+        uploadedDocuments: documents.map((d) => ({
+          filename: d.filename,
+          s3Key: d.s3Key,
+        })),
+      };
+    }
+
+    const fillResult = await this.agenticOrchestrator.runFillPhase(
+      run.id,
+      assumptions,
+      { senderEmail },
+    );
+
     let proformaDownloadUrl: string | null = null;
-    if (result.filledProformaModelS3Key) {
+    if (fillResult.filledProformaModelS3Key) {
       proformaDownloadUrl = await this.s3.getPresignedUrl(
-        result.filledProformaModelS3Key,
+        fillResult.filledProformaModelS3Key,
         3600,
       );
     }
 
     return {
-      ...result,
+      ...fillResult,
+      runId: run.id,
       proformaDownloadUrl,
       uploadedDocuments: documents.map((d) => ({
         filename: d.filename,

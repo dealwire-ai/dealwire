@@ -100,4 +100,41 @@ export class SQSService {
       throw error;
     }
   }
+
+  /**
+   * Enqueue an investor's reply to an underwriting ask/deliver email.
+   * The listener routes to parse → fill (first reply) or rerun (reply to completed).
+   */
+  async enqueueUnderwritingReply(messageBody: {
+    type: 'underwriting-reply-job';
+    parentRunId: string;
+    senderEmail: string;
+    rawBody: string;
+    inboundMessageId?: string;
+    inReplyToMessageId?: string;
+  }): Promise<void> {
+    if (!this.sqsService) {
+      this.logger.warn('SQS is disabled - skipping underwriting reply enqueue');
+      return;
+    }
+
+    try {
+      this.logger.log(
+        `Enqueueing underwriting reply: parentRunId=${messageBody.parentRunId} from=${messageBody.senderEmail}`,
+      );
+
+      const timestamp = Date.now();
+      const random = Math.random().toString(36).substring(2, 10);
+      const id = `uw-reply-${timestamp}-${random}`.substring(0, 80);
+
+      await this.sqsService.send('underwriting', { id, body: messageBody });
+      this.metricsService.recordSqsMessageSent('underwriting', 'success');
+    } catch (error) {
+      this.metricsService.recordSqsMessageSent('underwriting', 'error');
+      this.metricsService.recordSqsError('underwriting', 'send');
+      const msg = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Failed to enqueue underwriting reply: ${msg}`);
+      throw error;
+    }
+  }
 }

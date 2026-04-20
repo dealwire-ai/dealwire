@@ -24,8 +24,44 @@ export class UnderwritingInboundService {
       `Underwriting inbound email: ${emailId} from ${fromRaw} - "${subject}"`,
     );
 
-    // Look up sender org so the pipeline knows whose pro forma template to use
     const fromEmail = this.extractEmail(fromRaw).toLowerCase();
+
+    const headersArray: Array<{ name: string; value: string }> = Array.isArray(
+      emailData.headers,
+    )
+      ? emailData.headers
+      : [];
+    const inboundMessageId = this.findHeader(headersArray, 'message-id');
+    const inReplyTo = this.findHeader(headersArray, 'in-reply-to');
+    const autoSubmitted = this.findHeader(headersArray, 'auto-submitted');
+    const precedence = this.findHeader(headersArray, 'precedence');
+    const autoReply = this.findHeader(headersArray, 'x-autoreply');
+
+    if (
+      (autoSubmitted && autoSubmitted.toLowerCase() !== 'no') ||
+      (precedence && /auto[_-]?reply|bulk|list/i.test(precedence)) ||
+      (autoReply && /yes/i.test(autoReply))
+    ) {
+      this.logger.log(
+        `Underwriting email ${emailId} looks auto-generated (auto-submitted/precedence/x-autoreply) — skipping`,
+      );
+      return;
+    }
+
+    // ── Reply correlation ─────────────────────────────────────────────────
+    const parentRun = await this.resolveParentRun(inReplyTo, subject);
+    if (parentRun) {
+      await this.handleReply({
+        parentRunId: parentRun.id,
+        senderEmail: fromEmail,
+        rawBody: this.extractBody(emailData),
+        inboundMessageId,
+        inReplyToMessageId: inReplyTo,
+      });
+      return;
+    }
+
+    // ── New job flow ──────────────────────────────────────────────────────
     let orgId = '';
     if (fromEmail) {
       try {
@@ -46,7 +82,6 @@ export class UnderwritingInboundService {
       );
     }
 
-    // Fetch attachment metadata from Resend
     const attachments = await this.emailProcessing.fetchAttachments(emailId);
     if (attachments.length === 0) {
       this.logger.warn(
@@ -73,7 +108,6 @@ export class UnderwritingInboundService {
         }
 
         const buffer = Buffer.from(await response.arrayBuffer());
-        // S3 key: deals/uw_{jobId}/{timestamp}-{filename}
         const s3Key = await this.s3Service.uploadDealAttachment(
           buffer,
           att.filename,
@@ -100,17 +134,6 @@ export class UnderwritingInboundService {
       return;
     }
 
-    // Resend delivers headers as an array of {name, value} objects
-    const headersArray: Array<{ name: string; value: string }> = Array.isArray(
-      emailData.headers,
-    )
-      ? emailData.headers
-      : [];
-    const messageIdHeader = headersArray.find(
-      (h) => h.name?.toLowerCase() === 'message-id',
-    );
-    const inReplyToMessageId = messageIdHeader?.value || undefined;
-
     await this.sqsService.enqueueUnderwritingJob({
       type: 'underwriting-job',
       dealId: jobId,
@@ -118,11 +141,97 @@ export class UnderwritingInboundService {
       senderEmail: fromEmail,
       emailSubject: subject || undefined,
       documents,
-      inReplyToMessageId,
+      inReplyToMessageId: inboundMessageId,
     });
 
     this.logger.log(
       `Underwriting job ${jobId} enqueued with ${documents.length} document(s) from ${fromEmail}`,
+    );
+  }
+
+  /**
+   * Look up the parent run for a reply.
+   * Primary: RFC 5322 In-Reply-To matches a Message-ID we previously sent.
+   * Fallback: subject contains [UW-{runShortId}] token (client stripped In-Reply-To).
+   */
+  private async resolveParentRun(
+    inReplyTo: string | undefined,
+    subject: string,
+  ): Promise<{ id: string } | null> {
+    if (inReplyTo) {
+      const row = await this.prisma.underwritingRunMessage.findUnique({
+        where: { messageId: inReplyTo },
+        select: { runId: true, direction: true },
+      });
+      if (row && row.direction === 'OUTBOUND') {
+        return { id: row.runId };
+      }
+    }
+
+    const tokenMatch = subject.match(/\[UW-([a-z0-9]+)\]/i);
+    if (tokenMatch) {
+      const token = tokenMatch[1].toLowerCase();
+      const run = await this.prisma.underwritingRun.findFirst({
+        where: { id: { startsWith: token } },
+        select: { id: true },
+        orderBy: { createdAt: 'desc' },
+      });
+      if (run) return run;
+    }
+
+    return null;
+  }
+
+  private async handleReply(params: {
+    parentRunId: string;
+    senderEmail: string;
+    rawBody: string;
+    inboundMessageId?: string;
+    inReplyToMessageId?: string;
+  }): Promise<void> {
+    if (params.inboundMessageId) {
+      const existing = await this.prisma.underwritingRunMessage.findUnique({
+        where: { messageId: params.inboundMessageId },
+        select: { id: true },
+      });
+      if (existing) {
+        this.logger.log(
+          `[${params.parentRunId}] Duplicate inbound messageId=${params.inboundMessageId} — skipping`,
+        );
+        return;
+      }
+    }
+
+    await this.sqsService.enqueueUnderwritingReply({
+      type: 'underwriting-reply-job',
+      parentRunId: params.parentRunId,
+      senderEmail: params.senderEmail,
+      rawBody: params.rawBody,
+      inboundMessageId: params.inboundMessageId,
+      inReplyToMessageId: params.inReplyToMessageId,
+    });
+
+    this.logger.log(
+      `[${params.parentRunId}] Reply enqueued from ${params.senderEmail}`,
+    );
+  }
+
+  private findHeader(
+    headers: Array<{ name: string; value: string }>,
+    name: string,
+  ): string | undefined {
+    const match = headers.find(
+      (h) => h.name?.toLowerCase() === name.toLowerCase(),
+    );
+    return match?.value || undefined;
+  }
+
+  private extractBody(emailData: any): string {
+    return (
+      (emailData.body_plain as string | undefined) ||
+      (emailData.text as string | undefined) ||
+      (emailData.body as string | undefined) ||
+      ''
     );
   }
 
