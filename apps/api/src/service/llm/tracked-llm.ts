@@ -54,8 +54,8 @@ interface AiSdkLikeResult {
  * re-throw with the original stack.
  *
  * Usage:
- *   const { object } = await trackLlm('classification', () =>
- *     generateObject({ model: classifierModel(), schema, ... })
+ *   const { object } = await trackLlm('analysis', () =>
+ *     generateObject({ model: analyzerModel(), schema, ... })
  *   );
  *
  * If `stage` is passed, it overrides the current context stage for this call.
