@@ -1,6 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { randomUUID } from 'crypto';
 import { S3Service } from '../../s3/s3.service';
 import { EmailSenderService } from '../../email/email-sender.service';
+import { PrismaService } from '../../prisma/prisma.service';
 import { emailConfig } from '../../../config/email.config';
 import { DealAnalysis, ValidationResult } from './agentic-types';
 
@@ -12,9 +14,11 @@ export class AgenticDeliveryService {
   constructor(
     private readonly s3: S3Service,
     private readonly emailSender: EmailSenderService,
+    private readonly prisma: PrismaService,
   ) {}
 
   async deliver(params: {
+    runId: string;
     senderEmail: string;
     dealId: string;
     proformaS3Key: string;
@@ -24,6 +28,7 @@ export class AgenticDeliveryService {
     inReplyToMessageId?: string;
   }): Promise<void> {
     const {
+      runId,
       senderEmail,
       dealId,
       proformaS3Key,
@@ -36,7 +41,8 @@ export class AgenticDeliveryService {
     const buffer = await this.s3.downloadDealAttachment(proformaS3Key);
 
     const propertyAddress = analysis.propertyAddress || dealId;
-    const subject = `Underwriting Complete: ${propertyAddress}`;
+    const shortRun = runId.slice(0, 8);
+    const subject = `Underwriting Complete: ${propertyAddress} [UW-${shortRun}]`;
 
     const html = this.buildResultHtml(
       analysis,
@@ -50,6 +56,8 @@ export class AgenticDeliveryService {
       (addr) => addr.toLowerCase() !== senderEmail.toLowerCase(),
     );
 
+    const messageId = `<uw-${runId}-deliver-${randomUUID()}@mail.dealwire.ai>`;
+
     await this.emailSender.sendEmail({
       to: [senderEmail],
       cc: ccAddresses.length > 0 ? ccAddresses : undefined,
@@ -59,6 +67,7 @@ export class AgenticDeliveryService {
         ? `Dealwire <${this.config.underwritingInboundEmail}>`
         : undefined,
       replyToMessageId: inReplyToMessageId,
+      messageId,
       attachments: [
         {
           filename: 'proforma_filled.xlsx',
@@ -67,8 +76,17 @@ export class AgenticDeliveryService {
       ],
     });
 
+    await this.prisma.underwritingRunMessage.create({
+      data: {
+        runId,
+        messageId,
+        direction: 'OUTBOUND',
+        phase: 'DELIVER',
+      },
+    });
+
     this.logger.log(
-      `[${dealId}] Underwriting results delivered to ${senderEmail}`,
+      `[${dealId}] Underwriting results delivered to ${senderEmail} (msgId=${messageId})`,
     );
   }
 
