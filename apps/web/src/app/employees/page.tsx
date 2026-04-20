@@ -156,7 +156,7 @@ export default function Custom() {
                 })
               }
             >
-              <Button className="bg-[#C8A96E] hover:bg-[#b8952a] text-black font-semibold px-5 text-sm">
+              <Button className="bg-[#C8A96E] hover:bg-[#d9bb80] text-black font-semibold px-5 text-sm">
                 Get Started
               </Button>
             </Link>
@@ -217,7 +217,7 @@ export default function Custom() {
               >
                 <Button
                   size="lg"
-                  className="bg-[#C8A96E] hover:bg-[#b8952a] text-black font-semibold px-8 h-14 text-base"
+                  className="bg-[#C8A96E] hover:bg-[#d9bb80] text-black font-semibold px-8 h-14 text-base"
                 >
                   Get Started
                   <ArrowRight className="w-4 h-4 ml-2" />
@@ -844,7 +844,7 @@ export default function Custom() {
                   >
                     <Button
                       size="lg"
-                      className="bg-[#C8A96E] hover:bg-[#b8952a] text-black font-semibold px-8 h-14 text-base"
+                      className="bg-[#C8A96E] hover:bg-[#d9bb80] text-black font-semibold px-8 h-14 text-base"
                     >
                       Get Started
                       <ArrowRight className="w-4 h-4 ml-2" />

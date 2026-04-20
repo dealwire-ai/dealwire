@@ -57,7 +57,7 @@ export function Chatbot() {
         className={cn(
           "fixed bottom-6 right-6 z-50",
           "h-14 w-14 rounded-full",
-          "bg-[#C8A96E] hover:bg-[#b8952a] text-black",
+          "bg-[#C8A96E] hover:bg-[#d9bb80] text-black",
           "shadow-lg hover:shadow-xl hover:scale-105",
           "flex items-center justify-center",
           "transition-all duration-200",
