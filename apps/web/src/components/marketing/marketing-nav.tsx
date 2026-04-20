@@ -117,7 +117,7 @@ export function MarketingNav({ variant = "home" }: { variant?: Variant }) {
               })
             }
           >
-            <Button className="bg-[#C8A96E] hover:bg-[#b8952a] text-black font-semibold px-3 md:px-5 text-xs md:text-sm">
+            <Button className="bg-[#C8A96E] hover:bg-[#d9bb80] text-black font-semibold px-3 md:px-5 text-xs md:text-sm">
               Talk to founders
             </Button>
           </Link>

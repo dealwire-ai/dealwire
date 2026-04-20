@@ -159,7 +159,7 @@ export default function SecurityPage() {
                 })
               }
             >
-              <Button className="bg-[#C8A96E] hover:bg-[#b8952a] text-black font-semibold px-6 py-6 text-sm tracking-wide">
+              <Button className="bg-[#C8A96E] hover:bg-[#d9bb80] text-black font-semibold px-6 py-6 text-sm tracking-wide">
                 Request security diligence pack
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
