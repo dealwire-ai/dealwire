@@ -32,3 +32,23 @@ pre-push:
     typecheck-api:
       glob: "apps/api/**/*.ts"
       run: pnpm --filter @dealwire/api exec tsc --noEmit
+    prisma-migration-present:
+      run: |
+        BRANCH=$(git rev-parse --abbrev-ref HEAD)
+        if [ "$BRANCH" = "main" ] || [ "$BRANCH" = "master" ]; then
+          exit 0
+        fi
+        # Find merge base with origin/main; if it doesn't exist, diff against HEAD~1 as a fallback.
+        git fetch origin main --quiet 2>/dev/null || true
+        BASE=$(git merge-base HEAD origin/main 2>/dev/null || git rev-parse HEAD~1 2>/dev/null || echo "")
+        if [ -z "$BASE" ]; then exit 0; fi
+        CHANGED=$(git diff --name-only "$BASE"...HEAD)
+        SCHEMA_TOUCHED=$(echo "$CHANGED" | grep -E '^apps/api/prisma/schema\.prisma$' || true)
+        if [ -z "$SCHEMA_TOUCHED" ]; then exit 0; fi
+        MIGRATION_TOUCHED=$(echo "$CHANGED" | grep -E '^apps/api/prisma/migrations/' || true)
+        if [ -z "$MIGRATION_TOUCHED" ]; then
+          echo "❌ apps/api/prisma/schema.prisma changed but no file under apps/api/prisma/migrations/ was added/modified."
+          echo "   Run: cd apps/api && npx prisma migrate dev --name <short_description>"
+          echo "   (Use --no-verify only if this is a formatting-only edit to schema.prisma.)"
+          exit 1
+        fi
