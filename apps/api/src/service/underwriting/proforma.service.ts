@@ -10,7 +10,7 @@ import { z } from 'zod';
 import { proformaScanModel } from './model-config';
 import { PrismaService } from '../prisma/prisma.service';
 import { S3Service } from '../s3/s3.service';
-import { excelToTextWithCellRefs } from './extractors/extraction-types';
+import { excelToTextWithCellRefs } from './excel-utils';
 import { trackLlm } from '../llm/tracked-llm';
 
 export interface FieldMapEntry {

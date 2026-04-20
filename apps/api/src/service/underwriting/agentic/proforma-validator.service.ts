@@ -5,7 +5,7 @@ import {
   ValidationResultSchema,
   ValidationResult,
 } from './agentic-types';
-import { excelToTextWithCellRefs } from '../extractors/extraction-types';
+import { excelToTextWithCellRefs } from '../excel-utils';
 import { validatorModel } from '../model-config';
 import { trackLlm } from '../../llm/tracked-llm';
 

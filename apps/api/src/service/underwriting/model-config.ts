@@ -24,23 +24,6 @@ function resolveModelName(envVar: string, fallback: string): string {
 
 // ── Underwriting pipeline (AI SDK model objects) ────────────────────
 
-export function classifierModel() {
-  return resolveModel('UW_CLASSIFIER_MODEL', 'gpt-4.1-mini');
-}
-
-export function extractorModel() {
-  return resolveModel('UW_EXTRACTOR_MODEL', 'gpt-4.1');
-}
-
-/** Always defaults to Anthropic for PDF extraction (native file block support). */
-export function pdfExtractorModel() {
-  return resolveModel('UW_PDF_EXTRACTOR_MODEL', 'claude-sonnet-4-6');
-}
-
-export function mapperModel() {
-  return resolveModel('UW_MAPPER_MODEL', 'gpt-4.1');
-}
-
 export function analyzerModel() {
   return resolveModel('UW_ANALYZER_MODEL', 'claude-sonnet-4-6');
 }
@@ -55,6 +38,14 @@ export function validatorModel() {
 
 export function proformaScanModel() {
   return resolveModel('UW_PROFORMA_SCAN_MODEL', 'claude-haiku-4-5-20251001');
+}
+
+export function assumptionAskerModel() {
+  return resolveModel('UW_ASSUMPTION_ASKER_MODEL', 'claude-sonnet-4-6');
+}
+
+export function assumptionParserModel() {
+  return resolveModel('UW_ASSUMPTION_PARSER_MODEL', 'gpt-4.1-mini');
 }
 
 // ── Deal screening (raw model name strings for openai.chat.completions.create) ─
