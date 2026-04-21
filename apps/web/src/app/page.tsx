@@ -13,7 +13,7 @@ import { ClosingCtaSection } from "@/components/marketing/sections/closing-cta-s
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-[#080808] text-white overflow-x-hidden font-sans">
+    <div className="marketing-cursor min-h-screen bg-[#080808] text-white overflow-x-hidden font-sans">
       <AmbientBackground />
       <CursorGlow />
       <MarketingNav variant="home" />
