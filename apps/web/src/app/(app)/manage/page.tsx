@@ -196,7 +196,7 @@ export default function ManagePage() {
       actions={
         <button
           onClick={startCreate}
-          className="px-3 py-1.5 bg-[#C8A96E] hover:bg-[#b8952a] text-black font-medium rounded-md text-sm transition-colors"
+          className="px-3 py-1.5 bg-[#C8A96E] hover:bg-[#d9bb80] text-black font-medium rounded-md text-sm transition-colors"
         >
           + Add Bucket
         </button>
@@ -334,7 +334,7 @@ export default function ManagePage() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-4 py-2 bg-[#C8A96E] hover:bg-[#b8952a] text-black font-medium rounded-lg text-sm transition-colors disabled:opacity-50"
+                  className="px-4 py-2 bg-[#C8A96E] hover:bg-[#d9bb80] text-black font-medium rounded-lg text-sm transition-colors disabled:opacity-50"
                 >
                   {saving
                     ? "Saving..."

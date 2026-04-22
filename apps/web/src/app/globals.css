@@ -10,7 +10,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-space-grotesk);
   --font-mono: var(--font-ibm-plex-mono), ui-monospace, monospace;
-  --color-gold: #C8A96E;
+  --color-gold: #c8a96e;
   --color-gold-dim: #9a7e4f;
 }
 
@@ -25,4 +25,88 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+::-webkit-scrollbar-track {
+  background: #070707;
+  box-shadow:
+    inset 1px 0 0 rgba(200, 169, 110, 0.05),
+    inset -1px 0 0 rgba(200, 169, 110, 0.05);
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    180deg,
+    rgba(200, 169, 110, 0.55) 0%,
+    rgba(200, 169, 110, 0.35) 50%,
+    rgba(200, 169, 110, 0.55) 100%
+  );
+  border-radius: 6px;
+  border: 3px solid #070707;
+  box-shadow:
+    0 0 8px rgba(200, 169, 110, 0.25),
+    inset 0 0 1px rgba(255, 224, 170, 0.5);
+  transition: background 0.2s ease;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    180deg,
+    rgba(220, 190, 130, 0.9) 0%,
+    rgba(200, 169, 110, 0.75) 50%,
+    rgba(220, 190, 130, 0.9) 100%
+  );
+  box-shadow:
+    0 0 14px rgba(200, 169, 110, 0.55),
+    inset 0 0 2px rgba(255, 224, 170, 0.7);
+}
+::-webkit-scrollbar-thumb:active {
+  background: rgba(220, 190, 130, 1);
+  box-shadow:
+    0 0 20px rgba(200, 169, 110, 0.75),
+    inset 0 0 3px rgba(255, 235, 190, 0.9);
+}
+::-webkit-scrollbar-corner {
+  background: #070707;
+}
+
+html {
+  scrollbar-color: rgba(200, 169, 110, 0.45) #070707;
+  scrollbar-width: thin;
+}
+
+/* Custom cursor — scoped to marketing pages (home + /security) */
+.marketing-cursor {
+  cursor:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'><path d='M2 2 L2 16 L6 13 L8.5 18.5 L10.5 17.5 L8 12 L13 12 Z' fill='%23c8a96e' stroke='%23070707' stroke-width='1' stroke-linejoin='round'/></svg>")
+      2 2,
+    auto;
+}
+.marketing-cursor a,
+.marketing-cursor button,
+.marketing-cursor [role="button"],
+.marketing-cursor label,
+.marketing-cursor summary {
+  cursor:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><circle cx='12' cy='12' r='10' fill='none' stroke='%23c8a96e' stroke-width='1.25' opacity='0.55'/><circle cx='12' cy='12' r='4' fill='%23c8a96e' stroke='%23070707' stroke-width='1'/></svg>")
+      12 12,
+    pointer;
+}
+.marketing-cursor input,
+.marketing-cursor textarea,
+.marketing-cursor [contenteditable="true"] {
+  cursor: text;
+}
+@media (hover: none), (pointer: coarse) {
+  .marketing-cursor,
+  .marketing-cursor a,
+  .marketing-cursor button,
+  .marketing-cursor [role="button"],
+  .marketing-cursor label,
+  .marketing-cursor summary {
+    cursor: auto;
+  }
 }
