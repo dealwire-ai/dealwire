@@ -42,7 +42,7 @@ export default function NotFound() {
 
         <Link
           href="/"
-          className="inline-flex items-center gap-2 px-6 py-3 bg-[#C8A96E] hover:bg-[#b8952a] text-black font-semibold text-sm rounded-md transition-colors"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-[#C8A96E] hover:bg-[#d9bb80] text-black font-semibold text-sm rounded-md transition-colors"
         >
           Back to the lobby
         </Link>

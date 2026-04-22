@@ -209,6 +209,9 @@ importers:
       "@clerk/themes":
         specifier: ^2.4.55
         version: 2.4.55(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
+      "@paper-design/shaders-react":
+        specifier: ^0.0.76
+        version: 0.0.76(@types/react@19.2.7)(react@19.2.1)
       "@radix-ui/react-avatar":
         specifier: ^1.1.11
         version: 1.1.11(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
@@ -2388,6 +2391,24 @@ packages:
         integrity: sha512-R5R9tb2AXs2IRLNKLBJDynhkfmx7mX0vi8NkhZb3gUkPWHn6HXk5J8iQ/dql0U3ApfWym4kXXmBDRGO+oeOfjg==,
       }
     engines: { node: ">=14" }
+
+  "@paper-design/shaders-react@0.0.76":
+    resolution:
+      {
+        integrity: sha512-uPJWrYRf6cJdO2H+fuXlahaqz0QjYglNAyUTaRfIInpzCa/d6guxBIK003soAZQFuQ035yg9FhtfFzKNWm+a5A==,
+      }
+    peerDependencies:
+      "@types/react": ^18 || ^19
+      react: ^18 || ^19
+    peerDependenciesMeta:
+      "@types/react":
+        optional: true
+
+  "@paper-design/shaders@0.0.76":
+    resolution:
+      {
+        integrity: sha512-AcNDY4J66YQHUfQYFInkCP7M9VOje0od7wLpOR7LtCmc532opJy6ll+h1W9zBovz8tt9U7OADUmJ/qKEXyOX/A==,
+      }
 
   "@paralleldrive/cuid2@2.3.1":
     resolution:
@@ -12092,6 +12113,15 @@ snapshots:
       "@opentelemetry/semantic-conventions": 1.39.0
 
   "@opentelemetry/semantic-conventions@1.39.0": {}
+
+  "@paper-design/shaders-react@0.0.76(@types/react@19.2.7)(react@19.2.1)":
+    dependencies:
+      "@paper-design/shaders": 0.0.76
+      react: 19.2.1
+    optionalDependencies:
+      "@types/react": 19.2.7
+
+  "@paper-design/shaders@0.0.76": {}
 
   "@paralleldrive/cuid2@2.3.1":
     dependencies:
