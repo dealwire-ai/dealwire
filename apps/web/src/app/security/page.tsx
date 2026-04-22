@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import posthog from "posthog-js";
@@ -37,10 +36,10 @@ export default function SecurityPage() {
               <span className="text-white/30">data is the business.</span>
             </h1>
             <p className="text-lg md:text-xl text-white/50 leading-relaxed max-w-3xl">
-              Dealwire is built for firms whose data is, itself, the business
-              &mdash; inbound deal flow, LP communications, proprietary
+              What flows through Dealwire is a firm&apos;s most sensitive
+              material: inbound deal flow, LP communications, proprietary
               underwriting, decades of institutional knowledge. Two commitments
-              sit underneath everything we build.
+              underpin everything we build.
             </p>
           </motion.div>
         </div>
@@ -150,8 +149,8 @@ export default function SecurityPage() {
               covering model providers, sub-processors, data handling, and
               incident response is available under NDA.
             </p>
-            <Link
-              href="/book"
+            <a
+              href="mailto:noah@dealwire.ai?subject=Security%20diligence%20pack%20request"
               onClick={() =>
                 posthog.capture("cta_clicked", {
                   cta_type: "request_diligence_pack",
@@ -163,7 +162,7 @@ export default function SecurityPage() {
                 Request security diligence pack
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
-            </Link>
+            </a>
           </FadeInSection>
         </div>
       </section>
