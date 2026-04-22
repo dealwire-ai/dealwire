@@ -2,11 +2,9 @@
 
 import { useEffect } from "react";
 import Script from "next/script";
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
-import { Button } from "../../components/ui/button";
 import posthog from "posthog-js";
-import { SignalMark } from "@/components/signal-mark";
+import { MarketingNav } from "@/components/marketing/marketing-nav";
+import { MarketingFooter } from "@/components/marketing/marketing-footer";
 
 export default function BookPage() {
   useEffect(() => {
@@ -14,7 +12,7 @@ export default function BookPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#080808] text-white font-sans">
+    <div className="marketing-cursor min-h-screen bg-[#080808] text-white font-sans">
       <Script
         src="//embed.typeform.com/next/embed.js"
         strategy="afterInteractive"
@@ -25,26 +23,7 @@ export default function BookPage() {
         <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-[#C8A96E]/6 rounded-full blur-[140px] translate-y-1/2 -translate-x-1/3" />
       </div>
 
-      {/* Navigation */}
-      <nav className="relative z-50 px-6 lg:px-16 py-6">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3">
-            <SignalMark />
-            <span className="text-base font-medium tracking-tight text-white/90">
-              Dealwire
-            </span>
-          </Link>
-          <Link href="/">
-            <Button
-              variant="outline"
-              className="border-white/10 bg-transparent text-white/60 hover:bg-white/5 hover:text-white"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
-            </Button>
-          </Link>
-        </div>
-      </nav>
+      <MarketingNav />
 
       {/* Booking Section */}
       <section className="relative z-10 px-6 lg:px-16 py-12 lg:py-20">
@@ -65,20 +44,7 @@ export default function BookPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="relative z-10 px-6 lg:px-16 py-10 border-t border-white/[0.04]">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <SignalMark />
-            <span className="text-sm text-white/30 font-mono tracking-wide">
-              Dealwire
-            </span>
-          </div>
-          <p className="text-xs font-mono text-white/15 tracking-wider">
-            © {new Date().getFullYear()} · Frontstep AI, LLC.
-          </p>
-        </div>
-      </footer>
+      <MarketingFooter />
     </div>
   );
 }

@@ -32,7 +32,7 @@ const LAYERS = [
 
 export function IntelligenceLayerSection() {
   return (
-    <SectionShell>
+    <SectionShell id="approach">
       <FadeInSection>
         <Eyebrow className="mb-6">The intelligence layer</Eyebrow>
         <h2 className="text-4xl md:text-5xl font-normal tracking-tight mb-16 leading-[1.1] max-w-4xl">
