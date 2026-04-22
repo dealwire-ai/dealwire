@@ -202,7 +202,7 @@ function PreviouslyBuilt() {
 
 export function TeamSection() {
   return (
-    <SectionShell id="about" className="py-20 lg:py-28">
+    <SectionShell id="team" className="py-20 lg:py-28">
       <FadeInSection>
         <Eyebrow className="mb-4">Team</Eyebrow>
         <h2 className="text-4xl md:text-5xl font-normal tracking-tight mb-6">

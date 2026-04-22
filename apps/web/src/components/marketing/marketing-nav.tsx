@@ -14,36 +14,55 @@ export function MarketingNav({ variant = "home" }: { variant?: Variant }) {
   const { signOut } = useClerk();
   const router = useRouter();
 
-  const handleEngagementsClick = () => {
+  const handleAnchorClick = (anchorId: string, ctaType: string) => {
     posthog.capture("cta_clicked", {
-      cta_type: "engagements_anchor",
+      cta_type: ctaType,
       location: "header",
     });
-    if (variant === "home") {
-      document
-        .getElementById("engagements")
-        ?.scrollIntoView({ behavior: "smooth" });
+    const el =
+      typeof document !== "undefined"
+        ? document.getElementById(anchorId)
+        : null;
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
     } else {
-      router.push("/#engagements");
+      router.push(`/#${anchorId}`);
     }
   };
+
+  const anchorLinkClass =
+    "text-xs font-mono tracking-widest uppercase text-white/40 hover:text-white/80 transition-colors cursor-pointer";
 
   return (
     <nav className="relative z-50 px-6 lg:px-16 py-6">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <Link href="/" className="flex items-center gap-3">
-          <SignalMark />
-          <span className="text-base font-medium tracking-tight text-white/90">
+          <SignalMark className="w-[48px] h-[30px]" />
+          <span className="text-lg font-medium tracking-tight text-white/90">
             Dealwire
           </span>
         </Link>
 
         <div className="hidden md:flex items-center gap-8">
           <button
-            onClick={handleEngagementsClick}
-            className="text-xs font-mono tracking-widest uppercase text-white/40 hover:text-white/80 transition-colors cursor-pointer"
+            onClick={() => handleAnchorClick("approach", "approach_anchor")}
+            className={anchorLinkClass}
+          >
+            Approach
+          </button>
+          <button
+            onClick={() =>
+              handleAnchorClick("engagements", "engagements_anchor")
+            }
+            className={anchorLinkClass}
           >
             Engagements
+          </button>
+          <button
+            onClick={() => handleAnchorClick("team", "team_anchor")}
+            className={anchorLinkClass}
+          >
+            Team
           </button>
           <Link
             href="/security"
