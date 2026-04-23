@@ -18,7 +18,7 @@ const ibmPlexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Dealwire — We build your firm's private intelligence layer",
+  title: "Dealwire — Your firm's private brain",
   description:
     "Dealwire builds a bespoke private intelligence layer for institutional private-market firms — unifying decades of deal flow, memos, and broker relationships so your whole firm, and every AI you deploy, works from the same source of truth.",
   metadataBase: new URL("https://dealwire.ai"),
