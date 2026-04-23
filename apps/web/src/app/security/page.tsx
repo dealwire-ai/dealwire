@@ -11,7 +11,7 @@ import { FadeInSection } from "@/components/marketing/fade-in-section";
 
 export default function SecurityPage() {
   return (
-    <div className="marketing-cursor min-h-screen bg-[#080808] text-white overflow-x-hidden font-sans">
+    <div className="min-h-screen bg-[#080808] text-white overflow-x-hidden font-sans">
       {/* Ambient Background */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-[#C8A96E]/4 rounded-full blur-[180px] -translate-y-1/2 translate-x-1/3" />
