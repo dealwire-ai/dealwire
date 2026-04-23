@@ -12,7 +12,7 @@ export default function BookPage() {
   }, []);
 
   return (
-    <div className="marketing-cursor min-h-screen bg-[#080808] text-white font-sans">
+    <div className="min-h-screen bg-[#080808] text-white font-sans">
       <Script
         src="//embed.typeform.com/next/embed.js"
         strategy="afterInteractive"
