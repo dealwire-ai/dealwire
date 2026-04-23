@@ -100,6 +100,44 @@ html {
 .marketing-cursor [contenteditable="true"] {
   cursor: text;
 }
+/* I-beam over plain text blocks so selection affordance is visible.
+   Only targets non-interactive text — interactive ancestors (a, button, etc.)
+   have higher-specificity rules above that still win. */
+.marketing-cursor p,
+.marketing-cursor h1,
+.marketing-cursor h2,
+.marketing-cursor h3,
+.marketing-cursor h4,
+.marketing-cursor h5,
+.marketing-cursor h6,
+.marketing-cursor li,
+.marketing-cursor blockquote {
+  cursor: text;
+}
+.marketing-cursor a p,
+.marketing-cursor a h1,
+.marketing-cursor a h2,
+.marketing-cursor a h3,
+.marketing-cursor a h4,
+.marketing-cursor a h5,
+.marketing-cursor a h6,
+.marketing-cursor a li,
+.marketing-cursor button p,
+.marketing-cursor button h1,
+.marketing-cursor button h2,
+.marketing-cursor button h3,
+.marketing-cursor button h4,
+.marketing-cursor button h5,
+.marketing-cursor button h6,
+.marketing-cursor [role="button"] p,
+.marketing-cursor [role="button"] h1,
+.marketing-cursor [role="button"] h2,
+.marketing-cursor [role="button"] h3,
+.marketing-cursor [role="button"] h4,
+.marketing-cursor [role="button"] h5,
+.marketing-cursor [role="button"] h6 {
+  cursor: inherit;
+}
 @media (hover: none), (pointer: coarse) {
   .marketing-cursor,
   .marketing-cursor a,
