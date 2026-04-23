@@ -454,10 +454,6 @@ export default function TermsOfUsePage() {
                 Levine
               </p>
               <p>
-                <span className="text-white/60">Address:</span> 23 Avondale
-                Road, West Hartford, Connecticut 06117
-              </p>
-              <p>
                 <span className="text-white/60">Email:</span>{" "}
                 <a
                   href="mailto:isaac@dealwire.ai"
@@ -523,8 +519,7 @@ export default function TermsOfUsePage() {
                       >
                         isaac@dealwire.ai
                       </a>
-                      , or by mail to 23 Avondale Road, West Hartford,
-                      Connecticut 06117.
+                      .
                     </p>
                   </div>
                   <div>
@@ -564,8 +559,7 @@ export default function TermsOfUsePage() {
                     <p>
                       You have the right to opt out of the provisions of this
                       arbitration agreement by sending a timely written notice
-                      within 30 days to: 23 Avondale Road, West Hartford,
-                      Connecticut 06117, or email to{" "}
+                      within 30 days by email to{" "}
                       <a
                         href="mailto:isaac@dealwire.ai"
                         className="text-[#C8A96E] hover:underline"
@@ -584,10 +578,6 @@ export default function TermsOfUsePage() {
                 <div className="bg-white/[0.02] border border-white/5 p-5 rounded space-y-1 text-white/80">
                   <p className="font-semibold text-white">
                     Frontstep AI, LLC (d/b/a Dealwire)
-                  </p>
-                  <p>
-                    <span className="text-white/60">Address:</span> 23 Avondale
-                    Road, West Hartford, Connecticut 06117
                   </p>
                   <p>
                     <span className="text-white/60">Email:</span>{" "}
