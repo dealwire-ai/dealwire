@@ -1,3 +1,5 @@
+import { parseBbl } from "@/lib/bbl";
+
 const DOB_NOW_SEARCH_URL =
   "https://a810-dobnow.nyc.gov/Publish/Index.html#!/search";
 
@@ -32,4 +34,17 @@ export function buildDobBisUrl(
 
 export function getDobNowSearchUrl(): string {
   return DOB_NOW_SEARCH_URL;
+}
+
+// ACRIS legacy BBL search — auto-submits and returns the document index
+// (deeds, mortgages, transfers, satisfactions) for the given parcel.
+export function buildAcrisUrl(bbl: string): string | null {
+  const parts = parseBbl(bbl);
+  if (!parts.borough || !parts.block || !parts.lot) return null;
+  const params = new URLSearchParams({
+    borough: parts.borough,
+    block: String(Number(parts.block)),
+    lot: String(Number(parts.lot)),
+  });
+  return `https://a836-acris.nyc.gov/bblsearch/bblsearch.asp?${params.toString()}`;
 }

@@ -32,7 +32,11 @@ import {
 import { formatBuildingClass } from "@/lib/building-class-labels";
 import { StreetViewImage } from "./street-view-image";
 import { BblDisplay } from "./bbl-display";
-import { buildDobBisUrl, getDobNowSearchUrl } from "@/lib/nyc-external-links";
+import {
+  buildAcrisUrl,
+  buildDobBisUrl,
+  getDobNowSearchUrl,
+} from "@/lib/nyc-external-links";
 import { useApi } from "@/hooks/use-api";
 
 const BOROUGH_NAMES: Record<string, string> = {
@@ -782,6 +786,7 @@ export function ParcelTable({
                               borough={parcel.borough}
                               address={parcel.address}
                             />
+                            <AcrisLink bbl={parcel.bbl} />
                           </div>
                         </div>
 
@@ -1041,6 +1046,32 @@ function InlineSkipTraceButton({
       <Phone className="w-3 h-3" />
       <span>Trace</span>
     </button>
+  );
+}
+
+function AcrisLink({ bbl }: { bbl: string }) {
+  const acrisUrl = buildAcrisUrl(bbl);
+
+  return (
+    <div className="pt-1">
+      <span className="text-zinc-500">ACRIS: </span>
+      {acrisUrl ? (
+        <a
+          href={acrisUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[#C8A96E] hover:underline"
+          onClick={(e) => e.stopPropagation()}
+          title="ACRIS — deeds, mortgages, transfers, satisfactions for this BBL"
+        >
+          Document history
+        </a>
+      ) : (
+        <span className="text-zinc-600" title="Valid BBL required">
+          Document history
+        </span>
+      )}
+    </div>
   );
 }
 
