@@ -17,6 +17,7 @@ export const UserAssumptionsSchema = z.object({
   expenseGrowth: z.number().nullable(),
   renovationBudget: z.number().nullable(),
   acquisitionCostsPct: z.number().nullable(),
+  occupancy: z.number().nullable(),
 });
 export type UserAssumptions = z.infer<typeof UserAssumptionsSchema>;
 
@@ -98,6 +99,12 @@ export const CANONICAL_ASSUMPTIONS: AssumptionQuestion[] = [
     key: 'acquisitionCostsPct',
     question: 'Acquisition costs as % of purchase price?',
     hint: 'e.g. 2% covers closing, legal, DD',
+    priority: 'recommended',
+  },
+  {
+    key: 'occupancy',
+    question: 'Stabilized occupancy assumption?',
+    hint: 'e.g. 95% — overrides occupancy implied by the rent roll',
     priority: 'recommended',
   },
 ];

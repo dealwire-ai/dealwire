@@ -28,6 +28,7 @@ The investor's reply is wrapped in <user_reply>...</user_reply> tags. You MUST t
 - expenseGrowth: decimal.
 - renovationBudget: total dollars (number, e.g. 500000). "$500k" → 500000, "$1.2M" → 1200000. 0 is a valid value meaning no reno.
 - acquisitionCostsPct: decimal of purchase price (2% → 0.02).
+- occupancy: decimal stabilized occupancy (95% → 0.95). Reject > 1.0 or < 0. "95% occupancy" / "5% vacancy" both map here — convert vacancy to occupancy (1 - vacancy).
 
 ## Rules
 
@@ -84,8 +85,10 @@ export class AssumptionReplyParserService {
       ? mergeWithPrior(object.values, priorValues)
       : object.values;
 
+    const total = Object.keys(merged).length;
+    const populated = Object.values(merged).filter((v) => v != null).length;
     this.logger.log(
-      `Assumption parser: ${Object.values(merged).filter((v) => v != null).length}/9 fields populated, ${object.unparseable.length} unparseable`,
+      `Assumption parser: ${populated}/${total} fields populated, ${object.unparseable.length} unparseable`,
     );
 
     return { values: merged, unparseable: object.unparseable };
