@@ -2,6 +2,7 @@ import { ClientLogos } from "@/components/client-logos";
 import { MarketingNav } from "@/components/marketing/marketing-nav";
 import { MarketingFooter } from "@/components/marketing/marketing-footer";
 import { CursorGlow } from "@/components/marketing/cursor-glow";
+import { RB2BScript } from "@/components/marketing/rb2b-script";
 import { AmbientBackground } from "@/components/marketing/sections/ambient-background";
 import { HeroSection } from "@/components/marketing/sections/hero-section";
 import { AssetSection } from "@/components/marketing/sections/asset-section";
@@ -28,6 +29,7 @@ export default function Home() {
       <ClosingCtaSection />
 
       <MarketingFooter />
+      <RB2BScript />
     </div>
   );
 }
