@@ -112,6 +112,8 @@ export class AgenticUnderwritingService {
     replyContext: {
       senderEmail: string;
       inReplyToMessageId?: string;
+      threadAnchorRunId?: string;
+      references?: string[];
     },
   ): Promise<UnderwritingResult> {
     const startTime = Date.now();
@@ -220,6 +222,8 @@ export class AgenticUnderwritingService {
       validation,
       correctionsApplied,
       inReplyToMessageId: replyContext.inReplyToMessageId,
+      threadAnchorRunId: replyContext.threadAnchorRunId,
+      references: replyContext.references,
     });
 
     const durationMs = Date.now() - startTime;
@@ -273,6 +277,9 @@ export class AgenticUnderwritingService {
       where: { id: parentRunId },
     });
 
+    const rootRunId = await this.findRootRunId(parent);
+    const references = await this.collectThreadReferences(rootRunId);
+
     const childJobId = `${parent.jobId}_r${Date.now().toString(36)}`;
 
     const child = await this.prisma.underwritingRun.create({
@@ -291,10 +298,58 @@ export class AgenticUnderwritingService {
     });
 
     this.logger.log(
-      `[${child.jobId}] Re-run: child run ${child.id} of parent ${parent.id}`,
+      `[${child.jobId}] Re-run: child run ${child.id} of parent ${parent.id} (thread anchor=${rootRunId}, refs=${references.length})`,
     );
 
-    return this.runFillPhase(child.id, newAssumptions, replyContext);
+    return this.runFillPhase(child.id, newAssumptions, {
+      ...replyContext,
+      threadAnchorRunId: rootRunId,
+      references,
+    });
+  }
+
+  /** Walk parentRunId up until we hit the root of the thread. */
+  private async findRootRunId(run: {
+    id: string;
+    parentRunId: string | null;
+  }): Promise<string> {
+    let cursor: { id: string; parentRunId: string | null } = run;
+    const seen = new Set<string>([cursor.id]);
+    while (cursor.parentRunId) {
+      if (seen.has(cursor.parentRunId)) break;
+      const parent = await this.prisma.underwritingRun.findUnique({
+        where: { id: cursor.parentRunId },
+        select: { id: true, parentRunId: true },
+      });
+      if (!parent) break;
+      seen.add(parent.id);
+      cursor = parent;
+    }
+    return cursor.id;
+  }
+
+  /**
+   * Collect all message IDs in the thread starting at rootRunId, in
+   * chronological order. Walks every descendant run and returns each run's
+   * messages so References reflects the full conversation.
+   */
+  private async collectThreadReferences(rootRunId: string): Promise<string[]> {
+    const runIds = new Set<string>([rootRunId]);
+    let frontier: string[] = [rootRunId];
+    while (frontier.length > 0) {
+      const children = await this.prisma.underwritingRun.findMany({
+        where: { parentRunId: { in: frontier } },
+        select: { id: true },
+      });
+      frontier = children.map((c) => c.id).filter((id) => !runIds.has(id));
+      frontier.forEach((id) => runIds.add(id));
+    }
+    const messages = await this.prisma.underwritingRunMessage.findMany({
+      where: { runId: { in: Array.from(runIds) } },
+      orderBy: { sentAt: 'asc' },
+      select: { messageId: true },
+    });
+    return messages.map((m) => m.messageId);
   }
 }
 
