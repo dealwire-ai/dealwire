@@ -1,9 +1,4 @@
-export const ADMIN_EMAILS = [
-  'isaac@dealwire.ai',
-  'noah@dealwire.ai',
-  'isaac@frontstep.ai',
-  'noah@frontstep.ai',
-];
+export const ADMIN_EMAILS = ['isaac@dealwire.ai', 'noah@dealwire.ai'];
 
 export interface EmailConfig {
   resendApiKey: string;
