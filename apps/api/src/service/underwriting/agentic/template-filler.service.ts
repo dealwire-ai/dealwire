@@ -40,8 +40,8 @@ For cells with stale data: if the current deal has a matching value, map it. If 
 
 The handling depends on whether the user assumptions JSON is non-null:
 
-- If user assumptions are PROVIDED (non-null): DO map their fields into the corresponding input cells. This includes loan terms (interestRate, ltv, amortizationYears), hold period, exitCapRate, rentGrowth, expenseGrowth, renovationBudget, and acquisitionCostsPct. Use the values verbatim — do not second-guess them. Apply the same decimal-vs-percent rule above based on surrounding template context.
-- If user assumptions are "null": do NOT map investor assumption fields (loan terms, interest rates, renovation budgets, exit cap rates, growth rates, hold period, discount rates, disposition timeline, CAPEX reserves). Leave those cells alone — the user has not provided them yet.`;
+- If user assumptions are PROVIDED (non-null): DO map their fields into the corresponding input cells. This includes loan terms (interestRate, ltv, amortizationYears), hold period, exitCapRate, rentGrowth, expenseGrowth, renovationBudget, acquisitionCostsPct, and occupancy. Use the values verbatim — do not second-guess them. Apply the same decimal-vs-percent rule above based on surrounding template context. NOTE: when occupancy is provided, it overrides any occupancy/vacancy figure derived from the rent roll — write the user's value into the occupancy/vacancy input cell (vacancy = 1 - occupancy if the cell is labeled vacancy).
+- If user assumptions are "null": do NOT map investor assumption fields (loan terms, interest rates, renovation budgets, exit cap rates, growth rates, hold period, discount rates, disposition timeline, CAPEX reserves, occupancy overrides). Leave those cells alone — the user has not provided them yet.`;
 
 @Injectable()
 export class TemplateFillerService {
