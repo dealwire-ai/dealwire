@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Space_Grotesk, IBM_Plex_Mono } from "next/font/google";
-import Script from "next/script";
 import { Toaster } from "sonner";
 import { clerkAppearance } from "@/lib/clerk-appearance";
 import "./globals.css";
@@ -47,9 +46,6 @@ export default function RootLayout({
         <body
           className={`${spaceGrotesk.variable} ${ibmPlexMono.variable} font-sans antialiased`}
         >
-          <Script id="rb2b" strategy="afterInteractive">
-            {`!function(key){if(window.reb2b)return;window.reb2b={loaded:true};var s=document.createElement("script");s.async=true;s.src="https://ddwl4m2hdecbv.cloudfront.net/b/"+key+"/"+key+".js.gz";document.getElementsByTagName("script")[0].parentNode.insertBefore(s,document.getElementsByTagName("script")[0]);}("5NRP9H7LPXO1");`}
-          </Script>
           {children}
           <Toaster
             theme="dark"
