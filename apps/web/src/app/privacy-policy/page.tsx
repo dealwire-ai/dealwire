@@ -423,10 +423,6 @@ export default function PrivacyPolicyPage() {
                   isaac@dealwire.ai
                 </a>
               </p>
-              <p>
-                <span className="text-white/60">Address:</span> 23 Avondale
-                Road, West Hartford, Connecticut 06117
-              </p>
             </div>
           </section>
 
