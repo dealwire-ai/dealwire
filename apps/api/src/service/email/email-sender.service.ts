@@ -29,6 +29,7 @@ export class EmailSenderService {
     cc?: string[];
     text?: string;
     replyToMessageId?: string;
+    references?: string[];
     messageId?: string;
     attachments?: Array<{ filename: string; content: string }>;
   }): Promise<string | null> {
@@ -51,7 +52,13 @@ export class EmailSenderService {
       const headers: Record<string, string> = {};
       if (params.replyToMessageId) {
         headers['In-Reply-To'] = params.replyToMessageId;
-        headers['References'] = params.replyToMessageId;
+      }
+      const refs = buildReferencesHeader(
+        params.references,
+        params.replyToMessageId,
+      );
+      if (refs) {
+        headers['References'] = refs;
       }
       if (params.messageId) {
         headers['Message-ID'] = params.messageId;
@@ -88,4 +95,17 @@ export class EmailSenderService {
   getApiKey(): string {
     return this.config.resendApiKey;
   }
+}
+
+function buildReferencesHeader(
+  references: string[] | undefined,
+  replyToMessageId: string | undefined,
+): string | undefined {
+  const ids: string[] = [];
+  if (references) ids.push(...references);
+  if (replyToMessageId && !ids.includes(replyToMessageId)) {
+    ids.push(replyToMessageId);
+  }
+  if (ids.length === 0) return undefined;
+  return Array.from(new Set(ids)).join(' ');
 }

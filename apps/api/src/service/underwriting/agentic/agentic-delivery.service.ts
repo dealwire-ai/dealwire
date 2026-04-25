@@ -26,6 +26,8 @@ export class AgenticDeliveryService {
     validation?: ValidationResult;
     correctionsApplied?: number;
     inReplyToMessageId?: string;
+    threadAnchorRunId?: string;
+    references?: string[];
   }): Promise<void> {
     const {
       runId,
@@ -36,13 +38,18 @@ export class AgenticDeliveryService {
       validation,
       correctionsApplied,
       inReplyToMessageId,
+      threadAnchorRunId,
+      references,
     } = params;
 
     const buffer = await this.s3.downloadDealAttachment(proformaS3Key);
 
     const propertyAddress = analysis.propertyAddress || dealId;
-    const shortRun = runId.slice(0, 8);
-    const subject = `Underwriting Complete: ${propertyAddress} [UW-${shortRun}]`;
+    const isReply = Boolean(threadAnchorRunId && threadAnchorRunId !== runId);
+    const tokenRunId = threadAnchorRunId ?? runId;
+    const shortRun = tokenRunId.slice(0, 8);
+    const baseSubject = `Underwriting Complete: ${propertyAddress} [UW-${shortRun}]`;
+    const subject = isReply ? `Re: ${baseSubject}` : baseSubject;
 
     const html = this.buildResultHtml(
       analysis,
@@ -67,6 +74,7 @@ export class AgenticDeliveryService {
         ? `Dealwire <${this.config.underwritingInboundEmail}>`
         : undefined,
       replyToMessageId: inReplyToMessageId,
+      references,
       messageId,
       attachments: [
         {
