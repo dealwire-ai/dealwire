@@ -22,6 +22,11 @@ model User {
   microsoftSubscription MicrosoftSubscription?
   receivedDeals         Deal[]                 @relation("ReceivedDeals")
   triggeredIngestions   HistoricalIngestion[]  @relation("TriggeredIngestions")
+
+  parcelDealsAssigned      ParcelDeal[]     @relation("ParcelDealAssignedTo")
+  parcelDealsAssignedBy    ParcelDeal[]     @relation("ParcelDealAssignedBy")
+  parcelDealsLastContacted ParcelDeal[]     @relation("ParcelDealLastContactedBy")
+  parcelActivities         ParcelActivity[]
 }
 
 model Organization {
@@ -37,6 +42,9 @@ model Organization {
   historicalIngestions HistoricalIngestion[]
   proformas            Proforma[]
   underwritingRuns     UnderwritingRun[]
+  parcelDealStages     ParcelDealStage[]
+  parcelDeals          ParcelDeal[]
+  parcelActivities     ParcelActivity[]
   createdAt            DateTime              @default(now())
   updatedAt            DateTime              @updatedAt
 }
@@ -444,6 +452,10 @@ model Parcel {
   // Org-scoped AVM lookup tracking
   orgAvmLookups OrgAvmLookup[]
 
+  // CRM (org-scoped pipeline + activity log)
+  deals      ParcelDeal[]
+  activities ParcelActivity[]
+
   @@index([borough])
   @@index([buildingClass])
   @@index([distressScore(sort: Desc)])
@@ -517,6 +529,103 @@ model PhoneNote {
 
   @@unique([parcelId, phoneNumber, organizationId])
   @@index([parcelId, organizationId])
+}
+
+// ============================================
+// PARCEL CRM — org-configurable pipeline + activity log
+// ============================================
+
+model ParcelDealStage {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  name           String
+  color          String? // hex e.g. "#22c55e" — UI tag color, optional
+  order          Int // display order within org
+  isDefault      Boolean      @default(false) // new deals land here
+  isTerminal     Boolean      @default(false) // closed states (won / not interested)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  deals ParcelDeal[]
+
+  @@unique([organizationId, order])
+  @@unique([organizationId, name])
+  @@index([organizationId])
+}
+
+model ParcelDeal {
+  id             String       @id @default(cuid())
+  parcelId       String
+  parcel         Parcel       @relation(fields: [parcelId], references: [id], onDelete: Cascade)
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  stageId String
+  // Restrict so an org can't delete a stage that still holds deals — they must reassign first.
+  stage   ParcelDealStage @relation(fields: [stageId], references: [id], onDelete: Restrict)
+
+  // Assignment (nullable — a parcel can be in the pipeline but unassigned)
+  assignedToUserId String?
+  assignedToUser   User?     @relation("ParcelDealAssignedTo", fields: [assignedToUserId], references: [id], onDelete: SetNull)
+  assignedByUserId String?
+  assignedByUser   User?     @relation("ParcelDealAssignedBy", fields: [assignedByUserId], references: [id], onDelete: SetNull)
+  assignedAt       DateTime?
+
+  // Denormalized contact summary (source of truth = ParcelActivity timeline)
+  nextFollowUpAt        DateTime?
+  lastContactedAt       DateTime?
+  lastContactedByUserId String?
+  lastContactedByUser   User?     @relation("ParcelDealLastContactedBy", fields: [lastContactedByUserId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([parcelId, organizationId])
+  @@index([organizationId, stageId])
+  @@index([organizationId, assignedToUserId])
+  @@index([organizationId, nextFollowUpAt])
+}
+
+enum ParcelActivityType {
+  CALL
+  NOTE
+  STAGE_CHANGED
+  ASSIGNED
+  UNASSIGNED
+  FOLLOWUP_SCHEDULED
+  FOLLOWUP_COMPLETED
+  PHONE_STATUS_CHANGED
+}
+
+model ParcelActivity {
+  id             String       @id @default(cuid())
+  parcelId       String
+  parcel         Parcel       @relation(fields: [parcelId], references: [id], onDelete: Cascade)
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  // Actor (nullable so audit trail survives user deletion; userInitials preserved for display)
+  userId       String?
+  user         User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userInitials String
+
+  type ParcelActivityType
+  body String?            @db.Text
+
+  // Phone-related fields hoisted out of metadata so they're queryable
+  phoneNumber String?
+  phoneStatus PhoneStatus?
+
+  // Type-specific extras: { fromStageId, toStageId, fromUserId, toUserId, followUpAt, ... }
+  metadata Json?
+
+  occurredAt DateTime @default(now())
+  createdAt  DateTime @default(now())
+
+  @@index([parcelId, organizationId, occurredAt(sort: Desc)])
+  @@index([parcelId, phoneNumber, occurredAt(sort: Desc)])
+  @@index([organizationId, type, occurredAt(sort: Desc)])
 }
 
 model IngestionRun {
