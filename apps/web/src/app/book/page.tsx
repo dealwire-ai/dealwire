@@ -5,6 +5,7 @@ import Script from "next/script";
 import posthog from "posthog-js";
 import { MarketingNav } from "@/components/marketing/marketing-nav";
 import { MarketingFooter } from "@/components/marketing/marketing-footer";
+import { RB2BScript } from "@/components/marketing/rb2b-script";
 
 export default function BookPage() {
   useEffect(() => {
@@ -45,6 +46,7 @@ export default function BookPage() {
       </section>
 
       <MarketingFooter />
+      <RB2BScript />
     </div>
   );
 }

@@ -22,6 +22,7 @@ import { DealFlowTicker } from "../../components/deal-flow-ticker";
 import { useAuth, useClerk } from "@clerk/nextjs";
 import posthog from "posthog-js";
 import { SignalMark } from "@/components/signal-mark";
+import { RB2BScript } from "@/components/marketing/rb2b-script";
 
 const FadeInSection = ({
   children,
@@ -871,6 +872,7 @@ export default function Custom() {
           </p>
         </div>
       </footer>
+      <RB2BScript />
     </div>
   );
 }
