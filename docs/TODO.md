@@ -3,6 +3,7 @@
 ## General Ops
 
 ## Biz Dev
+- demo for marc zegen (biz journals)
 - revision for Jim (Froggy Companies)
 - record data platform demo
 - Re-engage older prospects
