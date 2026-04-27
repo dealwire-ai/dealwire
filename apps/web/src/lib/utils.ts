@@ -1,6 +1,7 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { ADMIN_EMAILS } from "../../../api/src/config/email.config";
+
+const ADMIN_EMAILS = ["isaac@dealwire.ai", "noah@dealwire.ai"];
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
