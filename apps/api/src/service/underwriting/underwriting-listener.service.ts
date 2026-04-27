@@ -4,7 +4,6 @@ import { Message } from '@aws-sdk/client-sqs';
 import { Prisma } from '@prisma/client';
 import { UnderwritingJobContext } from './underwriting-types';
 import { AgenticUnderwritingService } from './agentic/agentic-underwriting.service';
-import { AssumptionReplyParserService } from './agentic/assumption-reply-parser.service';
 import { AssumptionEmailService } from './agentic/assumption-email.service';
 import {
   AssumptionQuestion,
@@ -12,6 +11,10 @@ import {
 } from './agentic/assumption-types';
 import { threadPropertyLabel } from './agentic/thread-subject';
 import { DealAnalysis } from './agentic/agentic-types';
+import {
+  ConversationTurn,
+  ReplyRouterService,
+} from './agentic/reply-router.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { LlmContextStore, withLlmContext } from '../llm/llm-context';
 import { MetricsService } from '../metrics/metrics.service';
@@ -49,8 +52,8 @@ export class UnderwritingListenerService {
     private readonly agenticPipeline: AgenticUnderwritingService,
     private readonly prisma: PrismaService,
     private readonly metrics: MetricsService,
-    private readonly replyParser: AssumptionReplyParserService,
     private readonly assumptionEmail: AssumptionEmailService,
+    private readonly replyRouter: ReplyRouterService,
   ) {}
 
   @SqsMessageHandler('underwriting', false)
@@ -174,6 +177,7 @@ export class UnderwritingListenerService {
             messageId: inboundMessageId,
             direction: 'INBOUND',
             phase: 'REPLY',
+            bodyText: rawBody,
           },
         });
       } catch (err) {
@@ -215,21 +219,45 @@ export class UnderwritingListenerService {
     };
 
     try {
-      const parsedReply = await withLlmContext(llmStore, () =>
-        this.replyParser.parseReply(rawBody, askedQuestions, priorValues),
+      const analysis =
+        (parent.extractionSnapshot as unknown as DealAnalysis | null) || null;
+      const property = threadPropertyLabel(analysis);
+      const rootRunId = await this.agenticPipeline.findRootRunId(parent);
+      const references =
+        await this.agenticPipeline.collectThreadReferences(rootRunId);
+      const history = await this.loadConversationHistory(rootRunId);
+
+      const decision = await withLlmContext(llmStore, () =>
+        this.replyRouter.route({
+          rawBody,
+          history,
+          askedQuestions,
+          priorValues,
+          analysis,
+        }),
       );
 
-      if (parsedReply.unparseable.length > 0) {
-        const rootRunId = await this.agenticPipeline.findRootRunId(parent);
-        const references =
-          await this.agenticPipeline.collectThreadReferences(rootRunId);
-        const property = threadPropertyLabel(
-          parent.extractionSnapshot as unknown as DealAnalysis | null,
+      if (decision.intent === 'answer') {
+        await this.assumptionEmail.sendAnswerEmail({
+          runId: parent.id,
+          senderEmail,
+          answer: decision.answer,
+          inReplyToMessageId: parsed.inReplyToMessageId,
+          property,
+          rootRunId,
+          references,
+        });
+        this.logger.log(
+          `[${parent.jobId}] Answer sent (parent.status=${parent.status}, reason="${decision.rationale.slice(0, 80)}")`,
         );
+        return;
+      }
+
+      if (decision.intent === 'clarify') {
         await this.assumptionEmail.sendClarificationEmail({
           runId: parent.id,
           senderEmail,
-          unparseable: parsedReply.unparseable,
+          unparseable: decision.parsed.unparseable,
           inReplyToMessageId: parsed.inReplyToMessageId,
           property,
           rootRunId,
@@ -240,10 +268,13 @@ export class UnderwritingListenerService {
           data: { status: 'WAITING_FOR_CLARIFICATION' },
         });
         this.logger.log(
-          `[${parent.jobId}] Clarification sent — ${parsedReply.unparseable.length} unparseable`,
+          `[${parent.jobId}] Clarification sent — ${decision.parsed.unparseable.length} unparseable`,
         );
         return;
       }
+
+      // intent === 'apply'
+      const values = decision.parsed.values;
 
       if (
         parent.status === 'WAITING_FOR_ASSUMPTIONS' ||
@@ -267,7 +298,7 @@ export class UnderwritingListenerService {
         }
 
         await withLlmContext(llmStore, () =>
-          this.agenticPipeline.runFillPhase(parent.id, parsedReply.values, {
+          this.agenticPipeline.runFillPhase(parent.id, values, {
             senderEmail,
             inReplyToMessageId: parsed.inReplyToMessageId,
           }),
@@ -281,7 +312,7 @@ export class UnderwritingListenerService {
 
       if (parent.status === 'COMPLETED') {
         await withLlmContext(llmStore, () =>
-          this.agenticPipeline.runRerunPhase(parent.id, parsedReply.values, {
+          this.agenticPipeline.runRerunPhase(parent.id, values, {
             senderEmail,
             inReplyToMessageId: parsed.inReplyToMessageId,
           }),
@@ -290,7 +321,7 @@ export class UnderwritingListenerService {
       }
 
       this.logger.warn(
-        `[${parent.jobId}] Reply received but parent status=${parent.status} — ignoring`,
+        `[${parent.jobId}] Apply intent but parent status=${parent.status} — ignoring`,
       );
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
@@ -363,6 +394,37 @@ export class UnderwritingListenerService {
         })}`,
       );
     }
+  }
+
+  /**
+   * Load the conversation transcript for a thread, ordered chronologically.
+   * Pulls every message from runs descended from `rootRunId` (so reruns are
+   * included). Skips messages without bodyText (legacy rows + delivery emails).
+   */
+  private async loadConversationHistory(
+    rootRunId: string,
+  ): Promise<ConversationTurn[]> {
+    const runIds = new Set<string>([rootRunId]);
+    let frontier: string[] = [rootRunId];
+    while (frontier.length > 0) {
+      const children = await this.prisma.underwritingRun.findMany({
+        where: { parentRunId: { in: frontier } },
+        select: { id: true },
+      });
+      frontier = children.map((c) => c.id).filter((id) => !runIds.has(id));
+      frontier.forEach((id) => runIds.add(id));
+    }
+    const messages = await this.prisma.underwritingRunMessage.findMany({
+      where: { runId: { in: Array.from(runIds) }, bodyText: { not: null } },
+      orderBy: { sentAt: 'asc' },
+      select: { direction: true, bodyText: true },
+    });
+    return messages
+      .filter((m) => m.bodyText && m.bodyText.trim().length > 0)
+      .map((m) => ({
+        role: m.direction === 'INBOUND' ? 'user' : 'assistant',
+        body: m.bodyText as string,
+      }));
   }
 
   private async markFailed(dealId: string, error: string): Promise<void> {

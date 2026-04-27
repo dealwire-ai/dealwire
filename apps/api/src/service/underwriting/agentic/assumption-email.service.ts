@@ -32,6 +32,7 @@ export class AssumptionEmailService {
     const messageId = buildMessageId(params.runId, 'ask');
     const html = this.buildQuestionsHtml(params.questions, params.runId);
     const text = this.buildQuestionsText(params.questions);
+    const bodyText = text;
 
     const ccAddresses = this.config.adminEmails.filter(
       (addr) => addr.toLowerCase() !== params.senderEmail.toLowerCase(),
@@ -56,6 +57,7 @@ export class AssumptionEmailService {
         messageId,
         direction: 'OUTBOUND',
         phase: 'ASK',
+        bodyText,
       },
     });
 
@@ -109,6 +111,7 @@ export class AssumptionEmailService {
         messageId,
         direction: 'OUTBOUND',
         phase: 'CLARIFY',
+        bodyText: text,
       },
     });
 
@@ -117,6 +120,77 @@ export class AssumptionEmailService {
     );
 
     return { messageId };
+  }
+
+  /**
+   * Send a conversational answer in-thread (no proforma fill).
+   * Used when the router classifies the reply as "answer" (e.g. the user
+   * asks a question or makes a comment instead of supplying assumptions).
+   */
+  async sendAnswerEmail(params: {
+    runId: string;
+    senderEmail: string;
+    answer: string;
+    inReplyToMessageId?: string;
+    property: string | null | undefined;
+    rootRunId: string;
+    references?: string[];
+  }): Promise<{ messageId: string }> {
+    const messageId = buildMessageId(params.runId, 'answer');
+    const html = this.buildAnswerHtml(params.answer);
+    const text = this.buildAnswerText(params.answer);
+
+    const ccAddresses = this.config.adminEmails.filter(
+      (addr) => addr.toLowerCase() !== params.senderEmail.toLowerCase(),
+    );
+
+    const subject = buildThreadSubject(params.property, params.rootRunId, true);
+
+    await this.emailSender.sendEmail({
+      to: [params.senderEmail],
+      cc: ccAddresses.length > 0 ? ccAddresses : undefined,
+      subject,
+      html,
+      text,
+      from: this.config.underwritingInboundEmail
+        ? `Dealwire <${this.config.underwritingInboundEmail}>`
+        : undefined,
+      replyToMessageId: params.inReplyToMessageId,
+      references: params.references,
+      messageId,
+    });
+
+    await this.prisma.underwritingRunMessage.create({
+      data: {
+        runId: params.runId,
+        messageId,
+        direction: 'OUTBOUND',
+        phase: 'ANSWER',
+        bodyText: params.answer,
+      },
+    });
+
+    this.logger.log(
+      `[${params.runId}] Answer email sent to ${params.senderEmail} (msgId=${messageId})`,
+    );
+
+    return { messageId };
+  }
+
+  private buildAnswerHtml(answer: string): string {
+    const escaped = escapeHtml(answer).replace(/\n/g, '<br>');
+    return `
+<!DOCTYPE html>
+<html>
+<body style="font-family:Arial,sans-serif;max-width:700px;margin:0 auto;color:#1a1a1a;line-height:1.6;">
+  <div style="font-size:14px;">${escaped}</div>
+  <p style="margin-top:24px;color:#9ca3af;font-size:12px;">Reply with new values like "drop rate to 5.5%" any time and I'll re-run the pro forma.</p>
+</body>
+</html>`;
+  }
+
+  private buildAnswerText(answer: string): string {
+    return `${answer}\n\nReply with new values any time and I'll re-run the pro forma.`;
   }
 
   private buildQuestionsHtml(
@@ -200,7 +274,7 @@ export class AssumptionEmailService {
 
 function buildMessageId(
   runId: string,
-  phase: 'ask' | 'clarify' | 'deliver',
+  phase: 'ask' | 'clarify' | 'deliver' | 'answer',
 ): string {
   return `<uw-${runId}-${phase}-${randomUUID()}@${MESSAGE_ID_DOMAIN}>`;
 }

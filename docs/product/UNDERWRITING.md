@@ -2,7 +2,13 @@
 
 ## Implementation Status (as of Apr 2026)
 
-The pipeline is now **interactive**. On a new deal email the agent analyzes the docs but does NOT run the pro forma — it replies asking for the investor's underwriting assumptions. Once the investor replies with values, the agent runs the pro forma and emails back the filled Excel. Follow-up replies to the filled model (e.g. "what if rate drops to 5.5%") re-run with updated assumptions, with the prior values carried forward.
+The pipeline is now **interactive and multi-turn**. On a new deal email the agent analyzes the docs but does NOT run the pro forma — it replies asking for the investor's underwriting assumptions. Each subsequent investor reply is routed by `ReplyRouterService` into one of three intents:
+
+- **apply** — the reply contains values to use ("rate 5.5%, LTV 70"). The agent runs the pro forma and emails back the filled Excel.
+- **answer** — the reply asks a question or comments without supplying values ("what does cap rate mean?", "is that all?"). The agent answers in-thread and waits for further input — no fill is triggered.
+- **clarify** — the reply contains values but at least one is unparseable. The agent asks for clarification and parks the run in `WAITING_FOR_CLARIFICATION`.
+
+Follow-up replies to the filled model (e.g. "what if rate drops to 5.5%") re-run with updated assumptions, with the prior values carried forward.
 
 This replaces the previous "run the pro forma immediately from documents alone" flow, which was producing unusable output (negative returns, zero reno assumed) because it was filling investor-assumption cells with defaults.
 
@@ -11,7 +17,8 @@ This replaces the previous "run the pro forma immediately from documents alone" 
 | Email inbound + reply correlation              | ✅     | `UnderwritingInboundService` — In-Reply-To + subject-token fallback                 |
 | Deal analysis (single-pass)                    | ✅     | `DealAnalyzerService`, Sonnet-4-6                                                   |
 | Assumption ask (tailored per template)         | ✅     | `AssumptionAskerService`, Sonnet-4-6 prunes canonical list against blue input cells |
-| Assumption reply parser                        | ✅     | `AssumptionReplyParserService`, gpt-4.1-mini, `<user_reply>` sandbox + Zod          |
+| Reply router (apply / answer / clarify)        | ✅     | `ReplyRouterService`, Sonnet-4-6, `<user_reply>` sandbox + discriminated-union Zod  |
+| Conversational answer (no fill)                | ✅     | `AssumptionEmailService.sendAnswerEmail` — replies to questions in-thread           |
 | Template fill (analysis + assumptions)         | ✅     | `TemplateFillerService`, Sonnet-4-6 + xlsx-populate                                 |
 | QA validator + auto-corrections                | ✅     | `ProformaValidatorService`                                                          |
 | Email delivery (with deterministic Message-ID) | ✅     | `AgenticDeliveryService`                                                            |

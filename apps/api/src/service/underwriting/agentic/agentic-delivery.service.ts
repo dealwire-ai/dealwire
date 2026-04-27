@@ -7,7 +7,11 @@ import { emailConfig } from '../../../config/email.config';
 import { DealAnalysis, ValidationResult } from './agentic-types';
 import { UserAssumptions } from './assumption-types';
 import { buildThreadSubject } from './thread-subject';
-import { diffAssumptions, renderAppliedChangesHtml } from './assumption-diff';
+import {
+  diffAssumptions,
+  renderAppliedChangesHtml,
+  renderAppliedChangesText,
+} from './assumption-diff';
 
 @Injectable()
 export class AgenticDeliveryService {
@@ -93,12 +97,15 @@ export class AgenticDeliveryService {
       ],
     });
 
+    const deliveryBodyText = buildDeliveryBodyText(analysis, property, changes);
+
     await this.prisma.underwritingRunMessage.create({
       data: {
         runId,
         messageId,
         direction: 'OUTBOUND',
         phase: 'DELIVER',
+        bodyText: deliveryBodyText,
       },
     });
 
@@ -234,4 +241,19 @@ export class AgenticDeliveryService {
 </body>
 </html>`;
   }
+}
+
+function buildDeliveryBodyText(
+  analysis: DealAnalysis,
+  property: string,
+  changes: ReturnType<typeof diffAssumptions>,
+): string {
+  const lines = [
+    `Delivered filled pro forma for ${property}.`,
+    renderAppliedChangesText(changes).trim(),
+  ];
+  if (analysis.flags && analysis.flags.length > 0) {
+    lines.push(`Flags:\n${analysis.flags.map((f) => `- ${f}`).join('\n')}`);
+  }
+  return lines.filter(Boolean).join('\n\n');
 }
