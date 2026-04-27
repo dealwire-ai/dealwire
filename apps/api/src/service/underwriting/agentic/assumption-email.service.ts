@@ -4,6 +4,7 @@ import { EmailSenderService } from '../../email/email-sender.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { emailConfig } from '../../../config/email.config';
 import { AssumptionQuestion, ParsedAssumptions } from './assumption-types';
+import { buildThreadSubject } from './thread-subject';
 
 const MESSAGE_ID_DOMAIN = 'mail.dealwire.ai';
 
@@ -74,6 +75,9 @@ export class AssumptionEmailService {
     senderEmail: string;
     unparseable: ParsedAssumptions['unparseable'];
     inReplyToMessageId?: string;
+    property: string | null | undefined;
+    rootRunId: string;
+    references?: string[];
   }): Promise<{ messageId: string }> {
     const messageId = buildMessageId(params.runId, 'clarify');
     const html = this.buildClarificationHtml(params.unparseable);
@@ -83,16 +87,19 @@ export class AssumptionEmailService {
       (addr) => addr.toLowerCase() !== params.senderEmail.toLowerCase(),
     );
 
+    const subject = buildThreadSubject(params.property, params.rootRunId, true);
+
     await this.emailSender.sendEmail({
       to: [params.senderEmail],
       cc: ccAddresses.length > 0 ? ccAddresses : undefined,
-      subject: 'Re: Underwriting Assumptions — a few need clarification',
+      subject,
       html,
       text,
       from: this.config.underwritingInboundEmail
         ? `Dealwire <${this.config.underwritingInboundEmail}>`
         : undefined,
       replyToMessageId: params.inReplyToMessageId,
+      references: params.references,
       messageId,
     });
 

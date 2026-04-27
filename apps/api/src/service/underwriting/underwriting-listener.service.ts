@@ -10,6 +10,8 @@ import {
   AssumptionQuestion,
   UserAssumptions,
 } from './agentic/assumption-types';
+import { threadPropertyLabel } from './agentic/thread-subject';
+import { DealAnalysis } from './agentic/agentic-types';
 import { PrismaService } from '../prisma/prisma.service';
 import { LlmContextStore, withLlmContext } from '../llm/llm-context';
 import { MetricsService } from '../metrics/metrics.service';
@@ -218,11 +220,20 @@ export class UnderwritingListenerService {
       );
 
       if (parsedReply.unparseable.length > 0) {
+        const rootRunId = await this.agenticPipeline.findRootRunId(parent);
+        const references =
+          await this.agenticPipeline.collectThreadReferences(rootRunId);
+        const property = threadPropertyLabel(
+          parent.extractionSnapshot as unknown as DealAnalysis | null,
+        );
         await this.assumptionEmail.sendClarificationEmail({
           runId: parent.id,
           senderEmail,
           unparseable: parsedReply.unparseable,
           inReplyToMessageId: parsed.inReplyToMessageId,
+          property,
+          rootRunId,
+          references,
         });
         await this.prisma.underwritingRun.update({
           where: { id: parent.id },
