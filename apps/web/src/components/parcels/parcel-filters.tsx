@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Popover,
   PopoverContent,
@@ -9,6 +9,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { Check, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  MultiSelectSearchFilter,
+  type MultiSelectOption,
+} from "./multi-select-search-filter";
+import { useApi } from "@/hooks/use-api";
 
 /**
  * Building class groups per Daniel's 3/4 feedback:
@@ -236,6 +241,40 @@ interface ParcelFiltersProps {
 }
 
 export function ParcelFilters({ filters, onSetFilter }: ParcelFiltersProps) {
+  const { apiCall } = useApi();
+  const [zipOptions, setZipOptions] = useState<MultiSelectOption[]>([]);
+
+  // Re-fetch zip options whenever non-zip filters change so the list narrows.
+  // Strip `zipCode` from the params so the dropdown stays stable while the user
+  // adds/removes zip selections.
+  const otherFiltersKey = Object.entries(filters)
+    .filter(([k, v]) => k !== "zipCode" && v)
+    .map(([k, v]) => `${k}=${v}`)
+    .join("&");
+
+  useEffect(() => {
+    let cancelled = false;
+    const params = new URLSearchParams();
+    for (const [k, v] of Object.entries(filters)) {
+      if (k !== "zipCode" && v) params.set(k, v);
+    }
+    apiCall(`/public-data/parcels/zip-options?${params.toString()}`)
+      .then((res: { zipCodes: MultiSelectOption[] }) => {
+        if (!cancelled) setZipOptions(res.zipCodes ?? []);
+      })
+      .catch(() => {
+        // Non-critical; leave whatever we already have
+      });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [otherFiltersKey]);
+
+  const selectedZips = filters.zipCode
+    ? filters.zipCode.split(",").filter(Boolean)
+    : [];
+
   return (
     <>
       {/* Borough filter */}
@@ -251,6 +290,17 @@ export function ParcelFilters({ filters, onSetFilter }: ParcelFiltersProps) {
           { value: "3,4", label: "BK + QN" },
           { value: "1,3,4", label: "MN + BK + QN" },
         ]}
+      />
+
+      {/* Zip code (multi-select with search) */}
+      <MultiSelectSearchFilter
+        label="Zip Code"
+        value={selectedZips}
+        options={zipOptions}
+        onChange={(next) => onSetFilter("zipCode", next.join(","))}
+        width="w-[170px]"
+        searchPlaceholder="Search zip..."
+        emptyMessage="No zip codes match."
       />
 
       {/* Min distress score */}
