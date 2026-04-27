@@ -13,7 +13,9 @@ import { ExportButton } from "@/components/parcels/export-button";
 import { ColumnToggle } from "@/components/parcels/column-toggle";
 import { BatchSkipTraceButton } from "@/components/parcels/batch-skip-trace-button";
 import { BatchListAssignButton } from "@/components/parcels/batch-list-assign-button";
+import { BatchAssignButton } from "@/components/parcels/batch-assign-button";
 import type { ParcelListType } from "@/components/parcels/list-assign-popover";
+import type { OrgMember } from "@/components/parcels/assign-popover";
 import { DataCoverageBar } from "@/components/parcels/data-coverage-bar";
 import { TableToolbar } from "@/components/table-toolbar";
 import { TablePagination } from "@/components/table-pagination";
@@ -64,6 +66,7 @@ export default function ParcelsPage() {
     null,
   );
   const [lastRun, setLastRun] = useState<IngestionRun | null>(null);
+  const [members, setMembers] = useState<OrgMember[]>([]);
   const [showCoverage, setShowCoverage] = useState(() => {
     if (typeof window === "undefined") return true;
     return localStorage.getItem("parcels-show-coverage") !== "false";
@@ -99,11 +102,30 @@ export default function ParcelsPage() {
     try {
       setLoading(true);
       setError(null);
-      const response = await apiCall(
-        `/public-data/parcels?${table.queryString}`,
-      );
-      setParcels(response.data || []);
-      if (response.pagination) table.setMeta(response.pagination);
+      // Fetch parcels + the org's CRM deals in parallel; merge assignee onto each parcel client-side
+      // so /public-data/parcels stays unchanged. Deals payload is small (one row per parcel ever
+      // touched in the CRM for the org) so this scales fine for current use.
+      const [parcelRes, dealRes] = await Promise.all([
+        apiCall(`/public-data/parcels?${table.queryString}`),
+        apiCall("/public-data/crm/deals").catch(() => ({ deals: [] })),
+      ]);
+      const dealByBbl = new Map<string, { assignedToUser: OrgMember | null }>();
+      for (const deal of (dealRes.deals as
+        | Array<{
+            parcel: { bbl: string };
+            assignedToUser: OrgMember | null;
+          }>
+        | undefined) ?? []) {
+        dealByBbl.set(deal.parcel.bbl, {
+          assignedToUser: deal.assignedToUser,
+        });
+      }
+      const merged = (parcelRes.data || []).map((p: Parcel) => ({
+        ...p,
+        _assignee: dealByBbl.get(p.bbl)?.assignedToUser ?? null,
+      }));
+      setParcels(merged);
+      if (parcelRes.pagination) table.setMeta(parcelRes.pagination);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load parcels");
     } finally {
@@ -111,6 +133,17 @@ export default function ParcelsPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoaded, userId, table.queryString]);
+
+  const fetchMembers = useCallback(async () => {
+    if (!isLoaded || !userId) return;
+    try {
+      const res = await apiCall("/public-data/crm/org-members");
+      setMembers(res.members ?? []);
+    } catch {
+      // Non-critical — assignee popovers will show "No teammates yet"
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoaded, userId]);
 
   const fetchStats = useCallback(async () => {
     if (!isLoaded || !userId) return;
@@ -167,6 +200,10 @@ export default function ParcelsPage() {
   useEffect(() => {
     fetchSkipTraceUsage();
   }, [fetchSkipTraceUsage]);
+
+  useEffect(() => {
+    fetchMembers();
+  }, [fetchMembers]);
 
   useEffect(() => {
     fetchLastRun();
@@ -339,6 +376,20 @@ export default function ParcelsPage() {
                       setSelectedBbls(new Set());
                     }}
                   />
+                  <BatchAssignButton
+                    selectedBbls={selectedBbls}
+                    members={members}
+                    onAssigned={(member) => {
+                      setParcels((prev) =>
+                        prev.map((p) =>
+                          selectedBbls.has(p.bbl)
+                            ? { ...p, _assignee: member }
+                            : p,
+                        ),
+                      );
+                      setSelectedBbls(new Set());
+                    }}
+                  />
                   <BatchSkipTraceButton
                     selectedBbls={selectedBbls}
                     quotaRemaining={skipTraceUsage?.remaining}
@@ -373,6 +424,7 @@ export default function ParcelsPage() {
               parcels={parcels}
               expandedRows={expandedRows}
               visibleColumns={visibleColumns}
+              members={members}
               onToggleRow={(id) => {
                 const newExpanded = new Set(expandedRows);
                 if (newExpanded.has(id)) {
