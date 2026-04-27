@@ -151,6 +151,13 @@ export const COLUMNS: ColumnDef[] = [
     sortable: true,
   },
   {
+    key: "zipCode",
+    label: "Zip",
+    field: "zipCode",
+    defaultVisible: true,
+    sortable: true,
+  },
+  {
     key: "buildingClass",
     label: "Class",
     field: "buildingClass",
@@ -382,6 +389,8 @@ function renderCell(
       );
     case "borough":
       return BOROUGH_NAMES[parcel.borough] || parcel.borough;
+    case "zipCode":
+      return parcel.zipCode ?? "-";
     case "buildingClass":
       return formatBuildingClass(parcel.buildingClass);
     case "unitsTotal":
