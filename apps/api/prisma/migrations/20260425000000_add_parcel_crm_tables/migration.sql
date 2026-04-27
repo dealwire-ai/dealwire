@@ -140,6 +140,12 @@ ON CONFLICT ("parcelId", "organizationId") DO NOTHING;
 -- 3) Backfill ParcelActivity from PhoneNote.
 --    Each PhoneNote becomes a single PHONE_STATUS_CHANGED event carrying both the status
 --    and the freeform note (if any). Latest such row per (parcel, phone) is the current sticker.
+--
+--    PhoneNote.userId / PhoneNote.organizationId never had FK constraints, so prod has
+--    rows pointing to users that have since been deleted from Clerk (a previous deploy
+--    attempt failed on this — userId FK violation). LEFT JOIN User to NULL out missing
+--    userIds (preserves audit row + denormalized initials); JOIN Organization to skip
+--    rows for orgs that no longer exist (defensive — none today, but cheap insurance).
 INSERT INTO "ParcelActivity" (
     "id", "parcelId", "organizationId", "userId", "userInitials",
     "type", "body", "phoneNumber", "phoneStatus", "occurredAt", "createdAt"
@@ -148,7 +154,7 @@ SELECT
     'seed_' || pn.id,
     pn."parcelId",
     pn."organizationId",
-    pn."userId",
+    u.id,
     pn."userInitials",
     'PHONE_STATUS_CHANGED'::"ParcelActivityType",
     pn."note",
@@ -156,4 +162,6 @@ SELECT
     pn."status",
     pn."updatedAt",
     pn."createdAt"
-FROM "PhoneNote" pn;
+FROM "PhoneNote" pn
+JOIN "Organization" o ON o.id = pn."organizationId"
+LEFT JOIN "User" u ON u.id = pn."userId";
