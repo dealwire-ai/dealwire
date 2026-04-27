@@ -50,6 +50,19 @@ export class ParcelCrmController {
     }
   }
 
+  // ----- Org members (assignee picker) -----
+
+  @Get('org-members')
+  async listOrgMembers(@AuthUser('organizationId') organizationId: string) {
+    await this.assertParcelsEnabled(organizationId);
+    const members = await this.prisma.user.findMany({
+      where: { organizationId },
+      select: { id: true, firstName: true, lastName: true, email: true },
+      orderBy: [{ firstName: 'asc' }, { lastName: 'asc' }],
+    });
+    return { members };
+  }
+
   // ----- Stages -----
 
   @Get('stages')
