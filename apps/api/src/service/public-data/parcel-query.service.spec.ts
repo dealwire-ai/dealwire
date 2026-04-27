@@ -178,6 +178,53 @@ describe('ParcelQueryService', () => {
       );
     });
 
+    it('should apply zipCodes filter as an in clause when non-empty', async () => {
+      // Arrange
+      prisma.parcel.findMany.mockResolvedValue([]);
+      prisma.parcel.count.mockResolvedValue(0);
+
+      // Act
+      await service.queryParcels({ zipCodes: ['11201', '11215'] });
+
+      // Assert
+      expect(prisma.parcel.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            zipCode: { in: ['11201', '11215'] },
+          }),
+        }),
+      );
+    });
+
+    it('should ignore zipCodes filter when array is empty', async () => {
+      // Arrange
+      prisma.parcel.findMany.mockResolvedValue([]);
+      prisma.parcel.count.mockResolvedValue(0);
+
+      // Act
+      await service.queryParcels({ zipCodes: [] });
+
+      // Assert
+      const callArgs = prisma.parcel.findMany.mock.calls[0][0];
+      expect(callArgs.where.zipCode).toBeUndefined();
+    });
+
+    it('should accept zipCode as a sort field', async () => {
+      // Arrange
+      prisma.parcel.findMany.mockResolvedValue([]);
+      prisma.parcel.count.mockResolvedValue(0);
+
+      // Act
+      await service.queryParcels({ sort: 'zipCode', order: 'asc' });
+
+      // Assert
+      expect(prisma.parcel.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          orderBy: { zipCode: { sort: 'asc', nulls: 'last' } },
+        }),
+      );
+    });
+
     it('should calculate pagination correctly for page 2', async () => {
       // Arrange
       prisma.parcel.findMany.mockResolvedValue([]);
@@ -208,6 +255,49 @@ describe('ParcelQueryService', () => {
         where: { bbl: '3001230045' },
       });
       expect(result).toEqual(mockParcel);
+    });
+  });
+
+  describe('getZipCodeOptions', () => {
+    it('should return distinct zip codes with counts, ignoring nulls', async () => {
+      // Arrange
+      prisma.parcel.groupBy.mockResolvedValue([
+        { zipCode: '11201', _count: 10 },
+        { zipCode: '11215', _count: 5 },
+      ]);
+
+      // Act
+      const result = await service.getZipCodeOptions({});
+
+      // Assert
+      expect(prisma.parcel.groupBy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          by: ['zipCode'],
+          where: expect.objectContaining({ zipCode: { not: null } }),
+          orderBy: { zipCode: 'asc' },
+        }),
+      );
+      expect(result).toEqual([
+        { value: '11201', count: 10 },
+        { value: '11215', count: 5 },
+      ]);
+    });
+
+    it('should exclude its own zipCodes filter when computing options', async () => {
+      // Arrange
+      prisma.parcel.groupBy.mockResolvedValue([]);
+
+      // Act
+      await service.getZipCodeOptions({
+        zipCodes: ['11201'],
+        boroughs: ['3'],
+      });
+
+      // Assert: where clause should include borough filter but NOT zip filter
+      const where = prisma.parcel.groupBy.mock.calls[0][0].where;
+      expect(where.borough).toEqual({ in: ['3'] });
+      // zipCode is set to { not: null } only, not { in: [...] }
+      expect(where.zipCode).toEqual({ not: null });
     });
   });
 

@@ -189,7 +189,7 @@ export class PublicDataController {
     @Query('maxDistressScore') maxDistressScore?: string,
     @Query('minUnits') minUnits?: string,
     @Query('maxUnits') maxUnits?: string,
-    @Query('zipCode') zipCode?: string,
+    @Query('zipCode') zipCode?: string, // comma-separated list, e.g. "11201,11215"
     @Query('search') search?: string,
     @Query('buildingClass') buildingClass?: string,
     @Query('buildingClassGroups') buildingClassGroups?: string,
@@ -232,7 +232,7 @@ export class PublicDataController {
       maxLienSaleAmount: maxLienSaleAmount
         ? parseFloat(maxLienSaleAmount)
         : undefined,
-      zipCode,
+      zipCodes: zipCode ? zipCode.split(',').filter(Boolean) : undefined,
       search,
       buildingClasses: buildingClass ? buildingClass.split(',') : undefined,
       buildingClassGroups: buildingClassGroups
@@ -249,6 +249,70 @@ export class PublicDataController {
     });
   }
 
+  @Get('parcels/zip-options')
+  async getParcelZipOptions(
+    @AuthUser('organizationId') organizationId: string,
+    @Query('borough') borough?: string,
+    @Query('excludeCoops') excludeCoops?: string,
+    @Query('hasActiveLien') hasActiveLien?: string,
+    @Query('minDistressScore') minDistressScore?: string,
+    @Query('maxDistressScore') maxDistressScore?: string,
+    @Query('minUnits') minUnits?: string,
+    @Query('maxUnits') maxUnits?: string,
+    @Query('search') search?: string,
+    @Query('buildingClass') buildingClass?: string,
+    @Query('buildingClassGroups') buildingClassGroups?: string,
+    @Query('excludeDClass') excludeDClass?: string,
+    @Query('minOutstandingTaxBill') minOutstandingTaxBill?: string,
+    @Query('maxOutstandingTaxBill') maxOutstandingTaxBill?: string,
+    @Query('minLienSaleAmount') minLienSaleAmount?: string,
+    @Query('maxLienSaleAmount') maxLienSaleAmount?: string,
+    @Query('listType') listType?: string,
+    @Query('hasNoList') hasNoList?: string,
+    @Query('skipTraceStatus') skipTraceStatus?: string,
+  ) {
+    await this.assertParcelsEnabled(organizationId);
+
+    const zipCodes = await this.parcelQuery.getZipCodeOptions({
+      boroughs: borough ? borough.split(',') : undefined,
+      excludeCoops: excludeCoops !== 'false',
+      excludeDClass: excludeDClass === 'false' ? false : true,
+      hasActiveLien:
+        hasActiveLien !== undefined ? hasActiveLien === 'true' : undefined,
+      minDistressScore: minDistressScore
+        ? parseFloat(minDistressScore)
+        : undefined,
+      maxDistressScore: maxDistressScore
+        ? parseFloat(maxDistressScore)
+        : undefined,
+      minUnits: minUnits ? parseInt(minUnits) : undefined,
+      maxUnits: maxUnits ? parseInt(maxUnits) : undefined,
+      minOutstandingTaxBill: minOutstandingTaxBill
+        ? parseFloat(minOutstandingTaxBill)
+        : undefined,
+      maxOutstandingTaxBill: maxOutstandingTaxBill
+        ? parseFloat(maxOutstandingTaxBill)
+        : undefined,
+      minLienSaleAmount: minLienSaleAmount
+        ? parseFloat(minLienSaleAmount)
+        : undefined,
+      maxLienSaleAmount: maxLienSaleAmount
+        ? parseFloat(maxLienSaleAmount)
+        : undefined,
+      search,
+      buildingClasses: buildingClass ? buildingClass.split(',') : undefined,
+      buildingClassGroups: buildingClassGroups
+        ? buildingClassGroups.split(',')
+        : undefined,
+      listType: listType || undefined,
+      hasNoList: hasNoList === 'true' ? true : undefined,
+      skipTraceStatus: skipTraceStatus || undefined,
+      organizationId,
+    });
+
+    return { zipCodes };
+  }
+
   @Get('parcels/export')
   async exportParcels(
     @AuthUser('organizationId') organizationId: string,
@@ -260,7 +324,7 @@ export class PublicDataController {
     @Query('maxDistressScore') maxDistressScore?: string,
     @Query('minUnits') minUnits?: string,
     @Query('maxUnits') maxUnits?: string,
-    @Query('zipCode') zipCode?: string,
+    @Query('zipCode') zipCode?: string, // comma-separated list, e.g. "11201,11215"
     @Query('search') search?: string,
     @Query('buildingClass') buildingClass?: string,
     @Query('buildingClassGroups') buildingClassGroups?: string,
@@ -300,7 +364,7 @@ export class PublicDataController {
       maxLienSaleAmount: maxLienSaleAmount
         ? parseFloat(maxLienSaleAmount)
         : undefined,
-      zipCode,
+      zipCodes: zipCode ? zipCode.split(',').filter(Boolean) : undefined,
       search,
       buildingClasses: buildingClass ? buildingClass.split(',') : undefined,
       buildingClassGroups: buildingClassGroups
