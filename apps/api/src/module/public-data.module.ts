@@ -15,6 +15,9 @@ import { PhoneNoteService } from '../service/public-data/phone-note.service';
 import { PropertyListService } from '../service/public-data/property-list.service';
 import { PublicDataSchedulerService } from '../service/public-data/public-data-scheduler.service';
 import { AttomAvmService } from '../service/public-data/attom-avm.service';
+import { ParcelDealStageService } from '../service/public-data/parcel-deal-stage.service';
+import { ParcelDealService } from '../service/public-data/parcel-deal.service';
+import { ParcelActivityService } from '../service/public-data/parcel-activity.service';
 import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
 
 @Module({
@@ -30,10 +33,20 @@ import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
     CareScraperService,
     PhoneNoteService,
     PropertyListService,
+    ParcelDealStageService,
+    ParcelDealService,
+    ParcelActivityService,
     PublicDataSchedulerService,
     AttomAvmService,
     ClerkAuthGuard,
   ],
-  exports: [ParcelQueryService, PropertyListService, PhoneNoteService],
+  exports: [
+    ParcelQueryService,
+    PropertyListService,
+    PhoneNoteService,
+    ParcelDealStageService,
+    ParcelDealService,
+    ParcelActivityService,
+  ],
 })
 export class PublicDataModule {}
