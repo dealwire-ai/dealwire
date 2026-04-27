@@ -10,6 +10,8 @@
 
 ## Foxfield OS
 - IR/AM intro calls
+- Get back to yardi abt meeting
+-   setup yardi api email
 
 ## Deal Screener
 
