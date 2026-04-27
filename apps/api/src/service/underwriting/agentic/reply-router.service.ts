@@ -6,28 +6,36 @@ import { trackLlm } from '../../llm/tracked-llm';
 import { DealAnalysis } from './agentic-types';
 import {
   AssumptionQuestion,
+  ParsedAssumptions,
   ParsedAssumptionsSchema,
   UserAssumptions,
 } from './assumption-types';
 
-export const RouterDecisionSchema = z.discriminatedUnion('intent', [
-  z.object({
-    intent: z.literal('apply'),
-    rationale: z.string(),
-    parsed: ParsedAssumptionsSchema,
-  }),
-  z.object({
-    intent: z.literal('answer'),
-    rationale: z.string(),
-    answer: z.string(),
-  }),
-  z.object({
-    intent: z.literal('clarify'),
-    rationale: z.string(),
-    parsed: ParsedAssumptionsSchema,
-  }),
-]);
-export type RouterDecision = z.infer<typeof RouterDecisionSchema>;
+/**
+ * Flat object schema (not a discriminated union) because Anthropic tool-use
+ * rejects top-level `anyOf` — input_schema.type must be "object".
+ *
+ * The model fills `answer` for intent=answer, `parsed` for intent=apply|clarify.
+ * The router normalizes to {@link RouterDecision} after validation.
+ */
+const RawRouterDecisionSchema = z.object({
+  intent: z.enum(['apply', 'answer', 'clarify']),
+  rationale: z.string(),
+  answer: z
+    .string()
+    .nullable()
+    .describe(
+      'Conversational reply to the investor. Required when intent=answer; null otherwise.',
+    ),
+  parsed: ParsedAssumptionsSchema.nullable().describe(
+    'Parsed assumption values + unparseable entries. Required when intent=apply or clarify; null when intent=answer.',
+  ),
+});
+
+export type RouterDecision =
+  | { intent: 'apply'; rationale: string; parsed: ParsedAssumptions }
+  | { intent: 'answer'; rationale: string; answer: string }
+  | { intent: 'clarify'; rationale: string; parsed: ParsedAssumptions };
 
 export interface ConversationTurn {
   role: 'user' | 'assistant';
@@ -66,6 +74,14 @@ Decide what the investor wants right now and pick exactly one intent:
 - Answers must be short (1-3 sentences). Reference concrete numbers from the deal context when relevant.
 - If the investor asks something you genuinely cannot answer from the deal/assumptions context, say so and ask a clarifying question.
 - Never invent metrics. Use only what's in the deal context or prior assumptions.
+
+## Output shape
+
+Always emit all four top-level fields. Use null where not applicable:
+
+- intent=apply: parsed = {values, unparseable}, answer = null
+- intent=clarify: parsed = {values, unparseable: [...]} where unparseable is non-empty, answer = null
+- intent=answer: answer = "the reply text", parsed = null
 
 ## Security
 
@@ -123,7 +139,7 @@ export class ReplyRouterService {
     const { object } = await trackLlm('agentic.reply_router', () =>
       generateObject({
         model: replyRouterModel(),
-        schema: RouterDecisionSchema,
+        schema: RawRouterDecisionSchema,
         system: SYSTEM_PROMPT,
         messages: [{ role: 'user', content: userPrompt }],
         maxRetries: 2,
@@ -131,22 +147,47 @@ export class ReplyRouterService {
     );
 
     if (object.intent === 'apply' || object.intent === 'clarify') {
+      const parsed: ParsedAssumptions = object.parsed ?? {
+        values: emptyAssumptions(),
+        unparseable: [],
+      };
       const merged = input.priorValues
-        ? mergeWithPrior(object.parsed.values, input.priorValues)
-        : object.parsed.values;
+        ? mergeWithPrior(parsed.values, input.priorValues)
+        : parsed.values;
       const populated = Object.values(merged).filter((v) => v != null).length;
       this.logger.log(
-        `Reply router → ${object.intent} (${populated}/${Object.keys(merged).length} populated, ${object.parsed.unparseable.length} unparseable)`,
+        `Reply router → ${object.intent} (${populated}/${Object.keys(merged).length} populated, ${parsed.unparseable.length} unparseable)`,
       );
       return {
-        ...object,
-        parsed: { values: merged, unparseable: object.parsed.unparseable },
+        intent: object.intent,
+        rationale: object.rationale,
+        parsed: { values: merged, unparseable: parsed.unparseable },
       };
     }
 
-    this.logger.log(`Reply router → answer ("${truncate(object.answer, 80)}")`);
-    return object;
+    const answer = object.answer ?? '';
+    this.logger.log(`Reply router → answer ("${truncate(answer, 80)}")`);
+    return {
+      intent: 'answer',
+      rationale: object.rationale,
+      answer,
+    };
   }
+}
+
+function emptyAssumptions(): UserAssumptions {
+  return {
+    interestRate: null,
+    ltv: null,
+    amortizationYears: null,
+    holdPeriodYears: null,
+    exitCapRate: null,
+    rentGrowth: null,
+    expenseGrowth: null,
+    renovationBudget: null,
+    acquisitionCostsPct: null,
+    occupancy: null,
+  };
 }
 
 function sanitizeBody(body: string): string {
