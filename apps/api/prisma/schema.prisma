@@ -660,6 +660,7 @@ enum UnderwritingMessagePhase {
   CLARIFY
   DELIVER
   REPLY
+  ANSWER
 }
 
 model UnderwritingRun {
@@ -726,7 +727,9 @@ model UnderwritingRunMessage {
   messageId String                       @unique // RFC 5322 Message-ID we generated (OUTBOUND) or received (INBOUND)
   direction UnderwritingMessageDirection
   phase     UnderwritingMessagePhase
+  bodyText  String?                      @db.Text // Plain-text body, persisted for multi-turn conversation history
   sentAt    DateTime                     @default(now())
 
   @@index([runId, phase])
+  @@index([runId, sentAt])
 }
