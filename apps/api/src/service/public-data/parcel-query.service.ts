@@ -62,7 +62,7 @@ export interface ParcelQueryFilters {
   maxOutstandingTaxBill?: number;
   minLienSaleAmount?: number;
   maxLienSaleAmount?: number;
-  zipCode?: string;
+  zipCodes?: string[];
   search?: string;
   buildingClasses?: string[];
   buildingClassGroups?: string[];
@@ -153,8 +153,8 @@ export class ParcelQueryService {
       }
     }
 
-    if (filters.zipCode) {
-      where.zipCode = filters.zipCode;
+    if (filters.zipCodes && filters.zipCodes.length > 0) {
+      where.zipCode = { in: filters.zipCodes };
     }
 
     // Building class filtering: groups take precedence over individual classes
@@ -244,6 +244,7 @@ export class ParcelQueryService {
     const validSortFields = [
       'distressScore',
       'address',
+      'zipCode',
       'borough',
       'buildingClass',
       'unitsTotal',
@@ -464,6 +465,28 @@ export class ParcelQueryService {
       withSkipTrace,
       withCompleteData,
     };
+  }
+
+  /**
+   * Distinct zip codes with parcel counts, narrowed by current filters.
+   * The zip filter itself is excluded so the dropdown shows all options
+   * available given the rest of the filter state.
+   */
+  async getZipCodeOptions(filters: ParcelQueryFilters) {
+    const { zipCodes: _ignored, ...filtersWithoutZip } = filters;
+    void _ignored;
+    const where = this.buildWhere(filtersWithoutZip);
+
+    const grouped = await this.prisma.parcel.groupBy({
+      by: ['zipCode'],
+      where: { ...where, zipCode: { not: null } },
+      _count: true,
+      orderBy: { zipCode: 'asc' },
+    });
+
+    return grouped
+      .filter((g) => g.zipCode != null)
+      .map((g) => ({ value: g.zipCode as string, count: g._count }));
   }
 
   /**
