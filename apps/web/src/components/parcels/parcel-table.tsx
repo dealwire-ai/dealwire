@@ -29,6 +29,8 @@ import {
   ListBadge,
   type ParcelListType,
 } from "./list-assign-popover";
+import { AssignPopover, type OrgMember } from "./assign-popover";
+import { ActivityPanel } from "./activity-panel";
 import { formatBuildingClass } from "@/lib/building-class-labels";
 import { StreetViewImage } from "./street-view-image";
 import { BblDisplay } from "./bbl-display";
@@ -124,6 +126,8 @@ export interface Parcel {
   _verifiedPhone?: string | null;
   // List assignment from API (flattened from listAssignments)
   _listType?: ParcelListType | null;
+  // Current CRM assignee (merged client-side from /public-data/crm/deals)
+  _assignee?: OrgMember | null;
 }
 
 export interface ColumnDef {
@@ -207,6 +211,13 @@ export const COLUMNS: ColumnDef[] = [
     key: "listType",
     label: "List",
     field: "listType",
+    defaultVisible: true,
+    sortable: false,
+  },
+  {
+    key: "assignee",
+    label: "Assigned",
+    field: "assignee",
     defaultVisible: true,
     sortable: false,
   },
@@ -324,6 +335,7 @@ interface ParcelTableProps {
   onSortChange?: (field: string) => void;
   onParcelUpdated?: (bbl: string, updates: Partial<Parcel>) => void;
   visibleColumns: Set<string>;
+  members?: OrgMember[];
 }
 
 function formatCurrency(value: number | null | undefined): string {
@@ -368,6 +380,7 @@ function renderCell(
   key: string,
   parcel: Parcel,
   onParcelUpdated?: (bbl: string, updates: Partial<Parcel>) => void,
+  members: OrgMember[] = [],
 ) {
   switch (key) {
     case "distressScore":
@@ -468,6 +481,17 @@ function renderCell(
           }
         />
       );
+    case "assignee":
+      return (
+        <AssignPopover
+          bbl={parcel.bbl}
+          members={members}
+          currentAssignee={parcel._assignee ?? null}
+          onAssigned={(member) =>
+            onParcelUpdated?.(parcel.bbl, { _assignee: member })
+          }
+        />
+      );
     default:
       return "-";
   }
@@ -487,6 +511,7 @@ export function ParcelTable({
   onSortChange,
   onParcelUpdated,
   visibleColumns,
+  members = [],
 }: ParcelTableProps) {
   const allSelected =
     parcels.length > 0 && parcels.every((p) => selectedBbls?.has(p.bbl));
@@ -620,9 +645,12 @@ export function ParcelTable({
                     col.key,
                     parcel,
                     onParcelUpdated,
+                    members,
                   );
                   const needsStopPropagation =
-                    col.key === "ownerPhones" || col.key === "listType";
+                    col.key === "ownerPhones" ||
+                    col.key === "listType" ||
+                    col.key === "assignee";
                   return (
                     <Fragment key={col.key}>
                       {showDataDotBefore && (
@@ -927,6 +955,9 @@ export function ParcelTable({
                             )}
                           </div>
                         </div>
+                      </div>
+                      <div className="mt-4">
+                        <ActivityPanel bbl={parcel.bbl} />
                       </div>
                     </div>
                   </TableCell>
