@@ -6,13 +6,10 @@
 - demo for marc zegen (biz journals)
 - revision for Jim (Froggy Companies)
 - record data platform demo
-- Re-engage older prospects
-- Turn on Apollo Sequence
-- remove custom cursor from landing page
+- (continue) re-engaging older prospects
 
 ## Foxfield OS
-- move GH project
-- intro calls
+- IR/AM intro calls
 
 ## Deal Screener
 
@@ -21,4 +18,4 @@
   
 ## Frontstep
 - update pricing page
-- get article live
+- get article live + post on LI
