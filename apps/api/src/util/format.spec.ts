@@ -1,9 +1,4 @@
-import {
-  formatFileSize,
-  timeAgo,
-  escapeHtml,
-  getErrorMessage,
-} from './format';
+import { formatFileSize, timeAgo, escapeHtml, getErrorMessage } from './format';
 
 describe('formatFileSize', () => {
   it('returns bytes for values under 1024', () => {
@@ -128,11 +123,13 @@ describe('timeAgo', () => {
 
   it('returns "X months ago" for multiple months', () => {
     // Arrange
-    const ninetyDaysAgo = new Date();
-    ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+    // 100 days (not 90) gives margin for the DST hour shift, which can flip the
+    // floored day-count down by one when the window crosses a clock change.
+    const hundredDaysAgo = new Date();
+    hundredDaysAgo.setDate(hundredDaysAgo.getDate() - 100);
 
     // Act
-    const result = timeAgo(ninetyDaysAgo);
+    const result = timeAgo(hundredDaysAgo);
 
     // Assert
     expect(result).toBe('3 months ago');
