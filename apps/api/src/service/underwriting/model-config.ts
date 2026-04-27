@@ -48,6 +48,10 @@ export function assumptionParserModel() {
   return resolveModel('UW_ASSUMPTION_PARSER_MODEL', 'gpt-4.1-mini');
 }
 
+export function replyRouterModel() {
+  return resolveModel('UW_REPLY_ROUTER_MODEL', 'claude-sonnet-4-6');
+}
+
 // ── Deal screening (raw model name strings for openai.chat.completions.create) ─
 
 export function dealDetectionModelName(): string {
