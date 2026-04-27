@@ -7,8 +7,8 @@ import { TemplateFillerService } from '../service/underwriting/agentic/template-
 import { ProformaValidatorService } from '../service/underwriting/agentic/proforma-validator.service';
 import { AgenticDeliveryService } from '../service/underwriting/agentic/agentic-delivery.service';
 import { AssumptionAskerService } from '../service/underwriting/agentic/assumption-asker.service';
-import { AssumptionReplyParserService } from '../service/underwriting/agentic/assumption-reply-parser.service';
 import { AssumptionEmailService } from '../service/underwriting/agentic/assumption-email.service';
+import { ReplyRouterService } from '../service/underwriting/agentic/reply-router.service';
 import { ProformaController } from '../controller/underwriting/proforma.controller';
 import { UnderwritingDevController } from '../controller/underwriting/underwriting-dev.controller';
 import { UnderwritingRunsController } from '../controller/underwriting/underwriting-runs.controller';
@@ -34,8 +34,8 @@ import { EmailModule } from './email.module';
     ProformaValidatorService,
     AgenticDeliveryService,
     AssumptionAskerService,
-    AssumptionReplyParserService,
     AssumptionEmailService,
+    ReplyRouterService,
   ],
   exports: [AgenticUnderwritingService],
 })
