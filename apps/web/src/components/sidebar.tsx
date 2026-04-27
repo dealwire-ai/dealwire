@@ -18,6 +18,7 @@ import {
   Settings,
   Building,
   MoreHorizontal,
+  Columns3,
 } from "lucide-react";
 import { useFeatureFlags } from "@/hooks/use-feature-flags";
 import { isInternalUser, isAdminUser } from "@/lib/utils";
@@ -187,7 +188,14 @@ export function Sidebar() {
     },
     {
       title: "Market Data",
-      items: [{ label: "Parcels", href: "/public-data/parcels", icon: Map }],
+      items: [
+        { label: "Parcels", href: "/public-data/parcels", icon: Map },
+        {
+          label: "Pipeline",
+          href: "/public-data/pipeline",
+          icon: Columns3,
+        },
+      ],
       flag: flags.parcels,
     },
     {

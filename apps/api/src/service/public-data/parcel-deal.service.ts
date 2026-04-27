@@ -10,6 +10,16 @@ type DealRow = Prisma.ParcelDealGetPayload<{
     assignedToUser: {
       select: { id: true; firstName: true; lastName: true; email: true };
     };
+    parcel: {
+      select: {
+        bbl: true;
+        address: true;
+        borough: true;
+        zipCode: true;
+        buildingClass: true;
+        distressScore: true;
+      };
+    };
   };
 }>;
 
@@ -17,6 +27,16 @@ const DEAL_INCLUDE = {
   stage: { select: { id: true, name: true, color: true, isTerminal: true } },
   assignedToUser: {
     select: { id: true, firstName: true, lastName: true, email: true },
+  },
+  parcel: {
+    select: {
+      bbl: true,
+      address: true,
+      borough: true,
+      zipCode: true,
+      buildingClass: true,
+      distressScore: true,
+    },
   },
 } as const;
 
