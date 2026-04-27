@@ -10,6 +10,7 @@ import { AssumptionAskerService } from './assumption-asker.service';
 import { AssumptionEmailService } from './assumption-email.service';
 import { DealAnalysis, ValidationResult } from './agentic-types';
 import { AssumptionQuestion, UserAssumptions } from './assumption-types';
+import { buildThreadSubject, threadPropertyLabel } from './thread-subject';
 import {
   UnderwritingJobContext,
   UnderwritingResult,
@@ -73,7 +74,11 @@ export class AgenticUnderwritingService {
       dealId,
     );
 
-    const subject = buildAskSubject(run.id, analysis);
+    const subject = buildThreadSubject(
+      threadPropertyLabel(analysis),
+      run.id,
+      false,
+    );
 
     await this.assumptionEmail.sendQuestionsEmail({
       runId: run.id,
@@ -114,6 +119,7 @@ export class AgenticUnderwritingService {
       inReplyToMessageId?: string;
       threadAnchorRunId?: string;
       references?: string[];
+      priorAssumptions?: UserAssumptions | null;
     },
   ): Promise<UnderwritingResult> {
     const startTime = Date.now();
@@ -213,6 +219,9 @@ export class AgenticUnderwritingService {
       dealId,
     );
 
+    const rootRunId =
+      replyContext.threadAnchorRunId ?? (await this.findRootRunId(run));
+
     await this.delivery.deliver({
       runId: run.id,
       senderEmail: replyContext.senderEmail,
@@ -222,8 +231,10 @@ export class AgenticUnderwritingService {
       validation,
       correctionsApplied,
       inReplyToMessageId: replyContext.inReplyToMessageId,
-      threadAnchorRunId: replyContext.threadAnchorRunId,
+      threadAnchorRunId: rootRunId,
       references: replyContext.references,
+      priorAssumptions: replyContext.priorAssumptions ?? null,
+      newAssumptions: assumptions,
     });
 
     const durationMs = Date.now() - startTime;
@@ -301,15 +312,19 @@ export class AgenticUnderwritingService {
       `[${child.jobId}] Re-run: child run ${child.id} of parent ${parent.id} (thread anchor=${rootRunId}, refs=${references.length})`,
     );
 
+    const priorAssumptions =
+      (parent.receivedAssumptions as unknown as UserAssumptions | null) || null;
+
     return this.runFillPhase(child.id, newAssumptions, {
       ...replyContext,
       threadAnchorRunId: rootRunId,
       references,
+      priorAssumptions,
     });
   }
 
   /** Walk parentRunId up until we hit the root of the thread. */
-  private async findRootRunId(run: {
+  async findRootRunId(run: {
     id: string;
     parentRunId: string | null;
   }): Promise<string> {
@@ -333,7 +348,7 @@ export class AgenticUnderwritingService {
    * chronological order. Walks every descendant run and returns each run's
    * messages so References reflects the full conversation.
    */
-  private async collectThreadReferences(rootRunId: string): Promise<string[]> {
+  async collectThreadReferences(rootRunId: string): Promise<string[]> {
     const runIds = new Set<string>([rootRunId]);
     let frontier: string[] = [rootRunId];
     while (frontier.length > 0) {
@@ -351,11 +366,4 @@ export class AgenticUnderwritingService {
     });
     return messages.map((m) => m.messageId);
   }
-}
-
-function buildAskSubject(runId: string, analysis: DealAnalysis): string {
-  const property =
-    analysis.propertyName || analysis.propertyAddress || 'your deal';
-  const shortRun = runId.slice(0, 8);
-  return `Underwriting Assumptions Needed: ${property} [UW-${shortRun}]`;
 }
