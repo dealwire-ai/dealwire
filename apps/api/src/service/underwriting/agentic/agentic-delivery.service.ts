@@ -5,6 +5,9 @@ import { EmailSenderService } from '../../email/email-sender.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { emailConfig } from '../../../config/email.config';
 import { DealAnalysis, ValidationResult } from './agentic-types';
+import { UserAssumptions } from './assumption-types';
+import { buildThreadSubject } from './thread-subject';
+import { diffAssumptions, renderAppliedChangesHtml } from './assumption-diff';
 
 @Injectable()
 export class AgenticDeliveryService {
@@ -28,6 +31,8 @@ export class AgenticDeliveryService {
     inReplyToMessageId?: string;
     threadAnchorRunId?: string;
     references?: string[];
+    priorAssumptions: UserAssumptions | null;
+    newAssumptions: UserAssumptions;
   }): Promise<void> {
     const {
       runId,
@@ -40,16 +45,19 @@ export class AgenticDeliveryService {
       inReplyToMessageId,
       threadAnchorRunId,
       references,
+      priorAssumptions,
+      newAssumptions,
     } = params;
 
     const buffer = await this.s3.downloadDealAttachment(proformaS3Key);
 
-    const propertyAddress = analysis.propertyAddress || dealId;
-    const isReply = Boolean(threadAnchorRunId && threadAnchorRunId !== runId);
-    const tokenRunId = threadAnchorRunId ?? runId;
-    const shortRun = tokenRunId.slice(0, 8);
-    const baseSubject = `Underwriting Complete: ${propertyAddress} [UW-${shortRun}]`;
-    const subject = isReply ? `Re: ${baseSubject}` : baseSubject;
+    const property =
+      analysis.propertyName || analysis.propertyAddress || dealId;
+    const rootRunId = threadAnchorRunId ?? runId;
+    // Fill/rerun deliveries are always responses inside an existing thread.
+    const subject = buildThreadSubject(property, rootRunId, true);
+
+    const changes = diffAssumptions(priorAssumptions, newAssumptions);
 
     const html = this.buildResultHtml(
       analysis,
@@ -57,6 +65,7 @@ export class AgenticDeliveryService {
       senderEmail,
       validation,
       correctionsApplied,
+      changes,
     );
 
     const ccAddresses = this.config.adminEmails.filter(
@@ -101,9 +110,10 @@ export class AgenticDeliveryService {
   private buildResultHtml(
     analysis: DealAnalysis,
     dealId: string,
-    senderEmail?: string,
-    validation?: ValidationResult,
-    correctionsApplied?: number,
+    senderEmail: string | undefined,
+    validation: ValidationResult | undefined,
+    correctionsApplied: number | undefined,
+    changes: ReturnType<typeof diffAssumptions>,
   ): string {
     const fmt = (n: number | null | undefined, prefix = '', suffix = '') =>
       n !== null && n !== undefined
@@ -153,6 +163,8 @@ export class AgenticDeliveryService {
   <p><strong>Deal ID:</strong> ${dealId}</p>
   ${senderEmail ? `<p style="color:#6b7280;font-size:13px;margin:4px 0 0;">Requested by ${senderEmail}</p>` : ''}
   ${analysis.propertyAddress ? `<p><strong>Property:</strong> ${analysis.propertyAddress}${analysis.city ? `, ${analysis.city}` : ''}${analysis.state ? `, ${analysis.state}` : ''}</p>` : ''}
+
+  ${renderAppliedChangesHtml(changes)}
 
   ${analystHtml}
 
