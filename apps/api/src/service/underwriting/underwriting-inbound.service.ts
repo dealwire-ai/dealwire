@@ -15,6 +15,11 @@ export class UnderwritingInboundService {
     private readonly prisma: PrismaService,
   ) {}
 
+  private async fetchReplyBody(emailId: string): Promise<string> {
+    const { text } = await this.emailProcessing.extractEmailBody(emailId);
+    return text || '';
+  }
+
   async handleEmail(emailData: any): Promise<void> {
     const emailId = emailData.email_id as string;
     const fromRaw: string = emailData.from || '';
@@ -51,10 +56,17 @@ export class UnderwritingInboundService {
     // ── Reply correlation ─────────────────────────────────────────────────
     const parentRun = await this.resolveParentRun(inReplyTo, subject);
     if (parentRun) {
+      const rawBody = await this.fetchReplyBody(emailId);
+      if (!rawBody.trim()) {
+        this.logger.warn(
+          `[${parentRun.id}] Reply ${emailId} has empty body after Resend fetch — skipping`,
+        );
+        return;
+      }
       await this.handleReply({
         parentRunId: parentRun.id,
         senderEmail: fromEmail,
-        rawBody: this.extractBody(emailData),
+        rawBody,
         inboundMessageId,
         inReplyToMessageId: inReplyTo,
       });
@@ -224,15 +236,6 @@ export class UnderwritingInboundService {
       (h) => h.name?.toLowerCase() === name.toLowerCase(),
     );
     return match?.value || undefined;
-  }
-
-  private extractBody(emailData: any): string {
-    return (
-      (emailData.body_plain as string | undefined) ||
-      (emailData.text as string | undefined) ||
-      (emailData.body as string | undefined) ||
-      ''
-    );
   }
 
   private extractEmail(value: string): string {
