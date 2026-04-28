@@ -34,4 +34,13 @@ export const demos: Demo[] = [
     status: "active",
     createdAt: "2026-04-06",
   },
+  {
+    slug: "mrc",
+    client: "Madison Realty Capital",
+    domain: "Construction Loan Origination",
+    description:
+      "Business journal automation for new development sites in LA, Miami, WPB, Seattle",
+    status: "active",
+    createdAt: "2026-04-28",
+  },
 ];
