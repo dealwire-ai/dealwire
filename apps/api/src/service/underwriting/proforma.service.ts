@@ -5,13 +5,12 @@ import {
   Logger,
 } from '@nestjs/common';
 import { Proforma, Prisma } from '@prisma/client';
-import { generateObject } from 'ai';
 import { z } from 'zod';
 import { proformaScanModel } from './model-config';
 import { PrismaService } from '../prisma/prisma.service';
 import { S3Service } from '../s3/s3.service';
 import { excelToTextWithCellRefs } from './excel-utils';
-import { trackLlm } from '../llm/tracked-llm';
+import { ModelGatewayService } from '../llm/model-gateway.service';
 
 export interface FieldMapEntry {
   name: string;
@@ -45,6 +44,7 @@ export class ProformaService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly s3: S3Service,
+    private readonly gateway: ModelGatewayService,
   ) {}
 
   list(orgId: string): Promise<Proforma[]> {
@@ -65,11 +65,11 @@ export class ProformaService {
           ? rawText.slice(0, MAX_CHARS) + '\n\n[... truncated for length ...]'
           : rawText;
 
-      const { object } = await trackLlm('proforma_scan', () =>
-        generateObject({
-          model: proformaScanModel(),
-          schema: ScannedFieldsSchema,
-          system: `You are analyzing a real estate pro forma Excel template to identify input cells.
+      const object = await this.gateway.runStructured({
+        stage: 'proforma_scan',
+        model: proformaScanModel(),
+        schema: ScannedFieldsSchema,
+        system: `You are analyzing a real estate pro forma Excel template to identify input cells.
 
 The spreadsheet is serialized as: CELLREF:"value" per cell, with (formula) marking computed cells.
 Example: B6:"Name"  C6:"Northway at Fern Forest"  means C6 contains the property name input.
@@ -84,14 +84,13 @@ For each input cell, return:
 - cell: the cell address exactly as shown (e.g. "C6", "G9") — copy it verbatim from the serialized data
 
 Focus on purchase terms, income assumptions, expense assumptions, financing parameters, and unit/property characteristics. Target 10-30 fields. Skip formula cells, headers, and labels.`,
-          messages: [
-            {
-              role: 'user',
-              content: `Here is the pro forma spreadsheet content:\n\n${text}\n\nIdentify all input cells (not formulas) and return them with plain-English names and descriptions. Copy cell addresses verbatim from the data above.`,
-            },
-          ],
-        }),
-      );
+        messages: [
+          {
+            role: 'user',
+            content: `Here is the pro forma spreadsheet content:\n\n${text}\n\nIdentify all input cells (not formulas) and return them with plain-English names and descriptions. Copy cell addresses verbatim from the data above.`,
+          },
+        ],
+      });
 
       this.logger.log(
         `[proforma] Scanned ${object.fields.length} input fields from template`,
