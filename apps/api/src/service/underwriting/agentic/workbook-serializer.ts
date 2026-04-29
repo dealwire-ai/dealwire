@@ -28,18 +28,29 @@ export function serializeWorkbook(workbook: any): string {
       for (let c = startCol; c <= endCol; c++) {
         const cell = sheet.cell(r, c);
         const value = cell.value();
-        if (value === undefined || value === null || value === '') continue;
-
         const formula = cell.formula();
         const ref = cell.address();
+        const isEmpty = value === undefined || value === null || value === '';
 
         if (formula) {
+          if (isEmpty) continue;
           rowCells.push(`${ref}(formula):"${value}"`);
-        } else {
-          hasInputCells = true;
-          const tag = isInputCell(cell) ? '[input]' : '';
-          rowCells.push(`${ref}${tag}:"${value}"`);
+          continue;
         }
+
+        // Surface input cells even when empty — the model can't fill what it can't see.
+        // Without this, blank inputs like an empty "Purchase Price" cell get silently skipped
+        // and the resulting pro forma has broken downstream calcs (negative IRR, etc.).
+        if (isInputCell(cell)) {
+          hasInputCells = true;
+          const valStr = isEmpty ? '<empty>' : String(value);
+          rowCells.push(`${ref}[input]:"${valStr}"`);
+          continue;
+        }
+
+        if (isEmpty) continue;
+        hasInputCells = true;
+        rowCells.push(`${ref}:"${value}"`);
       }
       if (rowCells.length > 0) lines.push(rowCells.join('  '));
     }
