@@ -21,6 +21,7 @@ You are given:
 Your task: return the ordered subset of canonical questions that are actually needed to fill this specific template for this specific deal. Rules:
 
 - If the template has no blue input cell for a canonical field (e.g. no renovation budget cell), DROP that question.
+- The "askingPrice" question is special: DROP it if the deal summary already includes a non-null Asking value (we already have the price). KEEP it if the deal summary shows no asking price — without a purchase price, the entire pro forma (loan amount, equity, IRR, cap rate) cannot compute.
 - If the template already has a non-empty value in the input cell AND it looks like a reasonable default from the modeler (not stale deal data), you may still ask — the user's number overrides defaults.
 - Preserve the canonical wording unless the template context strongly suggests a sharper hint (e.g. if the template shows an entry cap rate, the exit cap hint can reference it: "e.g. 6.5% — entry cap on this deal is 5.75%").
 - Priority: "required" questions gate the pro forma. "recommended" questions have safe defaults if omitted — mark optional template fields as recommended.
@@ -71,7 +72,7 @@ export class AssumptionAskerService {
         }),
       );
 
-      const pruned = ensureRequired(object.questions);
+      const pruned = ensureRequired(object.questions, analysis);
       this.logger.log(
         `[${dealId}] Assumption asker produced ${pruned.length}/${CANONICAL_ASSUMPTIONS.length} questions`,
       );
@@ -81,7 +82,7 @@ export class AssumptionAskerService {
       this.logger.warn(
         `[${dealId}] Assumption asker failed, falling back to canonical list: ${msg}`,
       );
-      return CANONICAL_ASSUMPTIONS;
+      return defaultQuestions(analysis);
     }
   }
 }
@@ -89,14 +90,17 @@ export class AssumptionAskerService {
 /**
  * Guard against a model that accidentally drops a required canonical question.
  * If any required key is missing from the model's output, re-insert it in
- * its canonical position.
+ * its canonical position. Skips askingPrice when the OM already supplied one
+ * (we don't need to ask the user for a value we already have).
  */
 function ensureRequired(
   modelOutput: AssumptionQuestion[],
+  analysis: DealAnalysis,
 ): AssumptionQuestion[] {
   const byKey = new Map(modelOutput.map((q) => [q.key, q]));
   const result: AssumptionQuestion[] = [];
   for (const canon of CANONICAL_ASSUMPTIONS) {
+    if (canon.key === 'askingPrice' && analysis.askingPrice != null) continue;
     const fromModel = byKey.get(canon.key);
     if (fromModel) {
       result.push(fromModel);
@@ -107,6 +111,12 @@ function ensureRequired(
   }
   for (const extra of byKey.values()) result.push(extra);
   return result;
+}
+
+function defaultQuestions(analysis: DealAnalysis): AssumptionQuestion[] {
+  return analysis.askingPrice != null
+    ? CANONICAL_ASSUMPTIONS.filter((q) => q.key !== 'askingPrice')
+    : CANONICAL_ASSUMPTIONS;
 }
 
 function summarizeAnalysis(analysis: DealAnalysis): string {

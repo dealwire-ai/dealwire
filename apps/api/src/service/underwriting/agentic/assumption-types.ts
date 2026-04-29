@@ -8,6 +8,7 @@ import { z } from 'zod';
  * All values use decimal form (0.065 = 6.5%) except where noted.
  */
 export const UserAssumptionsSchema = z.object({
+  askingPrice: z.number().nullable(),
   interestRate: z.number().nullable(),
   ltv: z.number().nullable(),
   amortizationYears: z.number().int().nullable(),
@@ -47,6 +48,12 @@ export type ParsedAssumptions = z.infer<typeof ParsedAssumptionsSchema>;
  * template-specific fields.
  */
 export const CANONICAL_ASSUMPTIONS: AssumptionQuestion[] = [
+  {
+    key: 'askingPrice',
+    question: 'Purchase price?',
+    hint: 'Total dollars, e.g. $13,500,000. Required when the OM has no asking price.',
+    priority: 'required',
+  },
   {
     key: 'interestRate',
     question: 'Interest rate on acquisition debt?',

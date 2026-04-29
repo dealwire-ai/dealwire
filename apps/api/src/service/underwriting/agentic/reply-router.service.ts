@@ -52,6 +52,7 @@ Decide what the investor wants right now and pick exactly one intent:
 
 ## Canonical assumption keys and units
 
+- askingPrice: total purchase price in dollars. "$13.5M" → 13500000, "13,500,000" → 13500000. Reject < 0 or absurdly small ( < 100000 for a CRE deal).
 - interestRate: decimal (0.065 = 6.5%). Reject > 0.25 or < 0.
 - ltv: decimal (0.70 = 70%). Reject > 1 or < 0.
 - amortizationYears: integer (typical 20–40).
@@ -177,6 +178,7 @@ export class ReplyRouterService {
 
 function emptyAssumptions(): UserAssumptions {
   return {
+    askingPrice: null,
     interestRate: null,
     ltv: null,
     amortizationYears: null,

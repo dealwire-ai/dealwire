@@ -320,6 +320,9 @@ export class UnderwritingListenerService {
           this.agenticPipeline.runFillPhase(parent.id, values, {
             senderEmail,
             inReplyToMessageId: parsed.inReplyToMessageId,
+            threadAnchorRunId: rootRunId,
+            references,
+            priorAssumptions: priorValues,
           }),
         );
         this.persistLlmTotals(parent.jobId, parent.organizationId, llmStore, {
