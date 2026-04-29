@@ -16,6 +16,8 @@ import { useApi } from "@/hooks/use-api";
 import { DealCard } from "./deal-card";
 import { StageColumn } from "./stage-column";
 import { StageSettingsSheet } from "./stage-settings-sheet";
+import { ParcelDetailSheet } from "@/components/parcels/parcel-detail-sheet";
+import type { OrgMember } from "@/components/parcels/assign-popover";
 import type {
   PipelineDeal,
   PipelineDealsResponse,
@@ -31,6 +33,8 @@ export function PipelineBoard() {
   const [error, setError] = useState<string | null>(null);
   const [activeDealId, setActiveDealId] = useState<string | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [openParcelBbl, setOpenParcelBbl] = useState<string | null>(null);
+  const [members, setMembers] = useState<OrgMember[]>([]);
 
   // Pointer sensor with a small drag distance so card clicks don't immediately
   // start a drag (lets us add click-to-open later without conflict).
@@ -42,12 +46,16 @@ export function PipelineBoard() {
     setLoading(true);
     setError(null);
     try {
-      const [stageRes, dealRes] = await Promise.all([
+      const [stageRes, dealRes, memberRes] = await Promise.all([
         apiCall("/public-data/crm/stages") as Promise<PipelineStagesResponse>,
         apiCall("/public-data/crm/deals") as Promise<PipelineDealsResponse>,
+        apiCall("/public-data/crm/org-members").catch(() => ({
+          members: [] as OrgMember[],
+        })) as Promise<{ members: OrgMember[] }>,
       ]);
       setStages(stageRes.stages);
       setDeals(dealRes.deals);
+      setMembers(memberRes.members ?? []);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load pipeline");
     } finally {
@@ -173,6 +181,7 @@ export function PipelineBoard() {
               key={stage.id}
               stage={stage}
               deals={dealsByStage.get(stage.id) ?? []}
+              onCardClick={(deal) => setOpenParcelBbl(deal.parcel.bbl)}
             />
           ))}
         </div>
@@ -187,6 +196,32 @@ export function PipelineBoard() {
         onOpenChange={setSettingsOpen}
         stages={stages}
         onStagesChanged={load}
+      />
+
+      <ParcelDetailSheet
+        open={openParcelBbl !== null}
+        onOpenChange={(o) => !o && setOpenParcelBbl(null)}
+        bbl={openParcelBbl}
+        members={members}
+        onParcelUpdated={(bbl, updates) => {
+          // Mirror assignee changes back onto the deal so the card updates without
+          // re-fetching the whole board. If anything fancier is needed later
+          // (e.g. updating other parcel fields visible on the card), refresh
+          // via load() instead.
+          if (updates._assignee !== undefined) {
+            setDeals((prev) =>
+              prev.map((d) =>
+                d.parcel.bbl === bbl
+                  ? {
+                      ...d,
+                      assignedToUserId: updates._assignee?.id ?? null,
+                      assignedToUser: updates._assignee ?? null,
+                    }
+                  : d,
+              ),
+            );
+          }
+        }}
       />
     </div>
   );
