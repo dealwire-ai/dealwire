@@ -1,6 +1,8 @@
 import {
   Controller,
+  Delete,
   Get,
+  HttpCode,
   Param,
   Query,
   ParseIntPipe,
@@ -132,5 +134,28 @@ export class UnderwritingRunsController {
       3600,
     );
     return { url };
+  }
+
+  /**
+   * Delete an underwriting run and its full re-run thread (children cascade
+   * via the parentRunId FK). UnderwritingRunMessage rows cascade via their
+   * own onDelete: Cascade. The S3 objects are intentionally not deleted —
+   * cleanup of orphaned proforma/document blobs is a separate concern.
+   */
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async delete(
+    @AuthUser('organizationId') orgId: string,
+    @Param('id') id: string,
+  ): Promise<void> {
+    const run = await this.prisma.underwritingRun.findUnique({
+      where: { id },
+      select: { organizationId: true },
+    });
+    if (!run || run.organizationId !== orgId) {
+      throw new HttpException('Not found', HttpStatus.NOT_FOUND);
+    }
+
+    await this.prisma.underwritingRun.delete({ where: { id } });
   }
 }
