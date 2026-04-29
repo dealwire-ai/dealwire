@@ -34,6 +34,8 @@ export interface PipelineDealParcel {
   zipCode: string | null;
   buildingClass: string | null;
   distressScore: number | null;
+  latitude: number | null;
+  longitude: number | null;
 }
 
 export interface PipelineDeal {
