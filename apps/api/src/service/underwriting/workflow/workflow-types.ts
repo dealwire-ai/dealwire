@@ -3,7 +3,7 @@ import { z } from 'zod';
 // ─── Call 1: Deal Analysis ───────────────────────────────────────────────────
 
 /**
- * Flat schema for the agentic deal analysis output.
+ * Flat schema for the deal analysis output.
  * The model reads ALL deal documents in one pass and produces a single
  * structured object — no separate classification or per-doc-type extraction.
  */

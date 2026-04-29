@@ -3,18 +3,18 @@ import { SqsMessageHandler, SqsConsumerEventHandler } from '@ssut/nestjs-sqs';
 import { Message } from '@aws-sdk/client-sqs';
 import { Prisma } from '@prisma/client';
 import { UnderwritingJobContext } from './underwriting-types';
-import { AgenticUnderwritingService } from './agentic/agentic-underwriting.service';
-import { AssumptionEmailService } from './agentic/assumption-email.service';
+import { UnderwritingWorkflowService } from './workflow/underwriting-workflow.service';
+import { AssumptionEmailService } from './workflow/assumption-email.service';
 import {
   AssumptionQuestion,
   UserAssumptions,
-} from './agentic/assumption-types';
-import { threadPropertyLabel } from './agentic/thread-subject';
-import { DealAnalysis } from './agentic/agentic-types';
+} from './workflow/assumption-types';
+import { threadPropertyLabel } from './workflow/thread-subject';
+import { DealAnalysis } from './workflow/workflow-types';
 import {
   ConversationTurn,
   ReplyRouterService,
-} from './agentic/reply-router.service';
+} from './workflow/reply-router.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { LlmContextStore, withLlmContext } from '../llm/llm-context';
 import { MetricsService } from '../metrics/metrics.service';
@@ -49,7 +49,7 @@ export class UnderwritingListenerService {
   private readonly logger = new Logger(UnderwritingListenerService.name);
 
   constructor(
-    private readonly agenticPipeline: AgenticUnderwritingService,
+    private readonly workflow: UnderwritingWorkflowService,
     private readonly prisma: PrismaService,
     private readonly metrics: MetricsService,
     private readonly assumptionEmail: AssumptionEmailService,
@@ -148,9 +148,7 @@ export class UnderwritingListenerService {
     };
 
     try {
-      await withLlmContext(llmStore, () =>
-        this.agenticPipeline.runAnalysisPhase(ctx),
-      );
+      await withLlmContext(llmStore, () => this.workflow.runAnalysisPhase(ctx));
       this.persistLlmTotals(parsed.dealId, parsed.orgId, llmStore, {
         finalize: false,
       });
@@ -223,9 +221,8 @@ export class UnderwritingListenerService {
       const analysis =
         (parent.extractionSnapshot as unknown as DealAnalysis | null) || null;
       const property = threadPropertyLabel(analysis);
-      const rootRunId = await this.agenticPipeline.findRootRunId(parent);
-      const references =
-        await this.agenticPipeline.collectThreadReferences(rootRunId);
+      const rootRunId = await this.workflow.findRootRunId(parent);
+      const references = await this.workflow.collectThreadReferences(rootRunId);
       const history = await this.loadConversationHistory(rootRunId);
 
       const decision = await withLlmContext(llmStore, () =>
@@ -317,7 +314,7 @@ export class UnderwritingListenerService {
         }
 
         await withLlmContext(llmStore, () =>
-          this.agenticPipeline.runFillPhase(parent.id, values, {
+          this.workflow.runFillPhase(parent.id, values, {
             senderEmail,
             inReplyToMessageId: parsed.inReplyToMessageId,
           }),
@@ -331,7 +328,7 @@ export class UnderwritingListenerService {
 
       if (parent.status === 'COMPLETED') {
         await withLlmContext(llmStore, () =>
-          this.agenticPipeline.runRerunPhase(parent.id, values, {
+          this.workflow.runRerunPhase(parent.id, values, {
             senderEmail,
             inReplyToMessageId: parsed.inReplyToMessageId,
           }),
