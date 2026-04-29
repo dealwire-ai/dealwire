@@ -313,4 +313,18 @@ export class ParcelCrmController {
     });
     return { activity };
   }
+
+  @Delete('activities/:activityId')
+  async deleteActivity(
+    @AuthUser('organizationId') organizationId: string,
+    @AuthUser('userId') userId: string | null,
+    @Param('activityId') activityId: string,
+  ) {
+    await this.assertParcelsEnabled(organizationId);
+    return this.activities.delete({
+      activityId,
+      organizationId,
+      userId: userId!,
+    });
+  }
 }

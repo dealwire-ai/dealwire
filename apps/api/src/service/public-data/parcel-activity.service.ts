@@ -149,4 +149,38 @@ export class ParcelActivityService {
       },
     });
   }
+
+  // Author-only delete on user-created activities (CALL, NOTE,
+  // PHONE_STATUS_CHANGED). System events (STAGE_CHANGED, ASSIGNED, etc) are
+  // immutable so the audit trail can't be rewritten — we want to be able to
+  // explain "why is this deal in stage X?" forever.
+  async delete(params: {
+    activityId: string;
+    organizationId: string;
+    userId: string;
+  }): Promise<{ id: string }> {
+    const activity = await this.prisma.parcelActivity.findUnique({
+      where: { id: params.activityId },
+      select: { id: true, organizationId: true, userId: true, type: true },
+    });
+    if (!activity || activity.organizationId !== params.organizationId) {
+      throw new HttpException('Activity not found', HttpStatus.NOT_FOUND);
+    }
+    if (!USER_FACING_TYPES.has(activity.type)) {
+      throw new HttpException(
+        'System-generated activities cannot be deleted',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+    if (activity.userId !== params.userId) {
+      throw new HttpException(
+        'You can only delete your own activities',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+    await this.prisma.parcelActivity.delete({
+      where: { id: params.activityId },
+    });
+    return { id: params.activityId };
+  }
 }
