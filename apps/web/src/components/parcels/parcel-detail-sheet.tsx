@@ -85,8 +85,8 @@ export function ParcelDetailSheet({
         side="right"
         className="w-full overflow-y-auto p-0 sm:max-w-3xl"
       >
-        <SheetHeader className="sticky top-0 z-10 border-b border-zinc-800 bg-zinc-950 px-6 py-4">
-          <div className="flex items-center justify-between gap-4 pr-8">
+        <SheetHeader className="sticky top-0 z-10 border-b border-zinc-800 bg-zinc-950 px-6 py-4 pr-16">
+          <div className="flex items-center justify-between gap-4">
             <div className="min-w-0 flex-1">
               <SheetTitle className="truncate">
                 {effective?.address ||
@@ -145,16 +145,17 @@ function ParcelDetailContent({
 }) {
   return (
     <div className="space-y-6 text-sm">
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-[280px_1fr]">
-        <div>
-          <SectionHeader>Street View</SectionHeader>
-          <StreetViewImage
-            address={parcel.address ?? ""}
-            borough={parcel.borough}
-            zipCode={parcel.zipCode}
-          />
-        </div>
+      {/* Hero street view spans full width so the rest of the panel doesn't sit
+          next to a narrow square with empty space below it. */}
+      <div className="overflow-hidden rounded-md border border-zinc-800">
+        <StreetViewImage
+          address={parcel.address ?? ""}
+          borough={parcel.borough}
+          zipCode={parcel.zipCode}
+        />
+      </div>
 
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div>
           <SectionHeader>Property Details</SectionHeader>
           <div className="space-y-1">
@@ -248,123 +249,123 @@ function ParcelDetailContent({
             <AcrisLink bbl={parcel.bbl} />
           </div>
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div>
-          <SectionHeader>HPD Violations</SectionHeader>
-          <div className="space-y-1">
-            <DetailRow
-              label="Total"
-              value={parcel.violationsTotal.toString()}
-            />
-            <DetailRow
-              label="Open"
-              value={parcel.violationsOpen.toString()}
-              highlight={parcel.violationsOpen > 0}
-            />
-            <DetailRow
-              label="Class A (non-hazardous)"
-              value={parcel.violationsClassA.toString()}
-            />
-            <DetailRow
-              label="Class B (hazardous)"
-              value={parcel.violationsClassB.toString()}
-              highlight={parcel.violationsClassB > 0}
-            />
-            <DetailRow
-              label="Class C (immediately hazardous)"
-              value={parcel.violationsClassC.toString()}
-              highlight={parcel.violationsClassC > 0}
-            />
-            <DetailRow
-              label="Violations/Unit"
-              value={parcel.violationsPerUnit?.toFixed(2)}
-            />
+        <div className="space-y-6">
+          <div>
+            <SectionHeader>HPD Violations</SectionHeader>
+            <div className="space-y-1">
+              <DetailRow
+                label="Total"
+                value={parcel.violationsTotal.toString()}
+              />
+              <DetailRow
+                label="Open"
+                value={parcel.violationsOpen.toString()}
+                highlight={parcel.violationsOpen > 0}
+              />
+              <DetailRow
+                label="Class A (non-hazardous)"
+                value={parcel.violationsClassA.toString()}
+              />
+              <DetailRow
+                label="Class B (hazardous)"
+                value={parcel.violationsClassB.toString()}
+                highlight={parcel.violationsClassB > 0}
+              />
+              <DetailRow
+                label="Class C (immediately hazardous)"
+                value={parcel.violationsClassC.toString()}
+                highlight={parcel.violationsClassC > 0}
+              />
+              <DetailRow
+                label="Violations/Unit"
+                value={parcel.violationsPerUnit?.toFixed(2)}
+              />
+            </div>
           </div>
-        </div>
 
-        <div>
-          <SectionHeader>Tax Lien & Financials</SectionHeader>
-          <div className="space-y-1">
-            <DetailRow
-              label="Active Lien"
-              value={parcel.hasActiveLien ? "Yes" : "No"}
-              highlight={parcel.hasActiveLien}
-            />
-            <DetailRow label="Cycle" value={parcel.lienCycle} />
-            <DetailRow
-              label="Water Debt Only"
-              value={parcel.waterDebtOnly ? "Yes" : "No"}
-            />
-            <DetailRow
-              label="Outstanding Tax Bill"
-              value={formatCurrency(parcel.outstandingTaxBill)}
-              highlight={(parcel.outstandingTaxBill ?? 0) > 0}
-            />
-            <DetailRow
-              label="Total Owed to DOF"
-              value={formatCurrency(parcel.totalOutstandingBalance)}
-              highlight={(parcel.totalOutstandingBalance ?? 0) > 0}
-            />
-            <DetailRow
-              label="Distress Score"
-              value={parcel.distressScore?.toString()}
-            />
-            {parcel.lienSaleAmount != null && (
-              <>
-                <div className="mb-1 mt-3 inline-flex items-center gap-2 text-xs font-medium text-zinc-400">
-                  NYCTL Lien Sale
-                  {parcel.lienMatchConfidence === "group_small" && (
-                    <Badge className="border-yellow-900/50 bg-yellow-900/30 px-1 py-0 text-[10px] leading-tight text-yellow-400">
-                      ~Est (group)
-                    </Badge>
-                  )}
-                  {(parcel.lienMatchConfidence === "group_large" ||
-                    parcel.lienMatchConfidence === "estimated") && (
-                    <Badge className="border-orange-900/50 bg-orange-900/30 px-1 py-0 text-[10px] leading-tight text-orange-400">
-                      ~Est (group)
-                    </Badge>
-                  )}
-                </div>
-                <DetailRow
-                  label="Sale Amount"
-                  value={formatCurrency(parcel.lienSaleAmount)}
-                  highlight={(parcel.lienSaleAmount ?? 0) > 0}
-                />
-                <DetailRow
-                  label="Redemptive Value"
-                  value={formatCurrency(parcel.lienRedemptiveValue)}
-                />
-                <DetailRow label="Servicer" value={parcel.lienServicer} />
-                <DetailRow
-                  label="Redeemed"
-                  value={
-                    parcel.lienRedeemed === null
-                      ? "Unknown"
-                      : parcel.lienRedeemed
-                        ? "Yes"
-                        : "No"
-                  }
-                />
-                <DetailRow
-                  label="Foreclosure"
-                  value={parcel.lienForeclosureStatus}
-                />
-                <DetailRow
-                  label="Trust Vintage"
-                  value={parcel.lienTrustVintage}
-                />
-                <DetailRow label="Sale Date" value={parcel.lienSaleDate} />
-                {parcel.lienMatchGroupSize != null &&
-                  parcel.lienMatchGroupSize > 1 && (
-                    <DetailRow
-                      label="Group Size"
-                      value={`${parcel.lienMatchGroupSize} BBLs`}
-                    />
-                  )}
-              </>
-            )}
+          <div>
+            <SectionHeader>Tax Lien & Financials</SectionHeader>
+            <div className="space-y-1">
+              <DetailRow
+                label="Active Lien"
+                value={parcel.hasActiveLien ? "Yes" : "No"}
+                highlight={parcel.hasActiveLien}
+              />
+              <DetailRow label="Cycle" value={parcel.lienCycle} />
+              <DetailRow
+                label="Water Debt Only"
+                value={parcel.waterDebtOnly ? "Yes" : "No"}
+              />
+              <DetailRow
+                label="Outstanding Tax Bill"
+                value={formatCurrency(parcel.outstandingTaxBill)}
+                highlight={(parcel.outstandingTaxBill ?? 0) > 0}
+              />
+              <DetailRow
+                label="Total Owed to DOF"
+                value={formatCurrency(parcel.totalOutstandingBalance)}
+                highlight={(parcel.totalOutstandingBalance ?? 0) > 0}
+              />
+              <DetailRow
+                label="Distress Score"
+                value={parcel.distressScore?.toString()}
+              />
+              {parcel.lienSaleAmount != null && (
+                <>
+                  <div className="mb-1 mt-3 inline-flex items-center gap-2 text-xs font-medium text-zinc-400">
+                    NYCTL Lien Sale
+                    {parcel.lienMatchConfidence === "group_small" && (
+                      <Badge className="border-yellow-900/50 bg-yellow-900/30 px-1 py-0 text-[10px] leading-tight text-yellow-400">
+                        ~Est (group)
+                      </Badge>
+                    )}
+                    {(parcel.lienMatchConfidence === "group_large" ||
+                      parcel.lienMatchConfidence === "estimated") && (
+                      <Badge className="border-orange-900/50 bg-orange-900/30 px-1 py-0 text-[10px] leading-tight text-orange-400">
+                        ~Est (group)
+                      </Badge>
+                    )}
+                  </div>
+                  <DetailRow
+                    label="Sale Amount"
+                    value={formatCurrency(parcel.lienSaleAmount)}
+                    highlight={(parcel.lienSaleAmount ?? 0) > 0}
+                  />
+                  <DetailRow
+                    label="Redemptive Value"
+                    value={formatCurrency(parcel.lienRedemptiveValue)}
+                  />
+                  <DetailRow label="Servicer" value={parcel.lienServicer} />
+                  <DetailRow
+                    label="Redeemed"
+                    value={
+                      parcel.lienRedeemed === null
+                        ? "Unknown"
+                        : parcel.lienRedeemed
+                          ? "Yes"
+                          : "No"
+                    }
+                  />
+                  <DetailRow
+                    label="Foreclosure"
+                    value={parcel.lienForeclosureStatus}
+                  />
+                  <DetailRow
+                    label="Trust Vintage"
+                    value={parcel.lienTrustVintage}
+                  />
+                  <DetailRow label="Sale Date" value={parcel.lienSaleDate} />
+                  {parcel.lienMatchGroupSize != null &&
+                    parcel.lienMatchGroupSize > 1 && (
+                      <DetailRow
+                        label="Group Size"
+                        value={`${parcel.lienMatchGroupSize} BBLs`}
+                      />
+                    )}
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>

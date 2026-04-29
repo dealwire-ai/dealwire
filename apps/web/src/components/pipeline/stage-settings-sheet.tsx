@@ -157,7 +157,7 @@ export function StageSettingsSheet({
                       type="button"
                       disabled={idx === 0 || busy}
                       onClick={() => handleReorder(stage.id, -1)}
-                      className="text-zinc-500 hover:text-zinc-200 disabled:opacity-30"
+                      className="cursor-pointer text-zinc-500 transition-colors hover:text-zinc-200 disabled:cursor-not-allowed disabled:opacity-30"
                       aria-label="Move up"
                     >
                       <GripVertical className="h-3 w-3 rotate-90" />
@@ -166,7 +166,7 @@ export function StageSettingsSheet({
                       type="button"
                       disabled={idx === stages.length - 1 || busy}
                       onClick={() => handleReorder(stage.id, 1)}
-                      className="text-zinc-500 hover:text-zinc-200 disabled:opacity-30"
+                      className="cursor-pointer text-zinc-500 transition-colors hover:text-zinc-200 disabled:cursor-not-allowed disabled:opacity-30"
                       aria-label="Move down"
                     >
                       <GripVertical className="h-3 w-3 -rotate-90" />
@@ -204,7 +204,7 @@ export function StageSettingsSheet({
                         ? "Default stage"
                         : "Make default for new deals"
                     }
-                    className={`text-zinc-500 hover:text-amber-300 disabled:opacity-100 ${
+                    className={`cursor-pointer text-zinc-500 transition-colors hover:text-amber-300 disabled:cursor-default disabled:opacity-100 ${
                       stage.isDefault ? "text-amber-400" : ""
                     }`}
                   >
@@ -233,7 +233,7 @@ export function StageSettingsSheet({
                         ? "Promote another stage to default before deleting"
                         : "Delete stage"
                     }
-                    className="text-zinc-500 hover:text-red-400 disabled:opacity-30"
+                    className="cursor-pointer text-zinc-500 transition-colors hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-30"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
