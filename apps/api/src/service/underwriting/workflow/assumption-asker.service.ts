@@ -1,8 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { generateObject } from 'ai';
 import { z } from 'zod';
 import { assumptionAskerModel } from '../model-config';
-import { trackLlm } from '../../llm/tracked-llm';
+import { ModelGatewayService } from '../../llm/model-gateway.service';
 import {
   AssumptionQuestion,
   AssumptionQuestionSchema,
@@ -35,6 +34,8 @@ const OutputSchema = z.object({
 export class AssumptionAskerService {
   private readonly logger = new Logger(AssumptionAskerService.name);
 
+  constructor(private readonly gateway: ModelGatewayService) {}
+
   /**
    * Produce the assumption question list to email the investor, tailored to
    * the org's proforma template and the extracted deal. Always returns at
@@ -56,20 +57,18 @@ export class AssumptionAskerService {
     const analysisSummary = summarizeAnalysis(analysis);
 
     try {
-      const { object } = await trackLlm('workflow.assumption_ask', () =>
-        generateObject({
-          model: assumptionAskerModel(),
-          schema: OutputSchema,
-          system: SYSTEM_PROMPT,
-          messages: [
-            {
-              role: 'user',
-              content: `## Canonical Assumptions\n\n\`\`\`json\n${canonicalJson}\n\`\`\`\n\n## Deal Summary\n\n${analysisSummary}\n\n## Proforma Input Cells\n\n${inputCellsText || '(no blue input cells detected)'}\n\nReturn the ordered subset of canonical questions the investor should answer to fill this proforma.`,
-            },
-          ],
-          maxRetries: 2,
-        }),
-      );
+      const object = await this.gateway.runStructured({
+        stage: 'workflow.assumption_ask',
+        model: assumptionAskerModel(),
+        schema: OutputSchema,
+        system: SYSTEM_PROMPT,
+        messages: [
+          {
+            role: 'user',
+            content: `## Canonical Assumptions\n\n\`\`\`json\n${canonicalJson}\n\`\`\`\n\n## Deal Summary\n\n${analysisSummary}\n\n## Proforma Input Cells\n\n${inputCellsText || '(no blue input cells detected)'}\n\nReturn the ordered subset of canonical questions the investor should answer to fill this proforma.`,
+          },
+        ],
+      });
 
       const pruned = ensureRequired(object.questions);
       this.logger.log(
