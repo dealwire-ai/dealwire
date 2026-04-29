@@ -16,6 +16,7 @@ import { BatchListAssignButton } from "@/components/parcels/batch-list-assign-bu
 import { BatchAssignButton } from "@/components/parcels/batch-assign-button";
 import type { ParcelListType } from "@/components/parcels/list-assign-popover";
 import type { OrgMember } from "@/components/parcels/assign-popover";
+import { ParcelDetailSheet } from "@/components/parcels/parcel-detail-sheet";
 import { DataCoverageBar } from "@/components/parcels/data-coverage-bar";
 import { TableToolbar } from "@/components/table-toolbar";
 import { TablePagination } from "@/components/table-pagination";
@@ -60,7 +61,7 @@ export default function ParcelsPage() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+  const [openParcel, setOpenParcel] = useState<Parcel | null>(null);
   const [selectedBbls, setSelectedBbls] = useState<Set<string>>(new Set());
   const [skipTraceUsage, setSkipTraceUsage] = useState<SkipTraceUsage | null>(
     null,
@@ -210,7 +211,6 @@ export default function ParcelsPage() {
   }, [fetchLastRun]);
 
   useEffect(() => {
-    setExpandedRows(new Set());
     setSelectedBbls(new Set());
   }, [table.page, table.sort, table.order]);
 
@@ -422,18 +422,9 @@ export default function ParcelsPage() {
           ) : (
             <ParcelTable
               parcels={parcels}
-              expandedRows={expandedRows}
               visibleColumns={visibleColumns}
               members={members}
-              onToggleRow={(id) => {
-                const newExpanded = new Set(expandedRows);
-                if (newExpanded.has(id)) {
-                  newExpanded.delete(id);
-                } else {
-                  newExpanded.add(id);
-                }
-                setExpandedRows(newExpanded);
-              }}
+              onRowClick={(parcel) => setOpenParcel(parcel)}
               selectedBbls={selectedBbls}
               onToggleSelect={(bbl) => {
                 const next = new Set(selectedBbls);
@@ -460,6 +451,11 @@ export default function ParcelsPage() {
                 setParcels((prev) =>
                   prev.map((p) => (p.bbl === bbl ? { ...p, ...updates } : p)),
                 );
+                // Mirror the optimistic update onto the open sheet so its
+                // popovers reflect the change immediately too.
+                setOpenParcel((p) =>
+                  p && p.bbl === bbl ? { ...p, ...updates } : p,
+                );
               }}
             />
           )}
@@ -473,6 +469,19 @@ export default function ParcelsPage() {
           />
         </div>
       </div>
+
+      <ParcelDetailSheet
+        open={openParcel !== null}
+        onOpenChange={(o) => !o && setOpenParcel(null)}
+        parcel={openParcel}
+        members={members}
+        onParcelUpdated={(bbl, updates) => {
+          setParcels((prev) =>
+            prev.map((p) => (p.bbl === bbl ? { ...p, ...updates } : p)),
+          );
+          setOpenParcel((p) => (p && p.bbl === bbl ? { ...p, ...updates } : p));
+        }}
+      />
 
       <Chatbot />
     </div>
