@@ -429,6 +429,8 @@ export class NycIngestionService {
             lotDepth: parseFloat(record.lotdepth) || null,
             bldgFront: parseFloat(record.bldgfront) || null,
             bldgDepth: parseFloat(record.bldgdepth) || null,
+            latitude: parseFloat(record.latitude) || null,
+            longitude: parseFloat(record.longitude) || null,
             numFloors: parseFloat(record.numfloors) || null,
             yearBuilt: parseInt(record.yearbuilt) || null,
             ownerName: record.ownername || null,

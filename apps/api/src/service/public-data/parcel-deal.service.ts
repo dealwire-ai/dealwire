@@ -18,6 +18,8 @@ type DealRow = Prisma.ParcelDealGetPayload<{
         zipCode: true;
         buildingClass: true;
         distressScore: true;
+        latitude: true;
+        longitude: true;
       };
     };
   };
@@ -36,6 +38,8 @@ const DEAL_INCLUDE = {
       zipCode: true,
       buildingClass: true,
       distressScore: true,
+      latitude: true,
+      longitude: true,
     },
   },
 } as const;

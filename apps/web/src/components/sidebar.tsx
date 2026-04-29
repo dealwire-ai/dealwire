@@ -19,6 +19,7 @@ import {
   Building,
   MoreHorizontal,
   Columns3,
+  MapPin,
 } from "lucide-react";
 import { useFeatureFlags } from "@/hooks/use-feature-flags";
 import { isInternalUser, isAdminUser } from "@/lib/utils";
@@ -194,6 +195,11 @@ export function Sidebar() {
           label: "Pipeline",
           href: "/public-data/pipeline",
           icon: Columns3,
+        },
+        {
+          label: "Map",
+          href: "/public-data/map",
+          icon: MapPin,
         },
       ],
       flag: flags.parcels,
