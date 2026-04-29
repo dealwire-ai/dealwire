@@ -55,7 +55,7 @@ export function AssignPopover({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <button
-          className="inline-flex items-center"
+          className="inline-flex cursor-pointer items-center"
           onClick={(e) => e.stopPropagation()}
         >
           {currentAssignee ? (
