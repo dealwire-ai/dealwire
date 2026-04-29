@@ -70,17 +70,20 @@ src/service/underwriting/
   underwriting-listener.service.ts     # SQS consumer: dispatches new-job / reply-job
   underwriting-types.ts                # UnderwritingJobContext / UnderwritingResult
 
-  agentic/
-    agentic-underwriting.service.ts    # runAnalysisPhase / runFillPhase / runRerunPhase
+  workflow/
+    underwriting-workflow.service.ts   # Orchestrator: runAnalysisPhase / runFillPhase / runRerunPhase
+    workflow-types.ts                  # DealAnalysisSchema, CellMappingSchema, ValidationResultSchema
     deal-analyzer.service.ts           # Single-pass OM + rent roll + T-12 analysis (Sonnet-4-6)
     assumption-asker.service.ts        # Prune canonical questions to what this template needs
-    assumption-email.service.ts        # Outbound ASK / CLARIFY emails (deterministic Message-ID)
-    assumption-reply-parser.service.ts # Parse investor reply → UserAssumptions (gpt-4.1-mini)
+    assumption-email.service.ts        # Outbound ASK / CLARIFY / ANSWER emails (deterministic Message-ID)
+    assumption-types.ts                # UserAssumptions, AssumptionQuestion, CANONICAL_ASSUMPTIONS
+    assumption-diff.ts                 # "Applied changes" block for delivery emails
+    reply-router.service.ts            # Classify investor reply: apply | answer | clarify (Sonnet)
     template-filler.service.ts         # Cell mapper: analysis + assumptions → CellMappings
     proforma-validator.service.ts      # Second-pass QA on filled model
-    agentic-delivery.service.ts        # Outbound DELIVER email with deterministic Message-ID
+    delivery.service.ts                # Outbound DELIVER email with deterministic Message-ID
     workbook-serializer.ts             # Shared blue-input-cell detection + serialization
-    assumption-types.ts                # UserAssumptions, AssumptionQuestion, CANONICAL_ASSUMPTIONS
+    thread-subject.ts                  # Thread subject + property label helpers
 
 src/service/underwriting/proforma.service.ts  # Template CRUD (blue-cell scan)
 src/controller/underwriting/proforma.controller.ts  # /underwriting/proforma REST endpoints
@@ -106,14 +109,14 @@ Inbound email
                              merges new over prior receivedAssumptions
 ```
 
-**Threading:** every outbound email has a deterministic Message-ID (`<uw-{runId}-{ask|clarify|deliver}-{uuid}@mail.dealwire.ai>`) persisted to `UnderwritingRunMessage`. Inbound replies are correlated by `In-Reply-To`, with a subject-token fallback (`[UW-{runId-short}]`). Auto-replies are dropped via `Auto-Submitted` / `Precedence` / `X-Autoreply` headers. Duplicate inbounds are deduped on the inbound Message-ID.
+**Threading:** every outbound email has a deterministic Message-ID (`<uw-{runId}-{ask|clarify|answer|deliver}-{uuid}@mail.dealwire.ai>`) persisted to `UnderwritingRunMessage`. Inbound replies are correlated by `In-Reply-To`, with a subject-token fallback (`[UW-{runId-short}]`). Auto-replies are dropped via `Auto-Submitted` / `Precedence` / `X-Autoreply` headers. Duplicate inbounds are deduped on the inbound Message-ID.
 
 **Env vars:** `AWS_UNDERWRITING_QUEUE_URL`, `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `UNDERWRITING_INBOUND_EMAIL`, optional `UW_ANALYZER_MODEL` / `UW_TEMPLATE_FILLER_MODEL` / `UW_VALIDATOR_MODEL` / `UW_ASSUMPTION_ASKER_MODEL` / `UW_ASSUMPTION_PARSER_MODEL`.
 
 **Notes:**
 
 - No BullMQ — uses SQS directly. Two message types on the `underwriting` queue: `underwriting-job` (new) and `underwriting-reply-job` (reply).
-- Legacy (extractor-per-doc-type) pipeline is removed; the agentic pipeline is the only path.
+- Legacy (extractor-per-doc-type) pipeline is removed; the workflow pipeline is the only path.
 - Web pro forma rendering (dashboard view) is NOT yet implemented — delivery is via email attachment.
 
 ---

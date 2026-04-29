@@ -1,6 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { generateObject } from 'ai';
-import { CellMappingSchema, CellMappings, DealAnalysis } from './agentic-types';
+import {
+  CellMappingSchema,
+  CellMappings,
+  DealAnalysis,
+} from './workflow-types';
 import { UserAssumptions } from './assumption-types';
 import { templateFillerModel } from '../model-config';
 import { trackLlm } from '../../llm/tracked-llm';
@@ -70,7 +74,7 @@ export class TemplateFillerService {
       ? JSON.stringify(assumptions, null, 2)
       : 'null';
 
-    const { object } = await trackLlm('agentic.template_fill', () =>
+    const { object } = await trackLlm('workflow.template_fill', () =>
       generateObject({
         model: templateFillerModel(),
         schema: CellMappingSchema,

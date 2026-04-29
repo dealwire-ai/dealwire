@@ -1,4 +1,4 @@
-import { DealAnalysis } from './agentic-types';
+import { DealAnalysis } from './workflow-types';
 
 /**
  * Canonical thread subject for an underwriting conversation. Every outbound

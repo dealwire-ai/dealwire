@@ -15,11 +15,11 @@ import { ClerkAuthGuard } from '../../guard/clerk-auth.guard';
 import { AuthUser } from '../../decorator/auth-user.decorator';
 import { S3Service } from '../../service/s3/s3.service';
 import { PrismaService } from '../../service/prisma/prisma.service';
-import { AgenticUnderwritingService } from '../../service/underwriting/agentic/agentic-underwriting.service';
+import { UnderwritingWorkflowService } from '../../service/underwriting/workflow/underwriting-workflow.service';
 import {
   UserAssumptions,
   UserAssumptionsSchema,
-} from '../../service/underwriting/agentic/assumption-types';
+} from '../../service/underwriting/workflow/assumption-types';
 
 /**
  * Dev endpoint for testing the interactive underwriting pipeline.
@@ -40,7 +40,7 @@ export class UnderwritingDevController {
   constructor(
     private readonly s3: S3Service,
     private readonly prisma: PrismaService,
-    private readonly agenticOrchestrator: AgenticUnderwritingService,
+    private readonly workflow: UnderwritingWorkflowService,
   ) {}
 
   onModuleInit() {
@@ -114,7 +114,7 @@ export class UnderwritingDevController {
       },
     });
 
-    await this.agenticOrchestrator.runAnalysisPhase({
+    await this.workflow.runAnalysisPhase({
       dealId,
       orgId: effectiveOrgId,
       senderEmail,
@@ -132,11 +132,9 @@ export class UnderwritingDevController {
       };
     }
 
-    const fillResult = await this.agenticOrchestrator.runFillPhase(
-      run.id,
-      assumptions,
-      { senderEmail },
-    );
+    const fillResult = await this.workflow.runFillPhase(run.id, assumptions, {
+      senderEmail,
+    });
 
     let proformaDownloadUrl: string | null = null;
     if (fillResult.filledProformaModelS3Key) {
