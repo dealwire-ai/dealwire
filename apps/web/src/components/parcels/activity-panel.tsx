@@ -1,9 +1,17 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Phone, FileText, RefreshCw } from "lucide-react";
+import { Phone, FileText, RefreshCw, Trash2 } from "lucide-react";
+import { useAuth } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { useApi } from "@/hooks/use-api";
+
+// User-created types are deletable; system events stay immutable as audit trail.
+const DELETABLE_TYPES = new Set<ActivityType>([
+  "CALL",
+  "NOTE",
+  "PHONE_STATUS_CHANGED",
+]);
 
 type ActivityType =
   | "CALL"
@@ -33,12 +41,15 @@ interface ActivityPanelProps {
 
 export function ActivityPanel({ bbl }: ActivityPanelProps) {
   const { apiCall } = useApi();
+  const { userId: currentUserId } = useAuth();
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(false);
   const [posting, setPosting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [draftType, setDraftType] = useState<"CALL" | "NOTE">("CALL");
   const [draftBody, setDraftBody] = useState("");
+  // Two-step confirm: first click stages the row for delete, second commits.
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -78,6 +89,23 @@ export function ActivityPanel({ bbl }: ActivityPanelProps) {
       setError(err instanceof Error ? err.message : "Failed to log activity");
     } finally {
       setPosting(false);
+    }
+  }
+
+  async function handleDelete(activityId: string) {
+    const prev = activities;
+    // Optimistic remove — restore on error.
+    setActivities((current) => current.filter((a) => a.id !== activityId));
+    setPendingDeleteId(null);
+    try {
+      await apiCall(`/public-data/crm/activities/${activityId}`, {
+        method: "DELETE",
+      });
+    } catch (err) {
+      setActivities(prev);
+      setError(
+        err instanceof Error ? err.message : "Failed to delete activity",
+      );
     }
   }
 
@@ -160,24 +188,81 @@ export function ActivityPanel({ bbl }: ActivityPanelProps) {
           </div>
         )}
         {activities.map((a) => (
-          <ActivityRow key={a.id} activity={a} />
+          <ActivityRow
+            key={a.id}
+            activity={a}
+            canDelete={
+              DELETABLE_TYPES.has(a.type) &&
+              currentUserId !== null &&
+              currentUserId !== undefined &&
+              a.userId === currentUserId
+            }
+            pendingDelete={pendingDeleteId === a.id}
+            onRequestDelete={() => setPendingDeleteId(a.id)}
+            onCancelDelete={() => setPendingDeleteId(null)}
+            onConfirmDelete={() => handleDelete(a.id)}
+          />
         ))}
       </div>
     </div>
   );
 }
 
-function ActivityRow({ activity }: { activity: Activity }) {
+function ActivityRow({
+  activity,
+  canDelete,
+  pendingDelete,
+  onRequestDelete,
+  onCancelDelete,
+  onConfirmDelete,
+}: {
+  activity: Activity;
+  canDelete: boolean;
+  pendingDelete: boolean;
+  onRequestDelete: () => void;
+  onCancelDelete: () => void;
+  onConfirmDelete: () => void;
+}) {
   const occurred = new Date(activity.occurredAt);
   return (
-    <div className="flex items-start gap-2 rounded border border-zinc-800/50 bg-zinc-900/30 p-2 text-xs">
+    <div className="group flex items-start gap-2 rounded border border-zinc-800/50 bg-zinc-900/30 p-2 text-xs">
       <span className="inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-zinc-700 text-[9px] font-semibold text-zinc-200">
         {activity.userInitials}
       </span>
       <div className="min-w-0 flex-1">
         <div className="flex items-center justify-between gap-2 text-zinc-400">
           <span>{describeActivity(activity)}</span>
-          <span className="text-zinc-600">{occurred.toLocaleString()}</span>
+          <div className="flex items-center gap-2">
+            <span className="text-zinc-600">{occurred.toLocaleString()}</span>
+            {canDelete &&
+              (pendingDelete ? (
+                <span className="inline-flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={onConfirmDelete}
+                    className="cursor-pointer rounded bg-red-950/40 px-1.5 py-0.5 text-[10px] font-medium text-red-300 transition-colors hover:bg-red-950/70"
+                  >
+                    Confirm
+                  </button>
+                  <button
+                    type="button"
+                    onClick={onCancelDelete}
+                    className="cursor-pointer rounded px-1.5 py-0.5 text-[10px] text-zinc-500 transition-colors hover:text-zinc-300"
+                  >
+                    Cancel
+                  </button>
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  onClick={onRequestDelete}
+                  aria-label="Delete"
+                  className="cursor-pointer text-zinc-600 opacity-0 transition-opacity hover:text-red-400 group-hover:opacity-100"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              ))}
+          </div>
         </div>
         {activity.body && (
           <div className="mt-1 whitespace-pre-wrap text-zinc-300">
