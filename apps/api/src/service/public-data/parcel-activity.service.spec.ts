@@ -5,14 +5,24 @@ describe('ParcelActivityService', () => {
   let service: ParcelActivityService;
   let prisma: {
     parcel: { findUnique: jest.Mock };
-    parcelActivity: { findMany: jest.Mock; create: jest.Mock };
+    parcelActivity: {
+      findMany: jest.Mock;
+      findUnique: jest.Mock;
+      create: jest.Mock;
+      delete: jest.Mock;
+    };
     user: { findUnique: jest.Mock };
   };
 
   beforeEach(() => {
     prisma = {
       parcel: { findUnique: jest.fn() },
-      parcelActivity: { findMany: jest.fn(), create: jest.fn() },
+      parcelActivity: {
+        findMany: jest.fn(),
+        findUnique: jest.fn(),
+        create: jest.fn(),
+        delete: jest.fn(),
+      },
       user: { findUnique: jest.fn() },
     };
     service = new ParcelActivityService(prisma as any);
@@ -111,6 +121,79 @@ describe('ParcelActivityService', () => {
       expect(
         result.find((r) => r.phoneNumber === '212-555-0002'),
       ).toMatchObject({ phoneStatus: PhoneStatus.UNKNOWN });
+    });
+  });
+
+  describe('delete', () => {
+    it('deletes a NOTE created by the same user', async () => {
+      prisma.parcelActivity.findUnique.mockResolvedValue({
+        id: 'a1',
+        organizationId: 'org_1',
+        userId: 'u1',
+        type: ParcelActivityType.NOTE,
+      });
+
+      await service.delete({
+        activityId: 'a1',
+        organizationId: 'org_1',
+        userId: 'u1',
+      });
+
+      expect(prisma.parcelActivity.delete).toHaveBeenCalledWith({
+        where: { id: 'a1' },
+      });
+    });
+
+    it('refuses to delete an activity created by another user', async () => {
+      prisma.parcelActivity.findUnique.mockResolvedValue({
+        id: 'a1',
+        organizationId: 'org_1',
+        userId: 'u_someone_else',
+        type: ParcelActivityType.NOTE,
+      });
+
+      await expect(
+        service.delete({
+          activityId: 'a1',
+          organizationId: 'org_1',
+          userId: 'u1',
+        }),
+      ).rejects.toMatchObject({ status: 403 });
+      expect(prisma.parcelActivity.delete).not.toHaveBeenCalled();
+    });
+
+    it('refuses to delete a system-generated activity', async () => {
+      prisma.parcelActivity.findUnique.mockResolvedValue({
+        id: 'a1',
+        organizationId: 'org_1',
+        userId: 'u1',
+        type: ParcelActivityType.STAGE_CHANGED,
+      });
+
+      await expect(
+        service.delete({
+          activityId: 'a1',
+          organizationId: 'org_1',
+          userId: 'u1',
+        }),
+      ).rejects.toMatchObject({ status: 403 });
+    });
+
+    it('refuses to delete an activity belonging to a different org', async () => {
+      prisma.parcelActivity.findUnique.mockResolvedValue({
+        id: 'a1',
+        organizationId: 'other_org',
+        userId: 'u1',
+        type: ParcelActivityType.NOTE,
+      });
+
+      await expect(
+        service.delete({
+          activityId: 'a1',
+          organizationId: 'org_1',
+          userId: 'u1',
+        }),
+      ).rejects.toMatchObject({ status: 404 });
     });
   });
 });
