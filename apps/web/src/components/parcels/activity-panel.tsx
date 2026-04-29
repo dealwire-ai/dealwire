@@ -92,7 +92,7 @@ export function ActivityPanel({ bbl }: ActivityPanelProps) {
           onClick={load}
           disabled={loading}
           aria-label="Refresh"
-          className="text-zinc-500 hover:text-zinc-300 disabled:opacity-30"
+          className="cursor-pointer text-zinc-500 transition-colors hover:text-zinc-300 disabled:cursor-not-allowed disabled:opacity-30"
         >
           <RefreshCw
             className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`}
@@ -111,10 +111,10 @@ export function ActivityPanel({ bbl }: ActivityPanelProps) {
           <button
             type="button"
             onClick={() => setDraftType("CALL")}
-            className={`inline-flex items-center gap-1 rounded px-2 py-1 text-xs ${
+            className={`inline-flex cursor-pointer items-center gap-1 rounded px-2 py-1 text-xs transition-colors ${
               draftType === "CALL"
                 ? "bg-zinc-800 text-zinc-100"
-                : "text-zinc-500 hover:text-zinc-300"
+                : "text-zinc-500 hover:bg-zinc-900 hover:text-zinc-300"
             }`}
           >
             <Phone className="h-3 w-3" /> Call
@@ -122,10 +122,10 @@ export function ActivityPanel({ bbl }: ActivityPanelProps) {
           <button
             type="button"
             onClick={() => setDraftType("NOTE")}
-            className={`inline-flex items-center gap-1 rounded px-2 py-1 text-xs ${
+            className={`inline-flex cursor-pointer items-center gap-1 rounded px-2 py-1 text-xs transition-colors ${
               draftType === "NOTE"
                 ? "bg-zinc-800 text-zinc-100"
-                : "text-zinc-500 hover:text-zinc-300"
+                : "text-zinc-500 hover:bg-zinc-900 hover:text-zinc-300"
             }`}
           >
             <FileText className="h-3 w-3" /> Note

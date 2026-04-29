@@ -51,7 +51,7 @@ export function DealCard({
       {...(isDragOverlay ? {} : attributes)}
       {...(isDragOverlay ? {} : listeners)}
       onClick={isDragOverlay ? undefined : onClick}
-      className={`group cursor-grab rounded-md border border-zinc-800 bg-zinc-900 p-3 text-sm shadow-sm transition-colors hover:border-zinc-700 active:cursor-grabbing ${
+      className={`group cursor-pointer rounded-md border border-zinc-800 bg-zinc-900 p-3 text-sm shadow-sm transition-colors hover:border-zinc-600 hover:bg-zinc-800/60 active:cursor-grabbing ${
         isDragOverlay ? "rotate-2 cursor-grabbing shadow-xl" : ""
       }`}
     >
