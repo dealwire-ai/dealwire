@@ -5,8 +5,6 @@ import {
   ArrowDown,
   ArrowUp,
   ArrowUpDown,
-  ChevronDown,
-  ChevronUp,
   Circle,
   Phone,
   RefreshCw,
@@ -22,23 +20,10 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScoreBadge } from "./score-badge";
-import { SkipTraceButton } from "./skip-trace-button";
-import { ValuationButton } from "./valuation-button";
-import {
-  ListAssignPopover,
-  ListBadge,
-  type ParcelListType,
-} from "./list-assign-popover";
+import { ListAssignPopover, type ParcelListType } from "./list-assign-popover";
 import { AssignPopover, type OrgMember } from "./assign-popover";
-import { ActivityPanel } from "./activity-panel";
 import { formatBuildingClass } from "@/lib/building-class-labels";
-import { StreetViewImage } from "./street-view-image";
 import { BblDisplay } from "./bbl-display";
-import {
-  buildAcrisUrl,
-  buildDobBisUrl,
-  getDobNowSearchUrl,
-} from "@/lib/nyc-external-links";
 import { useApi } from "@/hooks/use-api";
 
 const BOROUGH_NAMES: Record<string, string> = {
@@ -330,8 +315,7 @@ const DATA_DOT_LABELS = {
 
 interface ParcelTableProps {
   parcels: Parcel[];
-  expandedRows: Set<string>;
-  onToggleRow: (id: string) => void;
+  onRowClick: (parcel: Parcel) => void;
   selectedBbls?: Set<string>;
   onToggleSelect?: (bbl: string) => void;
   onSelectAll?: (bbls: string[]) => void;
@@ -367,20 +351,6 @@ function formatSaleDate(value: string): string {
     day: "numeric",
     year: "numeric",
   });
-}
-
-function formatDimensions(
-  front: number | null,
-  depth: number | null,
-  area: number | null,
-): string | null {
-  const hasDims = front && depth;
-  const dimStr = hasDims
-    ? `${Math.round(front!)}' × ${Math.round(depth!)}'`
-    : null;
-  const areaStr = area ? `${formatNumber(area)} sqft` : null;
-  if (dimStr && areaStr) return `${dimStr} (${areaStr})`;
-  return dimStr || areaStr;
 }
 
 function renderCell(
@@ -508,8 +478,7 @@ function renderCell(
 
 export function ParcelTable({
   parcels,
-  expandedRows,
-  onToggleRow,
+  onRowClick,
   selectedBbls,
   onToggleSelect,
   onSelectAll,
@@ -526,8 +495,6 @@ export function ParcelTable({
     parcels.length > 0 && parcels.every((p) => selectedBbls?.has(p.bbl));
 
   const activeColumns = COLUMNS.filter((c) => visibleColumns.has(c.key));
-  // +2 for checkbox, +1 for expand chevron, +1 for data quality dot
-  const totalColSpan = activeColumns.length + 3;
 
   if (parcels.length === 0) {
     return (
@@ -567,7 +534,6 @@ export function ParcelTable({
               className="cursor-pointer"
             />
           </TableHead>
-          <TableHead className="w-10"></TableHead>
           {activeColumns.map((col, i) => {
             const isActive = sort === col.field;
             // Insert data quality dot header after Score column (index 0)
@@ -625,13 +591,12 @@ export function ParcelTable({
       </TableHeader>
       <TableBody>
         {parcels.map((parcel) => {
-          const isExpanded = expandedRows.has(parcel.id);
           const quality = getDataQuality(parcel);
           return (
             <Fragment key={parcel.id}>
               <TableRow
                 className="cursor-pointer hover:bg-zinc-900/70"
-                onClick={() => onToggleRow(parcel.id)}
+                onClick={() => onRowClick(parcel)}
               >
                 <TableCell onClick={(e) => e.stopPropagation()}>
                   <Checkbox
@@ -639,13 +604,6 @@ export function ParcelTable({
                     onCheckedChange={() => onToggleSelect?.(parcel.bbl)}
                     className="cursor-pointer"
                   />
-                </TableCell>
-                <TableCell>
-                  {isExpanded ? (
-                    <ChevronUp className="w-4 h-4 text-zinc-400" />
-                  ) : (
-                    <ChevronDown className="w-4 h-4 text-zinc-400" />
-                  )}
                 </TableCell>
                 {activeColumns.map((col, i) => {
                   const showDataDotBefore =
@@ -699,279 +657,6 @@ export function ParcelTable({
                   </TableCell>
                 )}
               </TableRow>
-              {isExpanded && (
-                <TableRow>
-                  <TableCell
-                    colSpan={totalColSpan + 1}
-                    className="bg-zinc-950/50 p-0 transition-all duration-200"
-                  >
-                    <div className="border-l-2 border-[#C8A96E] pl-4 py-4 pr-4">
-                      <div className="grid grid-cols-[280px_1fr_1fr_1fr] gap-6 text-sm">
-                        {/* Street View */}
-                        <div>
-                          <div className="text-zinc-400 mb-2 font-medium">
-                            Street View
-                          </div>
-                          <StreetViewImage
-                            address={parcel.address ?? ""}
-                            borough={parcel.borough}
-                            zipCode={parcel.zipCode}
-                          />
-                        </div>
-
-                        {/* Property Details */}
-                        <div>
-                          <div className="text-zinc-400 mb-2 font-medium">
-                            Property Details
-                          </div>
-                          <div className="space-y-1">
-                            <div>
-                              <span className="text-zinc-500">BBL: </span>
-                              <BblDisplay
-                                bbl={parcel.bbl}
-                                className="text-zinc-300"
-                              />
-                            </div>
-                            <DetailRow label="Address" value={parcel.address} />
-                            <DetailRow label="Zip" value={parcel.zipCode} />
-                            <DetailRow label="Owner" value={parcel.ownerName} />
-                            <div>
-                              <span className="text-zinc-500">List: </span>
-                              <span
-                                className="inline-block"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <ListAssignPopover
-                                  bbl={parcel.bbl}
-                                  currentList={parcel._listType ?? null}
-                                  onAssigned={(listType) =>
-                                    onParcelUpdated?.(parcel.bbl, {
-                                      _listType: listType,
-                                    })
-                                  }
-                                />
-                              </span>
-                            </div>
-                            {parcel._verifiedPhone && (
-                              <DetailRow
-                                label="Verified Phone"
-                                value={parcel._verifiedPhone}
-                                highlight
-                              />
-                            )}
-                            <div className="mt-2">
-                              <SkipTraceButton
-                                parcel={parcel}
-                                onUpdated={(updates) =>
-                                  onParcelUpdated?.(parcel.bbl, updates)
-                                }
-                              />
-                            </div>
-                            <div className="mt-2">
-                              <ValuationButton
-                                parcel={parcel}
-                                onUpdated={(updates) =>
-                                  onParcelUpdated?.(parcel.bbl, updates)
-                                }
-                              />
-                            </div>
-                            <DetailRow
-                              label="Zoning"
-                              value={parcel.zoneDist1}
-                            />
-                            <DetailRow
-                              label="Tax Class"
-                              value={parcel.taxClass}
-                            />
-                            <DetailRow
-                              label="Lot"
-                              value={formatDimensions(
-                                parcel.lotFront,
-                                parcel.lotDepth,
-                                parcel.lotArea,
-                              )}
-                            />
-                            <DetailRow
-                              label="Building"
-                              value={formatDimensions(
-                                parcel.bldgFront,
-                                parcel.bldgDepth,
-                                parcel.buildingArea,
-                              )}
-                            />
-                            <DetailRow
-                              label="Floors"
-                              value={parcel.numFloors?.toString()}
-                            />
-                            <DetailRow
-                              label="Year Built"
-                              value={parcel.yearBuilt?.toString()}
-                            />
-                            <DetailRow
-                              label="Residential Units"
-                              value={parcel.unitsRes?.toString()}
-                            />
-                            <DetailRow
-                              label="Assessed Value"
-                              value={formatCurrency(parcel.assessTotal)}
-                            />
-                            <DetailRow
-                              label="Is Coop"
-                              value={parcel.isCoopExcluded ? "Yes" : "No"}
-                            />
-                            <DobLinks
-                              borough={parcel.borough}
-                              address={parcel.address}
-                            />
-                            <AcrisLink bbl={parcel.bbl} />
-                          </div>
-                        </div>
-
-                        {/* Violations */}
-                        <div>
-                          <div className="text-zinc-400 mb-2 font-medium">
-                            HPD Violations
-                          </div>
-                          <div className="space-y-1">
-                            <DetailRow
-                              label="Total"
-                              value={parcel.violationsTotal.toString()}
-                            />
-                            <DetailRow
-                              label="Open"
-                              value={parcel.violationsOpen.toString()}
-                              highlight={parcel.violationsOpen > 0}
-                            />
-                            <DetailRow
-                              label="Class A (non-hazardous)"
-                              value={parcel.violationsClassA.toString()}
-                            />
-                            <DetailRow
-                              label="Class B (hazardous)"
-                              value={parcel.violationsClassB.toString()}
-                              highlight={parcel.violationsClassB > 0}
-                            />
-                            <DetailRow
-                              label="Class C (immediately hazardous)"
-                              value={parcel.violationsClassC.toString()}
-                              highlight={parcel.violationsClassC > 0}
-                            />
-                            <DetailRow
-                              label="Violations/Unit"
-                              value={parcel.violationsPerUnit?.toFixed(2)}
-                            />
-                          </div>
-                        </div>
-
-                        {/* Lien Status & Financials */}
-                        <div>
-                          <div className="text-zinc-400 mb-2 font-medium">
-                            Tax Lien & Financials
-                          </div>
-                          <div className="space-y-1">
-                            <DetailRow
-                              label="Active Lien"
-                              value={parcel.hasActiveLien ? "Yes" : "No"}
-                              highlight={parcel.hasActiveLien}
-                            />
-                            <DetailRow label="Cycle" value={parcel.lienCycle} />
-                            <DetailRow
-                              label="Water Debt Only"
-                              value={parcel.waterDebtOnly ? "Yes" : "No"}
-                            />
-                            <DetailRow
-                              label="Outstanding Tax Bill"
-                              value={formatCurrency(parcel.outstandingTaxBill)}
-                              highlight={(parcel.outstandingTaxBill ?? 0) > 0}
-                            />
-                            <DetailRow
-                              label="Total Owed to DOF"
-                              value={formatCurrency(
-                                parcel.totalOutstandingBalance,
-                              )}
-                              highlight={
-                                (parcel.totalOutstandingBalance ?? 0) > 0
-                              }
-                            />
-                            <DetailRow
-                              label="Distress Score"
-                              value={parcel.distressScore?.toString()}
-                            />
-                            {parcel.lienSaleAmount != null && (
-                              <>
-                                <div className="mt-3 mb-1 text-zinc-400 font-medium text-xs inline-flex items-center gap-2">
-                                  NYCTL Lien Sale
-                                  {parcel.lienMatchConfidence ===
-                                    "group_small" && (
-                                    <Badge className="bg-yellow-900/30 text-yellow-400 border-yellow-900/50 text-[10px] px-1 py-0 leading-tight">
-                                      ~Est (group)
-                                    </Badge>
-                                  )}
-                                  {(parcel.lienMatchConfidence ===
-                                    "group_large" ||
-                                    parcel.lienMatchConfidence ===
-                                      "estimated") && (
-                                    <Badge className="bg-orange-900/30 text-orange-400 border-orange-900/50 text-[10px] px-1 py-0 leading-tight">
-                                      ~Est (group)
-                                    </Badge>
-                                  )}
-                                </div>
-                                <DetailRow
-                                  label="Sale Amount"
-                                  value={formatCurrency(parcel.lienSaleAmount)}
-                                  highlight={(parcel.lienSaleAmount ?? 0) > 0}
-                                />
-                                <DetailRow
-                                  label="Redemptive Value"
-                                  value={formatCurrency(
-                                    parcel.lienRedemptiveValue,
-                                  )}
-                                />
-                                <DetailRow
-                                  label="Servicer"
-                                  value={parcel.lienServicer}
-                                />
-                                <DetailRow
-                                  label="Redeemed"
-                                  value={
-                                    parcel.lienRedeemed === null
-                                      ? "Unknown"
-                                      : parcel.lienRedeemed
-                                        ? "Yes"
-                                        : "No"
-                                  }
-                                />
-                                <DetailRow
-                                  label="Foreclosure"
-                                  value={parcel.lienForeclosureStatus}
-                                />
-                                <DetailRow
-                                  label="Trust Vintage"
-                                  value={parcel.lienTrustVintage}
-                                />
-                                <DetailRow
-                                  label="Sale Date"
-                                  value={parcel.lienSaleDate}
-                                />
-                                {parcel.lienMatchGroupSize != null &&
-                                  parcel.lienMatchGroupSize > 1 && (
-                                    <DetailRow
-                                      label="Group Size"
-                                      value={`${parcel.lienMatchGroupSize} BBLs`}
-                                    />
-                                  )}
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="mt-4">
-                        <ActivityPanel bbl={parcel.bbl} />
-                      </div>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              )}
             </Fragment>
           );
         })}
@@ -1086,94 +771,5 @@ function InlineSkipTraceButton({
       <Phone className="w-3 h-3" />
       <span>Trace</span>
     </button>
-  );
-}
-
-function AcrisLink({ bbl }: { bbl: string }) {
-  const acrisUrl = buildAcrisUrl(bbl);
-
-  return (
-    <div className="pt-1">
-      <span className="text-zinc-500">ACRIS: </span>
-      {acrisUrl ? (
-        <a
-          href={acrisUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-[#C8A96E] hover:underline"
-          onClick={(e) => e.stopPropagation()}
-          title="ACRIS — deeds, mortgages, transfers, satisfactions for this BBL"
-        >
-          Document history
-        </a>
-      ) : (
-        <span className="text-zinc-600" title="Valid BBL required">
-          Document history
-        </span>
-      )}
-    </div>
-  );
-}
-
-function DobLinks({
-  borough,
-  address,
-}: {
-  borough: string;
-  address: string | null;
-}) {
-  const bisUrl = buildDobBisUrl(borough, address);
-  const dobNowUrl = getDobNowSearchUrl();
-
-  return (
-    <div className="pt-1">
-      <span className="text-zinc-500">NYC DOB: </span>
-      {bisUrl ? (
-        <a
-          href={bisUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-[#C8A96E] hover:underline"
-          onClick={(e) => e.stopPropagation()}
-          title="Old BIS — pre-2022 permits, violations, complaints"
-        >
-          BIS
-        </a>
-      ) : (
-        <span className="text-zinc-600" title="Address required for BIS lookup">
-          BIS
-        </span>
-      )}
-      <span className="text-zinc-600"> · </span>
-      <a
-        href={dobNowUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-[#C8A96E] hover:underline"
-        onClick={(e) => e.stopPropagation()}
-        title="DOB NOW — current permits (search by BBL or address)"
-      >
-        DOB NOW
-      </a>
-    </div>
-  );
-}
-
-function DetailRow({
-  label,
-  value,
-  highlight,
-}: {
-  label: string;
-  value: string | null | undefined;
-  highlight?: boolean;
-}) {
-  return (
-    <div>
-      <span className="text-zinc-500">{label}: </span>
-      <span className={highlight ? "text-red-400" : "text-zinc-300"}>
-        {value || "-"}
-      </span>
-    </div>
   );
 }

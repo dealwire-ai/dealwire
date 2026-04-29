@@ -7,9 +7,10 @@ import type { PipelineDeal, PipelineStage } from "./types";
 interface StageColumnProps {
   stage: PipelineStage;
   deals: PipelineDeal[];
+  onCardClick?: (deal: PipelineDeal) => void;
 }
 
-export function StageColumn({ stage, deals }: StageColumnProps) {
+export function StageColumn({ stage, deals, onCardClick }: StageColumnProps) {
   const { setNodeRef, isOver } = useDroppable({
     id: stage.id,
     data: { stageId: stage.id },
@@ -43,7 +44,11 @@ export function StageColumn({ stage, deals }: StageColumnProps) {
         }`}
       >
         {deals.map((deal) => (
-          <DealCard key={deal.id} deal={deal} />
+          <DealCard
+            key={deal.id}
+            deal={deal}
+            onClick={onCardClick ? () => onCardClick(deal) : undefined}
+          />
         ))}
         {deals.length === 0 && (
           <div className="flex flex-1 items-center justify-center text-xs text-zinc-600">
