@@ -12,6 +12,7 @@ export interface AssumptionChange {
 }
 
 const LABELS: Record<keyof UserAssumptions, string> = {
+  askingPrice: 'Purchase Price',
   interestRate: 'Interest Rate',
   ltv: 'LTV',
   amortizationYears: 'Amortization',
@@ -39,7 +40,10 @@ const YEAR_KEYS = new Set<keyof UserAssumptions>([
   'holdPeriodYears',
 ]);
 
-const DOLLAR_KEYS = new Set<keyof UserAssumptions>(['renovationBudget']);
+const DOLLAR_KEYS = new Set<keyof UserAssumptions>([
+  'renovationBudget',
+  'askingPrice',
+]);
 
 function formatValue(key: keyof UserAssumptions, value: number | null): string {
   if (value === null || value === undefined) return '—';

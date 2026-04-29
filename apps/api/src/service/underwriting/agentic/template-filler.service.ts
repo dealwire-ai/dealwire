@@ -32,7 +32,7 @@ For cells with stale data: if the current deal has a matching value, map it. If 
 - Copy the sheet name and cell address EXACTLY as shown in the template data. Case-sensitive, verbatim.
 - Use numbers for numeric values, not strings. For percentages stored as decimals in the deal data (e.g. 0.065 for 6.5%), check the template context: if the cell seems to expect a whole number percentage (e.g. nearby cells show "6.5" or the label says "%"), multiply by 100. If the cell expects a decimal, keep as-is.
 - DO map: property info (name, address, city, state, zip, units, sqft, year built), purchase price, income line items, expense line items, NOI, cap rate, occupancy, vacancy, unit mix data.
-- ALWAYS map purchase price (deal_data.askingPrice) when it is non-null AND a "Purchase Price" / "Asking Price" / similar input cell exists. Purchase price is the single most important input — many downstream formulas (loan amount, equity, IRR, cap rate, sources & uses) depend on it. Do not skip it.
+- ALWAYS map purchase price into the "Purchase Price" / "Asking Price" / similar input cell. Source priority: (1) deal_data.askingPrice if non-null, otherwise (2) user_assumptions.askingPrice if non-null. Purchase price is the single most important input — many downstream formulas (loan amount, equity, IRR, cap rate, sources & uses) depend on it. Never leave it blank when either source has a value.
 - For unit mix sheets: map bed/bath types, unit counts, average sqft, and average rents into the appropriate rows. If the template has more unit type rows than the deal data needs, clear the extra rows by mapping their cells to "" or 0.
 - If a field in the deal data is null AND the cell is empty or has no stale data, skip it.
 - If a field in the deal data is null BUT the cell has stale data from a prior deal, map it to "" to clear it.
@@ -103,18 +103,24 @@ export class TemplateFillerService {
       );
     }
 
-    const askingPrice = analysis.askingPrice;
-    if (askingPrice != null) {
+    const effectivePrice = analysis.askingPrice ?? assumptions?.askingPrice;
+    if (effectivePrice != null) {
       const mappedPriceLike = object.mappings.find(
         (m) =>
           typeof m.value === 'number' &&
-          Math.abs(m.value - askingPrice) / askingPrice < 0.01,
+          Math.abs(m.value - effectivePrice) / effectivePrice < 0.01,
       );
       if (!mappedPriceLike) {
+        const source =
+          analysis.askingPrice != null ? 'analysis' : 'assumptions';
         this.logger.warn(
-          `[${dealId}] askingPrice=${askingPrice} is set in analysis but no mapping wrote a matching value — purchase-price cell may be unfilled`,
+          `[${dealId}] askingPrice=${effectivePrice} (source=${source}) but no mapping wrote a matching value — purchase-price cell may be unfilled`,
         );
       }
+    } else {
+      this.logger.warn(
+        `[${dealId}] No askingPrice in analysis or assumptions — pro forma will have unset purchase price (IRR will be #NUM!)`,
+      );
     }
 
     return object;
