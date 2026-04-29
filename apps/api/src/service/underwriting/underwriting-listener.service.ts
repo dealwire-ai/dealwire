@@ -218,6 +218,7 @@ export class UnderwritingListenerService {
       organizationId: parent.organizationId,
     };
 
+    let transitionedToRunning = false;
     try {
       const analysis =
         (parent.extractionSnapshot as unknown as DealAnalysis | null) || null;
@@ -276,25 +277,43 @@ export class UnderwritingListenerService {
       // intent === 'apply'
       const values = decision.parsed.values;
 
+      const fillEligibleStatuses: ReadonlyArray<typeof parent.status> = [
+        'WAITING_FOR_ASSUMPTIONS',
+        'WAITING_FOR_CLARIFICATION',
+      ];
+      const canRecoverFromFailed =
+        parent.status === 'FAILED' && analysis != null;
+
       if (
-        parent.status === 'WAITING_FOR_ASSUMPTIONS' ||
-        parent.status === 'WAITING_FOR_CLARIFICATION'
+        fillEligibleStatuses.includes(parent.status) ||
+        canRecoverFromFailed
       ) {
         // Optimistic lock → RUNNING. If another worker already grabbed it, skip.
         const lock = await this.prisma.underwritingRun.updateMany({
           where: {
             id: parent.id,
             status: {
-              in: ['WAITING_FOR_ASSUMPTIONS', 'WAITING_FOR_CLARIFICATION'],
+              in: [
+                'WAITING_FOR_ASSUMPTIONS',
+                'WAITING_FOR_CLARIFICATION',
+                'FAILED',
+              ],
             },
           },
-          data: { status: 'RUNNING' },
+          data: { status: 'RUNNING', error: null },
         });
         if (lock.count === 0) {
           this.logger.warn(
             `[${parent.jobId}] Lost optimistic lock on parent run — another worker is processing`,
           );
           return;
+        }
+        transitionedToRunning = true;
+
+        if (canRecoverFromFailed) {
+          this.logger.log(
+            `[${parent.jobId}] Recovering FAILED run with valid analysis snapshot`,
+          );
         }
 
         await withLlmContext(llmStore, () =>
@@ -329,12 +348,17 @@ export class UnderwritingListenerService {
         `[${parent.jobId}] Reply processing failed: ${msg}`,
         err instanceof Error ? err.stack : undefined,
       );
-      await this.prisma.underwritingRun
-        .update({
-          where: { id: parent.id },
-          data: { status: 'FAILED', error: msg, completedAt: new Date() },
-        })
-        .catch(() => {});
+      // Only mark the run FAILED if we actually started executing the apply
+      // phase. Router/clarify/answer crashes leave the run in its prior status
+      // so a follow-up reply can recover it.
+      if (transitionedToRunning) {
+        await this.prisma.underwritingRun
+          .update({
+            where: { id: parent.id },
+            data: { status: 'FAILED', error: msg, completedAt: new Date() },
+          })
+          .catch(() => {});
+      }
     }
   }
 
