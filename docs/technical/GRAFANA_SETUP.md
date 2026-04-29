@@ -105,7 +105,7 @@ The API emits Prometheus metrics for every LLM call (both Vercel AI SDK and raw 
 | `underwriting_run_llm_cost_usd` | Histogram | `organization_id`                                | Total USD cost of a completed underwriting run   |
 | `underwriting_run_llm_tokens`   | Histogram | `organization_id`, `direction`                   | Total tokens in/out per underwriting run         |
 
-`stage` values include `classification`, `extraction.om`, `extraction.rent_roll`, `extraction.t12`, `extraction.generic`, `field_mapping`, `agentic.deal_analysis`, `agentic.template_fill`, `agentic.validation`, `proforma_scan`, `deal_detection`, `initial_screening`, `data_extraction`, `summary`, `broker_reply_draft`, `deal_decision`, `image_ocr`, `chat_agent`.
+`stage` values include `classification`, `extraction.om`, `extraction.rent_roll`, `extraction.t12`, `extraction.generic`, `field_mapping`, `workflow.deal_analysis`, `workflow.assumption_ask`, `workflow.reply_router`, `workflow.template_fill`, `workflow.validation`, `proforma_scan`, `deal_detection`, `initial_screening`, `data_extraction`, `summary`, `broker_reply_draft`, `deal_decision`, `image_ocr`, `chat_agent`.
 
 ### Queries
 

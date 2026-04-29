@@ -5,10 +5,10 @@ import { S3Service } from '../../s3/s3.service';
 import { DealAnalyzerService } from './deal-analyzer.service';
 import { TemplateFillerService } from './template-filler.service';
 import { ProformaValidatorService } from './proforma-validator.service';
-import { AgenticDeliveryService } from './agentic-delivery.service';
+import { DeliveryService } from './delivery.service';
 import { AssumptionAskerService } from './assumption-asker.service';
 import { AssumptionEmailService } from './assumption-email.service';
-import { DealAnalysis, ValidationResult } from './agentic-types';
+import { DealAnalysis, ValidationResult } from './workflow-types';
 import { AssumptionQuestion, UserAssumptions } from './assumption-types';
 import { buildThreadSubject, threadPropertyLabel } from './thread-subject';
 import {
@@ -21,8 +21,8 @@ import {
 const XlsxPopulate = require('xlsx-populate') as any;
 
 @Injectable()
-export class AgenticUnderwritingService {
-  private readonly logger = new Logger(AgenticUnderwritingService.name);
+export class UnderwritingWorkflowService {
+  private readonly logger = new Logger(UnderwritingWorkflowService.name);
 
   constructor(
     private readonly prisma: PrismaService,
@@ -30,7 +30,7 @@ export class AgenticUnderwritingService {
     private readonly analyzer: DealAnalyzerService,
     private readonly filler: TemplateFillerService,
     private readonly validator: ProformaValidatorService,
-    private readonly delivery: AgenticDeliveryService,
+    private readonly delivery: DeliveryService,
     private readonly asker: AssumptionAskerService,
     private readonly assumptionEmail: AssumptionEmailService,
   ) {}

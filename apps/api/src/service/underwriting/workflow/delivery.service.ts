@@ -4,7 +4,7 @@ import { S3Service } from '../../s3/s3.service';
 import { EmailSenderService } from '../../email/email-sender.service';
 import { PrismaService } from '../../prisma/prisma.service';
 import { emailConfig } from '../../../config/email.config';
-import { DealAnalysis, ValidationResult } from './agentic-types';
+import { DealAnalysis, ValidationResult } from './workflow-types';
 import { UserAssumptions } from './assumption-types';
 import { buildThreadSubject } from './thread-subject';
 import {
@@ -14,8 +14,8 @@ import {
 } from './assumption-diff';
 
 @Injectable()
-export class AgenticDeliveryService {
-  private readonly logger = new Logger(AgenticDeliveryService.name);
+export class DeliveryService {
+  private readonly logger = new Logger(DeliveryService.name);
   private readonly config = emailConfig();
 
   constructor(
