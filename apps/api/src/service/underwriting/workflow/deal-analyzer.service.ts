@@ -1,7 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { generateObject } from 'ai';
 import { S3Service } from '../../s3/s3.service';
-import { trackLlm } from '../../llm/tracked-llm';
+import { ModelGatewayService } from '../../llm/model-gateway.service';
 import { analyzerModel } from '../model-config';
 import { excelToText } from '../excel-utils';
 import { DealAnalysisSchema, DealAnalysis } from './workflow-types';
@@ -50,7 +49,10 @@ Your job is to read ALL documents, extract every relevant metric, reconcile conf
 export class DealAnalyzerService {
   private readonly logger = new Logger(DealAnalyzerService.name);
 
-  constructor(private readonly s3: S3Service) {}
+  constructor(
+    private readonly s3: S3Service,
+    private readonly gateway: ModelGatewayService,
+  ) {}
 
   /**
    * Download all deal documents from S3, prepare them for the model,
@@ -67,15 +69,13 @@ export class DealAnalyzerService {
 
     this.logger.log(`[${dealId}] Running deal analysis (single-pass)`);
 
-    const { object } = await trackLlm('workflow.deal_analysis', () =>
-      generateObject({
-        model: analyzerModel(),
-        schema: DealAnalysisSchema,
-        system: SYSTEM_PROMPT,
-        messages,
-        maxRetries: 2,
-      }),
-    );
+    const object = await this.gateway.runStructured({
+      stage: 'workflow.deal_analysis',
+      model: analyzerModel(),
+      schema: DealAnalysisSchema,
+      system: SYSTEM_PROMPT,
+      messages,
+    });
 
     this.logger.log(
       `[${dealId}] Analysis complete: confidence=${object.confidence.toFixed(2)} flags=${object.flags.length} missing=${object.missingDocs.length}`,

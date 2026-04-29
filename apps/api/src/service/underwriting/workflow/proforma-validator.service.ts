@@ -1,5 +1,4 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { generateObject } from 'ai';
 import {
   DealAnalysis,
   ValidationResultSchema,
@@ -7,7 +6,7 @@ import {
 } from './workflow-types';
 import { excelToTextWithCellRefs } from '../excel-utils';
 import { validatorModel } from '../model-config';
-import { trackLlm } from '../../llm/tracked-llm';
+import { ModelGatewayService } from '../../llm/model-gateway.service';
 
 const SYSTEM_PROMPT = `You are a QA reviewer for commercial real estate pro forma models. You are given:
 
@@ -55,6 +54,8 @@ For any stale data found, add a CORRECTION to clear or replace it.
 export class ProformaValidatorService {
   private readonly logger = new Logger(ProformaValidatorService.name);
 
+  constructor(private readonly gateway: ModelGatewayService) {}
+
   async validate(
     filledTemplateBuffer: Buffer,
     analysis: DealAnalysis,
@@ -68,20 +69,18 @@ export class ProformaValidatorService {
 
     const analysisJson = JSON.stringify(analysis, null, 2);
 
-    const { object } = await trackLlm('workflow.validation', () =>
-      generateObject({
-        model: validatorModel(),
-        schema: ValidationResultSchema,
-        system: SYSTEM_PROMPT,
-        messages: [
-          {
-            role: 'user',
-            content: `## Deal Analysis (source of truth)\n\n\`\`\`json\n${analysisJson}\n\`\`\`\n\n## Filled Pro Forma Template\n\n${templateText}\n\nValidate this filled pro forma against the deal analysis. Check for stale data from prior deals, incorrect values, hallucinations, and missing fills. Return corrections for anything that needs fixing.`,
-          },
-        ],
-        maxRetries: 2,
-      }),
-    );
+    const object = await this.gateway.runStructured({
+      stage: 'workflow.validation',
+      model: validatorModel(),
+      schema: ValidationResultSchema,
+      system: SYSTEM_PROMPT,
+      messages: [
+        {
+          role: 'user',
+          content: `## Deal Analysis (source of truth)\n\n\`\`\`json\n${analysisJson}\n\`\`\`\n\n## Filled Pro Forma Template\n\n${templateText}\n\nValidate this filled pro forma against the deal analysis. Check for stale data from prior deals, incorrect values, hallucinations, and missing fills. Return corrections for anything that needs fixing.`,
+        },
+      ],
+    });
 
     const errorCount = object.issues.filter(
       (i) => i.severity === 'error',
