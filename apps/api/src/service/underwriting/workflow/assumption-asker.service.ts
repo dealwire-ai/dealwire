@@ -8,7 +8,7 @@ import {
   AssumptionQuestionSchema,
   CANONICAL_ASSUMPTIONS,
 } from './assumption-types';
-import { DealAnalysis } from './agentic-types';
+import { DealAnalysis } from './workflow-types';
 import { extractInputCells } from './workbook-serializer';
 
 const SYSTEM_PROMPT = `You are preparing a single email asking a commercial real estate investor for the underwriting assumptions needed to run a pro forma on a specific deal.
@@ -56,7 +56,7 @@ export class AssumptionAskerService {
     const analysisSummary = summarizeAnalysis(analysis);
 
     try {
-      const { object } = await trackLlm('agentic.assumption_ask', () =>
+      const { object } = await trackLlm('workflow.assumption_ask', () =>
         generateObject({
           model: assumptionAskerModel(),
           schema: OutputSchema,

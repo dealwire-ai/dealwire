@@ -25,7 +25,7 @@ This replaces the previous "run the pro forma immediately from documents alone" 
 | Re-run on reply to COMPLETED                   | ✅     | `runRerunPhase` creates child `UnderwritingRun` via `parentRunId`                   |
 | Web pro forma rendering                        | ❌     | Dashboard view of filled pro forma                                                  |
 
-**Legacy pipeline removed:** the extractor-per-doc-type orchestrator (classifier → OM/rent-roll/T-12 extractors → reconciler) has been deleted. The agentic pipeline is the only path. `AGENTIC_UNDERWRITING_ENABLED` no longer exists.
+**Legacy pipeline removed:** the extractor-per-doc-type orchestrator (classifier → OM/rent-roll/T-12 extractors → reconciler) has been deleted. The workflow pipeline is the only path. `AGENTIC_UNDERWRITING_ENABLED` no longer exists.
 
 ---
 
@@ -65,7 +65,7 @@ A dashboard upload path exists at the API level but the UI is not yet built.
 
 ## Architecture
 
-The pipeline is code-orchestrated — no LangChain, no agent frameworks, no agent loops. NestJS services run a fixed sequence of LLM-augmented steps; the model is called at decision points but never decides what runs next. (The directory is named `agentic/` for legacy reasons; functionally it's a workflow.)
+The pipeline is code-orchestrated — no LangChain, no agent frameworks, no agent loops. NestJS services run a fixed sequence of LLM-augmented steps; the model is called at decision points but never decides what runs next.
 
 Documents land in S3 **before** the SQS message is enqueued (same pattern as the email pipeline). SQS has a 256 KB body limit, so the message carries metadata only.
 
@@ -187,9 +187,9 @@ apps/api/src/service/underwriting/
   excel-utils.ts                       # SheetJS helpers (excelToText, excelToTextWithCellRefs)
   model-config.ts                      # Per-stage model selection from env
 
-  agentic/                             # workflow steps (the directory name is legacy — there is no agent loop)
-    agentic-underwriting.service.ts    # Orchestrator: runAnalysisPhase / runFillPhase / runRerunPhase
-    agentic-types.ts                   # DealAnalysisSchema, CellMappingSchema, ValidationResultSchema
+  workflow/                            # workflow steps — code-orchestrated, no agent loop
+    underwriting-workflow.service.ts   # Orchestrator: runAnalysisPhase / runFillPhase / runRerunPhase
+    workflow-types.ts                  # DealAnalysisSchema, CellMappingSchema, ValidationResultSchema
     deal-analyzer.service.ts           # Single-pass deal analysis (Sonnet)
     assumption-asker.service.ts        # Prune canonical questions per template (Sonnet)
     assumption-email.service.ts        # Outbound ask / clarify / answer emails (deterministic Message-ID)
@@ -198,7 +198,7 @@ apps/api/src/service/underwriting/
     reply-router.service.ts            # Classify investor reply: apply | answer | clarify (Sonnet)
     template-filler.service.ts         # Map deal data + assumptions → cell writes (Sonnet)
     proforma-validator.service.ts      # Second-pass QA + corrections (Sonnet)
-    agentic-delivery.service.ts        # Outbound delivery email + .xlsx attachment
+    delivery.service.ts                # Outbound delivery email + .xlsx attachment
     workbook-serializer.ts             # Blue-input-cell detection + serialization
     thread-subject.ts                  # Subject token + property label
 

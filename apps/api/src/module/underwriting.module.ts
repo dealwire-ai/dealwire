@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
 import { UnderwritingListenerService } from '../service/underwriting/underwriting-listener.service';
 import { ProformaService } from '../service/underwriting/proforma.service';
-import { AgenticUnderwritingService } from '../service/underwriting/agentic/agentic-underwriting.service';
-import { DealAnalyzerService } from '../service/underwriting/agentic/deal-analyzer.service';
-import { TemplateFillerService } from '../service/underwriting/agentic/template-filler.service';
-import { ProformaValidatorService } from '../service/underwriting/agentic/proforma-validator.service';
-import { AgenticDeliveryService } from '../service/underwriting/agentic/agentic-delivery.service';
-import { AssumptionAskerService } from '../service/underwriting/agentic/assumption-asker.service';
-import { AssumptionEmailService } from '../service/underwriting/agentic/assumption-email.service';
-import { ReplyRouterService } from '../service/underwriting/agentic/reply-router.service';
+import { UnderwritingWorkflowService } from '../service/underwriting/workflow/underwriting-workflow.service';
+import { DealAnalyzerService } from '../service/underwriting/workflow/deal-analyzer.service';
+import { TemplateFillerService } from '../service/underwriting/workflow/template-filler.service';
+import { ProformaValidatorService } from '../service/underwriting/workflow/proforma-validator.service';
+import { DeliveryService } from '../service/underwriting/workflow/delivery.service';
+import { AssumptionAskerService } from '../service/underwriting/workflow/assumption-asker.service';
+import { AssumptionEmailService } from '../service/underwriting/workflow/assumption-email.service';
+import { ReplyRouterService } from '../service/underwriting/workflow/reply-router.service';
 import { ProformaController } from '../controller/underwriting/proforma.controller';
 import { UnderwritingDevController } from '../controller/underwriting/underwriting-dev.controller';
 import { UnderwritingRunsController } from '../controller/underwriting/underwriting-runs.controller';
@@ -28,15 +28,15 @@ import { EmailModule } from './email.module';
     ClerkAuthGuard,
     UnderwritingListenerService,
     ProformaService,
-    AgenticUnderwritingService,
+    UnderwritingWorkflowService,
     DealAnalyzerService,
     TemplateFillerService,
     ProformaValidatorService,
-    AgenticDeliveryService,
+    DeliveryService,
     AssumptionAskerService,
     AssumptionEmailService,
     ReplyRouterService,
   ],
-  exports: [AgenticUnderwritingService],
+  exports: [UnderwritingWorkflowService],
 })
 export class UnderwritingModule {}

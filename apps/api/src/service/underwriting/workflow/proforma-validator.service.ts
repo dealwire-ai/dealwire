@@ -4,7 +4,7 @@ import {
   DealAnalysis,
   ValidationResultSchema,
   ValidationResult,
-} from './agentic-types';
+} from './workflow-types';
 import { excelToTextWithCellRefs } from '../excel-utils';
 import { validatorModel } from '../model-config';
 import { trackLlm } from '../../llm/tracked-llm';
@@ -68,7 +68,7 @@ export class ProformaValidatorService {
 
     const analysisJson = JSON.stringify(analysis, null, 2);
 
-    const { object } = await trackLlm('agentic.validation', () =>
+    const { object } = await trackLlm('workflow.validation', () =>
       generateObject({
         model: validatorModel(),
         schema: ValidationResultSchema,

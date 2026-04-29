@@ -4,7 +4,7 @@ import { S3Service } from '../../s3/s3.service';
 import { trackLlm } from '../../llm/tracked-llm';
 import { analyzerModel } from '../model-config';
 import { excelToText } from '../excel-utils';
-import { DealAnalysisSchema, DealAnalysis } from './agentic-types';
+import { DealAnalysisSchema, DealAnalysis } from './workflow-types';
 import { UnderwritingDocument } from '../underwriting-types';
 
 interface PreparedDocument {
@@ -67,7 +67,7 @@ export class DealAnalyzerService {
 
     this.logger.log(`[${dealId}] Running deal analysis (single-pass)`);
 
-    const { object } = await trackLlm('agentic.deal_analysis', () =>
+    const { object } = await trackLlm('workflow.deal_analysis', () =>
       generateObject({
         model: analyzerModel(),
         schema: DealAnalysisSchema,
