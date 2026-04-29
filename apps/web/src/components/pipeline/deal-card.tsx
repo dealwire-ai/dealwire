@@ -10,9 +10,14 @@ import type { PipelineDeal } from "./types";
 interface DealCardProps {
   deal: PipelineDeal;
   isDragOverlay?: boolean;
+  onClick?: () => void;
 }
 
-export function DealCard({ deal, isDragOverlay = false }: DealCardProps) {
+export function DealCard({
+  deal,
+  isDragOverlay = false,
+  onClick,
+}: DealCardProps) {
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({ id: deal.id, data: { stageId: deal.stageId } });
 
@@ -45,6 +50,7 @@ export function DealCard({ deal, isDragOverlay = false }: DealCardProps) {
       style={isDragOverlay ? undefined : style}
       {...(isDragOverlay ? {} : attributes)}
       {...(isDragOverlay ? {} : listeners)}
+      onClick={isDragOverlay ? undefined : onClick}
       className={`group cursor-grab rounded-md border border-zinc-800 bg-zinc-900 p-3 text-sm shadow-sm transition-colors hover:border-zinc-700 active:cursor-grabbing ${
         isDragOverlay ? "rotate-2 cursor-grabbing shadow-xl" : ""
       }`}
