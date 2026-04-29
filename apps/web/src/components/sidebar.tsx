@@ -20,6 +20,7 @@ import {
   MoreHorizontal,
   Columns3,
   MapPin,
+  FileSpreadsheet,
 } from "lucide-react";
 import { useFeatureFlags } from "@/hooks/use-feature-flags";
 import { isInternalUser, isAdminUser } from "@/lib/utils";
@@ -180,9 +181,14 @@ export function Sidebar() {
       title: "Underwriting",
       items: [
         {
-          label: "Underwriting",
-          href: "/underwriting",
+          label: "Model Templates",
+          href: "/underwriting/templates",
           icon: LayoutTemplate,
+        },
+        {
+          label: "Underwritten Deals",
+          href: "/underwriting/runs",
+          icon: FileSpreadsheet,
         },
       ],
       flag: flags.underwriting,
