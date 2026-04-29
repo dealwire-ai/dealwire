@@ -1,5 +1,4 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { generateObject } from 'ai';
 import {
   CellMappingSchema,
   CellMappings,
@@ -7,7 +6,7 @@ import {
 } from './workflow-types';
 import { UserAssumptions } from './assumption-types';
 import { templateFillerModel } from '../model-config';
-import { trackLlm } from '../../llm/tracked-llm';
+import { ModelGatewayService } from '../../llm/model-gateway.service';
 import { serializeWorkbook } from './workbook-serializer';
 
 const SYSTEM_PROMPT = `You are mapping commercial real estate deal data into a pro forma Excel template.
@@ -51,6 +50,8 @@ The handling depends on whether the user assumptions JSON is non-null:
 export class TemplateFillerService {
   private readonly logger = new Logger(TemplateFillerService.name);
 
+  constructor(private readonly gateway: ModelGatewayService) {}
+
   /**
    * Given a deal analysis, optional user assumptions, and an xlsx-populate
    * workbook, produce cell-level mappings via a single AI call. The workbook
@@ -74,20 +75,18 @@ export class TemplateFillerService {
       ? JSON.stringify(assumptions, null, 2)
       : 'null';
 
-    const { object } = await trackLlm('workflow.template_fill', () =>
-      generateObject({
-        model: templateFillerModel(),
-        schema: CellMappingSchema,
-        system: SYSTEM_PROMPT,
-        messages: [
-          {
-            role: 'user',
-            content: `## Deal Analysis Data\n\n\`\`\`json\n${analysisJson}\n\`\`\`\n\n## User-Provided Assumptions\n\n\`\`\`json\n${assumptionsJson}\n\`\`\`\n\n## Pro Forma Template\n\n${templateText}\n\nMap the deal data (and user assumptions, if provided) to the appropriate input cells in this template. Return only cells where you have a confident match.`,
-          },
-        ],
-        maxRetries: 2,
-      }),
-    );
+    const object = await this.gateway.runStructured({
+      stage: 'workflow.template_fill',
+      model: templateFillerModel(),
+      schema: CellMappingSchema,
+      system: SYSTEM_PROMPT,
+      messages: [
+        {
+          role: 'user',
+          content: `## Deal Analysis Data\n\n\`\`\`json\n${analysisJson}\n\`\`\`\n\n## User-Provided Assumptions\n\n\`\`\`json\n${assumptionsJson}\n\`\`\`\n\n## Pro Forma Template\n\n${templateText}\n\nMap the deal data (and user assumptions, if provided) to the appropriate input cells in this template. Return only cells where you have a confident match.`,
+        },
+      ],
+    });
 
     this.logger.log(
       `[${dealId}] Template fill: ${object.mappings.length} cell mappings produced`,

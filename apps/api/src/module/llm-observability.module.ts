@@ -1,6 +1,7 @@
 import { Global, Module, OnModuleInit } from '@nestjs/common';
 import { MetricsService } from '../service/metrics/metrics.service';
 import { __setLlmMetricsSingleton } from '../service/llm/tracked-llm';
+import { ModelGatewayService } from '../service/llm/model-gateway.service';
 
 /**
  * Wires the global `MetricsService` into the `tracked-llm` module-level
@@ -8,10 +9,14 @@ import { __setLlmMetricsSingleton } from '../service/llm/tracked-llm';
  * Nest DI. Must be imported as a `@Global()` module so `onModuleInit` fires
  * before any LLM calls happen during normal app operation.
  *
- * This module does not own any new services — it's a bootstrap hook.
+ * Also exports `ModelGatewayService` — the single chokepoint every workflow
+ * LLM call goes through.
  */
 @Global()
-@Module({})
+@Module({
+  providers: [ModelGatewayService],
+  exports: [ModelGatewayService],
+})
 export class LlmObservabilityModule implements OnModuleInit {
   constructor(private readonly metricsService: MetricsService) {}
 
