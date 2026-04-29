@@ -361,6 +361,8 @@ model Parcel {
   lotDepth      Float? // ft (PLUTO lotdepth)
   bldgFront     Float? // ft (PLUTO bldgfront)
   bldgDepth     Float? // ft (PLUTO bldgdepth)
+  latitude      Float? // PLUTO latitude (decimal degrees, NAD83)
+  longitude     Float? // PLUTO longitude (decimal degrees, NAD83)
   numFloors     Float?
   yearBuilt     Int?
   ownerName     String?
