@@ -54,7 +54,12 @@ export default function UnderwrittenDealsPage() {
         {loading ? (
           <div className="text-zinc-400 py-8 text-center">Loading runs...</div>
         ) : (
-          <UnderwritingRunsTable runs={runs} />
+          <UnderwritingRunsTable
+            runs={runs}
+            onRunDeleted={(id) =>
+              setRuns((prev) => prev.filter((r) => r.id !== id))
+            }
+          />
         )}
         <TablePagination
           page={table.page}
