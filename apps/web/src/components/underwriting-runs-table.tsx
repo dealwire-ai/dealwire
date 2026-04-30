@@ -1,7 +1,13 @@
 "use client";
 
 import { Fragment, useState } from "react";
-import { ChevronDown, ChevronUp, Download, AlertTriangle } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  Download,
+  AlertTriangle,
+  Trash2,
+} from "lucide-react";
 import {
   Table,
   TableBody,
@@ -96,14 +102,58 @@ function DownloadButton({ runId }: { runId: string }) {
   );
 }
 
+function DeleteButton({
+  runId,
+  onDeleted,
+}: {
+  runId: string;
+  onDeleted?: (id: string) => void;
+}) {
+  const { apiCall } = useApi();
+  const [loading, setLoading] = useState(false);
+
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (
+      !confirm(
+        "Delete this underwriting run? Any re-runs created from it will also be deleted.",
+      )
+    )
+      return;
+    setLoading(true);
+    try {
+      await apiCall(`/underwriting/runs/${runId}`, { method: "DELETE" });
+      onDeleted?.(runId);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Delete failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <button
+      onClick={handleDelete}
+      disabled={loading}
+      title="Delete run"
+      className="inline-flex items-center gap-1 text-xs px-2 py-1 bg-zinc-800 hover:bg-red-900/50 rounded text-zinc-400 hover:text-red-400 transition-colors disabled:opacity-50"
+    >
+      <Trash2 className="w-3 h-3" />
+      {loading ? "..." : "Delete"}
+    </button>
+  );
+}
+
 interface UnderwritingRunsTableProps {
   runs: UnderwritingRun[];
   emptyMessage?: string;
+  onRunDeleted?: (id: string) => void;
 }
 
 export function UnderwritingRunsTable({
   runs,
   emptyMessage,
+  onRunDeleted,
 }: UnderwritingRunsTableProps) {
   const { apiCall } = useApi();
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
@@ -148,7 +198,7 @@ export function UnderwritingRunsTable({
           <TableHead>Key Metrics</TableHead>
           <TableHead>Status</TableHead>
           <TableHead>Date</TableHead>
-          <TableHead className="w-24"></TableHead>
+          <TableHead className="w-44"></TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -249,9 +299,12 @@ export function UnderwritingRunsTable({
                   )}
                 </TableCell>
                 <TableCell>
-                  {run.filledProformaModelS3Key && (
-                    <DownloadButton runId={run.id} />
-                  )}
+                  <div className="flex items-center justify-end gap-1.5">
+                    {run.filledProformaModelS3Key && (
+                      <DownloadButton runId={run.id} />
+                    )}
+                    <DeleteButton runId={run.id} onDeleted={onRunDeleted} />
+                  </div>
                 </TableCell>
               </TableRow>
 

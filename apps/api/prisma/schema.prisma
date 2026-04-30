@@ -679,7 +679,7 @@ model UnderwritingRun {
   // Iteration chain: re-runs triggered by follow-up email replies link to the
   // original run via parentRunId. Each iteration is its own row for audit trail.
   parentRunId String?
-  parent      UnderwritingRun?  @relation("RunIterations", fields: [parentRunId], references: [id])
+  parent      UnderwritingRun?  @relation("RunIterations", fields: [parentRunId], references: [id], onDelete: Cascade)
   children    UnderwritingRun[] @relation("RunIterations")
 
   jobId        String  @unique // uw_ prefixed ID for S3 partitioning & SQS idempotency
