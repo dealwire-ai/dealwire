@@ -881,9 +881,11 @@ export class EmailProcessorService {
       ? this.extractLinksFromHtml(event.bodyHtml)
       : undefined;
 
-    // Use upsert so SQS retries don't fail on unique constraint if deal was already created
+    // Upsert on sourceMessageId (the natural idempotency key) so duplicate
+    // webhook deliveries and SQS retries reuse the existing deal, even when
+    // a fresh dealId was generated for this attempt.
     const savedDeal = await this.prismaService.deal.upsert({
-      where: { id: dealId },
+      where: { sourceMessageId: event.messageId },
       create: {
         id: dealId,
         organizationId,
