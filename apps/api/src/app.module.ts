@@ -29,8 +29,16 @@ import { sqsConfig } from './config/sqs.config';
 // so the @SqsMessageHandler-decorated methods were never wired to the
 // consumer. Producers worked because they're populated directly from the
 // register() options, but consumers silently never started polling.
+//
+// Gating on RAILWAY_ENVIRONMENT_NAME (not NODE_ENV) keeps PR environments
+// off the prod queues. Railway sets RAILWAY_ENVIRONMENT_NAME per environment
+// and never inherits it across env-var copies, so it's the only reliable
+// signal that we're actually running in production. NODE_ENV is "production"
+// in PR envs too because they run the production build, which is what made
+// 26 PR replicas all race the prod consumer for the same queue.
 const enableSqs =
-  process.env.ENABLE_SQS === 'true' || process.env.NODE_ENV === 'production';
+  process.env.ENABLE_SQS === 'true' ||
+  process.env.RAILWAY_ENVIRONMENT_NAME === 'production';
 
 const sqsImports = enableSqs
   ? [
