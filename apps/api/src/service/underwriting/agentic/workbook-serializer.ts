@@ -141,6 +141,64 @@ export function extractInputCells(workbook: any): string {
   return lines.join('\n');
 }
 
+export interface EmptyInputAudit {
+  sheet: string;
+  cell: string;
+  label: string;
+  wasAttempted: boolean;
+}
+
+/**
+ * Walk the workbook for [input] cells that are still empty after fill.
+ * `attemptedAddresses` is the set of `Sheet!Cell` keys the filler tried to
+ * write — anything in that set whose value is now empty was an intentional
+ * clear (the model decided to blank it). Anything not in that set was
+ * skipped entirely (model didn't try, or no mapping).
+ *
+ * Use this to triage post-fill problems: empty inputs that were never
+ * attempted point at extraction gaps or model misses; empty inputs that
+ * WERE attempted point at intentional clears or template-side issues.
+ */
+export function auditEmptyInputs(
+  workbook: any,
+  attemptedAddresses: Set<string>,
+): EmptyInputAudit[] {
+  const out: EmptyInputAudit[] = [];
+
+  for (const sheet of workbook.sheets()) {
+    const sheetName: string = sheet.name();
+    const usedRange = sheet.usedRange();
+    if (!usedRange) continue;
+
+    const startRow: number = usedRange.startCell().rowNumber();
+    const endRow: number = usedRange.endCell().rowNumber();
+    const startCol: number = usedRange.startCell().columnNumber();
+    const endCol: number = usedRange.endCell().columnNumber();
+
+    for (let r = startRow; r <= endRow; r++) {
+      for (let c = startCol; c <= endCol; c++) {
+        const cell = sheet.cell(r, c);
+        if (cell.formula()) continue;
+        if (!isInputCell(cell)) continue;
+
+        const value = cell.value();
+        const isEmpty = value === undefined || value === null || value === '';
+        if (!isEmpty) continue;
+
+        const ref = cell.address();
+        out.push({
+          sheet: sheetName,
+          cell: ref,
+          label: nearbyLabel(sheet, r, c),
+          wasAttempted: attemptedAddresses.has(`${sheetName}!${ref}`),
+        });
+      }
+    }
+  }
+
+  return out;
+}
+
 /**
  * Look left and above for a likely text label describing this input cell.
  * CRE proforma convention: label is usually the nearest non-empty text cell

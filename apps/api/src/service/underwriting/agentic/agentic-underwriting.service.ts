@@ -11,6 +11,7 @@ import { AssumptionEmailService } from './assumption-email.service';
 import { DealAnalysis, ValidationResult } from './agentic-types';
 import { AssumptionQuestion, UserAssumptions } from './assumption-types';
 import { buildThreadSubject, threadPropertyLabel } from './thread-subject';
+import { auditEmptyInputs } from './workbook-serializer';
 import {
   UnderwritingJobContext,
   UnderwritingResult,
@@ -211,6 +212,25 @@ export class AgenticUnderwritingService {
       const msg = err instanceof Error ? err.message : String(err);
       this.logger.error(`[${dealId}] Validation failed: ${msg}`);
       snapshot.flags.push('Pro forma validation failed — see logs');
+    }
+
+    const attempted = new Set<string>();
+    for (const m of cellMappings.mappings) {
+      attempted.add(`${m.sheet}!${m.cell}`);
+    }
+    for (const fix of validation?.corrections ?? []) {
+      attempted.add(`${fix.sheet}!${fix.cell}`);
+    }
+    const empties = auditEmptyInputs(workbook, attempted);
+    const neverAttempted = empties.filter((e) => !e.wasAttempted).length;
+    const intentionallyCleared = empties.length - neverAttempted;
+    this.logger.log(
+      `[${dealId}] Empty inputs after fill: ${empties.length} total (${neverAttempted} never attempted, ${intentionallyCleared} intentionally cleared)`,
+    );
+    for (const e of empties) {
+      this.logger.log(
+        `[${dealId}]   empty ${e.sheet}!${e.cell} label="${e.label}" attempted=${e.wasAttempted}`,
+      );
     }
 
     const outputBuffer = await workbook.outputAsync();
