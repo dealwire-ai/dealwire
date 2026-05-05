@@ -11,7 +11,7 @@
   "dependencies": {
     "@ai-sdk/openai": "^1.0.0",
     "@clerk/nextjs": "^6.36.2",
-    "@clerk/themes": "^2.4.55",
+    "@clerk/themes": "^2.4.57",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/utilities": "^3.2.2",
     "@paper-design/shaders-react": "^0.0.76",
@@ -32,16 +32,16 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
-    "framer-motion": "^12.26.2",
+    "framer-motion": "^12.38.0",
     "lucide-react": "^0.562.0",
-    "next": "16.0.10",
-    "openai": "^6.15.0",
-    "posthog-js": "^1.342.1",
-    "posthog-node": "^5.24.11",
-    "react": "19.2.1",
-    "react-dom": "19.2.1",
+    "next": "16.2.4",
+    "openai": "^6.36.0",
+    "posthog-js": "^1.372.8",
+    "posthog-node": "^5.33.2",
+    "react": "19.2.5",
+    "react-dom": "19.2.5",
     "sonner": "^2.0.7",
-    "tailwind-merge": "^3.4.0",
+    "tailwind-merge": "^3.5.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
@@ -51,7 +51,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "16.0.10",
+    "eslint-config-next": "16.2.4",
     "tailwindcss": "^4",
     "typescript": "^5.9.3"
   }
