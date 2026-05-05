@@ -1,5 +1,6 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ScheduleModule } from '@nestjs/schedule';
+import { SqsModule } from '@ssut/nestjs-sqs';
 import { AppController } from './controller/app.controller';
 import { FeatureFlagsController } from './controller/feature-flags.controller';
 import { AppService } from './service/app.service';
@@ -18,14 +19,58 @@ import { NotificationsModule } from './module/notifications.module';
 import { DealDigestModule } from './module/deal-digest.module';
 import { IngestionModule } from './module/ingestion.module';
 import { PublicDataModule } from './module/public-data.module';
-import { SqsRegistrationModule } from './module/sqs-registration.module';
 import { UnderwritingModule } from './module/underwriting.module';
 import { CorrelationIdMiddleware } from './middleware/correlation-id.middleware';
+import { sqsConfig } from './config/sqs.config';
+
+// SqsModule is registered directly (not via a wrapper module). The lib's
+// @ssut/nestjs-sqs SqsModule is already @Global(); wrapping it inside another
+// module created two SqsModule instances and confused @golevelup discovery,
+// so the @SqsMessageHandler-decorated methods were never wired to the
+// consumer. Producers worked because they're populated directly from the
+// register() options, but consumers silently never started polling.
+const enableSqs =
+  process.env.ENABLE_SQS === 'true' || process.env.NODE_ENV === 'production';
+
+const sqsImports = enableSqs
+  ? [
+      SqsModule.register({
+        consumers: [
+          {
+            name: 'normalized-email',
+            queueUrl: sqsConfig().normalizedEmailQueueUrl,
+            region: sqsConfig().region,
+            waitTimeSeconds: 5,
+            visibilityTimeout: 300,
+          },
+          {
+            name: 'underwriting',
+            queueUrl: sqsConfig().underwritingQueueUrl,
+            region: sqsConfig().region,
+            waitTimeSeconds: 5,
+            visibilityTimeout: 600,
+          },
+        ],
+        producers: [
+          {
+            name: 'normalized-email',
+            queueUrl: sqsConfig().normalizedEmailQueueUrl,
+            region: sqsConfig().region,
+          },
+          {
+            name: 'underwriting',
+            queueUrl: sqsConfig().underwritingQueueUrl,
+            region: sqsConfig().region,
+          },
+        ],
+      }),
+    ]
+  : [];
 
 @Module({
   imports: [
     ScheduleModule.forRoot(),
-    SqsRegistrationModule,
+    ...sqsImports,
     PrismaModule,
     MetricsModule,
     LlmObservabilityModule,
