@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { generateObject } from 'ai';
+import { generateObject, NoObjectGeneratedError } from 'ai';
 import { CellMappingSchema, CellMappings, DealAnalysis } from './agentic-types';
 import { UserAssumptions } from './assumption-types';
 import { templateFillerModel } from '../model-config';
@@ -71,20 +71,45 @@ export class TemplateFillerService {
       ? JSON.stringify(assumptions, null, 2)
       : 'null';
 
-    const { object } = await trackLlm('agentic.template_fill', () =>
-      generateObject({
-        model: templateFillerModel(),
-        schema: CellMappingSchema,
-        system: SYSTEM_PROMPT,
-        messages: [
-          {
-            role: 'user',
-            content: `## Deal Analysis Data\n\n\`\`\`json\n${analysisJson}\n\`\`\`\n\n## User-Provided Assumptions\n\n\`\`\`json\n${assumptionsJson}\n\`\`\`\n\n## Pro Forma Template\n\n${templateText}\n\nMap the deal data (and user assumptions, if provided) to the appropriate input cells in this template. Return only cells where you have a confident match.`,
-          },
-        ],
-        maxRetries: 2,
-      }),
-    );
+    let object: CellMappings;
+    try {
+      const result = await trackLlm('agentic.template_fill', () =>
+        generateObject({
+          model: templateFillerModel(),
+          schema: CellMappingSchema,
+          system: SYSTEM_PROMPT,
+          messages: [
+            {
+              role: 'user',
+              content: `## Deal Analysis Data\n\n\`\`\`json\n${analysisJson}\n\`\`\`\n\n## User-Provided Assumptions\n\n\`\`\`json\n${assumptionsJson}\n\`\`\`\n\n## Pro Forma Template\n\n${templateText}\n\nMap the deal data (and user assumptions, if provided) to the appropriate input cells in this template. Return only cells where you have a confident match.`,
+            },
+          ],
+          // Default Anthropic provider cap is 4096 — easily truncates a JSON
+          // array of dozens of cell mappings mid-object, which surfaces as
+          // AI_NoObjectGeneratedError. Sonnet 4.6 supports up to 64K output;
+          // 16K leaves comfortable headroom for templates with many inputs.
+          maxTokens: 16000,
+          maxRetries: 2,
+        }),
+      );
+      object = result.object;
+    } catch (err) {
+      if (NoObjectGeneratedError.isInstance(err)) {
+        const text = err.text ?? '';
+        const usage = err.usage as
+          | { promptTokens?: number; completionTokens?: number }
+          | undefined;
+        this.logger.error(
+          `[${dealId}] Template filler returned unparseable response: text.length=${text.length} promptTokens=${usage?.promptTokens ?? '?'} completionTokens=${usage?.completionTokens ?? '?'}`,
+        );
+        if (text) {
+          this.logger.error(
+            `[${dealId}]   tail of response: ...${text.slice(-500)}`,
+          );
+        }
+      }
+      throw err;
+    }
 
     const perSheet = new Map<string, number>();
     for (const m of object.mappings) {
