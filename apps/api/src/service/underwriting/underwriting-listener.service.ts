@@ -58,6 +58,7 @@ export class UnderwritingListenerService {
 
   @SqsMessageHandler('underwriting', false)
   async handleMessage(message: Message): Promise<void> {
+    this.logger.log('Processing new underwriting SQS message');
     if (!message.Body) {
       this.logger.warn('Received underwriting message without body');
       return;
