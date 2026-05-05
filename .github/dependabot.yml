@@ -15,31 +15,15 @@ updates:
       prefix: chore
       include: scope
     groups:
-      root-minor-and-patch:
+      npm-safe:
+        patterns: ["*"]
         update-types:
           - minor
           - patch
-
-  - package-ecosystem: npm
-    directory: "/apps/api"
-    schedule:
-      interval: weekly
-      day: monday
-      time: "09:00"
-      timezone: America/New_York
-    open-pull-requests-limit: 10
-    labels:
-      - chore
-      - dependencies
-      - api
-    commit-message:
-      prefix: chore
-      include: scope
-    groups:
-      api-minor-and-patch:
+      npm-majors:
+        patterns: ["*"]
         update-types:
-          - minor
-          - patch
+          - major
     ignore:
       # Major bumps for these tend to need manual coordination — review separately.
       - dependency-name: "@nestjs/*"
@@ -48,28 +32,6 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: "@prisma/client"
         update-types: ["version-update:semver-major"]
-
-  - package-ecosystem: npm
-    directory: "/apps/web"
-    schedule:
-      interval: weekly
-      day: monday
-      time: "09:00"
-      timezone: America/New_York
-    open-pull-requests-limit: 10
-    labels:
-      - chore
-      - dependencies
-      - frontend
-    commit-message:
-      prefix: chore
-      include: scope
-    groups:
-      web-minor-and-patch:
-        update-types:
-          - minor
-          - patch
-    ignore:
       - dependency-name: "next"
         update-types: ["version-update:semver-major"]
       - dependency-name: "react"
@@ -84,7 +46,7 @@ updates:
       day: monday
       time: "09:00"
       timezone: America/New_York
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 1
     labels:
       - chore
       - ci
@@ -92,7 +54,9 @@ updates:
       prefix: ci
       include: scope
     groups:
-      actions-minor-and-patch:
+      actions-all:
+        patterns: ["*"]
         update-types:
           - minor
           - patch
+          - major
