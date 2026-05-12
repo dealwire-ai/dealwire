@@ -3,20 +3,20 @@
 ## General Ops
 
 ## Biz Dev
-- demo for marc zegen (biz journals)
+- hawk down zegen with proposal
+- price / timeline proposal for terra nova (w/ tech stack)
 - revision for Jim (Froggy Companies)
 - record data platform demo
 - (continue) re-engaging older prospects
 
 ## Foxfield OS
-- IR/AM intro calls
-- Get back to yardi abt meeting
--   setup yardi api email
+- IR intro calls
 
 ## Deal Screener
 
 ## Tax Lien Analyzer
 - collect 2k
+- close loop on project
   
 ## Frontstep
 - update pricing page
