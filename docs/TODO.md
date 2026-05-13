@@ -1,6 +1,7 @@
 # TODO
 
 ## General Ops
+- (noah) call IRS
 
 ## Biz Dev
 - hawk down zegen with proposal
