@@ -6,9 +6,9 @@
 
 ## Biz Dev
 - hawk down zegen with proposal
+- one pager for bohopo
 - price / timeline proposal for terra nova (w/ tech stack)
 - revision for Jim (Froggy Companies)
-- record data platform demo
 - (continue) re-engaging older prospects
 
 ## Foxfield OS
