@@ -2,6 +2,7 @@
 
 ## General Ops
 - (noah) call IRS
+- adjust apollo copy
 
 ## Biz Dev
 - hawk down zegen with proposal
