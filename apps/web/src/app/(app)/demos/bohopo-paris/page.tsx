@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useRef, useEffect } from "react";
+import { Fragment, useState, useMemo, useRef, useEffect } from "react";
 import { DashboardPageShell } from "@/components/dashboard-page-shell";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -121,9 +121,97 @@ function RatingCell({ hotel }: { hotel: ParisHotel }) {
         ? "text-yellow-400"
         : "text-zinc-500";
   return (
-    <span className={`${color} font-mono text-sm font-medium`}>
+    <span
+      className={`${color} font-mono text-sm font-medium cursor-help`}
+      title={`${hotel.rating_source} // cleanliness ${hotel.cleanliness_rating.toFixed(1)} · service ${hotel.service_rating.toFixed(1)} · location ${hotel.location_rating.toFixed(1)} · value ${hotel.value_rating.toFixed(1)} · ${hotel.review_count.toLocaleString()} reviews`}
+    >
       {hotel.rating.toFixed(1)}
     </span>
+  );
+}
+
+function SubRatingBar({ label, value }: { label: string; value: number }) {
+  const pct = Math.max(0, Math.min(100, (value / 5) * 100));
+  const tone =
+    value < 3.4
+      ? "bg-red-400/70"
+      : value < 3.9
+        ? "bg-yellow-400/70"
+        : "bg-green-400/70";
+  return (
+    <div className="flex items-center gap-2">
+      <span className="text-[10px] uppercase tracking-wider text-zinc-600 font-mono w-20">
+        {label}
+      </span>
+      <div className="flex-1 h-1.5 bg-zinc-900 rounded overflow-hidden">
+        <div className={`h-full ${tone}`} style={{ width: `${pct}%` }} />
+      </div>
+      <span className="text-xs text-zinc-400 font-mono w-8 text-right tabular-nums">
+        {value.toFixed(1)}
+      </span>
+    </div>
+  );
+}
+
+function ReviewDetail({ hotel }: { hotel: ParisHotel }) {
+  const r = hotel.sample_review;
+  return (
+    <div className="bg-zinc-950/70 border-y border-zinc-800/60 px-6 py-4">
+      <div className="grid grid-cols-2 gap-8">
+        {/* Sub-ratings */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-[10px] uppercase tracking-widest text-zinc-600 font-mono">
+              category breakdown
+            </span>
+            <a
+              href={`https://www.booking.com/searchresults.html?ss=${encodeURIComponent(
+                hotel.name + " Paris",
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[10px] text-zinc-500 font-mono hover:text-zinc-300 underline underline-offset-2"
+            >
+              source: {hotel.rating_source} ↗
+            </a>
+          </div>
+          <SubRatingBar label="Cleanliness" value={hotel.cleanliness_rating} />
+          <SubRatingBar label="Service" value={hotel.service_rating} />
+          <SubRatingBar label="Location" value={hotel.location_rating} />
+          <SubRatingBar label="Value" value={hotel.value_rating} />
+          <p className="text-[10px] text-zinc-700 font-mono pt-1">
+            {hotel.review_count.toLocaleString()} reviews · trend{" "}
+            {hotel.rating_trend} ({hotel.rating_30d_change >= 0 ? "+" : ""}
+            {hotel.rating_30d_change.toFixed(2)} last 30d)
+          </p>
+        </div>
+        {/* Sample review */}
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[10px] uppercase tracking-widest text-zinc-600 font-mono">
+              selected review
+            </span>
+            <span className="text-[10px] text-zinc-600 font-mono">
+              {r.date}
+            </span>
+          </div>
+          <div className="bg-zinc-900/60 border border-zinc-800/60 rounded p-3">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs text-zinc-400 font-mono">
+                {r.author} <span className="text-zinc-600">· {r.country}</span>
+              </span>
+              <span className="text-xs text-zinc-300 font-mono tabular-nums">
+                {r.rating.toFixed(1)}
+                <span className="text-zinc-600">/10</span>
+              </span>
+            </div>
+            <p className="text-sm text-zinc-400 leading-relaxed italic">
+              &ldquo;{r.text}&rdquo;
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -147,6 +235,7 @@ export default function BohopoParisDemoPage() {
   const [roomMax, setRoomMax] = useState(55);
   const [maxRating, setMaxRating] = useState(5.0);
   const [distressOnly, setDistressOnly] = useState(false);
+  const [expandedKey, setExpandedKey] = useState<string | null>(null);
 
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatInput, setChatInput] = useState("");
@@ -501,6 +590,7 @@ export default function BohopoParisDemoPage() {
               <thead className="sticky top-0 bg-zinc-900 z-10">
                 <tr className="border-b border-zinc-800/60">
                   {[
+                    "",
                     "Property",
                     "Arr.",
                     "★",
@@ -513,9 +603,9 @@ export default function BohopoParisDemoPage() {
                     "Rate",
                     "Distress",
                     "Score",
-                  ].map((header) => (
+                  ].map((header, i) => (
                     <th
-                      key={header}
+                      key={header || `expand-${i}`}
                       className="text-left px-3 py-2 text-[10px] uppercase tracking-wider text-zinc-600 font-mono font-medium"
                     >
                       {header}
@@ -524,60 +614,79 @@ export default function BohopoParisDemoPage() {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((h, i) => (
-                  <tr
-                    key={`${h.name}-${i}`}
-                    className="border-b border-zinc-800/30 hover:bg-zinc-800/20 transition-colors"
-                  >
-                    <td className="px-3 py-2">
-                      <a
-                        href={h.maps_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-zinc-400 hover:text-zinc-200 font-medium transition-colors"
-                        title={`SIREN ${h.siren} // built ${h.building_year}`}
+                {filtered.map((h, i) => {
+                  const key = `${h.siren}-${i}`;
+                  const isOpen = expandedKey === key;
+                  return (
+                    <Fragment key={key}>
+                      <tr
+                        onClick={() => setExpandedKey(isOpen ? null : key)}
+                        className={`border-b border-zinc-800/30 hover:bg-zinc-800/20 transition-colors cursor-pointer ${
+                          isOpen ? "bg-zinc-800/20" : ""
+                        }`}
                       >
-                        {h.name}
-                      </a>
-                    </td>
-                    <td className="px-3 py-2 text-zinc-500 font-mono text-xs">
-                      {h.arrondissement}
-                    </td>
-                    <td className="px-3 py-2">
-                      <Stars n={h.stars} />
-                    </td>
-                    <td className="px-3 py-2 text-zinc-500 font-mono text-xs text-center">
-                      {h.rooms}
-                    </td>
-                    <td className="px-3 py-2">
-                      <OwnerBadge type={h.owner_type} />
-                    </td>
-                    <td className="px-3 py-2 text-zinc-500 font-mono text-xs text-center">
-                      {h.director_age}y
-                    </td>
-                    <td className="px-3 py-2 text-zinc-500 font-mono text-xs text-center">
-                      {h.years_held}y
-                    </td>
-                    <td className="px-3 py-2">
-                      <span className="flex items-center gap-1.5">
-                        <RatingCell hotel={h} />
-                        <TrendIcon trend={h.rating_trend} />
-                      </span>
-                    </td>
-                    <td className="px-3 py-2 text-zinc-600 font-mono text-xs text-right">
-                      {h.review_count.toLocaleString()}
-                    </td>
-                    <td className="px-3 py-2 text-zinc-600 font-mono text-xs">
-                      €{h.avg_nightly_rate}
-                    </td>
-                    <td className="px-3 py-2">
-                      <DistressBadge flag={h.distress_flag} />
-                    </td>
-                    <td className="px-3 py-2">
-                      <ScoreBadge score={h.bohopo_score} />
-                    </td>
-                  </tr>
-                ))}
+                        <td className="px-3 py-2 text-zinc-600 font-mono text-xs select-none w-6">
+                          {isOpen ? "▾" : "▸"}
+                        </td>
+                        <td className="px-3 py-2">
+                          <a
+                            href={h.maps_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-zinc-400 hover:text-zinc-200 font-medium transition-colors"
+                            title={`SIREN ${h.siren} // built ${h.building_year}`}
+                          >
+                            {h.name}
+                          </a>
+                        </td>
+                        <td className="px-3 py-2 text-zinc-500 font-mono text-xs">
+                          {h.arrondissement}
+                        </td>
+                        <td className="px-3 py-2">
+                          <Stars n={h.stars} />
+                        </td>
+                        <td className="px-3 py-2 text-zinc-500 font-mono text-xs text-center">
+                          {h.rooms}
+                        </td>
+                        <td className="px-3 py-2">
+                          <OwnerBadge type={h.owner_type} />
+                        </td>
+                        <td className="px-3 py-2 text-zinc-500 font-mono text-xs text-center">
+                          {h.director_age}y
+                        </td>
+                        <td className="px-3 py-2 text-zinc-500 font-mono text-xs text-center">
+                          {h.years_held}y
+                        </td>
+                        <td className="px-3 py-2">
+                          <span className="flex items-center gap-1.5">
+                            <RatingCell hotel={h} />
+                            <TrendIcon trend={h.rating_trend} />
+                          </span>
+                        </td>
+                        <td className="px-3 py-2 text-zinc-600 font-mono text-xs text-right">
+                          {h.review_count.toLocaleString()}
+                        </td>
+                        <td className="px-3 py-2 text-zinc-600 font-mono text-xs">
+                          €{h.avg_nightly_rate}
+                        </td>
+                        <td className="px-3 py-2">
+                          <DistressBadge flag={h.distress_flag} />
+                        </td>
+                        <td className="px-3 py-2">
+                          <ScoreBadge score={h.bohopo_score} />
+                        </td>
+                      </tr>
+                      {isOpen && (
+                        <tr>
+                          <td colSpan={13} className="p-0">
+                            <ReviewDetail hotel={h} />
+                          </td>
+                        </tr>
+                      )}
+                    </Fragment>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -585,8 +694,8 @@ export default function BohopoParisDemoPage() {
       )}
 
       <p className="text-[10px] text-zinc-700 font-mono mb-8">
-        {filtered.length} hotels // sorted by bohopo score // hover property for
-        siren + build year // click for map
+        {filtered.length} hotels // sorted by bohopo score // click row to
+        expand category breakdown + sample review // hover rating for source
       </p>
 
       {/* Section: Analyst */}
