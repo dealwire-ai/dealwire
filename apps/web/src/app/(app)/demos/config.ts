@@ -35,6 +35,15 @@ export const demos: Demo[] = [
     createdAt: "2026-04-06",
   },
   {
+    slug: "bohopo-paris",
+    client: "Bohopo",
+    domain: "Paris Hotel Acquisition",
+    description:
+      "Classified Paris hotels scored on succession, distress, and operational underperformance",
+    status: "active",
+    createdAt: "2026-05-15",
+  },
+  {
     slug: "mrc",
     client: "Madison Realty Capital",
     domain: "Construction Loan Origination",
