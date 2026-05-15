@@ -6,13 +6,13 @@
 
 ## Biz Dev
 - hawk down zegen with proposal
-- one pager for bohopo
+- proposal + recorded demo for bohopo
 - price / timeline proposal for terra nova (w/ tech stack)
 - revision for Jim (Froggy Companies)
 - (continue) re-engaging older prospects
 
 ## Foxfield OS
-- IR intro calls
+- IR intro call (Shawn)
 
 ## Deal Screener
 
