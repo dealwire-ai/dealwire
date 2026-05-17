@@ -2,12 +2,9 @@
 
 ## General Ops
 - (noah) call IRS
-- adjust apollo copy
 
 ## Biz Dev
 - hawk down zegen with proposal
-- proposal + recorded demo for bohopo
-- price / timeline proposal for terra nova (w/ tech stack)
 - revision for Jim (Froggy Companies)
 - (continue) re-engaging older prospects
 
