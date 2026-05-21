@@ -2,6 +2,7 @@
 
 ## General Ops
 - (noah) call IRS
+- (noahh deck for marketing guru 
 
 ## Biz Dev
 - hawk down zegen with proposal
