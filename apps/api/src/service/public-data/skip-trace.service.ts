@@ -2,6 +2,9 @@ import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { BOROUGH_NAMES } from './nyc-utils';
 
+/** Hard timeout for outbound Skip Sherpa requests so a slow provider can't hang a trace. */
+const SKIP_SHERPA_TIMEOUT_MS = 30_000;
+
 interface OwnerPhone {
   number: string;
   type: string;
@@ -523,21 +526,35 @@ export class SkipTraceService {
    * Processes in batches of 25 (Skip Sherpa's max per request).
    */
   private async skipSherpaFallback(bbls: string[]): Promise<void> {
-    const parcels = await this.prisma.parcel.findMany({
-      where: { bbl: { in: bbls } },
-      select: {
-        bbl: true,
-        address: true,
-        zipCode: true,
-        borough: true,
-        ownerName: true,
-      },
-    });
+    try {
+      const parcels = await this.prisma.parcel.findMany({
+        where: { bbl: { in: bbls } },
+        select: {
+          bbl: true,
+          address: true,
+          zipCode: true,
+          borough: true,
+          ownerName: true,
+        },
+      });
 
-    // Process in chunks of 25
-    for (let i = 0; i < parcels.length; i += 25) {
-      const chunk = parcels.slice(i, i + 25);
-      await this.skipSherpaLookupBatch(chunk);
+      // Process in chunks of 25
+      for (let i = 0; i < parcels.length; i += 25) {
+        const chunk = parcels.slice(i, i + 25);
+        await this.skipSherpaLookupBatch(chunk);
+      }
+    } catch (err) {
+      // The fallback threw before per-chunk handling could write results back
+      // (e.g. a DB error loading parcels). Reset any rows still marked pending
+      // to 'error' so the frontend stops polling instead of spinning until its
+      // 5-minute timeout, and so the user can retry.
+      this.logger.error(
+        `Skip Sherpa fallback aborted for ${bbls.length} BBLs: ${(err as Error).message}`,
+      );
+      await this.prisma.parcel.updateMany({
+        where: { bbl: { in: bbls }, skipTraceStatus: 'pending' },
+        data: { skipTraceStatus: 'error', skipTraceQueueId: null },
+      });
     }
   }
 
@@ -570,29 +587,41 @@ export class SkipTraceService {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ property_lookups: lookups }),
+        signal: AbortSignal.timeout(SKIP_SHERPA_TIMEOUT_MS),
       });
 
-      if (!response.ok) {
-        const text = await response.text().catch(() => response.statusText);
+      const text = await response.text();
+
+      // Skip Sherpa returns a non-2xx HTTP status (e.g. 404
+      // "contact_info_not_found") even when the body is a valid per-property
+      // result payload — that status reflects the lookup outcome, not a
+      // request failure. Parse the body regardless of HTTP status and route on
+      // each property's own status_code below. Only treat the call as a hard
+      // failure when there's no usable property_results array to work from
+      // (genuine auth/rate-limit/5xx or an unparseable body).
+      let data: { property_results?: SkipSherpaPropertyResult[] } | null = null;
+      try {
+        data = JSON.parse(text) as {
+          property_results?: SkipSherpaPropertyResult[];
+        };
+      } catch {
+        data = null;
+      }
+
+      if (!data?.property_results) {
         this.logger.error(
-          `Skip Sherpa fallback failed: ${response.status} ${text}`,
+          `Skip Sherpa request failed: ${response.status} ${text.slice(0, 500)}`,
         );
-        // Mark all as not_found
+        // Mark as 'error' (not 'not_found') — the lookup never completed, so
+        // it stays distinguishable from a genuine miss and remains retryable.
         await this.prisma.parcel.updateMany({
           where: { bbl: { in: parcels.map((p) => p.bbl) } },
-          data: {
-            skipTraceStatus: 'not_found',
-            skipTracedAt: now,
-            skipTraceQueueId: null,
-          },
+          data: { skipTraceStatus: 'error', skipTraceQueueId: null },
         });
         return;
       }
 
-      const data = (await response.json()) as {
-        property_results: SkipSherpaPropertyResult[];
-      };
-      const results = data.property_results || [];
+      const results = data.property_results;
 
       let fallbackFound = 0;
       for (let i = 0; i < parcels.length; i++) {
@@ -636,16 +665,14 @@ export class SkipTraceService {
         `Skip Sherpa fallback: ${fallbackFound}/${parcels.length} found`,
       );
     } catch (err) {
+      // Network error or request timeout — the lookup never completed, so mark
+      // 'error' (retryable) rather than 'not_found' (a real miss).
       this.logger.error(
         `Skip Sherpa fallback error: ${(err as Error).message}`,
       );
       await this.prisma.parcel.updateMany({
         where: { bbl: { in: parcels.map((p) => p.bbl) } },
-        data: {
-          skipTraceStatus: 'not_found',
-          skipTracedAt: now,
-          skipTraceQueueId: null,
-        },
+        data: { skipTraceStatus: 'error', skipTraceQueueId: null },
       });
     }
   }
