@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useRef, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { loadParcels, isPinelandsRestrictive, type NjParcel } from "./data";
 import { NjMap, scoreColor } from "./nj-map";
 import { ScoreHistogram, CountyBars } from "./charts";
@@ -11,7 +12,24 @@ import { ParcelDetailSheet } from "./detail-sheet";
 function AnalystMarkdown({ content }: { content: string }) {
   return (
     <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
       components={{
+        table: ({ children }) => (
+          <div className="mb-2 overflow-x-auto">
+            <table className="w-full border-collapse text-xs">{children}</table>
+          </div>
+        ),
+        thead: ({ children }) => <thead>{children}</thead>,
+        th: ({ children }) => (
+          <th className="border-b border-zinc-700/60 px-2 py-1.5 text-left text-[10px] uppercase tracking-wider text-zinc-500 font-mono font-medium">
+            {children}
+          </th>
+        ),
+        td: ({ children }) => (
+          <td className="border-b border-zinc-800/40 px-2 py-1.5 align-top text-zinc-400">
+            {children}
+          </td>
+        ),
         p: ({ children }) => (
           <p className="mb-2 last:mb-0 leading-relaxed">{children}</p>
         ),
