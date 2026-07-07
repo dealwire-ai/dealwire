@@ -52,6 +52,12 @@ export function replyRouterModel() {
   return resolveModel('UW_REPLY_ROUTER_MODEL', 'claude-sonnet-4-6');
 }
 
+// ── Demo analyst chat (AI SDK model object) ─────────────────────────
+
+export function demoAnalystModel() {
+  return resolveModel('DEMO_ANALYST_MODEL', 'claude-sonnet-4-6');
+}
+
 // ── Deal screening (raw model name strings for openai.chat.completions.create) ─
 
 export function dealDetectionModelName(): string {
