@@ -1,10 +1,57 @@
 "use client";
 
 import { useState, useMemo, useRef, useEffect } from "react";
+import ReactMarkdown from "react-markdown";
 import { loadParcels, isPinelandsRestrictive, type NjParcel } from "./data";
 import { NjMap, scoreColor } from "./nj-map";
 import { ScoreHistogram, CountyBars } from "./charts";
 import { ParcelDetailSheet } from "./detail-sheet";
+
+/** Assistant chat bubble: markdown with zinc-styled elements. */
+function AnalystMarkdown({ content }: { content: string }) {
+  return (
+    <ReactMarkdown
+      components={{
+        p: ({ children }) => (
+          <p className="mb-2 last:mb-0 leading-relaxed">{children}</p>
+        ),
+        strong: ({ children }) => (
+          <strong className="font-semibold text-zinc-200">{children}</strong>
+        ),
+        ul: ({ children }) => (
+          <ul className="mb-2 ml-4 list-disc space-y-1">{children}</ul>
+        ),
+        ol: ({ children }) => (
+          <ol className="mb-2 ml-4 list-decimal space-y-1">{children}</ol>
+        ),
+        li: ({ children }) => <li className="leading-relaxed">{children}</li>,
+        code: ({ children }) => (
+          <code className="rounded bg-zinc-800/80 px-1 py-0.5 font-mono text-[11px] text-zinc-300">
+            {children}
+          </code>
+        ),
+        h1: ({ children }) => (
+          <p className="mb-1.5 mt-2 text-sm font-semibold text-zinc-200">
+            {children}
+          </p>
+        ),
+        h2: ({ children }) => (
+          <p className="mb-1.5 mt-2 text-sm font-semibold text-zinc-200">
+            {children}
+          </p>
+        ),
+        h3: ({ children }) => (
+          <p className="mb-1 mt-2 text-[13px] font-semibold text-zinc-300">
+            {children}
+          </p>
+        ),
+        a: ({ children }) => <span>{children}</span>,
+      }}
+    >
+      {content}
+    </ReactMarkdown>
+  );
+}
 
 // ── Constants ──────────────────────────────────────────────
 
@@ -33,7 +80,17 @@ Critical caveats you must respect when advising:
 - Tax figure is prior-year billed tax; delinquency status is not in this data.
 - No owner information exists in this data (NJ redacts it under Daniel's Law); ownership for specific targets comes from county deed records.
 
-When asked for recommendations, return a ranked list (top 3-5) with 1-2 sentences per parcel referencing specific data: acreage, assessed value per acre, sewer status, blocker flags, and the score arithmetic. Be concise and actionable.`;
+HOW YOUR CONTEXT WORKS (respect this strictly):
+- Every user message carries the CURRENT filter state, exact AGGREGATES computed over the full filtered set, and a TOP-40-BY-SCORE sample of rows.
+- Use AGGREGATES for any statewide, county-level, or "how many" claim — they are exact.
+- Use the sample rows only for naming specific parcels; never present the sample as exhaustive ("the 40 highest-scoring parcels I can see" not "all parcels").
+- If a detail-view parcel is included, the user is probably asking about it — anchor on it.
+- Cite parcels by address + pams_pin. Reference the score arithmetic from score_notes when explaining a pick.
+
+STYLE:
+- Format with markdown: short paragraphs, **bold** key figures, compact bullet or numbered lists for rankings. No headings unless the answer is long.
+- Recommendations: ranked list (top 3-5), 1-2 sentences each, citing acreage, assessed $/acre, sewer status, blocker flags, and the score arithmetic.
+- Be concise and direct — a sharp analyst on a call, not a report generator. It is fine to flag a caveat in one clause rather than a paragraph.`;
 
 const SUGGESTIONS = [
   "Top targets in sewer service areas over 20 acres",
@@ -177,13 +234,54 @@ export default function DenholtzNjDemoPage() {
     return Math.round(vals[Math.floor(vals.length / 2)]);
   }, [filtered]);
 
-  // Chat handler
-  const handleChat = async (prompt: string) => {
-    if (!prompt.trim() || chatLoading) return;
+  /**
+   * Build the analyst's dataset context: exact aggregates over the FULL
+   * filtered set (so statewide questions get true numbers) plus a top-40
+   * sample of rows. Compact JSON — this rides in every chat message.
+   */
+  const buildAnalystContext = (): string => {
+    const rows = filtered;
+    const median = (vals: number[]) =>
+      vals.length === 0
+        ? 0
+        : [...vals].sort((a, b) => a - b)[Math.floor(vals.length / 2)];
 
-    const contextParcels = [...filtered]
+    const byCounty = new Map<string, { count: number; scores: number[] }>();
+    for (const p of rows) {
+      const c = byCounty.get(p.county) ?? { count: 0, scores: [] };
+      c.count++;
+      c.scores.push(p.score);
+      byCounty.set(p.county, c);
+    }
+    const countyLines = [...byCounty.entries()]
+      .sort((a, b) => b[1].count - a[1].count)
+      .map(
+        ([county, c]) =>
+          `${county}: ${c.count} parcels, median score ${median(c.scores)}`,
+      );
+
+    const scoreBuckets = new Array(10).fill(0) as number[];
+    for (const p of rows) scoreBuckets[Math.min(9, Math.floor(p.score / 10))]++;
+
+    const pct = (n: number) =>
+      `${((n / Math.max(rows.length, 1)) * 100).toFixed(1)}%`;
+    const aggregates = [
+      `Parcels in current filter: ${rows.length} (of ${parcels?.length ?? 0} screened statewide)`,
+      `Total acreage: ${Math.round(totalAcreage).toLocaleString()} ac; median parcel ${median(rows.map((p) => p.acres)).toFixed(1)} ac`,
+      `Median assessed land $/acre: $${medianPerAcre.toLocaleString()}`,
+      `Priority targets (score>=70): ${priorityCount}`,
+      `Score distribution (0-9 .. 90-99): ${scoreBuckets.join(", ")}`,
+      `In sewer service area: ${pct(rows.filter((p) => p.sewer).length)}`,
+      `SFHA flood: ${pct(rows.filter((p) => p.floodSfha === "yes").length)}; flood unmapped: ${pct(rows.filter((p) => p.floodSfha === "no-data").length)}`,
+      `Any wetlands overlap: ${pct(rows.filter((p) => (p.wetlandsPct ?? 1) > 0).length)}`,
+      `Highlands: ${rows.filter((p) => p.highlands === "preservation").length} preservation, ${rows.filter((p) => p.highlands === "planning").length} planning`,
+      `Pinelands restrictive: ${rows.filter((p) => isPinelandsRestrictive(p.pinelands)).length}`,
+      `By county: ${countyLines.join(" | ")}`,
+    ].join("\n");
+
+    const sample = [...rows]
       .sort((a, b) => b.score - a.score)
-      .slice(0, 30)
+      .slice(0, 40)
       .map((p) => ({
         pin: p.pin,
         address: p.address,
@@ -191,20 +289,30 @@ export default function DenholtzNjDemoPage() {
         county: p.county,
         acres: p.acres,
         assessed_land: p.landVal,
-        assessed_net: p.netVal,
         prior_year_tax: p.taxPrior,
         wetlands_pct: p.wetlandsPct,
-        flood_zone: p.floodZone,
-        flood_sfha: p.floodSfha,
+        flood: p.floodSfha === "yes" ? p.floodZone : p.floodSfha,
         highlands: p.highlands,
         pinelands: p.pinelands,
         sewer: p.sewer,
-        preserved_pct: p.preservedPct,
         score: p.score,
         score_notes: p.scoreNotes,
       }));
 
-    const fullPrompt = `Current filtered parcel data (top 30 of ${filtered.length} by score):\n\n${JSON.stringify(contextParcels, null, 2)}\n\nActive filters: Counties = ${selectedCounties.length === ALL_COUNTIES.length ? "all" : selectedCounties.join(", ")}, Acres = ${minAcres || 5}–${maxAcres || 100}, Min score = ${minScore}, Max wetlands % = ${maxWetlands}, Sewer only = ${sewerOnly}, Hide Highlands/Pinelands-restricted = ${hideRestrictive}, Exclude SFHA = ${excludeSfha}\n\nQuestion: ${prompt}`;
+    const filters = `Counties = ${selectedCounties.length === ALL_COUNTIES.length ? "all 21" : selectedCounties.join(", ")}; Acres = ${minAcres || 5}–${maxAcres || 100}; Min score = ${minScore}; Max wetlands % = ${maxWetlands >= 100 ? "any" : maxWetlands}; Sewer only = ${sewerOnly}; Hide Highlands/Pinelands-restricted = ${hideRestrictive}; Exclude SFHA = ${excludeSfha}`;
+
+    const selected = selectedParcel
+      ? `\n\nPARCEL CURRENTLY OPEN IN DETAIL VIEW:\n${JSON.stringify(selectedParcel)}`
+      : "";
+
+    return `ACTIVE FILTERS: ${filters}\n\nAGGREGATES (exact, computed over ALL ${rows.length} filtered parcels):\n${aggregates}\n\nTOP 40 PARCELS BY SCORE (sample only — use aggregates for any statewide/county claims):\n${JSON.stringify(sample)}${selected}`;
+  };
+
+  // Chat handler
+  const handleChat = async (prompt: string) => {
+    if (!prompt.trim() || chatLoading) return;
+
+    const fullPrompt = `${buildAnalystContext()}\n\nQUESTION: ${prompt}`;
 
     const newMessages: ChatMessage[] = [
       ...chatMessages,
@@ -215,12 +323,12 @@ export default function DenholtzNjDemoPage() {
     setChatLoading(true);
 
     try {
-      const res = await fetch("/api/chat", {
+      const res = await fetch("/api/demo-chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          system: SYSTEM_PROMPT,
           messages: [
-            { role: "system", content: SYSTEM_PROMPT },
             ...newMessages.slice(0, -1).map((m) => ({
               role: m.role,
               content: m.content,
@@ -230,7 +338,10 @@ export default function DenholtzNjDemoPage() {
         }),
       });
 
-      if (!res.ok) throw new Error("Chat request failed");
+      if (!res.ok) {
+        const errText = await res.text().catch(() => "");
+        throw new Error(`${res.status} ${errText}`.trim());
+      }
 
       const reader = res.body?.getReader();
       const decoder = new TextDecoder();
@@ -253,12 +364,13 @@ export default function DenholtzNjDemoPage() {
           });
         }
       }
-    } catch {
+    } catch (err) {
+      const detail = err instanceof Error ? err.message : String(err);
       setChatMessages((prev) => [
         ...prev,
         {
           role: "assistant",
-          content: "Sorry, I encountered an error. Please try again.",
+          content: `The analyst hit an error (${detail}). Please try again.`,
         },
       ]);
     } finally {
@@ -765,8 +877,8 @@ export default function DenholtzNjDemoPage() {
                       </p>
                     </div>
                   ) : (
-                    <div className="text-zinc-400 text-sm leading-relaxed whitespace-pre-wrap">
-                      {msg.content}
+                    <div className="text-zinc-400 text-sm">
+                      <AnalystMarkdown content={msg.content} />
                       {chatLoading && i === chatMessages.length - 1 && (
                         <span className="inline-block w-1.5 h-4 bg-zinc-500 animate-pulse ml-0.5 align-text-bottom" />
                       )}
