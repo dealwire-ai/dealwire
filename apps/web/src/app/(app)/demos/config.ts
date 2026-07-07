@@ -44,6 +44,15 @@ export const demos: Demo[] = [
     createdAt: "2026-05-15",
   },
   {
+    slug: "denholtz-nj",
+    client: "Denholtz Properties",
+    domain: "NJ Vacant Land Screening",
+    description:
+      "Statewide NJ class-1 vacant land (5–100 ac) screened for wetlands, flood, Highlands/Pinelands, and sewer service",
+    status: "active",
+    createdAt: "2026-07-07",
+  },
+  {
     slug: "mrc",
     client: "Madison Realty Capital",
     domain: "Construction Loan Origination",
