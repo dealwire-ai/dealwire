@@ -10,6 +10,7 @@ import {
 import { Response } from 'express';
 import { DemoAnalystService } from '../service/agent/demo-analyst.service';
 import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
+import { AuthUser } from '../decorator/auth-user.decorator';
 import type { CoreMessage } from 'ai';
 
 /**
@@ -27,9 +28,21 @@ export class DemoChatController {
 
   @Post()
   async chat(
+    @AuthUser('userId') userId: string | null,
     @Body() body: { system?: string; messages: CoreMessage[] },
     @Res() res: Response,
   ): Promise<void> {
+    // ClerkAuthGuard is permissive when REQUIRE_AUTH/NODE_ENV leave
+    // requireAuth false — it only attaches request.auth for a VALID token.
+    // Requiring a verified userId here makes this endpoint authenticated
+    // regardless of that env, so it can never stream LLM output to
+    // anonymous callers.
+    if (!userId) {
+      throw new HttpException(
+        'User not authenticated',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
     const { system, messages } = body || {};
     if (!Array.isArray(messages) || messages.length === 0) {
       throw new HttpException(
