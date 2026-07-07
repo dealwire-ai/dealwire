@@ -119,13 +119,15 @@ All project instructions live in `CLAUDE.md` (this file). `.cursorrules` points 
 
 #### `docs/clients/` — Client-Specific Notes
 
-| Document                        | Client         | Purpose                                                        |
-| ------------------------------- | -------------- | -------------------------------------------------------------- |
-| `JK_NOTES.md`                   | Jordan Karlik  | Meeting notes, Google Drive folder, Granola transcripts        |
-| `TAX_LIEN_NOTES.md`             | Daniel Gabay   | Tax lien research, proposals, Google Drive folder              |
-| `BOUTIQUE_HOTEL_OPPORTUNITY.md` | Minas Terlidis | Bohopo lead — hotel acquisition sourcing vertical              |
-| `DOLAN_DEMO.md`                 | Thomas Dolan   | DD\|HA demo script — Forever Wild guest intelligence           |
-| `SPREADSHEET_ASSESSMENT.md`     | Daniel Gabay   | PropertyShark spreadsheet assessment for lis pendens ingestion |
+| Document                        | Client          | Purpose                                                        |
+| ------------------------------- | --------------- | -------------------------------------------------------------- |
+| `JK_NOTES.md`                   | Jordan Karlik   | Meeting notes, Google Drive folder, Granola transcripts        |
+| `TAX_LIEN_NOTES.md`             | Daniel Gabay    | Tax lien research, proposals, Google Drive folder              |
+| `BOUTIQUE_HOTEL_OPPORTUNITY.md` | Minas Terlidis  | Bohopo lead — hotel acquisition sourcing vertical              |
+| `DOLAN_DEMO.md`                 | Thomas Dolan    | DD\|HA demo script — Forever Wild guest intelligence           |
+| `SPREADSHEET_ASSESSMENT.md`     | Daniel Gabay    | PropertyShark spreadsheet assessment for lis pendens ingestion |
+| `DENHOLTZ_NOTES.md`             | Steven Denholtz | NJ land pilot — client context, buy box, data sources          |
+| `DENHOLTZ_DEMO.md`              | Steven Denholtz | NJ land screen demo walkthrough script                         |
 
 #### Reference (not in docs/)
 
@@ -233,12 +235,12 @@ All task tracking lives in GitHub Issues on the project board. Do not track work
 
 ### Labels
 
-| Type      | Labels                                                                                       |
-| --------- | -------------------------------------------------------------------------------------------- |
-| Domain    | `feat`, `fix`, `chore`, `infra`, `data`, `email`, `underwriting`, `frontend`, `api`          |
-| Client    | `client:jk` (Jordan Karlik), `client:gabay` (Daniel Gabay), `client:bohopo` (Minas Terlidis) |
-| Priority  | `priority:high`, `priority:low`                                                              |
-| Structure | `epic` (groups related issues into a workstream)                                             |
+| Type      | Labels                                                                                                                            |
+| --------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| Domain    | `feat`, `fix`, `chore`, `infra`, `data`, `email`, `underwriting`, `frontend`, `api`                                               |
+| Client    | `client:jk` (Jordan Karlik), `client:gabay` (Daniel Gabay), `client:bohopo` (Minas Terlidis), `client:denholtz` (Steven Denholtz) |
+| Priority  | `priority:high`, `priority:low`                                                                                                   |
+| Structure | `epic` (groups related issues into a workstream)                                                                                  |
 
 ### Creating issues
 
@@ -340,11 +342,12 @@ Reference related issues in the PR body with `Relates to #<number>`. Do NOT use 
 
 Each client has a `client:*` label and a notes file in `docs/clients/`. When working on a client-specific issue, read the client notes file for context (meeting history, Drive folders, preferences, domain knowledge).
 
-| Client         | Label           | Notes file                                   | Domain doc                          |
-| -------------- | --------------- | -------------------------------------------- | ----------------------------------- |
-| Jordan Karlik  | `client:jk`     | `docs/clients/JK_NOTES.md`                   | `docs/product/UNDERWRITING.md`      |
-| Daniel Gabay   | `client:gabay`  | `docs/clients/TAX_LIEN_NOTES.md`             | `docs/product/TAX_LIEN_PLATFORM.md` |
-| Minas Terlidis | `client:bohopo` | `docs/clients/BOUTIQUE_HOTEL_OPPORTUNITY.md` | —                                   |
+| Client          | Label             | Notes file                                   | Domain doc                          |
+| --------------- | ----------------- | -------------------------------------------- | ----------------------------------- |
+| Jordan Karlik   | `client:jk`       | `docs/clients/JK_NOTES.md`                   | `docs/product/UNDERWRITING.md`      |
+| Daniel Gabay    | `client:gabay`    | `docs/clients/TAX_LIEN_NOTES.md`             | `docs/product/TAX_LIEN_PLATFORM.md` |
+| Minas Terlidis  | `client:bohopo`   | `docs/clients/BOUTIQUE_HOTEL_OPPORTUNITY.md` | —                                   |
+| Steven Denholtz | `client:denholtz` | `docs/clients/DENHOLTZ_NOTES.md`             | —                                   |
 
 ---
 

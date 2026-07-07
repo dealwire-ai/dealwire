@@ -1,0 +1,30 @@
+{
+  "name": "@dealwire/denholtz-nj-etl",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "One-off ETL: statewide NJ class-1 vacant land (5-100 ac) screened against development-blocker layers for the Denholtz pilot",
+  "scripts": {
+    "fetch-parcels": "tsx src/01-fetch-parcels.ts",
+    "screen-blockers": "tsx src/02-screen-blockers.ts",
+    "build-outputs": "tsx src/03-build-outputs.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@terraformer/arcgis": "^2.1.2",
+    "@turf/area": "^7.2.0",
+    "@turf/bbox": "^7.3.5",
+    "@turf/boolean-intersects": "^7.2.0",
+    "@turf/centroid": "^7.2.0",
+    "@turf/helpers": "^7.3.5",
+    "@turf/intersect": "^7.2.0",
+    "@turf/simplify": "^7.2.0",
+    "@types/geojson": "^7946.0.16",
+    "@types/node": "^22.10.2",
+    "csv-stringify": "^6.5.2",
+    "p-limit": "^6.2.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}
