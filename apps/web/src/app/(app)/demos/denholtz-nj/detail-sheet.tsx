@@ -6,8 +6,12 @@ import { scoreColor } from "./nj-map";
 
 /**
  * Slide-over detail panel for one parcel: full MOD-IV attributes, blocker
- * flags with plain-language labels, and the score arithmetic line by line.
+ * flags with plain-language labels, the score arithmetic line by line, and —
+ * when a CoStar listing matched this parcel — a market section with asking
+ * price, broker, and ownership.
  */
+
+const LISTING_AMBER = "#f59e0b";
 
 // Status colors (reserved scale — never reused for series), always paired
 // with a text label so state never rides on color alone.
@@ -103,6 +107,98 @@ export function ParcelDetailSheet({
           ))}
         </div>
       </div>
+
+      {/* CoStar market layer (matched listings only) */}
+      {parcel.listing && (
+        <>
+          <p className="mb-1 text-[10px] uppercase tracking-wider text-zinc-600 font-mono">
+            market · costar
+          </p>
+          <div
+            className="mb-4 rounded-md border px-3 py-2.5"
+            style={{ borderColor: `${LISTING_AMBER}4d` }}
+          >
+            <div className="flex items-baseline justify-between">
+              <span
+                className="text-[10px] font-mono font-medium uppercase tracking-wider"
+                style={{ color: LISTING_AMBER }}
+              >
+                {parcel.listing.status === "active"
+                  ? "● active listing"
+                  : "○ recently off-market"}
+              </span>
+              {parcel.listing.dom !== null && (
+                <span className="text-[10px] text-zinc-500 font-mono">
+                  {Math.round(parcel.listing.dom).toLocaleString()} days on
+                  market
+                </span>
+              )}
+            </div>
+            <div className="mt-2 flex items-baseline gap-2">
+              <span className="text-xl font-semibold font-mono text-zinc-200">
+                {parcel.listing.price === null
+                  ? "price on request"
+                  : `$${parcel.listing.price.toLocaleString()}`}
+              </span>
+              {parcel.listing.price !== null && (
+                <span className="text-[10px] text-zinc-500 font-mono">
+                  $
+                  {Math.round(
+                    parcel.listing.price / parcel.acres,
+                  ).toLocaleString()}
+                  /ac
+                </span>
+              )}
+            </div>
+            {parcel.listing.price !== null &&
+              parcel.netVal !== null &&
+              parcel.netVal > 0 && (
+                <p className="mt-0.5 text-[10px] text-zinc-500 font-mono">
+                  asking ={" "}
+                  <span style={{ color: LISTING_AMBER }}>
+                    {(parcel.listing.price / parcel.netVal).toFixed(1)}×
+                  </span>{" "}
+                  assessed value
+                </p>
+              )}
+            <dl className="mt-2.5 grid grid-cols-2 gap-x-3 gap-y-1.5 border-t border-zinc-800/40 pt-2">
+              {(
+                [
+                  ["Broker", parcel.listing.broker],
+                  ["Broker contact", parcel.listing.brokerContact],
+                  ["Broker phone", parcel.listing.brokerPhone],
+                  ["Owner (CoStar)", parcel.listing.owner],
+                  ["Owner phone", parcel.listing.ownerPhone],
+                  ["Zoning", parcel.listing.zoning],
+                  ["Proposed use", parcel.listing.use],
+                  [
+                    "Last sale (CoStar)",
+                    parcel.listing.lastSalePrice !== null
+                      ? `${money(parcel.listing.lastSalePrice)}${parcel.listing.lastSaleDate ? ` · ${parcel.listing.lastSaleDate}` : ""}`
+                      : null,
+                  ],
+                ] as [string, string | null][]
+              )
+                .filter(([, v]) => v)
+                .map(([k, v]) => (
+                  <div key={k}>
+                    <dt className="text-[10px] text-zinc-600">{k}</dt>
+                    <dd className="text-[11px] text-zinc-300 font-mono">{v}</dd>
+                  </div>
+                ))}
+            </dl>
+            {parcel.listing.multiParcel && (
+              <p className="mt-2 text-[9px] text-zinc-600">
+                Listing spans multiple parcels — price covers the full
+                assemblage.
+              </p>
+            )}
+            <p className="mt-2 text-[9px] text-zinc-700">
+              CoStar export · Jul 24 2026 · via Denholtz license
+            </p>
+          </div>
+        </>
+      )}
 
       {/* Blocker flags */}
       <p className="mb-1 text-[10px] uppercase tracking-wider text-zinc-600 font-mono">
