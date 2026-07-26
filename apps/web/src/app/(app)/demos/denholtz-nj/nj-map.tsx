@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { NjParcel } from "./data";
+import { moneyCompact, type MarketListing, type NjParcel } from "./data";
 import countiesGeo from "./nj-counties.json";
 
 /**
@@ -11,6 +11,10 @@ import countiesGeo from "./nj-counties.json";
  * colored by developability score on a sequential blue ramp (bright = high);
  * parcels excluded by the active filters stay visible but dimmed, so
  * tightening a filter visibly switches off regions of the state.
+ *
+ * CoStar market layer: parcels with an active listing get an amber ring;
+ * a toggle overlays every CoStar listing (all 1,139, including sub-5-acre
+ * and out-of-universe parcels) as amber diamonds with their own tooltips.
  *
  * Interaction: wheel/pinch zoom about the cursor, drag to pan, click to
  * select. A view transform (screen = base * k + t) layers on top of the
@@ -47,6 +51,9 @@ export function scoreColor(score: number): string {
 const EXCLUDED_DOT = "rgba(63, 63, 70, 0.35)"; // zinc-700 wash
 const COUNTY_STROKE = "rgba(113, 113, 122, 0.35)"; // zinc-500 wash
 const SURFACE = "#09090b";
+// Market layer: amber, deliberately outside the blue score ramp.
+const LISTING_COLOR = "#f59e0b";
+const LISTING_RING = "rgba(245, 158, 11, 0.85)";
 
 const MIN_K = 1;
 const MAX_K = 64;
@@ -134,25 +141,30 @@ interface DotBucket {
 
 interface PathCache {
   quantK: number;
-  buckets: { included: DotBucket[]; excluded: number[] };
+  buckets: { included: DotBucket[]; excluded: number[]; listed: number[] };
   positions: Float32Array;
   dotPaths: { color: string; path: Path2D }[];
   excludedPath: Path2D;
+  listedPath: Path2D;
 }
 
+/** Hover carries either a screened parcel or a raw CoStar listing. */
 interface HoverInfo {
-  parcel: NjParcel;
+  parcel?: NjParcel;
+  listing?: MarketListing;
   px: number;
   py: number;
 }
 
 export function NjMap({
   parcels,
+  listings,
   filteredPins,
   selectedPin,
   onSelect,
 }: {
   parcels: NjParcel[];
+  listings: MarketListing[] | null;
   filteredPins: Set<string>;
   selectedPin: string | null;
   onSelect: (pin: string | null) => void;
@@ -179,6 +191,8 @@ export function NjMap({
   // readout). Updated on ~0.1x boundaries; pure panning never touches it.
   const [uiZoom, setUiZoom] = useState(1);
   const uiZoomRef = useRef(1);
+  // CoStar market overlay (all 1,139 listings as diamonds).
+  const [showListings, setShowListings] = useState(false);
 
   const rings = useMemo(() => extractRings(), []);
 
@@ -228,6 +242,7 @@ export function NjMap({
 
   // Parcel indices grouped by (ramp color x size tier) so a frame is ~24
   // Path2D fills instead of 13.7k arcs. Slot order draws dim -> bright.
+  // `listed` = in-filter parcels with an active CoStar listing (amber ring).
   const buckets = useMemo(() => {
     const slots: DotBucket[] = [];
     for (let r = 0; r < RAMP.length; r++) {
@@ -235,6 +250,7 @@ export function NjMap({
       slots.push({ color: RAMP[r], baseR: 2.4, idxs: [] });
     }
     const excluded: number[] = [];
+    const listed: number[] = [];
     for (let i = 0; i < parcels.length; i++) {
       const p = parcels[i];
       if (!filteredPins.has(p.pin)) {
@@ -242,9 +258,26 @@ export function NjMap({
         continue;
       }
       slots[rampIndex(p.score) * 2 + (p.score >= 70 ? 1 : 0)].idxs.push(i);
+      if (p.listing?.status === "active") listed.push(i);
     }
-    return { included: slots.filter((s) => s.idxs.length > 0), excluded };
+    return {
+      included: slots.filter((s) => s.idxs.length > 0),
+      excluded,
+      listed,
+    };
   }, [parcels, filteredPins]);
+
+  // Base-space positions for the raw CoStar listing overlay.
+  const listingPositions = useMemo(() => {
+    if (!proj || !listings) return null;
+    const arr = new Float32Array(listings.length * 2);
+    for (let i = 0; i < listings.length; i++) {
+      const l = listings[i];
+      arr[i * 2] = l.lng === null ? NaN : proj.x(l.lng);
+      arr[i * 2 + 1] = l.lat === null ? NaN : proj.y(l.lat);
+    }
+    return arr;
+  }, [listings, proj]);
 
   const pinIndex = useMemo(() => {
     const m = new Map<string, number>();
@@ -306,6 +339,47 @@ export function NjMap({
     [nearestIndex],
   );
 
+  // Listing overlay hit-test: linear scan over 1,139 points (only runs while
+  // the overlay is visible; cheap next to a canvas redraw).
+  const hitTestListing = useCallback(
+    (sx: number, sy: number): number => {
+      if (!listingPositions || !listings) return -1;
+      const { k, tx, ty } = viewRef.current;
+      const bx = (sx - tx) / k;
+      const by = (sy - ty) / k;
+      const maxD = 9 / k;
+      let best = -1;
+      let bestDist = maxD * maxD;
+      for (let i = 0; i < listings.length; i++) {
+        const dx = listingPositions[i * 2] - bx;
+        const dy = listingPositions[i * 2 + 1] - by;
+        if (Number.isNaN(dx)) continue;
+        const d = dx * dx + dy * dy;
+        if (d < bestDist) {
+          bestDist = d;
+          best = i;
+        }
+      }
+      return best;
+    },
+    [listingPositions, listings],
+  );
+
+  /** Shared hover resolution: listing overlay wins when visible. */
+  const hoverAt = useCallback(
+    (sx: number, sy: number): HoverInfo | null => {
+      if (showListings) {
+        const li = hitTestListing(sx, sy);
+        if (li >= 0 && listings) {
+          return { listing: listings[li], px: sx, py: sy };
+        }
+      }
+      const idx = hitTest(sx, sy);
+      return idx >= 0 ? { parcel: parcels[idx], px: sx, py: sy } : null;
+    },
+    [showListings, hitTestListing, listings, hitTest, parcels],
+  );
+
   const buildPathCache = useCallback(
     (quantK: number): PathCache | null => {
       if (!positions) return null;
@@ -335,7 +409,17 @@ export function NjMap({
           side,
         );
       }
-      return { quantK, buckets, positions, dotPaths, excludedPath };
+      // Amber "for sale" rings sit just outside the largest dot tier.
+      const listedPath = new Path2D();
+      const ringR =
+        (Math.min(2.4 * Math.sqrt(quantK), 2.4 * DOT_GROWTH_CAP) + 2) / quantK;
+      for (const i of buckets.listed) {
+        const x = positions[i * 2];
+        const y = positions[i * 2 + 1];
+        listedPath.moveTo(x + ringR, y);
+        listedPath.arc(x, y, ringR, 0, Math.PI * 2);
+      }
+      return { quantK, buckets, positions, dotPaths, excludedPath, listedPath };
     },
     [buckets, positions],
   );
@@ -384,6 +468,39 @@ export function NjMap({
     for (const { color, path } of cache.dotPaths) {
       ctx.fillStyle = color;
       ctx.fill(path);
+    }
+
+    // Amber rings mark in-filter parcels with an active CoStar listing.
+    ctx.strokeStyle = LISTING_RING;
+    ctx.lineWidth = 1 / k;
+    ctx.stroke(cache.listedPath);
+
+    // CoStar overlay: every raw listing as a diamond (filled = active,
+    // hollow = recently off-market). 1,139 points — immediate mode is fine.
+    if (showListings && listingPositions && listings) {
+      const s = Math.min(3 * Math.sqrt(k), 7) / k;
+      for (const active of [false, true]) {
+        ctx.beginPath();
+        for (let i = 0; i < listings.length; i++) {
+          if ((listings[i].status === "active") !== active) continue;
+          const x = listingPositions[i * 2];
+          const y = listingPositions[i * 2 + 1];
+          if (Number.isNaN(x)) continue;
+          ctx.moveTo(x, y - s);
+          ctx.lineTo(x + s, y);
+          ctx.lineTo(x, y + s);
+          ctx.lineTo(x - s, y);
+          ctx.closePath();
+        }
+        if (active) {
+          ctx.fillStyle = LISTING_COLOR;
+          ctx.fill();
+        } else {
+          ctx.strokeStyle = LISTING_RING;
+          ctx.lineWidth = 1 / k;
+          ctx.stroke();
+        }
+      }
     }
 
     // Selected parcel ring, drawn in screen space at constant weight.
@@ -464,8 +581,7 @@ export function NjMap({
       (e.ctrlKey ? 10 : 1);
     zoomAboutPoint(Math.exp(delta), sx, sy);
     // Keep the tooltip truthful mid-zoom.
-    const idx = hitTest(sx, sy);
-    setHover(idx >= 0 ? { parcel: parcels[idx], px: sx, py: sy } : null);
+    setHover(hoverAt(sx, sy));
   };
   const wheelFnRef = useRef<(e: WheelEvent) => void>(() => {});
   useEffect(() => {
@@ -484,7 +600,17 @@ export function NjMap({
   useEffect(() => {
     viewRef.current = clampView(viewRef.current, size.w, size.h);
     scheduleDraw();
-  }, [buckets, selectedPin, positions, proj, countyPath, size, scheduleDraw]);
+  }, [
+    buckets,
+    selectedPin,
+    positions,
+    proj,
+    countyPath,
+    size,
+    showListings,
+    listingPositions,
+    scheduleDraw,
+  ]);
 
   const endDrag = () => {
     gestureRef.current.dragging = false;
@@ -525,8 +651,7 @@ export function NjMap({
       g.lastY = sy;
       return;
     }
-    const idx = hitTest(sx, sy);
-    setHover(idx >= 0 ? { parcel: parcels[idx], px: sx, py: sy } : null);
+    setHover(hoverAt(sx, sy));
   };
 
   const handlePointerUp = (e: React.PointerEvent<HTMLCanvasElement>) => {
@@ -541,7 +666,18 @@ export function NjMap({
     // A release after a real pan is not a click.
     if (wasPanned) return;
     const rect = canvas.getBoundingClientRect();
-    const idx = hitTest(e.clientX - rect.left, e.clientY - rect.top);
+    const sx = e.clientX - rect.left;
+    const sy = e.clientY - rect.top;
+    // A matched overlay listing selects its screened parcel; an unmatched
+    // one has no detail sheet (tooltip only), so it clears the selection.
+    if (showListings) {
+      const li = hitTestListing(sx, sy);
+      if (li >= 0 && listings) {
+        onSelect(listings[li].pin);
+        return;
+      }
+    }
+    const idx = hitTest(sx, sy);
     onSelect(idx >= 0 ? parcels[idx].pin : null);
   };
 
@@ -567,6 +703,20 @@ export function NjMap({
         onLostPointerCapture={endDrag}
         onDoubleClick={handleDoubleClick}
       />
+      {/* CoStar overlay toggle */}
+      {listings && (
+        <button
+          type="button"
+          onClick={() => setShowListings((v) => !v)}
+          className={`absolute left-3 top-3 rounded border px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-wider transition-colors ${
+            showListings
+              ? "border-amber-500/50 bg-zinc-950/80 text-amber-400"
+              : "border-zinc-800/60 bg-zinc-950/80 text-zinc-500 hover:border-zinc-700 hover:text-zinc-300"
+          }`}
+        >
+          ◆ costar listings ({listings.length.toLocaleString()})
+        </button>
+      )}
       {/* Zoom controls */}
       <div className="absolute right-3 top-3 flex flex-col items-center gap-1.5">
         <div className="flex flex-col divide-y divide-zinc-800/60 overflow-hidden rounded border border-zinc-800/60 bg-zinc-950/80">
@@ -635,6 +785,26 @@ export function NjMap({
             excluded by filters
           </span>
         </div>
+        <div className="mt-1 flex items-center gap-1.5">
+          <span
+            className="inline-block h-2 w-2 rounded-full border"
+            style={{ borderColor: LISTING_COLOR }}
+          />
+          <span className="text-[9px] text-zinc-600 font-mono">
+            for sale · costar
+          </span>
+        </div>
+        {showListings && (
+          <div className="mt-1 flex items-center gap-1.5">
+            <span
+              className="inline-block h-1.5 w-1.5 rotate-45"
+              style={{ backgroundColor: LISTING_COLOR }}
+            />
+            <span className="text-[9px] text-zinc-600 font-mono">
+              all costar listings
+            </span>
+          </div>
+        )}
       </div>
       {/* Hover tooltip */}
       {hover && (
@@ -645,19 +815,66 @@ export function NjMap({
             top: Math.max(hover.py - 10, 8),
           }}
         >
-          <p className="text-xs font-medium text-zinc-200">
-            {hover.parcel.address || hover.parcel.pin}
-          </p>
-          <p className="text-[10px] text-zinc-500 font-mono">
-            {hover.parcel.muni} · {hover.parcel.county}
-          </p>
-          <p className="mt-1 text-[10px] text-zinc-400 font-mono">
-            {hover.parcel.acres} ac · score{" "}
-            <span style={{ color: scoreColor(hover.parcel.score) }}>
-              {hover.parcel.score}
-            </span>
-            {hover.parcel.sewer ? " · sewer" : ""}
-          </p>
+          {hover.parcel && (
+            <>
+              <p className="text-xs font-medium text-zinc-200">
+                {hover.parcel.address || hover.parcel.pin}
+              </p>
+              <p className="text-[10px] text-zinc-500 font-mono">
+                {hover.parcel.muni} · {hover.parcel.county}
+              </p>
+              <p className="mt-1 text-[10px] text-zinc-400 font-mono">
+                {hover.parcel.acres} ac · score{" "}
+                <span style={{ color: scoreColor(hover.parcel.score) }}>
+                  {hover.parcel.score}
+                </span>
+                {hover.parcel.sewer ? " · sewer" : ""}
+              </p>
+              {hover.parcel.listing?.status === "active" && (
+                <p
+                  className="mt-0.5 text-[10px] font-mono"
+                  style={{ color: LISTING_COLOR }}
+                >
+                  for sale
+                  {hover.parcel.listing.price !== null
+                    ? ` · ${moneyCompact(hover.parcel.listing.price)}`
+                    : " · price on request"}
+                  {hover.parcel.listing.dom !== null
+                    ? ` · ${Math.round(hover.parcel.listing.dom)} dom`
+                    : ""}
+                </p>
+              )}
+            </>
+          )}
+          {hover.listing && (
+            <>
+              <p className="text-xs font-medium text-zinc-200">
+                {hover.listing.address || "(no address)"}
+              </p>
+              <p className="text-[10px] text-zinc-500 font-mono">
+                {hover.listing.city} · {hover.listing.county}
+              </p>
+              <p
+                className="mt-1 text-[10px] font-mono"
+                style={{ color: LISTING_COLOR }}
+              >
+                {hover.listing.status === "active"
+                  ? "costar listing"
+                  : "recently off-market"}
+                {hover.listing.acres !== null
+                  ? ` · ${hover.listing.acres} ac`
+                  : ""}
+                {hover.listing.price !== null
+                  ? ` · ${moneyCompact(hover.listing.price)}`
+                  : " · price on request"}
+              </p>
+              <p className="mt-0.5 text-[10px] text-zinc-500 font-mono">
+                {hover.listing.pin
+                  ? "in screen universe · click for detail"
+                  : "outside class-1 screen (size or property class)"}
+              </p>
+            </>
+          )}
         </div>
       )}
     </div>

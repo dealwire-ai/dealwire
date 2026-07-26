@@ -3,7 +3,14 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { loadParcels, isPinelandsRestrictive, type NjParcel } from "./data";
+import {
+  loadParcels,
+  loadListings,
+  isPinelandsRestrictive,
+  moneyCompact,
+  type NjParcel,
+  type MarketListing,
+} from "./data";
 import { NjMap, scoreColor } from "./nj-map";
 import { ScoreHistogram, CountyBars } from "./charts";
 import { ParcelDetailSheet } from "./detail-sheet";
@@ -77,7 +84,9 @@ const PAGE_SIZE = 100;
 
 const SYSTEM_PROMPT = `You are a land acquisition analyst for Denholtz Properties, a New Jersey-based developer sourcing development land statewide.
 
-The buy box: vacant land (NJ property class 1), 5 to 100 acres, anywhere in New Jersey, suitable for residential or commercial development. Farms are excluded by class. The data is built entirely from public records: NJGIN Parcels + MOD-IV composite, NJDEP Wetlands 2020, FEMA NFHL flood zones, NJ Highlands and Pinelands boundaries, statewide sewer service areas, and preserved-land layers.
+The buy box: vacant land (NJ property class 1), 5 to 100 acres, anywhere in New Jersey, suitable for residential or commercial development. Farms are excluded by class. The data is built from public records: NJGIN Parcels + MOD-IV composite, NJDEP Wetlands 2020, FEMA NFHL flood zones, NJ Highlands and Pinelands boundaries, statewide sewer service areas, and preserved-land layers.
+
+MARKET LAYER (CoStar): a one-time CoStar export (Jul 24 2026, pulled under Denholtz's license) of 1,139 NJ land listings has been joined onto the screen. ~231 screened parcels carry a listing (field name: listing_*) with asking price, days on market, broker + phone, CoStar-reported owner, zoning, and proposed use. Everything else about a parcel is still public records. Key market facts: only ~4% of the 80+-scoring parcels have an active listing — the rest are off-market; median asking on matched parcels runs several times assessed value (assessed is a tax figure, NOT market value — never treat assessed as a price estimate, only as a relative-cost signal). Days on market at export; a listing can be both high-scoring and wildly overpriced — say so when the numbers show it.
 
 Developability score (0-99) — every parcel starts at base 50, then:
 - Sewer service area: +25
@@ -96,7 +105,8 @@ Critical caveats you must respect when advising:
 - All flags are SCREENING-GRADE. Wetlands come from photo-interpreted 2020 land-cover mapping, not field delineations — a formal call needs an NJDEP Letter of Interpretation.
 - flood_sfha "no-data" means FEMA has no digital mapping there, NOT that the parcel is clear.
 - Tax figure is prior-year billed tax; delinquency status is not in this data.
-- No owner information exists in this data (NJ redacts it under Daniel's Law); ownership for specific targets comes from county deed records.
+- Public records carry no owner names (NJ redacts them under Daniel's Law). Owner names exist ONLY on parcels with a matched CoStar listing, sourced from CoStar under Denholtz's license — for everything else, ownership comes from county deed records.
+- The CoStar layer is a Jul 24 2026 snapshot: listings may have closed or repriced since.
 
 HOW YOUR CONTEXT WORKS (respect this strictly):
 - Every user message carries the CURRENT filter state, exact AGGREGATES computed over the full filtered set, and a TOP-40-BY-SCORE sample of rows.
@@ -112,9 +122,9 @@ STYLE:
 
 const SUGGESTIONS = [
   "Top targets in sewer service areas over 20 acres",
-  "Which counties have the cleanest large parcels?",
+  "Which listed parcels score 80+ — and is the asking price reasonable?",
   "Find low-cost parcels with zero wetlands and no flood risk",
-  "What should I know before trusting the wetlands flags?",
+  "Why does off-market matter here? What share of top parcels are listed?",
 ];
 
 // ── Chat Message Type ──────────────────────────────────────
@@ -126,7 +136,21 @@ interface ChatMessage {
 
 // ── Sort State ─────────────────────────────────────────────
 
-type SortField = "score" | "acres" | "landVal" | "county" | "wetlandsPct";
+type SortField =
+  | "score"
+  | "acres"
+  | "landVal"
+  | "county"
+  | "wetlandsPct"
+  | "asking";
+
+/** Sort accessor: "asking" reads the joined CoStar listing, rest are columns. */
+function sortValue(p: NjParcel, field: SortField): number | string | null {
+  if (field === "asking") {
+    return p.listing?.status === "active" ? (p.listing.price ?? -1) : null;
+  }
+  return p[field];
+}
 
 // ── Main Page ──────────────────────────────────────────────
 
@@ -134,6 +158,9 @@ export default function DenholtzNjDemoPage() {
   // Dataset — fetched at runtime (7.7MB of real screened parcels; too heavy
   // to bundle). null = still loading.
   const [parcels, setParcels] = useState<NjParcel[] | null>(null);
+  // Full CoStar market layer (1,139 listings incl. out-of-universe). null =
+  // loading or unavailable — the page must work without it.
+  const [listings, setListings] = useState<MarketListing[] | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
 
   const ALL_COUNTIES = useMemo(
@@ -150,6 +177,7 @@ export default function DenholtzNjDemoPage() {
   const [sewerOnly, setSewerOnly] = useState(false);
   const [hideRestrictive, setHideRestrictive] = useState(false);
   const [excludeSfha, setExcludeSfha] = useState(false);
+  const [listedOnly, setListedOnly] = useState(false);
   const [sortField, setSortField] = useState<SortField>("score");
   const [sortAsc, setSortAsc] = useState(false);
   const [page, setPage] = useState(0);
@@ -174,6 +202,10 @@ export default function DenholtzNjDemoPage() {
       .catch((err) =>
         setLoadError(err instanceof Error ? err.message : "failed to load"),
       );
+    // Market layer is additive — swallow failures rather than block the demo.
+    loadListings()
+      .then(setListings)
+      .catch(() => setListings(null));
   }, []);
 
   // Filter parcels
@@ -193,11 +225,12 @@ export default function DenholtzNjDemoPage() {
           (p.highlands !== "preservation" &&
             !isPinelandsRestrictive(p.pinelands)),
       )
-      .filter((p) => !excludeSfha || p.floodSfha !== "yes");
+      .filter((p) => !excludeSfha || p.floodSfha !== "yes")
+      .filter((p) => !listedOnly || p.listing?.status === "active");
 
     return result.sort((a, b) => {
-      const aVal = a[sortField] ?? -1;
-      const bVal = b[sortField] ?? -1;
+      const aVal = sortValue(a, sortField) ?? -1;
+      const bVal = sortValue(b, sortField) ?? -1;
       if (typeof aVal === "string" && typeof bVal === "string") {
         return sortAsc ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
       }
@@ -215,6 +248,7 @@ export default function DenholtzNjDemoPage() {
     sewerOnly,
     hideRestrictive,
     excludeSfha,
+    listedOnly,
     sortField,
     sortAsc,
   ]);
@@ -247,6 +281,23 @@ export default function DenholtzNjDemoPage() {
     const vals = filtered
       .filter((p) => p.landVal !== null && p.landVal > 0 && p.acres > 0)
       .map((p) => (p.landVal as number) / p.acres)
+      .sort((a, b) => a - b);
+    if (vals.length === 0) return 0;
+    return Math.round(vals[Math.floor(vals.length / 2)]);
+  }, [filtered]);
+  const activeListedCount = useMemo(
+    () => filtered.filter((p) => p.listing?.status === "active").length,
+    [filtered],
+  );
+  const medianAskPerAcre = useMemo(() => {
+    const vals = filtered
+      .filter(
+        (p) =>
+          p.listing?.status === "active" &&
+          p.listing.price !== null &&
+          p.acres > 0,
+      )
+      .map((p) => (p.listing!.price as number) / p.acres)
       .sort((a, b) => a - b);
     if (vals.length === 0) return 0;
     return Math.round(vals[Math.floor(vals.length / 2)]);
@@ -294,6 +345,8 @@ export default function DenholtzNjDemoPage() {
       `Any wetlands overlap: ${pct(rows.filter((p) => (p.wetlandsPct ?? 1) > 0).length)}`,
       `Highlands: ${rows.filter((p) => p.highlands === "preservation").length} preservation, ${rows.filter((p) => p.highlands === "planning").length} planning`,
       `Pinelands restrictive: ${rows.filter((p) => isPinelandsRestrictive(p.pinelands)).length}`,
+      `Active CoStar listings among filtered parcels: ${activeListedCount}${medianAskPerAcre ? ` (median asking $${medianAskPerAcre.toLocaleString()}/acre)` : ""}`,
+      `Score>=80 parcels in filter that are listed: ${rows.filter((p) => p.score >= 80 && p.listing?.status === "active").length} of ${rows.filter((p) => p.score >= 80).length} — the rest are off-market`,
       `By county: ${countyLines.join(" | ")}`,
     ].join("\n");
 
@@ -315,9 +368,23 @@ export default function DenholtzNjDemoPage() {
         sewer: p.sewer,
         score: p.score,
         score_notes: p.scoreNotes,
+        // CoStar market fields — present only on matched listings, so they
+        // add no bulk to the other ~37 sample rows.
+        ...(p.listing
+          ? {
+              listing_status: p.listing.status,
+              listing_price: p.listing.price,
+              listing_days_on_market: p.listing.dom,
+              listing_broker: p.listing.broker,
+              listing_broker_phone: p.listing.brokerPhone,
+              listing_owner: p.listing.owner,
+              listing_zoning: p.listing.zoning,
+              listing_proposed_use: p.listing.use,
+            }
+          : {}),
       }));
 
-    const filters = `Counties = ${selectedCounties.length === ALL_COUNTIES.length ? "all 21" : selectedCounties.join(", ")}; Acres = ${minAcres || 5}–${maxAcres || 100}; Min score = ${minScore}; Max wetlands % = ${maxWetlands >= 100 ? "any" : maxWetlands}; Sewer only = ${sewerOnly}; Hide Highlands/Pinelands-restricted = ${hideRestrictive}; Exclude SFHA = ${excludeSfha}`;
+    const filters = `Counties = ${selectedCounties.length === ALL_COUNTIES.length ? "all 21" : selectedCounties.join(", ")}; Acres = ${minAcres || 5}–${maxAcres || 100}; Min score = ${minScore}; Max wetlands % = ${maxWetlands >= 100 ? "any" : maxWetlands}; Sewer only = ${sewerOnly}; Hide Highlands/Pinelands-restricted = ${hideRestrictive}; Exclude SFHA = ${excludeSfha}; On-market only = ${listedOnly}`;
 
     const selected = selectedParcel
       ? `\n\nPARCEL CURRENTLY OPEN IN DETAIL VIEW:\n${JSON.stringify(selectedParcel)}`
@@ -470,6 +537,10 @@ export default function DenholtzNjDemoPage() {
                 ● live public records — njgin parcels+mod-iv · njdep wetlands ·
                 fema nfhl · highlands · pinelands · sewer service
               </p>
+              <p className="text-[10px] text-amber-500/70 font-mono mt-0.5">
+                ◆ costar market layer — 1,139 nj land listings · asking ·
+                brokers · ownership · exported jul 24 via denholtz license
+              </p>
             </div>
             <div className="flex flex-col items-end gap-1.5">
               <span className="text-[10px] uppercase tracking-wider text-zinc-600 font-mono border border-zinc-800 px-2.5 py-1 rounded">
@@ -555,6 +626,11 @@ export default function DenholtzNjDemoPage() {
                     excludeSfha,
                     () => setExcludeSfha(!excludeSfha),
                   ],
+                  [
+                    "On-Market Only",
+                    listedOnly,
+                    () => setListedOnly(!listedOnly),
+                  ],
                 ] as [string, boolean, () => void][]
               ).map(([label, active, toggle]) => (
                 <button
@@ -606,7 +682,7 @@ export default function DenholtzNjDemoPage() {
         </div>
 
         {/* Stats Bar */}
-        <div className="grid grid-cols-4 gap-3 mb-5">
+        <div className="grid grid-cols-5 gap-3 mb-5">
           {[
             {
               label: "Qualifying Parcels",
@@ -617,7 +693,19 @@ export default function DenholtzNjDemoPage() {
               label: "Priority Targets",
               value: priorityCount.toLocaleString(),
               sub: "score ≥ 70",
-              accent: true,
+              color: scoreColor(85),
+            },
+            {
+              label: "On Market",
+              value: activeListedCount.toLocaleString(),
+              sub:
+                activeListedCount > 0
+                  ? `${(
+                      (activeListedCount / Math.max(filtered.length, 1)) *
+                      100
+                    ).toFixed(1)}% of view · costar`
+                  : "costar listings",
+              color: "#f59e0b",
             },
             {
               label: "Total Acreage",
@@ -629,7 +717,9 @@ export default function DenholtzNjDemoPage() {
             {
               label: "Median Assessed $/Acre",
               value: `$${medianPerAcre.toLocaleString()}`,
-              sub: "land value only",
+              sub: medianAskPerAcre
+                ? `asking runs $${medianAskPerAcre.toLocaleString()}`
+                : "land value only",
             },
           ].map((stat) => (
             <div
@@ -641,9 +731,7 @@ export default function DenholtzNjDemoPage() {
               </p>
               <p
                 className="text-2xl font-semibold mt-1"
-                style={
-                  stat.accent ? { color: scoreColor(85) } : { color: "#e4e4e7" }
-                }
+                style={{ color: stat.color ?? "#e4e4e7" }}
               >
                 {stat.value}
               </p>
@@ -657,6 +745,7 @@ export default function DenholtzNjDemoPage() {
           <div className="col-span-2 h-[540px] rounded-md border border-zinc-800/60 bg-zinc-950/50 overflow-hidden">
             <NjMap
               parcels={parcels}
+              listings={listings}
               filteredPins={filteredPins}
               selectedPin={selectedPin}
               onSelect={setSelectedPin}
@@ -718,6 +807,12 @@ export default function DenholtzNjDemoPage() {
                     </th>
                     <th
                       className={thSortable}
+                      onClick={() => handleSort("asking")}
+                    >
+                      Asking{sortIndicator("asking")}
+                    </th>
+                    <th
+                      className={thSortable}
                       onClick={() => handleSort("wetlandsPct")}
                     >
                       Wetlands{sortIndicator("wetlandsPct")}
@@ -767,6 +862,29 @@ export default function DenholtzNjDemoPage() {
                         {parcel.landVal === null
                           ? ""
                           : `$${parcel.landVal.toLocaleString()}`}
+                      </td>
+                      <td className="px-3 py-2 font-mono text-xs tabular-nums">
+                        {parcel.listing?.status === "active" ? (
+                          parcel.listing.price !== null ? (
+                            <span className="text-amber-400">
+                              {moneyCompact(parcel.listing.price)}
+                              {parcel.netVal ? (
+                                <span className="text-zinc-600 ml-1 text-[10px]">
+                                  {(
+                                    parcel.listing.price / parcel.netVal
+                                  ).toFixed(1)}
+                                  ×
+                                </span>
+                              ) : null}
+                            </span>
+                          ) : (
+                            <span className="text-amber-400/70 italic">
+                              on request
+                            </span>
+                          )
+                        ) : (
+                          <span className="text-zinc-700">—</span>
+                        )}
                       </td>
                       <td className="px-3 py-2 font-mono text-xs tabular-nums">
                         {parcel.wetlandsPct === null ? (
