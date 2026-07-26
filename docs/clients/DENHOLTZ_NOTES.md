@@ -32,11 +32,19 @@
 - **Class 1 (vacant) only.** Class 3B farmland-assessed parcels are excluded per "no farms" — but 23,711 of them at 5–100 ac exist statewide and many are developer land banks (5 ac + $1k/yr ag sales qualifies for farmland assessment). This is a **verbal talking point**, not shipped data.
 - All blocker flags are **screening-grade** (NJDEP wetlands = photo-interpreted 2020 land cover, not delineations; FEMA NFHL has digitization gaps — "no data" ≠ "no risk").
 
+## CoStar layer (delivered Jul 2026)
+
+- Kris's CoStar access came through as three "all columns" exports (Jul 24, 2026): 1,139 NJ land listings — 242 at 0.25–1 ac, 423 at 1–5 ac, 474 at 5–100 ac; 1,010 actively for sale. Joined onto the screen by `demos/denholtz-nj/scripts/join-costar.py` (issue #431).
+- **What it added:** asking prices (69% fill), broker + phone (94%), CoStar-reported owner names (~65% — fills the Daniel's Law gap on matched parcels), zoning (89%), days on market, proposed use. 231 screened parcels carry a listing; the full 1,139 render as a map overlay.
+- **Demo-ready stats:** median asking ≈ 5.7× assessed on matched parcels; median 444 days on market; ~96% of parcels scoring 80+ have no active listing (the off-market pitch).
+- **Not in the export:** submarket rents/vacancy/pipeline, land sale comps (only 141 last-sale rows). Follow-up ask for Kris: a sold-comps export + submarket stats export.
+- Snapshot only — listings may close/reprice; data stays confined to the Denholtz demo + deliverable (their license).
+
 ## Pending / open
 
-- **CoStar access via Denholtz license** — Kris Hurlbut checking with CoStar (Jun 26). Would let us layer listing/market data on top. Non-blocking.
 - Kris's other database suggestions (unused by them): CommercialEdge, Crexi, Reonomy, LightBox Vision, LandApp.
 - Steven asked about **GSA website + broker sites** as sources — unaddressed so far.
+- CoStar follow-up exports worth requesting: sold land comps, submarket stats.
 
 ## Deliverables (epic #419)
 

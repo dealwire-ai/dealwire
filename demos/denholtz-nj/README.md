@@ -22,6 +22,23 @@ pnpm --filter @dealwire/denholtz-nj-etl build-outputs    # Stage C: score + parc
 - `data/` (raw pulls + checkpoints) is gitignored; `output/` (CSV + notes)
   and the demo's `parcels.json` are committed.
 
+## CoStar market layer (one-shot, Jul 2026)
+
+`scripts/join-costar.py` joins the CoStar "all columns" land-listing export
+(1,139 NJ listings in three acreage tiers, exported Jul 24 2026 under
+Denholtz's license) onto the screen: exact parcel-number match, then
+point-in-polygon against Stage A geometry, then nearest-centroid fallback.
+It rewrites `denholtz-nj-parcels.json` (attaching `listing` to ~231 matched
+parcels), emits `denholtz-nj-listings.json` (full slim layer for the map
+overlay), and `output/costar-listings-joined-2026-07-24.csv`.
+
+This is demo tooling, not a pipeline — the export is a snapshot and is not
+refreshed. Raw xlsx lives in `data/costar/` (gitignored — CoStar-licensed
+data; only the joined demo artifacts are committed). Requires local
+`data/raw/parcels.ndjson` from Stage A and Python 3 + openpyxl. Re-running
+Stage C (`build-outputs`) overwrites parcels.json WITHOUT listings — re-run
+the join script after it.
+
 ## Layers
 
 All endpoints verified live 2026-07-07 — see `src/layers.ts` for URLs and

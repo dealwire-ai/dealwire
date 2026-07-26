@@ -1201,7 +1201,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 96,
-    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; 10–40 ac +10; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; 10–40 ac +10; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 20269915,
+      "status": "off-market",
+      "price": null,
+      "dom": 702.0,
+      "acres": 54.0,
+      "broker": "Foresite Commercial Realty",
+      "brokerContact": "Samantha Zerafa Roessler",
+      "brokerPhone": "6096461919",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": null,
+      "use": null,
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "0108_2902_28",
@@ -1313,7 +1330,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 96,
-    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; 10–40 ac +10; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; 10–40 ac +10; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 25902,
+      "status": "off-market",
+      "price": 1000000.0,
+      "dom": 10550.0,
+      "acres": 21.48,
+      "broker": "Levin Commercial Real Estate, LLC",
+      "brokerContact": "Joshua Levin, CCIM",
+      "brokerPhone": "6093445200",
+      "owner": "Levin Emanuel L & Roberta T",
+      "ownerPhone": "6093445200",
+      "zoning": "Neighborhood Business",
+      "use": "Medical, Restaurant, Retail",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "0108_400_1",
@@ -1845,7 +1879,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 96,
-    "scoreNotes": "base 50; sewer service area +25; Pinelands Pinelands Village +5; 10–40 ac +10; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; sewer service area +25; Pinelands Pinelands Village +5; 10–40 ac +10; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 13093628,
+      "status": "active",
+      "price": 375000.0,
+      "dom": 1397.0,
+      "acres": 14.37,
+      "broker": "Berkshire Hathaway Fox & Roach - Devon-Wayne",
+      "brokerContact": "Sid Benstead",
+      "brokerPhone": "8568105710",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "PC3",
+      "use": "Commercial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "0504_235_3",
@@ -2153,7 +2204,25 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 96,
-    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; 10–40 ac +10; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; 10–40 ac +10; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 21303526,
+      "status": "active",
+      "price": null,
+      "dom": 338.0,
+      "acres": 40.41,
+      "broker": "Hilco Global",
+      "brokerContact": "Jamie Cote",
+      "brokerPhone": "8557552300",
+      "owner": "SUPOR JOSEPH JR MARITAL TRUST",
+      "ownerPhone": null,
+      "zoning": "R20",
+      "use": "MultiFamily",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin",
+      "multiParcel": true
+    }
   },
   {
     "pin": "1501_174_47.01",
@@ -2181,7 +2250,25 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 96,
-    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; 10–40 ac +10; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; 10–40 ac +10; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 21303526,
+      "status": "active",
+      "price": null,
+      "dom": 338.0,
+      "acres": 40.41,
+      "broker": "Hilco Global",
+      "brokerContact": "Jamie Cote",
+      "brokerPhone": "8557552300",
+      "owner": "SUPOR JOSEPH JR MARITAL TRUST",
+      "ownerPhone": null,
+      "zoning": "R20",
+      "use": "MultiFamily",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin",
+      "multiParcel": true
+    }
   },
   {
     "pin": "1517_285.11_11",
@@ -4309,7 +4396,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 95,
-    "scoreNotes": "base 50; sewer service area +25; 10–40 ac +10; <$5k/ac assessed +10"
+    "scoreNotes": "base 50; sewer service area +25; 10–40 ac +10; <$5k/ac assessed +10",
+    "listing": {
+      "id": 20923779,
+      "status": "active",
+      "price": 650000.0,
+      "dom": 219.0,
+      "acres": 53.0,
+      "broker": "Berkshire Fox & Roach Realtors - Northfield",
+      "brokerContact": "Richard Baehrle",
+      "brokerPhone": "6096410011",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": null,
+      "use": null,
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "0610_52_91",
@@ -5625,7 +5729,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 93,
-    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; 10–40 ac +10; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; 10–40 ac +10; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 20566436,
+      "status": "active",
+      "price": 3200000.0,
+      "dom": 634.0,
+      "acres": 7.0,
+      "broker": "Foresite Commercial Realty",
+      "brokerContact": "Samantha Zerafa Roessler",
+      "brokerPhone": "6096461919",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "HB",
+      "use": "Commercial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "0108_2610_14.01",
@@ -5961,7 +6082,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 93,
-    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; 10–40 ac +10; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; 10–40 ac +10; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 10296467,
+      "status": "active",
+      "price": null,
+      "dom": 270.0,
+      "acres": 28.3,
+      "broker": "HK99 Realty LLC",
+      "brokerContact": "Kelly Huang",
+      "brokerPhone": "2152083288",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "HC",
+      "use": "Commercial, Office, Retail, Storefront Retail/Office",
+      "lastSaleDate": "2025-09-26",
+      "lastSalePrice": 850000.0,
+      "join": "pin"
+    }
   },
   {
     "pin": "0112_996_37",
@@ -6241,7 +6379,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 93,
-    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; 10–40 ac +10; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; 10–40 ac +10; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 21096270,
+      "status": "active",
+      "price": 999000.0,
+      "dom": 395.0,
+      "acres": 16.23,
+      "broker": "Suburban City Commercial",
+      "brokerContact": "Glenn Gaines",
+      "brokerPhone": "2159950191",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "PC-2",
+      "use": "Commercial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "0504_226_19.04",
@@ -7137,7 +7292,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 91,
-    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; acreage in range +5; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; acreage in range +5; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 12622729,
+      "status": "active",
+      "price": 350000.0,
+      "dom": 1638.0,
+      "acres": 6.52,
+      "broker": "Foresite Commercial Realty",
+      "brokerContact": "Samantha Zerafa Roessler",
+      "brokerPhone": "6096461919",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "RG4",
+      "use": null,
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "0108_1223_8",
@@ -7249,7 +7421,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 91,
-    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; acreage in range +5; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; acreage in range +5; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 12622734,
+      "status": "active",
+      "price": 400000.0,
+      "dom": 1638.0,
+      "acres": 9.8,
+      "broker": "Foresite Commercial Realty",
+      "brokerContact": "Samantha Zerafa Roessler",
+      "brokerPhone": "6096461919",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "RG2",
+      "use": null,
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "0108_1802_45",
@@ -7641,7 +7830,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 91,
-    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; acreage in range +5; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; acreage in range +5; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 7513956,
+      "status": "off-market",
+      "price": 299000.0,
+      "dom": 172.0,
+      "acres": 3.26,
+      "broker": "Balsley Losco Real Estate",
+      "brokerContact": "Chris Losco",
+      "brokerPhone": "6095173717",
+      "owner": "Aqua Blue Properties Llc",
+      "ownerPhone": null,
+      "zoning": "HB",
+      "use": "Commercial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "0108_5701_52.01",
@@ -9489,7 +9695,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 91,
-    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; acreage in range +5; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; acreage in range +5; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 7616122,
+      "status": "active",
+      "price": 2100000.0,
+      "dom": 228.0,
+      "acres": 10.0,
+      "broker": "EXIT MBR REALTY",
+      "brokerContact": "Michael Bruccoliere",
+      "brokerPhone": "8566672000",
+      "owner": "William H Williams",
+      "ownerPhone": "8149468682",
+      "zoning": "PR4",
+      "use": "Commercial, MultiFamily, Restaurant, Retail, Storefront Retail/Office, Strip Center, Supermarket",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "0436_3206_2",
@@ -9573,7 +9796,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 91,
-    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; acreage in range +5; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; acreage in range +5; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 10716242,
+      "status": "active",
+      "price": 650000.0,
+      "dom": 675.0,
+      "acres": 9.0,
+      "broker": "Century 21 Reilly Realtors",
+      "brokerContact": "Charles Maimone",
+      "brokerPhone": "8567671776",
+      "owner": "Bari Saraj",
+      "ownerPhone": null,
+      "zoning": "PC1",
+      "use": null,
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "0436_404_5.03",
@@ -11561,7 +11801,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 91,
-    "scoreNotes": "base 50; sewer service area +25; 10–40 ac +10; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; sewer service area +25; 10–40 ac +10; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 5995885,
+      "status": "active",
+      "price": null,
+      "dom": 618.0,
+      "acres": 18.5,
+      "broker": "Greiner-Maltz of New Jersey LLC",
+      "brokerContact": "Raymond Musalo",
+      "brokerPhone": "2017865050",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "Industrial",
+      "use": "Hold for Development",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "1221_95_50.02",
@@ -11729,7 +11986,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 91,
-    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; acreage in range +5; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; acreage in range +5; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 12813316,
+      "status": "active",
+      "price": 799995.0,
+      "dom": 1207.0,
+      "acres": 5.45,
+      "broker": "Keller Williams Realty West Monmouth",
+      "brokerContact": "Mark Krupnick",
+      "brokerPhone": "7329455253",
+      "owner": "La Laan Llc",
+      "ownerPhone": null,
+      "zoning": "R-20 & TC Town center",
+      "use": "Mixed Use",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "1501_114.64_31",
@@ -12429,7 +12703,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 90,
-    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; 10–40 ac +10"
+    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; 10–40 ac +10",
+    "listing": {
+      "id": 1133042,
+      "status": "active",
+      "price": 750000.0,
+      "dom": 462.0,
+      "acres": 6.5,
+      "broker": "Coldwell Banker Argus Real Estate",
+      "brokerContact": "Matthew Bonomini",
+      "brokerPhone": "6098223700",
+      "owner": "C G K Llc",
+      "ownerPhone": null,
+      "zoning": "HWC",
+      "use": "Commercial, Fast Food, Office, Restaurant, Retail",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "0108_401_16",
@@ -12681,7 +12972,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 90,
-    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; 10–40 ac +10"
+    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; 10–40 ac +10",
+    "listing": {
+      "id": 9257944,
+      "status": "active",
+      "price": 1900000.0,
+      "dom": 354.0,
+      "acres": 8.26,
+      "broker": "RIPCO Real Estate",
+      "brokerContact": "Deborah Stone",
+      "brokerPhone": "2019144406",
+      "owner": "State of New Jersey Department of Transportation",
+      "ownerPhone": "6095302360",
+      "zoning": "HC (Highway Commercial)",
+      "use": "Retail, Storefront, Strip Center",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "0112_1323_2",
@@ -12709,7 +13017,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 90,
-    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; 10–40 ac +10"
+    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; 10–40 ac +10",
+    "listing": {
+      "id": 7410757,
+      "status": "active",
+      "price": 3499000.0,
+      "dom": 6016.0,
+      "acres": 31.0,
+      "broker": "Century 21 Action Plus Realty",
+      "brokerContact": "Thomas Hogan",
+      "brokerPhone": "8002992129",
+      "owner": "Group 1 Realty Inc Rash Assoc",
+      "ownerPhone": null,
+      "zoning": "DC",
+      "use": "Commercial, Mixed Use, Retail",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "0117_2501_1",
@@ -13269,7 +13594,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 90,
-    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; 10–40 ac +10"
+    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; 10–40 ac +10",
+    "listing": {
+      "id": 8278258,
+      "status": "active",
+      "price": null,
+      "dom": 256.0,
+      "acres": 45.0,
+      "broker": "Active Acquisitions",
+      "brokerContact": "Seth Gerszberg",
+      "brokerPhone": "8483330880",
+      "owner": "Active Acquisitions",
+      "ownerPhone": "9178564834",
+      "zoning": "PHB",
+      "use": "Commercial",
+      "lastSaleDate": "2025-06-25",
+      "lastSalePrice": 5500000.0,
+      "join": "pin"
+    }
   },
   {
     "pin": "0435_3101_15",
@@ -13381,7 +13723,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 90,
-    "scoreNotes": "base 50; sewer service area +25; acreage in range +5; <$5k/ac assessed +10"
+    "scoreNotes": "base 50; sewer service area +25; acreage in range +5; <$5k/ac assessed +10",
+    "listing": {
+      "id": 22049572,
+      "status": "active",
+      "price": 999000.0,
+      "dom": 67.0,
+      "acres": 4.54,
+      "broker": "Compass RE",
+      "brokerContact": "William Albrecht",
+      "brokerPhone": "6099679600",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "R",
+      "use": "Apartment Units - Condo, Single Family Development, Single Family Residence",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "0506_167.01_75_C0098",
@@ -15257,7 +15616,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 90,
-    "scoreNotes": "base 50; sewer service area +25; acreage in range +5; <$5k/ac assessed +10"
+    "scoreNotes": "base 50; sewer service area +25; acreage in range +5; <$5k/ac assessed +10",
+    "listing": {
+      "id": 12804543,
+      "status": "active",
+      "price": null,
+      "dom": 1484.0,
+      "acres": 5.62,
+      "broker": "Curran Commercial",
+      "brokerContact": "Ryan Curran",
+      "brokerPhone": "7323593203",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "commercial",
+      "use": null,
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "1219_136.15_75.01",
@@ -16853,7 +17229,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 89,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 5% -2; 10–40 ac +10; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 5% -2; 10–40 ac +10; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 7270138,
+      "status": "active",
+      "price": 899000.0,
+      "dom": 2670.0,
+      "acres": 25.0,
+      "broker": "Advisors Realty Inc.",
+      "brokerContact": "Aaron Ivatorov",
+      "brokerPhone": "2122011230",
+      "owner": "B & S Partners",
+      "ownerPhone": "8566917000",
+      "zoning": null,
+      "use": "Agricultural, Planned Unit Development, Single Family Development",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "0614_7801_62",
@@ -17049,7 +17442,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 89,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 2% -1; acreage in range +5; <$5k/ac assessed +10"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 2% -1; acreage in range +5; <$5k/ac assessed +10",
+    "listing": {
+      "id": 13831160,
+      "status": "active",
+      "price": 499900.0,
+      "dom": 1334.0,
+      "acres": 6.7,
+      "broker": "First New Jersey Real Estate Network Inc",
+      "brokerContact": "Robert Berlant",
+      "brokerPhone": "7328938234",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "MP",
+      "use": "Single Family Residence, Storefrnt Retail/Residntl",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "1810_143_8",
@@ -17609,7 +18019,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 88,
-    "scoreNotes": "base 50; sewer service area +25; flood unmapped -3; Pinelands Pinelands Village +5; acreage in range +5; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; sewer service area +25; flood unmapped -3; Pinelands Pinelands Village +5; acreage in range +5; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 19264755,
+      "status": "active",
+      "price": 795000.0,
+      "dom": 963.0,
+      "acres": 9.01,
+      "broker": "L.C. Realty",
+      "brokerContact": "Linda Cinelli CCIM, CEA",
+      "brokerPhone": "9087225661",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "HC-2",
+      "use": "Self-Storage",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "0111_324_8.03",
@@ -18113,7 +18540,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 88,
-    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; acreage in range +5; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; acreage in range +5; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 21044092,
+      "status": "active",
+      "price": 625000.0,
+      "dom": 431.0,
+      "acres": 5.0,
+      "broker": "Blue Chip Equities",
+      "brokerContact": "Justin Goodman",
+      "brokerPhone": "7325671433",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "Neighborhood Commercial",
+      "use": "Bank, Car Wash, Commercial, Day Care Center, Drug Store, General Freestanding, Health Care, Hospital, Medical, Neighborhood Center, Office, Rehabilitation Center, Restaurant, Self-Storage, Strip Center, Supermarket",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "0335_310_8",
@@ -18337,7 +18781,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 88,
-    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; acreage in range +5; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; acreage in range +5; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 7892170,
+      "status": "active",
+      "price": null,
+      "dom": 10.0,
+      "acres": 3.5,
+      "broker": "Bennett Realty & Development",
+      "brokerContact": "Joel Dicker",
+      "brokerPhone": "9086108488",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "C",
+      "use": "Commercial, General Freestanding, Restaurant, Retail",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "0435_802_21",
@@ -19093,7 +19554,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 88,
-    "scoreNotes": "base 50; sewer service area +25; 10–40 ac +10; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; sewer service area +25; 10–40 ac +10; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 12734894,
+      "status": "active",
+      "price": null,
+      "dom": 93.0,
+      "acres": 9.07,
+      "broker": "Wolf Commercial Real Estate L.L.C.",
+      "brokerContact": "Ryan Barikian",
+      "brokerPhone": "8568576300",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "R-3",
+      "use": "Medical, Office, Retail",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "0614_6103_25",
@@ -20101,7 +20579,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 88,
-    "scoreNotes": "base 50; sewer service area +25; 10–40 ac +10; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; sewer service area +25; 10–40 ac +10; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 9034201,
+      "status": "off-market",
+      "price": null,
+      "dom": 682.0,
+      "acres": 22.38,
+      "broker": "Century 21 Action Plus Realty",
+      "brokerContact": "Bernard Gutherz",
+      "brokerPhone": "8002992129",
+      "owner": "Bahadurian, Richard",
+      "ownerPhone": "7322233200",
+      "zoning": "RR-6",
+      "use": "MultiFamily, Planned Unit Development, Single Family Development",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "1501_161_29",
@@ -21109,7 +21604,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 87,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 2% -1; 10–40 ac +10; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 2% -1; 10–40 ac +10; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 10167346,
+      "status": "active",
+      "price": 1800000.0,
+      "dom": 695.0,
+      "acres": 7.38,
+      "broker": "BHHS Fox & Roach",
+      "brokerContact": "Nicolas DiMeglio",
+      "brokerPhone": "6099241600",
+      "owner": "Leonard Ronald T",
+      "ownerPhone": null,
+      "zoning": "AR",
+      "use": null,
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "1101_16_1",
@@ -21221,7 +21733,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 87,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 2% -1; 10–40 ac +10; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 2% -1; 10–40 ac +10; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 17452950,
+      "status": "off-market",
+      "price": null,
+      "dom": 1080.0,
+      "acres": 11.82,
+      "broker": "Everest Realty Group",
+      "brokerContact": "Chris Kaempffer",
+      "brokerPhone": "7326251055",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "PCD",
+      "use": "Distribution, Warehouse",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "1501_174_45",
@@ -21249,7 +21778,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 87,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 14% -6; Pinelands Regional Growth Area +5; 10–40 ac +10; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 14% -6; Pinelands Regional Growth Area +5; 10–40 ac +10; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 21466483,
+      "status": "active",
+      "price": 699000.0,
+      "dom": 294.0,
+      "acres": 10.334265,
+      "broker": "Rosetto Realty Group LLC",
+      "brokerContact": "Ronald Rosetto",
+      "brokerPhone": "7322446700",
+      "owner": "Watts Kenneth & Catherine",
+      "ownerPhone": null,
+      "zoning": "CPHD",
+      "use": "Auto Repair, Bank, Car Wash, Cemetery/Mausoleum, Commercial, Contractor Storage Yard, Convenience Store, Funeral Home, Garden Center, Hospitality, Hotel, Lodge/Meeting Hall, Lumberyard, Mixed Use, Police/Fire Station, Public Library, Religious Facility, Retail, Retail Warehouse, Schools, Self-Storage, Shelter, Spclty/Festvl/Entertnmnt, Storefront Retail/Office, Trailer/Camper Park, Truck Terminal, Veterinarian/Kennel, Warehouse",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "1501_174_48",
@@ -22089,7 +22635,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 86,
-    "scoreNotes": "base 50; sewer service area +25; acreage in range +5; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; sewer service area +25; acreage in range +5; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 22182647,
+      "status": "active",
+      "price": null,
+      "dom": 36.0,
+      "acres": 15.27,
+      "broker": "Vantage Real Estate Services",
+      "brokerContact": "Leor Hemo",
+      "brokerPhone": "8567971919",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "R1, R2",
+      "use": null,
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "0421_402_13",
@@ -22173,7 +22736,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 86,
-    "scoreNotes": "base 50; sewer service area +25; acreage in range +5; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; sewer service area +25; acreage in range +5; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 13970145,
+      "status": "active",
+      "price": 2400000.0,
+      "dom": 1214.0,
+      "acres": 11.0,
+      "broker": "Markeim Chalmers, Inc",
+      "brokerContact": "Kevin Burns",
+      "brokerPhone": "8563245191",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": null,
+      "use": "Commercial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "0428_120_5.01",
@@ -22397,7 +22977,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 86,
-    "scoreNotes": "base 50; sewer service area +25; acreage in range +5; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; sewer service area +25; acreage in range +5; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 19653956,
+      "status": "active",
+      "price": 1200000.0,
+      "dom": 206.0,
+      "acres": 9.43,
+      "broker": "RE/Max Centre Realtors",
+      "brokerContact": "Joseph Gaul",
+      "brokerPhone": "2153438200",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "PMU-1",
+      "use": "Apartment Units, Planned Unit Development, Single Family Development, Storefrnt Retail/Residntl",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "0601_183_55",
@@ -23097,7 +23694,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 86,
-    "scoreNotes": "base 50; sewer service area +25; acreage in range +5; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; sewer service area +25; acreage in range +5; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 15646740,
+      "status": "active",
+      "price": 1400000.0,
+      "dom": 45.0,
+      "acres": 10.0,
+      "broker": "Halo Realty",
+      "brokerContact": "Barbara Moran",
+      "brokerPhone": "9738964266",
+      "owner": "Bonanno Joseph",
+      "ownerPhone": "2017963223",
+      "zoning": "I-1",
+      "use": null,
+      "lastSaleDate": "2024-10-11",
+      "lastSalePrice": 975000.0,
+      "join": "near"
+    }
   },
   {
     "pin": "0610_574_7.04",
@@ -23825,7 +24439,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 86,
-    "scoreNotes": "base 50; sewer service area +25; acreage in range +5; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; sewer service area +25; acreage in range +5; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 10737094,
+      "status": "active",
+      "price": 650000.0,
+      "dom": 774.0,
+      "acres": 9.81,
+      "broker": "DePalma Realty",
+      "brokerContact": "Larry DePalma",
+      "brokerPhone": "8568255500",
+      "owner": "Fina Dom Llc",
+      "ownerPhone": null,
+      "zoning": "B4",
+      "use": "Commercial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "0614_7101_76",
@@ -23993,7 +24624,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 86,
-    "scoreNotes": "base 50; sewer service area +25; acreage in range +5; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; sewer service area +25; acreage in range +5; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 15965861,
+      "status": "active",
+      "price": null,
+      "dom": 101.0,
+      "acres": 7.31,
+      "broker": "CBRE",
+      "brokerContact": "Jay Miller",
+      "brokerPhone": "6108348000",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "NC",
+      "use": "Health Care, Medical, Restaurant, Retail",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "0802_386_9",
@@ -24413,7 +25061,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 86,
-    "scoreNotes": "base 50; sewer service area +25; acreage in range +5; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; sewer service area +25; acreage in range +5; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 21824097,
+      "status": "active",
+      "price": 795000.0,
+      "dom": 143.0,
+      "acres": 7.9,
+      "broker": "L.C. Realty",
+      "brokerContact": "Linda Cinelli CCIM, CEA",
+      "brokerPhone": "9087225661",
+      "owner": "Bharat Patel",
+      "ownerPhone": "7325723079",
+      "zoning": "C",
+      "use": "Commercial, Self-Storage",
+      "lastSaleDate": "2022-04-06",
+      "lastSalePrice": 401000.0,
+      "join": "near"
+    }
   },
   {
     "pin": "0811_13801_27",
@@ -24973,7 +25638,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 86,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 1% 0; acreage in range +5; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 1% 0; acreage in range +5; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 14625095,
+      "status": "active",
+      "price": null,
+      "dom": 256.0,
+      "acres": 16.0,
+      "broker": "Active Acquisitions",
+      "brokerContact": "Seth Gerszberg",
+      "brokerPhone": "8483330880",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "3A",
+      "use": "Commercial, Distribution, Food Processing, Hold for Development, Hold for Investment, Industrial, R&D, Warehouse",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "1321_233_1.01",
@@ -25981,7 +26663,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 85,
-    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; acreage in range +5",
+    "listing": {
+      "id": 12286089,
+      "status": "active",
+      "price": 475000.0,
+      "dom": 1856.0,
+      "acres": 7.36,
+      "broker": "Parkshore Development Corp",
+      "brokerContact": "Richard Steinberg",
+      "brokerPhone": "6099261000",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "O-P",
+      "use": "Office Park",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "0108_1702_92",
@@ -26317,7 +27016,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 85,
-    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; acreage in range +5",
+    "listing": {
+      "id": 10667137,
+      "status": "active",
+      "price": 2450000.0,
+      "dom": 639.0,
+      "acres": 6.3,
+      "broker": "Coastline Real Estate Dev",
+      "brokerContact": "Michael Guterman",
+      "brokerPhone": "6092666220",
+      "owner": "Coastline Real Estate Dev",
+      "ownerPhone": "6092666220",
+      "zoning": "Highway Commercial",
+      "use": "Apartment Units - Condo, Apartment Units - Senior, Auto Dealership, Bank, Car Wash, Commercial, Drug Store, Fast Food, Hotel, Medical, Office Park, Restaurant, Retail, Retail Warehouse, Strip Center, Warehouse",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "0112_1317_18",
@@ -26401,7 +27117,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 85,
-    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; acreage in range +5",
+    "listing": {
+      "id": 10540904,
+      "status": "active",
+      "price": null,
+      "dom": 499.0,
+      "acres": 43.76,
+      "broker": "Colliers",
+      "brokerContact": "Tony DiDio",
+      "brokerPhone": "8563164138",
+      "owner": "Heil Edward F Jr",
+      "ownerPhone": null,
+      "zoning": "DC",
+      "use": "Commercial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "0113_4009_6",
@@ -26933,7 +27666,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 85,
-    "scoreNotes": "base 50; sewer service area +25; 10–40 ac +10"
+    "scoreNotes": "base 50; sewer service area +25; 10–40 ac +10",
+    "listing": {
+      "id": 9077215,
+      "status": "active",
+      "price": 3500000.0,
+      "dom": 512.0,
+      "acres": 18.67,
+      "broker": "Cushman & Wakefield of New Jersey, LLC.",
+      "brokerContact": "Andrew Roberts",
+      "brokerPhone": "7326234700",
+      "owner": "Vincenco Buffolino Antonio Iadevaia",
+      "ownerPhone": null,
+      "zoning": "C2",
+      "use": "Agricultural, Bank, Commercial, Fast Food, Hold for Development, Hotel, Mixed Use, Parking Lot, Restaurant, Retail, Storefrnt Retail/Residntl",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "0320_3109_1",
@@ -27493,7 +28243,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 85,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 7% -3; 10–40 ac +10; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 7% -3; 10–40 ac +10; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 8061241,
+      "status": "active",
+      "price": 1750000.0,
+      "dom": 5541.0,
+      "acres": 20.0,
+      "broker": "Century 21 Reilly Realtors",
+      "brokerContact": "Charles Maimone",
+      "brokerPhone": "8567671776",
+      "owner": "Meisenzahl Partners Llc",
+      "ownerPhone": null,
+      "zoning": "PHB",
+      "use": "Commercial, Retail",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "0415_10801_12",
@@ -27773,7 +28540,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 85,
-    "scoreNotes": "base 50; sewer service area +25; 10–40 ac +10"
+    "scoreNotes": "base 50; sewer service area +25; 10–40 ac +10",
+    "listing": {
+      "id": 17006964,
+      "status": "active",
+      "price": null,
+      "dom": 429.0,
+      "acres": 10.13,
+      "broker": "NAI Mertz",
+      "brokerContact": "John Adderly",
+      "brokerPhone": "8563351080",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "MB",
+      "use": "Health Care, Retail",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "0434_229.24_27",
@@ -27829,7 +28613,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 85,
-    "scoreNotes": "base 50; sewer service area +25; 10–40 ac +10"
+    "scoreNotes": "base 50; sewer service area +25; 10–40 ac +10",
+    "listing": {
+      "id": 21050002,
+      "status": "active",
+      "price": null,
+      "dom": 409.0,
+      "acres": 14.42,
+      "broker": "Carlyle Management Company",
+      "brokerContact": "Gerry Simon",
+      "brokerPhone": "9142320795",
+      "owner": "CLOSE REALTY LLC",
+      "ownerPhone": null,
+      "zoning": "MB",
+      "use": null,
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "0436_2204_12",
@@ -27857,7 +28658,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 85,
-    "scoreNotes": "base 50; sewer service area +25; 10–40 ac +10"
+    "scoreNotes": "base 50; sewer service area +25; 10–40 ac +10",
+    "listing": {
+      "id": 10953900,
+      "status": "off-market",
+      "price": 795000.0,
+      "dom": 2820.0,
+      "acres": 11.06,
+      "broker": "Tri-State Business Service, Inc",
+      "brokerContact": "Mike Miller",
+      "brokerPhone": "6098592829",
+      "owner": "Eil Investments Lp",
+      "ownerPhone": null,
+      "zoning": "MC",
+      "use": "Neighborhood Center",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "0436_3003_18.01",
@@ -27913,7 +28731,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 85,
-    "scoreNotes": "base 50; sewer service area +25; 10–40 ac +10"
+    "scoreNotes": "base 50; sewer service area +25; 10–40 ac +10",
+    "listing": {
+      "id": 12332232,
+      "status": "active",
+      "price": null,
+      "dom": 171.0,
+      "acres": 7.0,
+      "broker": "BDS Commercial Inc",
+      "brokerContact": "Lisa Silveri",
+      "brokerPhone": "2157328000",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "C",
+      "use": "Commercial, Medical, Retail",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "0506_1434_20",
@@ -29621,7 +30456,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 85,
-    "scoreNotes": "base 50; sewer service area +25; 10–40 ac +10"
+    "scoreNotes": "base 50; sewer service area +25; 10–40 ac +10",
+    "listing": {
+      "id": 12876871,
+      "status": "active",
+      "price": null,
+      "dom": 702.0,
+      "acres": 16.000137,
+      "broker": "JLL",
+      "brokerContact": "Dean Brody",
+      "brokerPhone": "2015284410",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "ios warehouse",
+      "use": "Industrial, Truck Terminal",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "0906_30306_13",
@@ -32365,7 +33217,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 85,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 14% -6; 10–40 ac +10; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 14% -6; 10–40 ac +10; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 22060342,
+      "status": "active",
+      "price": 11500000.0,
+      "dom": 64.0,
+      "acres": 48.43,
+      "broker": "ARC Real Estate",
+      "brokerContact": "Sean Mulligan",
+      "brokerPhone": "6097314265",
+      "owner": "Anthony Mauriello",
+      "ownerPhone": "3472583840",
+      "zoning": "ARE2",
+      "use": "Agribusiness, Agricultural, Apartment Units, Apartment Units - Condo, Hospitality, Mixed Use, MultiFamily, Neighborhood Center, Pasture/Ranch, Religious Facility, Restaurant, Schools, Single Family Development",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "1321_71_21",
@@ -34773,7 +35642,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 85,
-    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; Pinelands Regional Growth Area +5; acreage in range +5",
+    "listing": {
+      "id": 5442909,
+      "status": "active",
+      "price": 1300000.0,
+      "dom": 140.0,
+      "acres": 9.3,
+      "broker": "Legacy Commercial Realty, LLC",
+      "brokerContact": "Matt Miller",
+      "brokerPhone": "7323336380",
+      "owner": "Sciano Brothers",
+      "ownerPhone": null,
+      "zoning": "GB",
+      "use": "Bank, Bowling Alley, Car Wash, Community Center, Day Care Center, Fast Food, Medical, Mixed Use, Neighborhood Center, Office, Restaurant, Retail, Self-Storage, Storefrnt Retail/Residntl, Storefront, Storefront Retail/Office, Strip Center",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "1519_102_2",
@@ -34829,7 +35715,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 85,
-    "scoreNotes": "base 50; sewer service area +25; Pinelands Pinelands Town +5; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; Pinelands Pinelands Town +5; acreage in range +5",
+    "listing": {
+      "id": 7124982,
+      "status": "active",
+      "price": 3800000.0,
+      "dom": 2017.0,
+      "acres": 8.28,
+      "broker": "Gillen Realty Inc",
+      "brokerContact": "Timothy Gillen",
+      "brokerPhone": "7322409600",
+      "owner": "Tmr Enterprises Llc",
+      "ownerPhone": null,
+      "zoning": "CB",
+      "use": "Drug Store, Health Care, Hospital, Hospitality, Medical, Mixed Use, Office, Restaurant, Retail",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "1519_38_6",
@@ -37433,7 +38336,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 83,
-    "scoreNotes": "base 50; sewer service area +25; acreage in range +5; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; sewer service area +25; acreage in range +5; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 5563592,
+      "status": "active",
+      "price": 1450000.0,
+      "dom": 84.0,
+      "acres": 14.0,
+      "broker": "Berkshire Fox & Roach Realtors - Northfield",
+      "brokerContact": "Richard Baehrle",
+      "brokerPhone": "6096410011",
+      "owner": "Hio Llc",
+      "ownerPhone": null,
+      "zoning": "RI/R2",
+      "use": "Commercial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "0108_6714_1.01",
@@ -38609,7 +39529,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 83,
-    "scoreNotes": "base 50; sewer service area +25; acreage in range +5; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; sewer service area +25; acreage in range +5; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 9355292,
+      "status": "active",
+      "price": 650000.0,
+      "dom": 4.0,
+      "acres": 6.48,
+      "broker": "Century 21 Reilly Realtors",
+      "brokerContact": "Charles Maimone",
+      "brokerPhone": "8567671776",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "LBD",
+      "use": "Retail",
+      "lastSaleDate": "2021-11-03",
+      "lastSalePrice": 260000.0,
+      "join": "geo"
+    }
   },
   {
     "pin": "0434_206_6",
@@ -38749,7 +39686,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 83,
-    "scoreNotes": "base 50; sewer service area +25; acreage in range +5; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; sewer service area +25; acreage in range +5; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 21021377,
+      "status": "active",
+      "price": 899000.0,
+      "dom": 191.0,
+      "acres": 6.88,
+      "broker": "Cape Islands Realty, LLC",
+      "brokerContact": "Joseph Rullo",
+      "brokerPhone": "6098279908",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "SR",
+      "use": "Commercial, Mixed Use",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "0506_166_44",
@@ -39085,7 +40039,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 83,
-    "scoreNotes": "base 50; sewer service area +25; acreage in range +5; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; sewer service area +25; acreage in range +5; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 15604218,
+      "status": "active",
+      "price": 1700000.0,
+      "dom": 1153.0,
+      "acres": 7.52,
+      "broker": "Frank Marghella",
+      "brokerContact": "Frank Marghella",
+      "brokerPhone": "6096854473",
+      "owner": "Frank Marghella",
+      "ownerPhone": "8566924659",
+      "zoning": "B3",
+      "use": "Commercial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "0614_1801_76",
@@ -39841,7 +40812,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 83,
-    "scoreNotes": "base 50; sewer service area +25; acreage in range +5; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; sewer service area +25; acreage in range +5; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 12825459,
+      "status": "off-market",
+      "price": 625000.0,
+      "dom": 1465.0,
+      "acres": 9.44,
+      "broker": "Nancy Kowalik Real Estate Group",
+      "brokerContact": "Nancy Kowalik",
+      "brokerPhone": "8564786562",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "R1",
+      "use": "Single Family Residence",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "0810_16_3",
@@ -40009,7 +40997,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 83,
-    "scoreNotes": "base 50; sewer service area +25; acreage in range +5; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; sewer service area +25; acreage in range +5; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 6315617,
+      "status": "active",
+      "price": 4500000.0,
+      "dom": 15.0,
+      "acres": 8.97,
+      "broker": "RE/MAX Preferred Commercial Division",
+      "brokerContact": "Bryant Lafferty",
+      "brokerPhone": "8562915880",
+      "owner": "W. Hargrove Demolition",
+      "ownerPhone": "8562251100",
+      "zoning": "Commercial",
+      "use": "Commercial, Retail, Strip Center",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "0811_201_10",
@@ -40065,7 +41070,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 83,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 12% -5; 10–40 ac +10; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 12% -5; 10–40 ac +10; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 21867000,
+      "status": "active",
+      "price": null,
+      "dom": 128.0,
+      "acres": 24.71,
+      "broker": "Retail Sites, LLC",
+      "brokerContact": "Tyler Arsenault",
+      "brokerPhone": "8567784900",
+      "owner": "Retail Sites, LLC",
+      "ownerPhone": "8567784900",
+      "zoning": null,
+      "use": "Medical, Mixed Use, Retail, Service Station, Storefrnt Retail/Residntl",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "0818_18.06_4_QFARM",
@@ -41045,7 +42067,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 83,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 1% 0; acreage in range +5; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 1% 0; acreage in range +5; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 7976342,
+      "status": "active",
+      "price": 3500000.0,
+      "dom": 63.0,
+      "acres": 10.0,
+      "broker": "The Kislak Company, Inc.",
+      "brokerContact": "Matt Weilheimer",
+      "brokerPhone": "9085960700",
+      "owner": "James P. Meeks",
+      "ownerPhone": "7036258585",
+      "zoning": "OP",
+      "use": "Commercial, Retail",
+      "lastSaleDate": "2024-06-05",
+      "lastSalePrice": 1284445.0,
+      "join": "near"
+    }
   },
   {
     "pin": "1221_86_34.04",
@@ -41073,7 +42112,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 83,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 21% -8; 10–40 ac +10; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 21% -8; 10–40 ac +10; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 9707230,
+      "status": "active",
+      "price": 1450000.0,
+      "dom": 4060.0,
+      "acres": 14.7,
+      "broker": "JLL",
+      "brokerContact": "Thomas Romano",
+      "brokerPhone": "6096581589",
+      "owner": "Ely Thomas J",
+      "ownerPhone": "2018914750",
+      "zoning": "OP",
+      "use": "Bank, Commercial, Day Care Center, Health Care, Health Club, Medical, Office, R&D",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "1221_88_14.03",
@@ -41969,7 +43025,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 83,
-    "scoreNotes": "base 50; sewer service area +25; acreage in range +5; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; sewer service area +25; acreage in range +5; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 12660370,
+      "status": "active",
+      "price": null,
+      "dom": 1157.0,
+      "acres": 8.310009,
+      "broker": "MSC",
+      "brokerContact": "Jon Kieserman",
+      "brokerPhone": "2154074200",
+      "owner": "Brandon Real Estate Development Co LLC",
+      "ownerPhone": null,
+      "zoning": "REO3",
+      "use": "Auto Repair, Medical, Office",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "1813_4071_1",
@@ -43733,7 +44806,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 81,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 11% -4; 10–40 ac +10"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 11% -4; 10–40 ac +10",
+    "listing": {
+      "id": 9204533,
+      "status": "active",
+      "price": null,
+      "dom": 4714.0,
+      "acres": 12.77,
+      "broker": "Monarch Realty Corp",
+      "brokerContact": "Charles  'Chip' Philibosian",
+      "brokerPhone": "2015692323",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "B3 & R12",
+      "use": "Commercial, Retail, Single Family Residence",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "0310_117.01_3",
@@ -44097,7 +45187,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 81,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 10% -4; 10–40 ac +10"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 10% -4; 10–40 ac +10",
+    "listing": {
+      "id": 9541232,
+      "status": "active",
+      "price": null,
+      "dom": 71.0,
+      "acres": 11.97,
+      "broker": "Wolf Commercial Real Estate L.L.C.",
+      "brokerContact": "Michael Scanzano",
+      "brokerPhone": "8564656637",
+      "owner": "DiAntonio & Bongiovanni Builders",
+      "ownerPhone": "2158529287",
+      "zoning": "R4",
+      "use": "Commercial",
+      "lastSaleDate": "2024-12-01",
+      "lastSalePrice": 785000.0,
+      "join": "near"
+    }
   },
   {
     "pin": "0818_17_1",
@@ -45833,7 +46940,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 80,
-    "scoreNotes": "base 50; sewer service area +25; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; acreage in range +5",
+    "listing": {
+      "id": 12735374,
+      "status": "active",
+      "price": 1200000.0,
+      "dom": 366.0,
+      "acres": 4.5,
+      "broker": "NAI Mertz",
+      "brokerContact": "Joseph Riggs",
+      "brokerPhone": "6093521162",
+      "owner": "Benjamin Banneker Preparatory Charter Sc",
+      "ownerPhone": null,
+      "zoning": "R12",
+      "use": "Office",
+      "lastSaleDate": "2022-07-29",
+      "lastSalePrice": 715000.0,
+      "join": "near"
+    }
   },
   {
     "pin": "0306_114.02_14.02",
@@ -47009,7 +48133,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 80,
-    "scoreNotes": "base 50; sewer service area +25; FEMA SFHA -15; 10–40 ac +10; <$5k/ac assessed +10"
+    "scoreNotes": "base 50; sewer service area +25; FEMA SFHA -15; 10–40 ac +10; <$5k/ac assessed +10",
+    "listing": {
+      "id": 20940088,
+      "status": "active",
+      "price": null,
+      "dom": 492.0,
+      "acres": 14.99,
+      "broker": "Binswanger",
+      "brokerContact": "Michael Torsiello",
+      "brokerPhone": "2154486210",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "ID",
+      "use": "Industrial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "0324_305.02_201",
@@ -47569,7 +48710,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 80,
-    "scoreNotes": "base 50; sewer service area +25; 0.2% flood zone -5; 10–40 ac +10"
+    "scoreNotes": "base 50; sewer service area +25; 0.2% flood zone -5; 10–40 ac +10",
+    "listing": {
+      "id": 19284744,
+      "status": "active",
+      "price": null,
+      "dom": 947.0,
+      "acres": 10.0,
+      "broker": "CBRE",
+      "brokerContact": "Adam Kohler",
+      "brokerPhone": "4845672460",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": null,
+      "use": "Commercial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "0413_7.04_16.10",
@@ -47737,7 +48895,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 80,
-    "scoreNotes": "base 50; sewer service area +25; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; acreage in range +5",
+    "listing": {
+      "id": 21058317,
+      "status": "active",
+      "price": 3500000.0,
+      "dom": 421.0,
+      "acres": 5.47,
+      "broker": "J.C. BAR Properties, Inc.",
+      "brokerContact": "Greg Jones",
+      "brokerPhone": "6102346491",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "NC",
+      "use": null,
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "0415_13105_1",
@@ -48017,7 +49192,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 80,
-    "scoreNotes": "base 50; sewer service area +25; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; acreage in range +5",
+    "listing": {
+      "id": 4730560,
+      "status": "active",
+      "price": 1195000.0,
+      "dom": 4400.0,
+      "acres": 8.12,
+      "broker": "Wolf Commercial Real Estate L.L.C.",
+      "brokerContact": "Jason Wolf",
+      "brokerPhone": "8568576300",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "RHB, Voorhees Twp",
+      "use": "Office",
+      "lastSaleDate": "2005-09-22",
+      "lastSalePrice": 600000.0,
+      "join": "pin"
+    }
   },
   {
     "pin": "0436_2102.01_24",
@@ -48045,7 +49237,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 80,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 14% -6; acreage in range +5; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 14% -6; acreage in range +5; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 21594544,
+      "status": "off-market",
+      "price": 325000.0,
+      "dom": 233.0,
+      "acres": 8.1,
+      "broker": "Vantage Real Estate Services",
+      "brokerContact": "Leor Hemo",
+      "brokerPhone": "8567971919",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "RH",
+      "use": "Agricultural, Single Family Residence",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "0436_502_2",
@@ -49697,7 +50906,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 80,
-    "scoreNotes": "base 50; sewer service area +25; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; acreage in range +5",
+    "listing": {
+      "id": 741196,
+      "status": "active",
+      "price": null,
+      "dom": 1157.0,
+      "acres": 10.0,
+      "broker": "Binswanger",
+      "brokerContact": "Michael Torsiello",
+      "brokerPhone": "2154486210",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "HB",
+      "use": "Mixed Use",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "0802_1.02_1",
@@ -49921,7 +51147,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 80,
-    "scoreNotes": "base 50; sewer service area +25; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; acreage in range +5",
+    "listing": {
+      "id": 22020492,
+      "status": "active",
+      "price": null,
+      "dom": 79.0,
+      "acres": 8.821412,
+      "broker": "KBC Advisors",
+      "brokerContact": "Summer Coulter",
+      "brokerPhone": "9096364777",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "LI2",
+      "use": "Industrial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "0803_1103.02_1",
@@ -50257,7 +51500,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 80,
-    "scoreNotes": "base 50; sewer service area +25; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; acreage in range +5",
+    "listing": {
+      "id": 7421183,
+      "status": "active",
+      "price": null,
+      "dom": 2093.0,
+      "acres": 3.04,
+      "broker": null,
+      "brokerContact": null,
+      "brokerPhone": null,
+      "owner": "Woodland Four Llc",
+      "ownerPhone": null,
+      "zoning": "C-55",
+      "use": "Industrial, Office, Retail, Warehouse",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "0808_57.10_1.01",
@@ -50369,7 +51629,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 80,
-    "scoreNotes": "base 50; sewer service area +25; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; acreage in range +5",
+    "listing": {
+      "id": 899089,
+      "status": "active",
+      "price": null,
+      "dom": 190.0,
+      "acres": 10.0,
+      "broker": "CBRE",
+      "brokerContact": "Connor Cunningham",
+      "brokerPhone": "2155618900",
+      "owner": "Dominick Caruso III",
+      "ownerPhone": "9085813810",
+      "zoning": "HC",
+      "use": "Retail",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "0810_249_4",
@@ -50621,7 +51898,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 80,
-    "scoreNotes": "base 50; sewer service area +25; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; acreage in range +5",
+    "listing": {
+      "id": 4167181,
+      "status": "active",
+      "price": null,
+      "dom": 92.0,
+      "acres": 8.0,
+      "broker": "Moriah Commercial Realty, LLC",
+      "brokerContact": "David Gutterman",
+      "brokerPhone": "8563613977",
+      "owner": "Mo Greens Self Storage LLC",
+      "ownerPhone": null,
+      "zoning": "RA",
+      "use": "Commercial, Self-Storage",
+      "lastSaleDate": "2024-09-18",
+      "lastSalePrice": 1200000.0,
+      "join": "near"
+    }
   },
   {
     "pin": "0811_14801.03_40",
@@ -50677,7 +51971,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 80,
-    "scoreNotes": "base 50; sewer service area +25; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; acreage in range +5",
+    "listing": {
+      "id": 6295401,
+      "status": "active",
+      "price": null,
+      "dom": 269.0,
+      "acres": 7.72,
+      "broker": "KW Commercial",
+      "brokerContact": "Tom Duffy",
+      "brokerPhone": "8562183313",
+      "owner": "Ander Mark & Carol",
+      "ownerPhone": null,
+      "zoning": "CC",
+      "use": null,
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "0811_8001_10",
@@ -52749,7 +54060,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 80,
-    "scoreNotes": "base 50; sewer service area +25; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; acreage in range +5",
+    "listing": {
+      "id": 10024945,
+      "status": "active",
+      "price": null,
+      "dom": 339.0,
+      "acres": 4.9,
+      "broker": null,
+      "brokerContact": null,
+      "brokerPhone": null,
+      "owner": "J. Supor & Son",
+      "ownerPhone": "2012991100",
+      "zoning": "LTI",
+      "use": "Industrial, Parking Lot",
+      "lastSaleDate": "2021-01-11",
+      "lastSalePrice": 3000000.0,
+      "join": "near"
+    }
   },
   {
     "pin": "0908_127_1.02",
@@ -53813,7 +55141,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 80,
-    "scoreNotes": "base 50; sewer service area +25; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; acreage in range +5",
+    "listing": {
+      "id": 20268686,
+      "status": "active",
+      "price": 2500000.0,
+      "dom": 703.0,
+      "acres": 5.38,
+      "broker": "Sitar Company",
+      "brokerContact": "William Sitar, Jr",
+      "brokerPhone": "7326232155",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "REO-5",
+      "use": "R&D",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "1103_2167_3",
@@ -53897,7 +55242,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 80,
-    "scoreNotes": "base 50; sewer service area +25; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; acreage in range +5",
+    "listing": {
+      "id": 13834748,
+      "status": "off-market",
+      "price": null,
+      "dom": 763.0,
+      "acres": 6.36,
+      "broker": "Lee & Associates Central Florida",
+      "brokerContact": "Chris Griffith",
+      "brokerPhone": "3212818508",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "Commercial",
+      "use": "Commercial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "1103_2613_4.03",
@@ -56921,7 +58283,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 80,
-    "scoreNotes": "base 50; sewer service area +25; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; acreage in range +5",
+    "listing": {
+      "id": 10953077,
+      "status": "off-market",
+      "price": null,
+      "dom": 2821.0,
+      "acres": 5.09,
+      "broker": "NAI DiLeo-Bram & Co.",
+      "brokerContact": "Marc Shein",
+      "brokerPhone": "7329853000",
+      "owner": "Sunoco Part Mrtg",
+      "ownerPhone": null,
+      "zoning": "GB",
+      "use": "Retail",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "1217_7911_1",
@@ -59777,7 +61156,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 80,
-    "scoreNotes": "base 50; sewer service area +25; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; acreage in range +5",
+    "listing": {
+      "id": 21445464,
+      "status": "active",
+      "price": null,
+      "dom": 302.0,
+      "acres": 8.1,
+      "broker": "One Real Estate",
+      "brokerContact": "Chaya Klein",
+      "brokerPhone": "7326639898",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": null,
+      "use": null,
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "1508_170_22",
@@ -59833,7 +61229,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 80,
-    "scoreNotes": "base 50; sewer service area +25; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; acreage in range +5",
+    "listing": {
+      "id": 22217464,
+      "status": "active",
+      "price": 4000000.0,
+      "dom": 30.0,
+      "acres": 6.0,
+      "broker": "Crossroads Realty Inc.",
+      "brokerContact": "Mark Kotzas",
+      "brokerPhone": "7322444900",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "LI",
+      "use": "Mixed Use",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "1508_192.17_1",
@@ -60113,7 +61526,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 80,
-    "scoreNotes": "base 50; sewer service area +25; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; acreage in range +5",
+    "listing": {
+      "id": 22152757,
+      "status": "active",
+      "price": null,
+      "dom": 45.0,
+      "acres": 4.8,
+      "broker": "R.J. Brunelli & Co., LLC.",
+      "brokerContact": "Peter Nicholson",
+      "brokerPhone": "7327215800",
+      "owner": "COUNTY OF OCEAN",
+      "ownerPhone": null,
+      "zoning": "RC",
+      "use": "Retail",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "1508_605_421.01",
@@ -60197,7 +61627,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 80,
-    "scoreNotes": "base 50; sewer service area +25; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; acreage in range +5",
+    "listing": {
+      "id": 21940987,
+      "status": "active",
+      "price": 16500000.0,
+      "dom": 101.0,
+      "acres": 3.8,
+      "broker": null,
+      "brokerContact": null,
+      "brokerPhone": null,
+      "owner": "A A TRUCK PARTS INC",
+      "ownerPhone": null,
+      "zoning": "NC",
+      "use": "Commercial, MultiFamily, Retail",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "1512_13501_2",
@@ -60673,7 +62120,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 80,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 1% 0; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 1% 0; acreage in range +5",
+    "listing": {
+      "id": 20833637,
+      "status": "active",
+      "price": null,
+      "dom": 609.0,
+      "acres": 1.0,
+      "broker": "Surge Spaces",
+      "brokerContact": "Zev Spira",
+      "brokerPhone": "7323759558",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "commercial",
+      "use": "Industrial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "1512_2603_29",
@@ -60841,7 +62305,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 80,
-    "scoreNotes": "base 50; sewer service area +25; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; acreage in range +5",
+    "listing": {
+      "id": 9579483,
+      "status": "active",
+      "price": 16500000.0,
+      "dom": 101.0,
+      "acres": 9.1,
+      "broker": null,
+      "brokerContact": null,
+      "brokerPhone": null,
+      "owner": "A & A TRUCK PARTS INC",
+      "ownerPhone": null,
+      "zoning": "NC",
+      "use": "Commercial, MultiFamily, Retail",
+      "lastSaleDate": "2016-04-08",
+      "lastSalePrice": 153000.0,
+      "join": "pin"
+    }
   },
   {
     "pin": "1513_165.01_1",
@@ -61065,7 +62546,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 80,
-    "scoreNotes": "base 50; sewer service area +25; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; acreage in range +5",
+    "listing": {
+      "id": 20838497,
+      "status": "active",
+      "price": null,
+      "dom": 604.0,
+      "acres": 3.38,
+      "broker": "Kassin Sabbagh Realty (KSR)",
+      "brokerContact": "Jack Zalta",
+      "brokerPhone": "3472569281",
+      "owner": "1950 RUTGERS BLVD LLC",
+      "ownerPhone": null,
+      "zoning": "M1",
+      "use": "Commercial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "1515_251.03_20",
@@ -62493,7 +63991,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 80,
-    "scoreNotes": "base 50; sewer service area +25; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; acreage in range +5",
+    "listing": {
+      "id": 12824577,
+      "status": "active",
+      "price": 1800000.0,
+      "dom": 1466.0,
+      "acres": 5.79,
+      "broker": "CBRE",
+      "brokerContact": "Samuel Bernhaut",
+      "brokerPhone": "2017125884",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "I-1",
+      "use": null,
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "1810_151_12.38",
@@ -64117,7 +65632,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 79,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 22% -9; 10–40 ac +10; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 22% -9; 10–40 ac +10; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 21027206,
+      "status": "active",
+      "price": 2000000.0,
+      "dom": 448.0,
+      "acres": 10.0,
+      "broker": "Atlas Real Estate",
+      "brokerContact": "Nick Fiocchi",
+      "brokerPhone": "8563691000",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "B4",
+      "use": null,
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "0614_7004_12.01",
@@ -64145,7 +65677,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 79,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 15% -6; 10–40 ac +10"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 15% -6; 10–40 ac +10",
+    "listing": {
+      "id": 12605545,
+      "status": "active",
+      "price": 925000.0,
+      "dom": 171.0,
+      "acres": 9.0,
+      "broker": "eXp Realty",
+      "brokerContact": "Carlo Drogo",
+      "brokerPhone": "8662016210",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "I-B",
+      "use": "Industrial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "0802_3_2",
@@ -65069,7 +66618,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 79,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 14% -6; 10–40 ac +10"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 14% -6; 10–40 ac +10",
+    "listing": {
+      "id": 11459096,
+      "status": "active",
+      "price": null,
+      "dom": 1312.0,
+      "acres": 17.08,
+      "broker": "Curran Commercial",
+      "brokerContact": "Ryan Curran",
+      "brokerPhone": "7323593203",
+      "owner": "Atlantic City Electric Company",
+      "ownerPhone": null,
+      "zoning": "General Commercial",
+      "use": "Commercial, Industrial, Parking Lot, Retail, Service Station, Truck Stop, Truck Terminal, Warehouse",
+      "lastSaleDate": "2024-12-17",
+      "lastSalePrice": 999999.0,
+      "join": "geo"
+    }
   },
   {
     "pin": "1709_601_6_QFARM",
@@ -65657,7 +67223,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 78,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 13% -5; acreage in range +5; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 13% -5; acreage in range +5; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 7892896,
+      "status": "active",
+      "price": null,
+      "dom": 263.0,
+      "acres": 9.0,
+      "broker": "Wolf Commercial Real Estate L.L.C.",
+      "brokerContact": "Michael Scanzano",
+      "brokerPhone": "8564656637",
+      "owner": "Sandberg Harry A & Marie R",
+      "ownerPhone": null,
+      "zoning": "NC",
+      "use": "Commercial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "0415_18801_41",
@@ -65993,7 +67576,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 78,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 42% -17; 10–40 ac +10; <$5k/ac assessed +10"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 42% -17; 10–40 ac +10; <$5k/ac assessed +10",
+    "listing": {
+      "id": 10656441,
+      "status": "active",
+      "price": 900000.0,
+      "dom": 94.0,
+      "acres": 21.87,
+      "broker": "United Real Estate",
+      "brokerContact": "Ratanjot Rahil",
+      "brokerPhone": "8568707779",
+      "owner": "Jasvir Kour",
+      "ownerPhone": null,
+      "zoning": "LM",
+      "use": "Industrial",
+      "lastSaleDate": "2023-08-02",
+      "lastSalePrice": 600000.0,
+      "join": "pin"
+    }
   },
   {
     "pin": "0806_426_38",
@@ -67309,7 +68909,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 78,
-    "scoreNotes": "base 50; sewer service area +25; Highlands Planning -10; 10–40 ac +10; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; sewer service area +25; Highlands Planning -10; 10–40 ac +10; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 20965021,
+      "status": "active",
+      "price": null,
+      "dom": 498.0,
+      "acres": 8.9,
+      "broker": "Sabre Real Estate Group LLC",
+      "brokerContact": "Etan Tammam",
+      "brokerPhone": "2012498911",
+      "owner": "Owen Properties LLC",
+      "ownerPhone": null,
+      "zoning": null,
+      "use": null,
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "2123_51_1",
@@ -68065,7 +69682,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 77,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 34% -14; Pinelands Regional Growth Area +5; acreage in range +5; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 34% -14; Pinelands Regional Growth Area +5; acreage in range +5; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 10363973,
+      "status": "active",
+      "price": 295000.0,
+      "dom": 1344.0,
+      "acres": 3.45,
+      "broker": "Century 21 Reilly Realtors",
+      "brokerContact": "Charles Maimone",
+      "brokerPhone": "8567671776",
+      "owner": "Eao Inc",
+      "ownerPhone": null,
+      "zoning": "PC2",
+      "use": "Commercial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "0504_251_22",
@@ -68261,7 +69895,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 77,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 36% -14; 10–40 ac +10; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 36% -14; 10–40 ac +10; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 21826736,
+      "status": "off-market",
+      "price": 199000.0,
+      "dom": 142.0,
+      "acres": 10.0,
+      "broker": "Warner Real Estate & Auction Co, Inc.",
+      "brokerContact": "Richard Warner",
+      "brokerPhone": "8567694111",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "RR-C",
+      "use": "Single Family Development, Single Family Residence",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "0806_33_8",
@@ -68401,7 +70052,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 77,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 20% -8; 10–40 ac +10"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 20% -8; 10–40 ac +10",
+    "listing": {
+      "id": 21532890,
+      "status": "active",
+      "price": null,
+      "dom": 262.0,
+      "acres": 29.16,
+      "broker": "Cushman & Wakefield",
+      "brokerContact": "John Gartland",
+      "brokerPhone": "2014920553",
+      "owner": "NVR Mortgage",
+      "ownerPhone": "8563339655",
+      "zoning": "CC",
+      "use": "Industrial",
+      "lastSaleDate": "2026-03-16",
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "0818_7_6",
@@ -70977,7 +72645,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 76,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 9% -4; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 9% -4; acreage in range +5",
+    "listing": {
+      "id": 10538120,
+      "status": "active",
+      "price": null,
+      "dom": 241.0,
+      "acres": 6.0,
+      "broker": "Wolf Commercial Real Estate L.L.C.",
+      "brokerContact": "Jason Wolf",
+      "brokerPhone": "8568576300",
+      "owner": "Philip J. Bowers Co.",
+      "ownerPhone": "7327417200",
+      "zoning": "RG-C",
+      "use": "Retail",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "0811_9610_1",
@@ -72349,7 +74034,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 76,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 11% -4; FEMA SFHA -15; 10–40 ac +10; <$5k/ac assessed +10"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 11% -4; FEMA SFHA -15; 10–40 ac +10; <$5k/ac assessed +10",
+    "listing": {
+      "id": 773097,
+      "status": "active",
+      "price": 1850000.0,
+      "dom": 252.0,
+      "acres": 25.34,
+      "broker": "Binswanger",
+      "brokerContact": "Michael Torsiello",
+      "brokerPhone": "2154486210",
+      "owner": "RJH Management",
+      "ownerPhone": "4102875277",
+      "zoning": "M",
+      "use": "Commercial, Industrial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "1710_1_1",
@@ -73077,7 +74779,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 75,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 12% -5; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 12% -5; acreage in range +5",
+    "listing": {
+      "id": 11121526,
+      "status": "active",
+      "price": null,
+      "dom": 36.0,
+      "acres": 20.0,
+      "broker": "Metro Commercial Real Estate, Inc.",
+      "brokerContact": "Luc Champagne",
+      "brokerPhone": "8608331070",
+      "owner": "Heston Loren Capital Partners",
+      "ownerPhone": "2259273760",
+      "zoning": "C1",
+      "use": "Commercial, Retail",
+      "lastSaleDate": "2023-04-14",
+      "lastSalePrice": 1275000.0,
+      "join": "geo"
+    }
   },
   {
     "pin": "0306_125_1.05",
@@ -73833,7 +75552,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 75,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 3% -1; Pinelands Rural Development -15; 10–40 ac +10; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 3% -1; Pinelands Rural Development -15; 10–40 ac +10; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 10432197,
+      "status": "off-market",
+      "price": 1000000.0,
+      "dom": 423.0,
+      "acres": 19.81,
+      "broker": "George Buriak",
+      "brokerContact": "George Buriak",
+      "brokerPhone": "8564665462",
+      "owner": "George Buriak",
+      "ownerPhone": "8564665462",
+      "zoning": "RGC",
+      "use": "Commercial, MultiFamily, Office, Retail",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "0811_9902_28",
@@ -73917,7 +75653,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 75,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 20% -8; acreage in range +5; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 20% -8; acreage in range +5; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 21462518,
+      "status": "active",
+      "price": null,
+      "dom": 289.0,
+      "acres": 32.32,
+      "broker": null,
+      "brokerContact": null,
+      "brokerPhone": null,
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "Planned Industrial",
+      "use": "Contractor Storage Yard, Warehouse",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "0820_251_5.01",
@@ -75681,7 +77434,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 75,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 13% -5; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 13% -5; acreage in range +5",
+    "listing": {
+      "id": 21011249,
+      "status": "active",
+      "price": null,
+      "dom": 462.0,
+      "acres": 7.32,
+      "broker": "Lee & Associates Commercial Real Estate Services",
+      "brokerContact": "Mark Fowler",
+      "brokerPhone": "7329962966",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "commerical",
+      "use": "Office, Retail",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "1513_101_1.02",
@@ -77613,7 +79383,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 74,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 23% -9; acreage in range +5; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 23% -9; acreage in range +5; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 5625612,
+      "status": "active",
+      "price": 999000.0,
+      "dom": 1009.0,
+      "acres": 8.6821,
+      "broker": "The Blau & Berg Company",
+      "brokerContact": "Juan Disla",
+      "brokerPhone": "9733796644",
+      "owner": "SVIT Express Inc",
+      "ownerPhone": "2156074592",
+      "zoning": "BC1",
+      "use": "Industrial, Truck Terminal",
+      "lastSaleDate": "2022-05-27",
+      "lastSalePrice": 580000.0,
+      "join": "geo"
+    }
   },
   {
     "pin": "0802_82_4",
@@ -78509,7 +80296,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 74,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 35% -14; 10–40 ac +10; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 35% -14; 10–40 ac +10; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 847847,
+      "status": "active",
+      "price": 3750000.0,
+      "dom": 178.0,
+      "acres": 32.0,
+      "broker": "Legacy Commercial Realty, LLC",
+      "brokerContact": "Matt Miller",
+      "brokerPhone": "7323336380",
+      "owner": "Stillwell Capital, LLC",
+      "ownerPhone": null,
+      "zoning": "Land conservation",
+      "use": "Commercial, Industrial, Self-Storage",
+      "lastSaleDate": "2001-06-04",
+      "lastSalePrice": 440000.0,
+      "join": "pin"
+    }
   },
   {
     "pin": "1349_101.03_4.01",
@@ -80133,7 +81937,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 73,
-    "scoreNotes": "base 50; sewer service area +25; Highlands Planning -10; acreage in range +5; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; sewer service area +25; Highlands Planning -10; acreage in range +5; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 9191756,
+      "status": "active",
+      "price": 5000000.0,
+      "dom": 1134.0,
+      "acres": 15.0,
+      "broker": "Corcoran Sawyer Smith - Flemington",
+      "brokerContact": "Jack Aquila",
+      "brokerPhone": "9087820100",
+      "owner": "Sweet Fish Holdings Llc",
+      "ownerPhone": null,
+      "zoning": "OB1",
+      "use": "Commercial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "1018_2_4.04",
@@ -80189,7 +82010,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 73,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 17% -7; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 17% -7; acreage in range +5",
+    "listing": {
+      "id": 9110975,
+      "status": "active",
+      "price": null,
+      "dom": 186.0,
+      "acres": 4.81,
+      "broker": "Predict Industrial",
+      "brokerContact": "Anthony Rittwager, CCIM, SIOR",
+      "brokerPhone": "6094546262",
+      "owner": "Del-pat Properties Llc",
+      "ownerPhone": null,
+      "zoning": "I-2",
+      "use": "Agricultural, Commercial, Hotel, Industrial, Motel, Office, Public Park, Retail, Truck Terminal, Warehouse",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "1021_36_52",
@@ -86937,7 +88775,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 71,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 43% -17; 10–40 ac +10; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 43% -17; 10–40 ac +10; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 10039659,
+      "status": "active",
+      "price": 3150000.0,
+      "dom": 4346.0,
+      "acres": 41.0,
+      "broker": "Berkshire Hathaway Fox & Roach - Devon-Wayne",
+      "brokerContact": "Winn Thompson",
+      "brokerPhone": "6097379100",
+      "owner": "Kerani Realty Llc",
+      "ownerPhone": null,
+      "zoning": "RR3",
+      "use": null,
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "1224_98.01_1",
@@ -90101,7 +91956,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 70,
-    "scoreNotes": "base 50; sewer service area +25; FEMA SFHA -15; 10–40 ac +10"
+    "scoreNotes": "base 50; sewer service area +25; FEMA SFHA -15; 10–40 ac +10",
+    "listing": {
+      "id": 5054813,
+      "status": "active",
+      "price": 3000000.0,
+      "dom": 253.0,
+      "acres": 21.0465,
+      "broker": "PRE Commercial",
+      "brokerContact": "John Notte Jr",
+      "brokerPhone": "9736905663",
+      "owner": "Vibra Screw Inc.",
+      "ownerPhone": "9732567410",
+      "zoning": "Industrial",
+      "use": "Apartment Units, Industrial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "0714_2438_1",
@@ -90577,7 +92449,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 70,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 40% -16; acreage in range +5; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 40% -16; acreage in range +5; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 19737601,
+      "status": "active",
+      "price": 600000.0,
+      "dom": 431.0,
+      "acres": 9.87,
+      "broker": "David Sharrow",
+      "brokerContact": "David Sharrow",
+      "brokerPhone": "6093527066",
+      "owner": "David Sharrow",
+      "ownerPhone": "6093527066",
+      "zoning": "BP",
+      "use": "Commercial, Industrial, Retail",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "0824_11_23.07",
@@ -93041,7 +94930,25 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 70,
-    "scoreNotes": "base 50; sewer service area +25; flood unmapped -3; Highlands Planning -10; acreage in range +5; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; sewer service area +25; flood unmapped -3; Highlands Planning -10; acreage in range +5; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 21567432,
+      "status": "active",
+      "price": 5700000.0,
+      "dom": 8.0,
+      "acres": 0.6,
+      "broker": "eXp Realty",
+      "brokerContact": "Matthew Clemente",
+      "brokerPhone": "8662016210",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": null,
+      "use": "Retail",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin",
+      "multiParcel": true
+    }
   },
   {
     "pin": "1427_4300_2",
@@ -96597,7 +98504,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 70,
-    "scoreNotes": "base 50; sewer service area +25; Highlands Planning -10; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; Highlands Planning -10; acreage in range +5",
+    "listing": {
+      "id": 12853130,
+      "status": "active",
+      "price": null,
+      "dom": 1456.0,
+      "acres": 7.69,
+      "broker": null,
+      "brokerContact": null,
+      "brokerPhone": null,
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "commercial",
+      "use": "Commercial, Neighborhood Center, Retail",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "0108_7101_5.02",
@@ -96653,7 +98577,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 69,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 3% -1; FEMA SFHA -15; Pinelands Pinelands Town +5; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 3% -1; FEMA SFHA -15; Pinelands Pinelands Town +5; acreage in range +5",
+    "listing": {
+      "id": 9306063,
+      "status": "active",
+      "price": 395000.0,
+      "dom": 30.0,
+      "acres": 20.0,
+      "broker": "Sail Lake Realty",
+      "brokerContact": "Michelle McMaster",
+      "brokerPhone": "6099576090",
+      "owner": "Maple Run Enterprises",
+      "ownerPhone": "6095610111",
+      "zoning": "B-2",
+      "use": "Commercial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "0220_1426_1",
@@ -97521,7 +99462,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 69,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 18% -7; FEMA SFHA -15; Pinelands Regional Growth Area +5; acreage in range +5; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 18% -7; FEMA SFHA -15; Pinelands Regional Growth Area +5; acreage in range +5; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 21150604,
+      "status": "active",
+      "price": 899000.0,
+      "dom": 378.0,
+      "acres": 15.480005,
+      "broker": "Nancy Kowalik Real Estate Group",
+      "brokerContact": "Nancy Kowalik",
+      "brokerPhone": "8564786562",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "RD-C",
+      "use": "Commercial, Single Family Development",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "0818_195_22.03",
@@ -98725,7 +100683,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 68,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 23% -9; flood unmapped -3; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 23% -9; flood unmapped -3; acreage in range +5",
+    "listing": {
+      "id": 20246958,
+      "status": "active",
+      "price": null,
+      "dom": 414.0,
+      "acres": 3.63,
+      "broker": "Subcarrier Communications Inc",
+      "brokerContact": "Lucrecia Escalante",
+      "brokerPhone": "7326072828",
+      "owner": "Subcarrier Communications",
+      "ownerPhone": "7326072828",
+      "zoning": null,
+      "use": null,
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "0108_7101_2",
@@ -99649,7 +101624,24 @@
     "sewer": true,
     "preservedPct": null,
     "score": 68,
-    "scoreNotes": "base 50; sewer service area +25; preserved-land overlap (pct unknown) -20; 10–40 ac +10; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; sewer service area +25; preserved-land overlap (pct unknown) -20; 10–40 ac +10; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 1507851,
+      "status": "off-market",
+      "price": 1950000.0,
+      "dom": 2682.0,
+      "acres": 11.0,
+      "broker": "RE/MAX Preferred Commercial Division",
+      "brokerContact": "Bryant Lafferty",
+      "brokerPhone": "8562915880",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "Commercial",
+      "use": "Bank, Commercial, Day Care Center, Fast Food, Office, Self-Storage, Strip Center, Supermarket",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "0417_64.19_24",
@@ -101609,7 +103601,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 68,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 4% -2; FEMA SFHA -15; Pinelands Regional Growth Area +5; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 4% -2; FEMA SFHA -15; Pinelands Regional Growth Area +5; acreage in range +5",
+    "listing": {
+      "id": 21591581,
+      "status": "active",
+      "price": null,
+      "dom": 234.0,
+      "acres": 5.5,
+      "broker": "One Real Estate",
+      "brokerContact": "Chaya Klein",
+      "brokerPhone": "7326639898",
+      "owner": "Yakov Labkovsky",
+      "ownerPhone": null,
+      "zoning": "I",
+      "use": "Commercial, Office, Warehouse",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "1512_5101_52",
@@ -102057,7 +104066,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 68,
-    "scoreNotes": "base 50; sewer service area +25; FEMA SFHA -15; acreage in range +5; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; sewer service area +25; FEMA SFHA -15; acreage in range +5; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 12812152,
+      "status": "off-market",
+      "price": null,
+      "dom": 1472.0,
+      "acres": 16.0,
+      "broker": "Weichert Commercial Brokerage, Inc.",
+      "brokerContact": "Clayton Brown",
+      "brokerPhone": "9738988664",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "R-R",
+      "use": "Commercial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "1902_87_18.02",
@@ -104941,7 +106967,24 @@
     "sewer": true,
     "preservedPct": null,
     "score": 67,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 9% -4; Pinelands Pinelands Town +5; preserved-land overlap (pct unknown) -20; acreage in range +5; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 9% -4; Pinelands Pinelands Town +5; preserved-land overlap (pct unknown) -20; acreage in range +5; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 8800413,
+      "status": "active",
+      "price": 695000.0,
+      "dom": 526.0,
+      "acres": 3.96,
+      "broker": "RE/MAX Neighborhood Properties",
+      "brokerContact": "Diane Brady",
+      "brokerPhone": "9733343341",
+      "owner": "George Brady",
+      "ownerPhone": "6092961426",
+      "zoning": "B-2",
+      "use": "Apartment Units - Condo, Apartment Units - Senior, Bank, Commercial, Day Care Center, Health Care, Hospitality, Hotel, Industrial, Medical, Mixed Use, Office Park, Open Space, Planned Unit Development, Religious Facility, Restaurant, Retail, Self-Storage, Single Family Development, Storefrnt Retail/Residntl, Storefront Retail/Office, Strip Center, Supermarket",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "1533_49_5",
@@ -105977,7 +108020,24 @@
     "sewer": false,
     "preservedPct": 0,
     "score": 66,
-    "scoreNotes": "base 50; 10–40 ac +10; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; 10–40 ac +10; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 8109069,
+      "status": "active",
+      "price": 400000.0,
+      "dom": 78.0,
+      "acres": 10.48,
+      "broker": "Natt Express INC",
+      "brokerContact": "Jagroop Singh",
+      "brokerPhone": "6099752039",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "B",
+      "use": "Commercial",
+      "lastSaleDate": "2024-11-01",
+      "lastSalePrice": 210000.0,
+      "join": "pin"
+    }
   },
   {
     "pin": "0603_60_4",
@@ -107069,7 +109129,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 66,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 24% -10; Pinelands Rural Development -15; 10–40 ac +10; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 24% -10; Pinelands Rural Development -15; 10–40 ac +10; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 9939101,
+      "status": "active",
+      "price": 3300000.0,
+      "dom": 1207.0,
+      "acres": 43.69,
+      "broker": "RE/MAX Preferred Commercial Division",
+      "brokerContact": "Bryant Lafferty",
+      "brokerPhone": "8562915880",
+      "owner": "Yasna Partnership Llp",
+      "ownerPhone": null,
+      "zoning": "RGPC",
+      "use": null,
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "0818_4.01_1",
@@ -107097,7 +109174,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 66,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 6% -2; FEMA SFHA -15; acreage in range +5; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 6% -2; FEMA SFHA -15; acreage in range +5; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 11582355,
+      "status": "active",
+      "price": 299000.0,
+      "dom": 2060.0,
+      "acres": 6.2,
+      "broker": "Vantage Real Estate Services",
+      "brokerContact": "Leor Hemo",
+      "brokerPhone": "8567971919",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "HC",
+      "use": "Commercial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "0906_3101_48.02_HM",
@@ -107517,7 +109611,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 66,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 36% -14; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 36% -14; acreage in range +5",
+    "listing": {
+      "id": 12804563,
+      "status": "active",
+      "price": null,
+      "dom": 1484.0,
+      "acres": 7.02,
+      "broker": "Curran Commercial",
+      "brokerContact": "Ryan Curran",
+      "brokerPhone": "7323593203",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "commercial",
+      "use": null,
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "1215_22001.21_1",
@@ -108301,7 +110412,24 @@
     "sewer": false,
     "preservedPct": 0,
     "score": 66,
-    "scoreNotes": "base 50; Pinelands Regional Growth Area +5; acreage in range +5; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; Pinelands Regional Growth Area +5; acreage in range +5; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 22184218,
+      "status": "active",
+      "price": 1500000.0,
+      "dom": 36.0,
+      "acres": 80.0,
+      "broker": "Jade Capital",
+      "brokerContact": "Abraham Sharaby",
+      "brokerPhone": "7325231553",
+      "owner": "Everflow Supplies",
+      "ownerPhone": "9084361100",
+      "zoning": "RA-5",
+      "use": "Apartment Units - Condo, Mixed Use, MultiFamily, Self-Storage, Single Family Development, Single Family Residence",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "1509_29_42.05",
@@ -109337,7 +111465,25 @@
     "sewer": false,
     "preservedPct": 0,
     "score": 66,
-    "scoreNotes": "base 50; 10–40 ac +10; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; 10–40 ac +10; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 12749142,
+      "status": "active",
+      "price": 699000.0,
+      "dom": 65.0,
+      "acres": 11.02,
+      "broker": "Krumpfer Realty Group, LLC",
+      "brokerContact": "Joseph Krumpfer",
+      "brokerPhone": "9732930085",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "TSC",
+      "use": "Casino, Commercial, Convenience Store, Department Store, Distribution, Fast Food, Health Care, Health Club, Hospital, Industrial, Industrial Park, Lumberyard, Medical, Office Park, R&D, Regional Mall, Restaurant, Retail, Retail Warehouse, Self-Storage, Truck Stop, Truck Terminal, Warehouse",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin",
+      "multiParcel": true
+    }
   },
   {
     "pin": "1914_47_12",
@@ -110149,7 +112295,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 65,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 37% -15; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 37% -15; acreage in range +5",
+    "listing": {
+      "id": 13860818,
+      "status": "active",
+      "price": 3500000.0,
+      "dom": 1296.0,
+      "acres": 7.0,
+      "broker": "Thomas Orban Realtor",
+      "brokerContact": "Thomas Orban",
+      "brokerPhone": "6095045894",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "B2",
+      "use": "Commercial, Retail",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "0307_106_2.02",
@@ -114433,7 +116596,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 65,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 38% -15; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 38% -15; acreage in range +5",
+    "listing": {
+      "id": 5392740,
+      "status": "active",
+      "price": 4150000.0,
+      "dom": 2159.0,
+      "acres": 5.57,
+      "broker": "Fennelly Associates, Inc.",
+      "brokerContact": "Gerard 'Jerry' Fennelly",
+      "brokerPhone": "6095200061",
+      "owner": "Genesis Investment Properties",
+      "ownerPhone": "8773004422",
+      "zoning": "OC-1",
+      "use": "Auto Dealership, Bank, Medical, Mixed Use, Office, Retail, Warehouse",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "1112_27.01_131",
@@ -115077,7 +117257,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 65,
-    "scoreNotes": "base 50; sewer service area +25; FEMA SFHA -15; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; FEMA SFHA -15; acreage in range +5",
+    "listing": {
+      "id": 11392956,
+      "status": "active",
+      "price": 10000000.0,
+      "dom": 196.0,
+      "acres": 2.7,
+      "broker": "Logistic Realty LLC",
+      "brokerContact": "William Hettler Sr.",
+      "brokerPhone": "7327388880",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "Industrial and retail",
+      "use": "Distribution, Industrial, Retail, Warehouse",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "1221_85.01_35.03",
@@ -115133,7 +117330,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 65,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 37% -15; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 37% -15; acreage in range +5",
+    "listing": {
+      "id": 18920688,
+      "status": "active",
+      "price": 3000000.0,
+      "dom": 781.0,
+      "acres": 6.682336,
+      "broker": "Fennelly Associates, Inc.",
+      "brokerContact": "Gerard 'Jerry' Fennelly",
+      "brokerPhone": "6095200061",
+      "owner": "DEER PARK RESEARCH CENTER LLC",
+      "ownerPhone": null,
+      "zoning": "OR",
+      "use": "Commercial, Warehouse",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "1225_1095_3",
@@ -116477,7 +118691,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 65,
-    "scoreNotes": "base 50; sewer service area +25; FEMA SFHA -15; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; FEMA SFHA -15; acreage in range +5",
+    "listing": {
+      "id": 6923018,
+      "status": "active",
+      "price": null,
+      "dom": 361.0,
+      "acres": 6.43,
+      "broker": "Catalyst Real Estate Partners",
+      "brokerContact": "William Farkas",
+      "brokerPhone": "7323338571",
+      "owner": "V. PAULIUS & ASSOCIATES",
+      "ownerPhone": "2018251050",
+      "zoning": null,
+      "use": "Industrial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "1612_181_3",
@@ -119361,7 +121592,24 @@
     "sewer": true,
     "preservedPct": 1,
     "score": 64,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 53% -21; FEMA SFHA -15; Pinelands Regional Growth Area +5; 10–40 ac +10; <$5k/ac assessed +10"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 53% -21; FEMA SFHA -15; Pinelands Regional Growth Area +5; 10–40 ac +10; <$5k/ac assessed +10",
+    "listing": {
+      "id": 20416043,
+      "status": "active",
+      "price": 775000.0,
+      "dom": 645.0,
+      "acres": 12.5,
+      "broker": "Century 21 Rauh & Johns",
+      "brokerContact": "Peter Sideris",
+      "brokerPhone": "8565820366",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "RGPR",
+      "use": "Commercial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "0811_3704_9.01",
@@ -120397,7 +122645,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 64,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 15% -6; flood unmapped -3; Highlands Planning -10; acreage in range +5; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 15% -6; flood unmapped -3; Highlands Planning -10; acreage in range +5; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 20961068,
+      "status": "active",
+      "price": 229000.0,
+      "dom": 500.0,
+      "acres": 6.7,
+      "broker": "Wayne Hills Realty",
+      "brokerContact": "Joe Mastropole",
+      "brokerPhone": "9739070227",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "R-1",
+      "use": "Single Family Development, Single Family Residence",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "1411_4202_6",
@@ -120901,7 +123166,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 64,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 47% -19; acreage in range +5; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 47% -19; acreage in range +5; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 7285752,
+      "status": "active",
+      "price": 10900000.0,
+      "dom": 550.0,
+      "acres": 9.74,
+      "broker": "Prominent Properties Commercial",
+      "brokerContact": "David Simon",
+      "brokerPhone": "2015685668",
+      "owner": "Yuriy Mirgorodskiy",
+      "ownerPhone": "2019444020",
+      "zoning": "C-3",
+      "use": "Auto Dealership, Restaurant, Retail",
+      "lastSaleDate": "2025-03-26",
+      "lastSalePrice": 6200000.0,
+      "join": "near"
+    }
   },
   {
     "pin": "1808_34.07_16.07",
@@ -121657,7 +123939,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 63,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 54% -22; Pinelands Regional Growth Area +5; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 54% -22; Pinelands Regional Growth Area +5; acreage in range +5",
+    "listing": {
+      "id": 19233963,
+      "status": "active",
+      "price": 3750000.0,
+      "dom": 721.0,
+      "acres": 4.1,
+      "broker": "Colliers",
+      "brokerContact": "Tony DiDio",
+      "brokerPhone": "8563164138",
+      "owner": "Starkman Properties, LLC",
+      "ownerPhone": "8564240497",
+      "zoning": "C-1",
+      "use": "Bank, Commercial, Day Care Center, Health Care, Medical, Office, Restaurant, Retail",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "0323_134_44",
@@ -123561,7 +125860,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 63,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 4% -2; FEMA SFHA -15; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 4% -2; FEMA SFHA -15; acreage in range +5",
+    "listing": {
+      "id": 21670864,
+      "status": "active",
+      "price": null,
+      "dom": 200.0,
+      "acres": 10.7,
+      "broker": "Colliers",
+      "brokerContact": "Michael Golarz",
+      "brokerPhone": "2159287569",
+      "owner": "YANNUZZI GROUP INC",
+      "ownerPhone": null,
+      "zoning": "LI",
+      "use": "Industrial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "1209_37_5.121",
@@ -123813,7 +126129,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 63,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 13% -5; FEMA SFHA -15; acreage in range +5; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 13% -5; FEMA SFHA -15; acreage in range +5; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 21045035,
+      "status": "active",
+      "price": null,
+      "dom": 431.0,
+      "acres": 4.5,
+      "broker": "The Blau & Berg Company",
+      "brokerContact": "John Longo",
+      "brokerPhone": "9088031876",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "SD3",
+      "use": null,
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "1215_7117_1",
@@ -125129,7 +127462,24 @@
     "sewer": false,
     "preservedPct": 0,
     "score": 63,
-    "scoreNotes": "base 50; 10–40 ac +10; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; 10–40 ac +10; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 19778818,
+      "status": "active",
+      "price": 550000.0,
+      "dom": 807.0,
+      "acres": 12.0,
+      "broker": "Fairclough Realtors",
+      "brokerContact": "Brian Fairclough",
+      "brokerPhone": "9735809123",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "HC",
+      "use": null,
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "1902_110_7_QFARM",
@@ -126865,7 +129215,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 62,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 69% -28; acreage in range +5; <$5k/ac assessed +10"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 69% -28; acreage in range +5; <$5k/ac assessed +10",
+    "listing": {
+      "id": 107979,
+      "status": "active",
+      "price": 249000.0,
+      "dom": 7701.0,
+      "acres": 5.9,
+      "broker": "Segal-LaBate Commercial Real Estate",
+      "brokerContact": "Anne LaBate",
+      "brokerPhone": "6093947557",
+      "owner": "Scherer George E",
+      "ownerPhone": null,
+      "zoning": "I-2",
+      "use": "Industrial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "1113_28_15.02",
@@ -128797,7 +131164,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 61,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 18% -7; FEMA SFHA -15; acreage in range +5; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 18% -7; FEMA SFHA -15; acreage in range +5; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 8268620,
+      "status": "active",
+      "price": 779000.0,
+      "dom": 444.0,
+      "acres": 9.87,
+      "broker": "Century 21 Alliance",
+      "brokerContact": "Michael Meyer",
+      "brokerPhone": "6096548797",
+      "owner": "Donald P & Kathleen D Willier",
+      "ownerPhone": "8567834419",
+      "zoning": "C",
+      "use": "Commercial, MultiFamily, Single Family Development, Single Family Residence",
+      "lastSaleDate": "2012-06-13",
+      "lastSalePrice": 157500.0,
+      "join": "near"
+    }
   },
   {
     "pin": "0505_410.01_30.01",
@@ -128965,7 +131349,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 61,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 59% -24; 0.2% flood zone -5; acreage in range +5; <$5k/ac assessed +10"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 59% -24; 0.2% flood zone -5; acreage in range +5; <$5k/ac assessed +10",
+    "listing": {
+      "id": 21344291,
+      "status": "active",
+      "price": null,
+      "dom": 336.0,
+      "acres": 7.41,
+      "broker": "JLL",
+      "brokerContact": "Rick Widerman",
+      "brokerPhone": "8563245301",
+      "owner": "SDK PROPERTIES LLC",
+      "ownerPhone": null,
+      "zoning": "TB",
+      "use": "Single Family Development",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "0603_14_12",
@@ -130953,7 +133354,24 @@
     "sewer": false,
     "preservedPct": 0,
     "score": 61,
-    "scoreNotes": "base 50; acreage in range +5; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; acreage in range +5; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 21988433,
+      "status": "active",
+      "price": 1500000.0,
+      "dom": 85.0,
+      "acres": 7.95,
+      "broker": "RE/MAX Preferred",
+      "brokerContact": "Eric Farhat",
+      "brokerPhone": "8566162626",
+      "owner": "NORTHEAST DIESEL NJ LLC",
+      "ownerPhone": null,
+      "zoning": "RA",
+      "use": "Auto Salvage Facility, Industrial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "0805_901_38",
@@ -131429,7 +133847,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 61,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 42% -17; 0.2% flood zone -5; acreage in range +5; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 42% -17; 0.2% flood zone -5; acreage in range +5; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 19111431,
+      "status": "active",
+      "price": 2500000.0,
+      "dom": 983.0,
+      "acres": 4.33,
+      "broker": "Fennelly Associates, Inc.",
+      "brokerContact": "Gerard 'Jerry' Fennelly",
+      "brokerPhone": "6095200061",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "RD",
+      "use": null,
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "1103_2739_5.10",
@@ -131821,7 +134256,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 61,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 11% -4; FEMA SFHA -15; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 11% -4; FEMA SFHA -15; acreage in range +5",
+    "listing": {
+      "id": 21772584,
+      "status": "active",
+      "price": null,
+      "dom": 163.0,
+      "acres": 10.11,
+      "broker": "NAI James E. Hanson, Inc.",
+      "brokerContact": "William Ericksen",
+      "brokerPhone": "9734631011",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "M-1",
+      "use": null,
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "1321_137_25",
@@ -132101,7 +134553,24 @@
     "sewer": false,
     "preservedPct": 0,
     "score": 61,
-    "scoreNotes": "base 50; wetlands 6% -2; 10–40 ac +10; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; wetlands 6% -2; 10–40 ac +10; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 11091853,
+      "status": "off-market",
+      "price": 795000.0,
+      "dom": 2654.0,
+      "acres": 15.59,
+      "broker": "Chen Realty",
+      "brokerContact": "Allen Chen",
+      "brokerPhone": "7329578889",
+      "owner": "CHING-KOU TSAI",
+      "ownerPhone": null,
+      "zoning": "R-130",
+      "use": "Single Family Development, Single Family Residence",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "1333_38_4.02",
@@ -132689,7 +135158,25 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 61,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 30% -12; FEMA SFHA -15; 10–40 ac +10; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 30% -12; FEMA SFHA -15; 10–40 ac +10; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 9599929,
+      "status": "active",
+      "price": null,
+      "dom": 842.0,
+      "acres": 47.39,
+      "broker": "Cresa",
+      "brokerContact": "Eric Zahniser",
+      "brokerPhone": "6108259298",
+      "owner": "Messer",
+      "ownerPhone": "9084648100",
+      "zoning": "I",
+      "use": "Distribution, Industrial, Industrial Park, Warehouse",
+      "lastSaleDate": "2014-12-23",
+      "lastSalePrice": 604200.0,
+      "join": "pin",
+      "multiParcel": true
+    }
   },
   {
     "pin": "1710_14_9",
@@ -136693,7 +139180,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 60,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 49% -20; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 49% -20; acreage in range +5",
+    "listing": {
+      "id": 18941019,
+      "status": "active",
+      "price": null,
+      "dom": 987.0,
+      "acres": 44.2,
+      "broker": "CBRE",
+      "brokerContact": "Benjamin Shapiro",
+      "brokerPhone": "7325092824",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "I",
+      "use": "Industrial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "1221_96.04_138",
@@ -136917,7 +139421,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 60,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 49% -20; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 49% -20; acreage in range +5",
+    "listing": {
+      "id": 20303293,
+      "status": "active",
+      "price": 1500000.0,
+      "dom": 17.0,
+      "acres": 4.0,
+      "broker": "Homesmart First Advantage Realty",
+      "brokerContact": "Gabriella Fried",
+      "brokerPhone": "7187302730",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "C-50",
+      "use": null,
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "1321_3_2",
@@ -138289,7 +140810,25 @@
     "sewer": false,
     "preservedPct": 0,
     "score": 60,
-    "scoreNotes": "base 50; 10–40 ac +10"
+    "scoreNotes": "base 50; 10–40 ac +10",
+    "listing": {
+      "id": 12749142,
+      "status": "active",
+      "price": 699000.0,
+      "dom": 65.0,
+      "acres": 11.02,
+      "broker": "Krumpfer Realty Group, LLC",
+      "brokerContact": "Joseph Krumpfer",
+      "brokerPhone": "9732930085",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "TSC",
+      "use": "Casino, Commercial, Convenience Store, Department Store, Distribution, Fast Food, Health Care, Health Club, Hospital, Industrial, Industrial Park, Lumberyard, Medical, Office Park, R&D, Regional Mall, Restaurant, Retail, Retail Warehouse, Self-Storage, Truck Stop, Truck Terminal, Warehouse",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin",
+      "multiParcel": true
+    }
   },
   {
     "pin": "1914_4_28",
@@ -140025,7 +142564,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 59,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 16% -6; FEMA SFHA -15; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 16% -6; FEMA SFHA -15; acreage in range +5",
+    "listing": {
+      "id": 20301251,
+      "status": "active",
+      "price": null,
+      "dom": 680.0,
+      "acres": 5.0,
+      "broker": "Commercial Development Company, Inc.",
+      "brokerContact": "Stephen Collins",
+      "brokerPhone": "3148352835",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": null,
+      "use": "Commercial, Industrial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "1104_1.01_1",
@@ -140193,7 +142749,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 59,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 64% -26; 10–40 ac +10"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 64% -26; 10–40 ac +10",
+    "listing": {
+      "id": 21823221,
+      "status": "off-market",
+      "price": null,
+      "dom": 143.0,
+      "acres": 17.98,
+      "broker": "Joseph R. Ridolfi & Associates",
+      "brokerContact": "Joseph Ridolfi",
+      "brokerPhone": "6095814848",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "MU-ARCD, HC",
+      "use": null,
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "1112_4.01_11.021",
@@ -141453,7 +144026,24 @@
     "sewer": false,
     "preservedPct": 1,
     "score": 59,
-    "scoreNotes": "base 50; wetlands 2% -1; 10–40 ac +10"
+    "scoreNotes": "base 50; wetlands 2% -1; 10–40 ac +10",
+    "listing": {
+      "id": 21863965,
+      "status": "active",
+      "price": 3200000.0,
+      "dom": 129.0,
+      "acres": 24.29,
+      "broker": "Davis Commercial",
+      "brokerContact": "Brian Walsh",
+      "brokerPhone": "7322541600",
+      "owner": "SAI DATTA MANDIR INC",
+      "ownerPhone": null,
+      "zoning": "A",
+      "use": null,
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "1808_417.02_444",
@@ -143805,7 +146395,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 58,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 93% -37; 10–40 ac +10; <$5k/ac assessed +10"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 93% -37; 10–40 ac +10; <$5k/ac assessed +10",
+    "listing": {
+      "id": 12804343,
+      "status": "active",
+      "price": null,
+      "dom": 1484.0,
+      "acres": 15.13,
+      "broker": "Curran Commercial",
+      "brokerContact": "Ryan Curran",
+      "brokerPhone": "7323593203",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "PUD",
+      "use": "Commercial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "1215_14262.14_101",
@@ -145709,7 +148316,24 @@
     "sewer": false,
     "preservedPct": 0,
     "score": 58,
-    "scoreNotes": "base 50; acreage in range +5; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; acreage in range +5; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 7820667,
+      "status": "active",
+      "price": 699900.0,
+      "dom": 533.0,
+      "acres": 9.34,
+      "broker": "Evergreen Commercial Real Estate",
+      "brokerContact": "Douglas Balduini",
+      "brokerPhone": "9733320518",
+      "owner": "Durling Realty Llc",
+      "ownerPhone": null,
+      "zoning": "Highway Commercial",
+      "use": "Auto Dealership, Commercial, Restaurant",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "1924_54_4.06",
@@ -145849,7 +148473,24 @@
     "sewer": false,
     "preservedPct": 0,
     "score": 58,
-    "scoreNotes": "base 50; acreage in range +5; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; acreage in range +5; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 12204578,
+      "status": "active",
+      "price": 3855005.0,
+      "dom": 170.0,
+      "acres": 9.0,
+      "broker": "The Kislak Company, Inc.",
+      "brokerContact": "Julie Gralla",
+      "brokerPhone": "7327503000",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": null,
+      "use": "Industrial",
+      "lastSaleDate": "2022-10-07",
+      "lastSalePrice": 475000.0,
+      "join": "near"
+    }
   },
   {
     "pin": "2106_902_9.16",
@@ -148425,7 +151066,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 57,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 33% -13; FEMA SFHA -15; 10–40 ac +10"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 33% -13; FEMA SFHA -15; 10–40 ac +10",
+    "listing": {
+      "id": 7100706,
+      "status": "active",
+      "price": 1400000.0,
+      "dom": 700.0,
+      "acres": 16.0,
+      "broker": "BHHS Fox & Roach",
+      "brokerContact": "Nicolas DiMeglio",
+      "brokerPhone": "6099241600",
+      "owner": "Andrew & Lillian Sedneff",
+      "ownerPhone": "7324226511",
+      "zoning": "CR",
+      "use": "MultiFamily, Single Family Development",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "1808_468.12_1.01",
@@ -149237,7 +151895,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 56,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 34% -14; Pinelands Rural Development -15; 10–40 ac +10"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 34% -14; Pinelands Rural Development -15; 10–40 ac +10",
+    "listing": {
+      "id": 691379,
+      "status": "active",
+      "price": null,
+      "dom": 680.0,
+      "acres": 30.0,
+      "broker": "Wolf Commercial Real Estate L.L.C.",
+      "brokerContact": "Jason Wolf",
+      "brokerPhone": "8568576300",
+      "owner": "Tequesta Properties, Inc.",
+      "ownerPhone": "8565521140",
+      "zoning": "O3, Voorhees Twp",
+      "use": "Mixed Use",
+      "lastSaleDate": "2004-12-15",
+      "lastSalePrice": 2250000.0,
+      "join": "pin"
+    }
   },
   {
     "pin": "0434_272_5.01",
@@ -157553,7 +160228,25 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 55,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 52% -21; FEMA SFHA -15; 10–40 ac +10; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 52% -21; FEMA SFHA -15; 10–40 ac +10; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 12768772,
+      "status": "active",
+      "price": null,
+      "dom": 185.0,
+      "acres": 41.938891,
+      "broker": "CBRE",
+      "brokerContact": "Andrew Green",
+      "brokerPhone": "6102515183",
+      "owner": "Carney Shell Urban Renewal LLC",
+      "ownerPhone": null,
+      "zoning": "GI",
+      "use": "Warehouse",
+      "lastSaleDate": "2025-08-28",
+      "lastSalePrice": 1500000.0,
+      "join": "pin",
+      "multiParcel": true
+    }
   },
   {
     "pin": "1705_33_9",
@@ -158729,7 +161422,24 @@
     "sewer": false,
     "preservedPct": 0,
     "score": 55,
-    "scoreNotes": "base 50; Highlands Planning -10; acreage in range +5; <$5k/ac assessed +10"
+    "scoreNotes": "base 50; Highlands Planning -10; acreage in range +5; <$5k/ac assessed +10",
+    "listing": {
+      "id": 21926657,
+      "status": "active",
+      "price": 1400000.0,
+      "dom": 107.0,
+      "acres": 12.42,
+      "broker": "Mountain Properties",
+      "brokerContact": "Glenn R Schechter",
+      "brokerPhone": "9734458642",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "Residential/Commercial",
+      "use": "Commercial, Mixed Use, MultiFamily, Single Family Development, Single Family Residence, Storefrnt Retail/Residntl, Strip Center",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "1924_139_2",
@@ -159093,7 +161803,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 55,
-    "scoreNotes": "base 50; sewer service area +25; FEMA SFHA -15; Highlands Planning -10; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; FEMA SFHA -15; Highlands Planning -10; acreage in range +5",
+    "listing": {
+      "id": 21661426,
+      "status": "active",
+      "price": 4800000.0,
+      "dom": 210.0,
+      "acres": 5.0,
+      "broker": "RE/MAX UNLIMITED REAL ESTATE",
+      "brokerContact": "Glenn Fritts",
+      "brokerPhone": "6102664000",
+      "owner": "TILCON NEW YORK INC",
+      "ownerPhone": null,
+      "zoning": "HB",
+      "use": "Industrial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "2122_65_1.02",
@@ -160465,7 +163192,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 54,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 64% -26; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 64% -26; acreage in range +5",
+    "listing": {
+      "id": 13923606,
+      "status": "active",
+      "price": 15225000.0,
+      "dom": 1235.0,
+      "acres": 14.5,
+      "broker": "Fennelly Associates, Inc.",
+      "brokerContact": "Gerard 'Jerry' Fennelly",
+      "brokerPhone": "6095200061",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "HC",
+      "use": "Auto Dealership",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "1112_25_10.98",
@@ -161137,7 +163881,24 @@
     "sewer": false,
     "preservedPct": 0,
     "score": 54,
-    "scoreNotes": "base 50; wetlands 2% -1; acreage in range +5"
+    "scoreNotes": "base 50; wetlands 2% -1; acreage in range +5",
+    "listing": {
+      "id": 21607051,
+      "status": "active",
+      "price": 1150000.0,
+      "dom": 228.0,
+      "acres": 5.5,
+      "broker": "SERHANT.",
+      "brokerContact": "Thomas Marinelli",
+      "brokerPhone": "7326167151",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "are6",
+      "use": "Agricultural, Garden Center, Horse Stables, Mixed Use, Pasture/Ranch, Religious Facility, Single Family Residence",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "1321_228_35.01",
@@ -161501,7 +164262,25 @@
     "sewer": true,
     "preservedPct": null,
     "score": 54,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 8% -3; flood unmapped -3; Highlands Planning -10; preserved-land overlap (pct unknown) -20; acreage in range +5; <$5k/ac assessed +10"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 8% -3; flood unmapped -3; Highlands Planning -10; preserved-land overlap (pct unknown) -20; acreage in range +5; <$5k/ac assessed +10",
+    "listing": {
+      "id": 21567432,
+      "status": "active",
+      "price": 5700000.0,
+      "dom": 8.0,
+      "acres": 0.6,
+      "broker": "eXp Realty",
+      "brokerContact": "Matthew Clemente",
+      "brokerPhone": "8662016210",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": null,
+      "use": "Retail",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin",
+      "multiParcel": true
+    }
   },
   {
     "pin": "1429_736_24",
@@ -161641,7 +164420,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 54,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 27% -11; FEMA SFHA -15; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 27% -11; FEMA SFHA -15; acreage in range +5",
+    "listing": {
+      "id": 10705541,
+      "status": "active",
+      "price": null,
+      "dom": 2011.0,
+      "acres": 10.79,
+      "broker": "The Blau & Berg Company",
+      "brokerContact": "Scott Savastano",
+      "brokerPhone": "9733796644",
+      "owner": "Jos. L. Muscarelle, Inc",
+      "ownerPhone": "2018458100",
+      "zoning": "HC",
+      "use": "Car Wash, Office, Retail",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "1701_19_28.02",
@@ -162621,7 +165417,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 53,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 29% -12; FEMA SFHA -15; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 29% -12; FEMA SFHA -15; acreage in range +5",
+    "listing": {
+      "id": 12310287,
+      "status": "active",
+      "price": 2699900.0,
+      "dom": 119.0,
+      "acres": 5.37,
+      "broker": "G & G Realtors",
+      "brokerContact": "Michael Gruosso",
+      "brokerPhone": "7325312003",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "HC",
+      "use": "Commercial, Hospitality, Hotel, Mixed Use, Motel, Restaurant, Retail, Strip Center",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "0320_401.02_18",
@@ -168277,7 +171090,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 52,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 36% -14; FEMA SFHA -15; Highlands Planning -10; 10–40 ac +10; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 36% -14; FEMA SFHA -15; Highlands Planning -10; 10–40 ac +10; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 11251622,
+      "status": "active",
+      "price": 2250000.0,
+      "dom": 232.0,
+      "acres": 10.5,
+      "broker": "Mountain Properties",
+      "brokerContact": "Steven Rosal",
+      "brokerPhone": "9738276767",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "TC",
+      "use": "Apartment Units - Condo, Health Club, Hospitality, Medical, Mixed Use, Neighborhood Center, Outlet Center, Retail, Storefront, Storefront Retail/Office",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "1924_138_6.03",
@@ -169089,7 +171919,24 @@
     "sewer": false,
     "preservedPct": 0,
     "score": 51,
-    "scoreNotes": "base 50; FEMA SFHA -15; 10–40 ac +10; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; FEMA SFHA -15; 10–40 ac +10; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 7617787,
+      "status": "active",
+      "price": null,
+      "dom": 449.0,
+      "acres": 14.0,
+      "broker": "Newmark",
+      "brokerContact": "Kurt Montagano",
+      "brokerPhone": "8563342124",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "I-2",
+      "use": "Industrial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "0306_94_3.01",
@@ -169481,7 +172328,24 @@
     "sewer": false,
     "preservedPct": 0,
     "score": 51,
-    "scoreNotes": "base 50; Pinelands Rural Development -15; 10–40 ac +10; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; Pinelands Rural Development -15; 10–40 ac +10; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 10355555,
+      "status": "active",
+      "price": 895000.0,
+      "dom": 940.0,
+      "acres": 10.21,
+      "broker": "Binswanger",
+      "brokerContact": "Michael Torsiello",
+      "brokerPhone": "2154486210",
+      "owner": "Vessella Joann",
+      "ownerPhone": null,
+      "zoning": "PI1",
+      "use": "Industrial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "0436_5902_10",
@@ -170209,7 +173073,24 @@
     "sewer": false,
     "preservedPct": 1,
     "score": 51,
-    "scoreNotes": "base 50; Pinelands Rural Development -15; 10–40 ac +10; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; Pinelands Rural Development -15; 10–40 ac +10; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 20277479,
+      "status": "active",
+      "price": 399999.0,
+      "dom": 696.0,
+      "acres": 15.32,
+      "broker": "Weichert Realtors - Washington Township",
+      "brokerContact": "Kathleen Hansbury",
+      "brokerPhone": "8562271950",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "Pinelands C-3",
+      "use": "Commercial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "0805_1401_68.24",
@@ -171161,7 +174042,24 @@
     "sewer": true,
     "preservedPct": null,
     "score": 51,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 23% -9; FEMA SFHA -15; preserved-land overlap (pct unknown) -20; 10–40 ac +10; <$5k/ac assessed +10"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 23% -9; FEMA SFHA -15; preserved-land overlap (pct unknown) -20; 10–40 ac +10; <$5k/ac assessed +10",
+    "listing": {
+      "id": 19853323,
+      "status": "active",
+      "price": 795000.0,
+      "dom": 765.0,
+      "acres": 10.0,
+      "broker": "Keller Williams Realty, Commercial Group",
+      "brokerContact": "Michael Briehler",
+      "brokerPhone": "6096586423",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "Residential",
+      "use": null,
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "1103_2658_1",
@@ -171665,7 +174563,24 @@
     "sewer": false,
     "preservedPct": 0,
     "score": 51,
-    "scoreNotes": "base 50; wetlands 37% -15; 10–40 ac +10; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; wetlands 37% -15; 10–40 ac +10; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 14633795,
+      "status": "active",
+      "price": null,
+      "dom": 227.0,
+      "acres": 20.0,
+      "broker": "Active Acquisitions",
+      "brokerContact": "Seth Gerszberg",
+      "brokerPhone": "8483330880",
+      "owner": "STAVOLA REALTY COMPANY",
+      "ownerPhone": null,
+      "zoning": "3A",
+      "use": "Commercial, Distribution, Food Processing, Hold for Development, Hold for Investment, Industrial, Industrial Park, R&D, Refrigeration/Cold Stor, Retail Warehouse, Warehouse",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "1330_153_98",
@@ -173289,7 +176204,24 @@
     "sewer": true,
     "preservedPct": 3,
     "score": 51,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 48% -19; FEMA SFHA -15; Highlands Planning -10; 10–40 ac +10; <$5k/ac assessed +10"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 48% -19; FEMA SFHA -15; Highlands Planning -10; 10–40 ac +10; <$5k/ac assessed +10",
+    "listing": {
+      "id": 18855783,
+      "status": "active",
+      "price": 375000.0,
+      "dom": 1024.0,
+      "acres": 19.97,
+      "broker": "Weichert Commercial Brokerage, Inc.",
+      "brokerContact": "Maria Lima",
+      "brokerPhone": "9732677778",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "R-40",
+      "use": null,
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "2122_66_1.05",
@@ -175053,7 +177985,24 @@
     "sewer": false,
     "preservedPct": 0,
     "score": 50,
-    "scoreNotes": "base 50; wetlands 2% -1; Pinelands Rural Development -15; 10–40 ac +10; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; wetlands 2% -1; Pinelands Rural Development -15; 10–40 ac +10; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 19777484,
+      "status": "active",
+      "price": null,
+      "dom": 808.0,
+      "acres": 7.9,
+      "broker": "Metro Commercial Real Estate Inc.",
+      "brokerContact": "David Judd",
+      "brokerPhone": "8562223037",
+      "owner": "Anastasios K Linardos",
+      "ownerPhone": "6097307122",
+      "zoning": "HCPL",
+      "use": null,
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "0334_402_2.02",
@@ -177013,7 +179962,24 @@
     "sewer": true,
     "preservedPct": 3,
     "score": 50,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 78% -31; 0.2% flood zone -5; acreage in range +5; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 78% -31; 0.2% flood zone -5; acreage in range +5; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 21340841,
+      "status": "active",
+      "price": 449000.0,
+      "dom": 337.0,
+      "acres": 8.25,
+      "broker": "G & G Realtors",
+      "brokerContact": "Michael Gruosso",
+      "brokerPhone": "7325312003",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "R-LI, 1",
+      "use": "Agricultural, Commercial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "1205_399_46",
@@ -177685,7 +180651,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 50,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 81% -32; flood unmapped -3; 10–40 ac +10"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 81% -32; flood unmapped -3; 10–40 ac +10",
+    "listing": {
+      "id": 10212149,
+      "status": "active",
+      "price": 1395000.0,
+      "dom": 2909.0,
+      "acres": 12.37,
+      "broker": "Coldwell Banker Commercial Realty",
+      "brokerContact": "Donn McDonald",
+      "brokerPhone": "9734641066",
+      "owner": "New Jersey Medical Diagnostic Assoc",
+      "ownerPhone": null,
+      "zoning": "PB-1 and R-40",
+      "use": "Bank, Medical, Office, Single Family Development",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "1420_1201_1",
@@ -178301,7 +181284,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 50,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 75% -30; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 75% -30; acreage in range +5",
+    "listing": {
+      "id": 11315416,
+      "status": "off-market",
+      "price": 575000.0,
+      "dom": 2356.0,
+      "acres": 9.43,
+      "broker": "American Dream Realty of South Jersey",
+      "brokerContact": "Don Redfield",
+      "brokerPhone": "8562996444",
+      "owner": "CARNEYS POINT HOLDING LLC",
+      "ownerPhone": null,
+      "zoning": "GC",
+      "use": "Commercial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "1702_233_9",
@@ -179561,7 +182561,24 @@
     "sewer": false,
     "preservedPct": 0,
     "score": 50,
-    "scoreNotes": "base 50; wetlands 15% -6; Highlands Planning -10; 10–40 ac +10; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; wetlands 15% -6; Highlands Planning -10; 10–40 ac +10; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 11069434,
+      "status": "active",
+      "price": 1750000.0,
+      "dom": 316.0,
+      "acres": 28.8,
+      "broker": "Coldwell Banker Commercial Realty",
+      "brokerContact": "Doug Krentz",
+      "brokerPhone": "9088794900",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "ROM",
+      "use": "Cemetery/Mausoleum, Commercial, Distribution, Food Processing, Health Care, Industrial, Medical, Office, Open Space, Power Center, Public Library, R&D, Warehouse",
+      "lastSaleDate": "2019-06-06",
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "2110_44_17",
@@ -180009,7 +183026,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 49,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 86% -34; acreage in range +5; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 86% -34; acreage in range +5; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 13910991,
+      "status": "active",
+      "price": null,
+      "dom": 241.0,
+      "acres": 2.0,
+      "broker": "Wolf Commercial Real Estate L.L.C.",
+      "brokerContact": "Corey Hassman",
+      "brokerPhone": "8568576300",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "R-1",
+      "use": "Day Care Center, Religious Facility, Storefrnt Retail/Residntl",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "0415_15803_5",
@@ -180065,7 +183099,24 @@
     "sewer": true,
     "preservedPct": null,
     "score": 49,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 11% -4; FEMA SFHA -15; preserved-land overlap (pct unknown) -20; 10–40 ac +10; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 11% -4; FEMA SFHA -15; preserved-land overlap (pct unknown) -20; 10–40 ac +10; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 26142,
+      "status": "off-market",
+      "price": null,
+      "dom": 738.0,
+      "acres": 26.7,
+      "broker": "Vantage Real Estate Services",
+      "brokerContact": "Leor Hemo",
+      "brokerPhone": "8567971919",
+      "owner": "Davis Roger J Trust",
+      "ownerPhone": null,
+      "zoning": "Industrial",
+      "use": null,
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "0430_155.05_1",
@@ -181493,7 +184544,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 49,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 52% -21; FEMA SFHA -15; 10–40 ac +10"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 52% -21; FEMA SFHA -15; 10–40 ac +10",
+    "listing": {
+      "id": 11173049,
+      "status": "active",
+      "price": 35000000.0,
+      "dom": 273.0,
+      "acres": 25.0,
+      "broker": "Newmark",
+      "brokerContact": "Todd Ward",
+      "brokerPhone": "2014605161",
+      "owner": "Ac I Neptune Llc",
+      "ownerPhone": null,
+      "zoning": "C-3",
+      "use": "Industrial, Retail",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "1411_4101_25",
@@ -182053,7 +185121,24 @@
     "sewer": false,
     "preservedPct": 0,
     "score": 49,
-    "scoreNotes": "base 50; wetlands 29% -12; acreage in range +5; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; wetlands 29% -12; acreage in range +5; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 12212584,
+      "status": "active",
+      "price": 500000.0,
+      "dom": 1092.0,
+      "acres": 4.37,
+      "broker": "Coldwell Banker Realty",
+      "brokerContact": "Jean Rubin",
+      "brokerPhone": "9739036777",
+      "owner": "FIFTY JAMES LLC",
+      "ownerPhone": null,
+      "zoning": "CED-1",
+      "use": "Commercial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "1906_2701_1",
@@ -182445,7 +185530,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 48,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 80% -32; FEMA SFHA -15; Pinelands Pinelands Town +5; acreage in range +5; <$5k/ac assessed +10"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 80% -32; FEMA SFHA -15; Pinelands Pinelands Town +5; acreage in range +5; <$5k/ac assessed +10",
+    "listing": {
+      "id": 7766522,
+      "status": "active",
+      "price": 1500000.0,
+      "dom": 281.0,
+      "acres": 11.5,
+      "broker": "Zachmar Inc.",
+      "brokerContact": "Robert Zochowski",
+      "brokerPhone": "5616324235",
+      "owner": "Richard Zochowski",
+      "ownerPhone": "7322190533",
+      "zoning": "HB",
+      "use": "Commercial, Convenience Store, Drug Store, Fast Food, Medical, Mixed Use, MultiFamily, Retail, Storefrnt Retail/Residntl, Storefront, Storefront Retail/Office, Strip Center, Supermarket, Warehouse",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "0119_193_12",
@@ -182697,7 +185799,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 48,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 33% -13; FEMA SFHA -15; Pinelands Rural Development -15; 10–40 ac +10; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 33% -13; FEMA SFHA -15; Pinelands Rural Development -15; 10–40 ac +10; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 10497374,
+      "status": "active",
+      "price": 699000.0,
+      "dom": 1228.0,
+      "acres": 19.0,
+      "broker": "Anchor Commercial Development",
+      "brokerContact": "Yvonne Hu",
+      "brokerPhone": "2153278817",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "LD",
+      "use": "Commercial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "0317_38_1.01",
@@ -186113,7 +189232,24 @@
     "sewer": false,
     "preservedPct": 0,
     "score": 48,
-    "scoreNotes": "base 50; Highlands Planning -10; acreage in range +5; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; Highlands Planning -10; acreage in range +5; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 9850999,
+      "status": "active",
+      "price": 1300000.0,
+      "dom": 2334.0,
+      "acres": 5.72,
+      "broker": "Melchor Realty",
+      "brokerContact": "Susan DiLeo",
+      "brokerPhone": "9086724221",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "Industrial",
+      "use": "Industrial, Office",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "2122_47_7.02",
@@ -187009,7 +190145,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 47,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 20% -8; FEMA SFHA -15; Pinelands Rural Development -15; 10–40 ac +10"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 20% -8; FEMA SFHA -15; Pinelands Rural Development -15; 10–40 ac +10",
+    "listing": {
+      "id": 10263430,
+      "status": "active",
+      "price": null,
+      "dom": 3394.0,
+      "acres": 28.82,
+      "broker": "CBRE",
+      "brokerContact": "Rick Weinberg",
+      "brokerPhone": "4845672812",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": null,
+      "use": "Commercial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "0506_472_31",
@@ -191713,7 +194866,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 46,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 84% -34; FEMA SFHA -15; 10–40 ac +10; <$5k/ac assessed +10"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 84% -34; FEMA SFHA -15; 10–40 ac +10; <$5k/ac assessed +10",
+    "listing": {
+      "id": 21506353,
+      "status": "active",
+      "price": 495000.0,
+      "dom": 275.0,
+      "acres": 47.71,
+      "broker": "Warner Real Estate & Auction Co, Inc.",
+      "brokerContact": "Richard Warner",
+      "brokerPhone": "8567694111",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "FP",
+      "use": null,
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "0604_23_200_QFARM",
@@ -196613,7 +199783,24 @@
     "sewer": false,
     "preservedPct": 0,
     "score": 45,
-    "scoreNotes": "base 50; wetlands 46% -18; 10–40 ac +10; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; wetlands 46% -18; 10–40 ac +10; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 21791633,
+      "status": "active",
+      "price": 999000.0,
+      "dom": 155.0,
+      "acres": 12.32,
+      "broker": null,
+      "brokerContact": null,
+      "brokerPhone": null,
+      "owner": "FOUNDATION SERVICING LLC",
+      "ownerPhone": null,
+      "zoning": "MRC",
+      "use": null,
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "1107_2601_24",
@@ -197173,7 +200360,24 @@
     "sewer": false,
     "preservedPct": 0,
     "score": 45,
-    "scoreNotes": "base 50; wetlands 24% -10; acreage in range +5"
+    "scoreNotes": "base 50; wetlands 24% -10; acreage in range +5",
+    "listing": {
+      "id": 20218019,
+      "status": "active",
+      "price": 995000.0,
+      "dom": 744.0,
+      "acres": 2.98,
+      "broker": "Legacy Commercial Realty, LLC",
+      "brokerContact": "Matt Miller",
+      "brokerPhone": "7323336380",
+      "owner": "Nanci Lucas",
+      "ownerPhone": "6094434344",
+      "zoning": "BP (Business Park)",
+      "use": "Distribution",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "1335_2401_1",
@@ -197201,7 +200405,24 @@
     "sewer": true,
     "preservedPct": null,
     "score": 45,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 51% -20; preserved-land overlap (pct unknown) -20; 10–40 ac +10"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 51% -20; preserved-land overlap (pct unknown) -20; 10–40 ac +10",
+    "listing": {
+      "id": 7751429,
+      "status": "active",
+      "price": 850000.0,
+      "dom": 2839.0,
+      "acres": 10.03,
+      "broker": "Mynt Equities LLC.",
+      "brokerContact": "Jonathan Smouha",
+      "brokerPhone": "9737777855",
+      "owner": "Mynt Equities LLC.",
+      "ownerPhone": "9737777784",
+      "zoning": "C-2",
+      "use": null,
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "1352_915_31",
@@ -202549,7 +205770,24 @@
     "sewer": false,
     "preservedPct": 0,
     "score": 43,
-    "scoreNotes": "base 50; FEMA SFHA -15; acreage in range +5; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; FEMA SFHA -15; acreage in range +5; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 11466877,
+      "status": "active",
+      "price": null,
+      "dom": 854.0,
+      "acres": 9.9,
+      "broker": "NAI Mertz",
+      "brokerContact": "Sandro Randazzo",
+      "brokerPhone": "8567244256",
+      "owner": "Ramos, Jose",
+      "ownerPhone": "2157934070",
+      "zoning": "I-2",
+      "use": "Commercial, Industrial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "0313_11.42_93",
@@ -202801,7 +206039,24 @@
     "sewer": false,
     "preservedPct": 0,
     "score": 43,
-    "scoreNotes": "base 50; Pinelands Rural Development -15; acreage in range +5; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; Pinelands Rural Development -15; acreage in range +5; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 10953913,
+      "status": "active",
+      "price": 1050000.0,
+      "dom": 2820.0,
+      "acres": 7.2,
+      "broker": "Tri-State Business Service, Inc",
+      "brokerContact": "Mike Miller",
+      "brokerPhone": "6098592829",
+      "owner": "Southampton Dg Llc",
+      "ownerPhone": null,
+      "zoning": "HC",
+      "use": "Neighborhood Center",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "0335_503_38",
@@ -203557,7 +206812,24 @@
     "sewer": false,
     "preservedPct": 0,
     "score": 43,
-    "scoreNotes": "base 50; wetlands 31% -12; FEMA SFHA -15; 10–40 ac +10; <$5k/ac assessed +10"
+    "scoreNotes": "base 50; wetlands 31% -12; FEMA SFHA -15; 10–40 ac +10; <$5k/ac assessed +10",
+    "listing": {
+      "id": 12900726,
+      "status": "active",
+      "price": null,
+      "dom": 176.0,
+      "acres": 84.0,
+      "broker": "Wolf Commercial Real Estate L.L.C.",
+      "brokerContact": "Michael Scanzano",
+      "brokerPhone": "8564656637",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "I",
+      "use": "Industrial, Industrial Park",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "1001_21_16.28",
@@ -204061,7 +207333,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 43,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 70% -28; FEMA SFHA -15; acreage in range +5; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 70% -28; FEMA SFHA -15; acreage in range +5; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 18939264,
+      "status": "active",
+      "price": null,
+      "dom": 987.0,
+      "acres": 8.9,
+      "broker": "CBRE",
+      "brokerContact": "Benjamin Shapiro",
+      "brokerPhone": "7325092824",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "I",
+      "use": "Commercial, Industrial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "1321_152_35.02",
@@ -206441,7 +209730,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 42,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 96% -38; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 96% -38; acreage in range +5",
+    "listing": {
+      "id": 7856897,
+      "status": "active",
+      "price": 1750000.0,
+      "dom": 340.0,
+      "acres": 5.02,
+      "broker": "Wolf Commercial Real Estate L.L.C.",
+      "brokerContact": "Corey Hassman",
+      "brokerPhone": "8568576300",
+      "owner": "Rathi Raja",
+      "ownerPhone": null,
+      "zoning": "ROM4",
+      "use": "Bank, Commercial, Drug Store, Hospital, Medical, Office, Office Park",
+      "lastSaleDate": "2017-08-21",
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "1204_148_3.01",
@@ -207841,7 +211147,25 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 42,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 66% -26; FEMA SFHA -15; acreage in range +5; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 66% -26; FEMA SFHA -15; acreage in range +5; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 9599929,
+      "status": "active",
+      "price": null,
+      "dom": 842.0,
+      "acres": 47.39,
+      "broker": "Cresa",
+      "brokerContact": "Eric Zahniser",
+      "brokerPhone": "6108259298",
+      "owner": "Messer",
+      "ownerPhone": "9084648100",
+      "zoning": "I",
+      "use": "Distribution, Industrial, Industrial Park, Warehouse",
+      "lastSaleDate": "2014-12-23",
+      "lastSalePrice": 604200.0,
+      "join": "pin",
+      "multiParcel": true
+    }
   },
   {
     "pin": "1709_2501_30",
@@ -208065,7 +211389,24 @@
     "sewer": false,
     "preservedPct": 0,
     "score": 42,
-    "scoreNotes": "base 50; wetlands 71% -28; 10–40 ac +10; <$5k/ac assessed +10"
+    "scoreNotes": "base 50; wetlands 71% -28; 10–40 ac +10; <$5k/ac assessed +10",
+    "listing": {
+      "id": 22191677,
+      "status": "active",
+      "price": 672000.0,
+      "dom": 32.0,
+      "acres": 11.2,
+      "broker": "Coldwell Banker Realty",
+      "brokerContact": "Nathanel Banks",
+      "brokerPhone": "8566855600",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "pending zoning",
+      "use": "Agribusiness, Agricultural, Commercial, Single Family Residence",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "1808_19_30.02",
@@ -209521,7 +212862,24 @@
     "sewer": true,
     "preservedPct": null,
     "score": 41,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 29% -12; FEMA SFHA -15; preserved-land overlap (pct unknown) -20; 10–40 ac +10; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 29% -12; FEMA SFHA -15; preserved-land overlap (pct unknown) -20; 10–40 ac +10; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 7393549,
+      "status": "active",
+      "price": 1500000.0,
+      "dom": 32.0,
+      "acres": 11.18,
+      "broker": "Moriah Commercial Realty, LLC",
+      "brokerContact": "David Gutterman",
+      "brokerPhone": "8563613977",
+      "owner": "Vim Goyal",
+      "ownerPhone": "5169787125",
+      "zoning": "SC",
+      "use": "Self-Storage",
+      "lastSaleDate": "2022-01-13",
+      "lastSalePrice": 875000.0,
+      "join": "pin"
+    }
   },
   {
     "pin": "0820_325_1",
@@ -210081,7 +213439,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 41,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 84% -34; 0.2% flood zone -5; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 84% -34; 0.2% flood zone -5; acreage in range +5",
+    "listing": {
+      "id": 21487986,
+      "status": "active",
+      "price": 5500000.0,
+      "dom": 283.0,
+      "acres": 5.03,
+      "broker": "Corey, J Schneider Realty",
+      "brokerContact": "Corey Schneider",
+      "brokerPhone": "9734723909",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "LI5",
+      "use": "Industrial, Truck Terminal, Warehouse",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "1224_108_31",
@@ -213777,7 +217152,25 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 40,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 78% -31; FEMA SFHA -15; acreage in range +5; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 78% -31; FEMA SFHA -15; acreage in range +5; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 12768772,
+      "status": "active",
+      "price": null,
+      "dom": 185.0,
+      "acres": 41.938891,
+      "broker": "CBRE",
+      "brokerContact": "Andrew Green",
+      "brokerPhone": "6102515183",
+      "owner": "Carney Shell Urban Renewal LLC",
+      "ownerPhone": null,
+      "zoning": "GI",
+      "use": "Warehouse",
+      "lastSaleDate": "2025-08-28",
+      "lastSalePrice": 1500000.0,
+      "join": "pin",
+      "multiParcel": true
+    }
   },
   {
     "pin": "1705_22_10",
@@ -214197,7 +217590,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 40,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 95% -38; 0.2% flood zone -5; acreage in range +5; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 95% -38; 0.2% flood zone -5; acreage in range +5; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 20942609,
+      "status": "active",
+      "price": null,
+      "dom": 46.0,
+      "acres": 5.0,
+      "broker": "Lee & Associates Commercial Real Estate Services",
+      "brokerContact": "Richard Marchisio",
+      "brokerPhone": "5512658312",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "Business and Industry",
+      "use": "Industrial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "1813_17001_6",
@@ -215849,7 +219259,24 @@
     "sewer": true,
     "preservedPct": 19,
     "score": 39,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 66% -26; preserved land 19% -20; 10–40 ac +10"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 66% -26; preserved land 19% -20; 10–40 ac +10",
+    "listing": {
+      "id": 21916954,
+      "status": "active",
+      "price": 1700000.0,
+      "dom": 112.0,
+      "acres": 11.04,
+      "broker": "Weichert Realtors",
+      "brokerContact": "Joseph Miczak",
+      "brokerPhone": "7326823740",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "B-4",
+      "use": null,
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "1114_4301_1",
@@ -218341,7 +221768,24 @@
     "sewer": true,
     "preservedPct": null,
     "score": 38,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 55% -22; FEMA SFHA -15; preserved-land overlap (pct unknown) -20; 10–40 ac +10; <$5k/ac assessed +10"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 55% -22; FEMA SFHA -15; preserved-land overlap (pct unknown) -20; 10–40 ac +10; <$5k/ac assessed +10",
+    "listing": {
+      "id": 21851788,
+      "status": "active",
+      "price": 675000.0,
+      "dom": 133.0,
+      "acres": 38.75,
+      "broker": "J.J. Elek Realty",
+      "brokerContact": "Joseph DeVizio",
+      "brokerPhone": "7326349100",
+      "owner": "EAPPEN MURIEKOLIL",
+      "ownerPhone": null,
+      "zoning": "ER",
+      "use": null,
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "1221_85_4.11",
@@ -218593,7 +222037,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 38,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 68% -27; FEMA SFHA -15; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 68% -27; FEMA SFHA -15; acreage in range +5",
+    "listing": {
+      "id": 22069141,
+      "status": "active",
+      "price": 9000000.0,
+      "dom": 64.0,
+      "acres": 11.07,
+      "broker": null,
+      "brokerContact": null,
+      "brokerPhone": null,
+      "owner": "The Brunetti Organization",
+      "ownerPhone": "7327273300",
+      "zoning": "HB/R30",
+      "use": "Commercial, Planned Unit Development, Retail",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "1421_41_5",
@@ -219209,7 +222670,24 @@
     "sewer": false,
     "preservedPct": 0,
     "score": 38,
-    "scoreNotes": "base 50; wetlands 24% -10; Highlands Planning -10; acreage in range +5; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; wetlands 24% -10; Highlands Planning -10; acreage in range +5; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 11085052,
+      "status": "active",
+      "price": 695000.0,
+      "dom": 232.0,
+      "acres": 7.215,
+      "broker": "RE/MAX Platinum Group",
+      "brokerContact": "Jessica Beasley",
+      "brokerPhone": "8624326756",
+      "owner": "Mckeon Realty Llc",
+      "ownerPhone": null,
+      "zoning": "ED",
+      "use": "Industrial, Medical, Office",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "1922_262_15",
@@ -219265,7 +222743,24 @@
     "sewer": false,
     "preservedPct": 0,
     "score": 38,
-    "scoreNotes": "base 50; wetlands 58% -23; acreage in range +5; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; wetlands 58% -23; acreage in range +5; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 21522475,
+      "status": "active",
+      "price": 179000.0,
+      "dom": 268.0,
+      "acres": 6.1,
+      "broker": "Realty One Group Next Door",
+      "brokerContact": "Michael Del Cioppo",
+      "brokerPhone": "9087770599",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "FPD",
+      "use": "Single Family Residence",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "2116_1501_9.01",
@@ -227077,7 +230572,24 @@
     "sewer": false,
     "preservedPct": 0,
     "score": 34,
-    "scoreNotes": "base 50; wetlands 30% -12; FEMA SFHA -15; acreage in range +5; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; wetlands 30% -12; FEMA SFHA -15; acreage in range +5; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 22316193,
+      "status": "active",
+      "price": null,
+      "dom": 2.0,
+      "acres": 6.63,
+      "broker": "Avison Young",
+      "brokerContact": "Jim Scott",
+      "brokerPhone": "2159321157",
+      "owner": "Harmandip Ghuman",
+      "ownerPhone": "8562357260",
+      "zoning": "LI",
+      "use": null,
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "0320_5512_1",
@@ -227217,7 +230729,24 @@
     "sewer": false,
     "preservedPct": 0,
     "score": 34,
-    "scoreNotes": "base 50; wetlands 4% -2; FEMA SFHA -15; Pinelands Rural Development -15; 10–40 ac +10; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; wetlands 4% -2; FEMA SFHA -15; Pinelands Rural Development -15; 10–40 ac +10; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 18840812,
+      "status": "active",
+      "price": 239900.0,
+      "dom": 1026.0,
+      "acres": 12.3,
+      "broker": "Century 21 Reilly Realtors",
+      "brokerContact": "Charles Maimone",
+      "brokerPhone": "8567671776",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "PR1",
+      "use": null,
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "0505_409_24.01",
@@ -228337,7 +231866,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 34,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 78% -31; FEMA SFHA -15; acreage in range +5"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 78% -31; FEMA SFHA -15; acreage in range +5",
+    "listing": {
+      "id": 6266948,
+      "status": "active",
+      "price": 1600000.0,
+      "dom": 1817.0,
+      "acres": 6.4,
+      "broker": "Sitar Company",
+      "brokerContact": "William Sitar, Jr",
+      "brokerPhone": "7326232155",
+      "owner": "Mountainview Terrace Associates Llc",
+      "ownerPhone": null,
+      "zoning": "B",
+      "use": "Day Care Center, Medical, Office, Retail",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "1702_263_3",
@@ -231109,7 +234655,24 @@
     "sewer": false,
     "preservedPct": null,
     "score": 33,
-    "scoreNotes": "base 50; Highlands Planning -10; preserved-land overlap (pct unknown) -20; 10–40 ac +10; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; Highlands Planning -10; preserved-land overlap (pct unknown) -20; 10–40 ac +10; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 9420302,
+      "status": "active",
+      "price": 3170000.0,
+      "dom": 353.0,
+      "acres": 11.04,
+      "broker": null,
+      "brokerContact": null,
+      "brokerPhone": null,
+      "owner": "Keila Transport Llc",
+      "ownerPhone": null,
+      "zoning": "ED",
+      "use": "Apartment Units - Condo, Commercial, Distribution, Industrial, Office",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "2122_27_14",
@@ -232313,7 +235876,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 32,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 94% -38; FEMA SFHA -15; 10–40 ac +10"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 94% -38; FEMA SFHA -15; 10–40 ac +10",
+    "listing": {
+      "id": 13807869,
+      "status": "active",
+      "price": 5800000.0,
+      "dom": 753.0,
+      "acres": 10.03,
+      "broker": "Richel Commercial Brokerage",
+      "brokerContact": "Steven Richel",
+      "brokerPhone": "7327200538",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "SED",
+      "use": "Industrial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "1328_69_2.03",
@@ -233293,7 +236873,24 @@
     "sewer": true,
     "preservedPct": 0,
     "score": 31,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 97% -39; FEMA SFHA -15; 10–40 ac +10"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 97% -39; FEMA SFHA -15; 10–40 ac +10",
+    "listing": {
+      "id": 21421081,
+      "status": "active",
+      "price": 1280000.0,
+      "dom": 305.0,
+      "acres": 12.28,
+      "broker": "Keller Williams Realty, Commercial Group",
+      "brokerContact": "Michael Briehler",
+      "brokerPhone": "6096586423",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "AH-1 Commercial & Res",
+      "use": "Bank, Car Wash, Commercial, Community Center, Convenience Store, Day Care Center, Fast Food, General Freestanding, Hospitality, Hotel, Office, Restaurant, Retail, Strip Center",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "0313_55_3",
@@ -237969,7 +241566,24 @@
     "sewer": false,
     "preservedPct": 0,
     "score": 29,
-    "scoreNotes": "base 50; wetlands 36% -14; FEMA SFHA -15; acreage in range +5; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; wetlands 36% -14; FEMA SFHA -15; acreage in range +5; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 10587547,
+      "status": "active",
+      "price": null,
+      "dom": 421.0,
+      "acres": 6.21,
+      "broker": "Serhant New Jersey LLC",
+      "brokerContact": "Arianna Nieves",
+      "brokerPhone": "7077395778",
+      "owner": "Joseph K Caracciolo",
+      "ownerPhone": null,
+      "zoning": "HC - WSRA (Redev)",
+      "use": "Commercial, Distribution, Health Care, Health Club, Hold for Development, Hold for Investment, Hospitality, Hotel, Industrial, Medical, Mixed Use, MultiFamily, Office, Office Park, Planned Unit Development, Retail, Retail Warehouse, Schools, Storefrnt Retail/Residntl, Storefront, Storefront Retail/Office, Strip Center, Warehouse",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "0435_6001_2",
@@ -239033,7 +242647,24 @@
     "sewer": false,
     "preservedPct": 0,
     "score": 29,
-    "scoreNotes": "base 50; wetlands 81% -32; acreage in range +5; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; wetlands 81% -32; acreage in range +5; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 10161168,
+      "status": "active",
+      "price": 490000.0,
+      "dom": 1992.0,
+      "acres": 5.0,
+      "broker": "COMPASS",
+      "brokerContact": "Natalie Jeker",
+      "brokerPhone": "2674358015",
+      "owner": "Josefina Jeker",
+      "ownerPhone": "6092026547",
+      "zoning": "O",
+      "use": "Agricultural, Commercial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "1705_37_9",
@@ -241469,7 +245100,24 @@
     "sewer": false,
     "preservedPct": null,
     "score": 27,
-    "scoreNotes": "base 50; wetlands 9% -4; FEMA SFHA -15; preserved-land overlap (pct unknown) -20; 10–40 ac +10; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; wetlands 9% -4; FEMA SFHA -15; preserved-land overlap (pct unknown) -20; 10–40 ac +10; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 10897584,
+      "status": "active",
+      "price": null,
+      "dom": 2877.0,
+      "acres": 39.75,
+      "broker": "American Properties Realty, Inc.",
+      "brokerContact": "Greg Kanter",
+      "brokerPhone": "7322839700",
+      "owner": "Pseg Services Corp",
+      "ownerPhone": null,
+      "zoning": "Heavy Industrial",
+      "use": "Industrial, Industrial Park, Service Station, Truck Terminal, Warehouse",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "0320_1001_2",
@@ -243065,7 +246713,24 @@
     "sewer": false,
     "preservedPct": 0,
     "score": 26,
-    "scoreNotes": "base 50; wetlands 4% -2; FEMA SFHA -15; Pinelands Rural Development -15; acreage in range +5; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; wetlands 4% -2; FEMA SFHA -15; Pinelands Rural Development -15; acreage in range +5; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 21791572,
+      "status": "active",
+      "price": 999000.0,
+      "dom": 155.0,
+      "acres": 3.160009,
+      "broker": null,
+      "brokerContact": null,
+      "brokerPhone": null,
+      "owner": "FS PROPERTIES 199",
+      "ownerPhone": null,
+      "zoning": null,
+      "use": null,
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "0435_4803_1",
@@ -243513,7 +247178,24 @@
     "sewer": false,
     "preservedPct": 0,
     "score": 26,
-    "scoreNotes": "base 50; wetlands 59% -24; FEMA SFHA -15; acreage in range +5; <$5k/ac assessed +10"
+    "scoreNotes": "base 50; wetlands 59% -24; FEMA SFHA -15; acreage in range +5; <$5k/ac assessed +10",
+    "listing": {
+      "id": 10415487,
+      "status": "active",
+      "price": 278000.0,
+      "dom": 4042.0,
+      "acres": 3.7,
+      "broker": null,
+      "brokerContact": null,
+      "brokerPhone": null,
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "R-1",
+      "use": "Single Family Residence",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "1101_46_25",
@@ -247153,7 +250835,24 @@
     "sewer": false,
     "preservedPct": 0,
     "score": 24,
-    "scoreNotes": "base 50; wetlands 67% -27; FEMA SFHA -15; 10–40 ac +10; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; wetlands 67% -27; FEMA SFHA -15; 10–40 ac +10; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 12016613,
+      "status": "active",
+      "price": 2300000.0,
+      "dom": 1988.0,
+      "acres": 16.0,
+      "broker": "COMPASS",
+      "brokerContact": "Natalie Jeker",
+      "brokerPhone": "2674358015",
+      "owner": "Josefina Jeker",
+      "ownerPhone": "6092026547",
+      "zoning": "A",
+      "use": "Agricultural, Commercial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "1704_34_16.01",
@@ -248273,7 +251972,24 @@
     "sewer": false,
     "preservedPct": 0,
     "score": 23,
-    "scoreNotes": "base 50; wetlands 81% -32; acreage in range +5"
+    "scoreNotes": "base 50; wetlands 81% -32; acreage in range +5",
+    "listing": {
+      "id": 14448796,
+      "status": "active",
+      "price": null,
+      "dom": 1170.0,
+      "acres": 14.85,
+      "broker": "Halo Realty",
+      "brokerContact": "Allan Argosino",
+      "brokerPhone": "8482291810",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "PCD",
+      "use": "Agricultural, Bank, Commercial, Day Care Center, Distribution, Health Care, Health Club, Industrial, Office Park, R&D, Restaurant, Warehouse",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "1333_26_3.09",
@@ -254209,7 +257925,24 @@
     "sewer": false,
     "preservedPct": 0,
     "score": 19,
-    "scoreNotes": "base 50; wetlands 77% -31; Pinelands Rural Development -15; acreage in range +5; <$5k/ac assessed +10"
+    "scoreNotes": "base 50; wetlands 77% -31; Pinelands Rural Development -15; acreage in range +5; <$5k/ac assessed +10",
+    "listing": {
+      "id": 10895047,
+      "status": "active",
+      "price": 595000.0,
+      "dom": 956.0,
+      "acres": 8.75,
+      "broker": "RE/MAX Preferred Commercial Division",
+      "brokerContact": "Bryant Lafferty",
+      "brokerPhone": "8562915880",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "C-2",
+      "use": null,
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "0316_74_1",
@@ -255217,7 +258950,24 @@
     "sewer": true,
     "preservedPct": null,
     "score": 19,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 89% -36; FEMA SFHA -15; preserved-land overlap (pct unknown) -20; acreage in range +5; <$5k/ac assessed +10"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 89% -36; FEMA SFHA -15; preserved-land overlap (pct unknown) -20; acreage in range +5; <$5k/ac assessed +10",
+    "listing": {
+      "id": 20987563,
+      "status": "off-market",
+      "price": null,
+      "dom": 479.0,
+      "acres": 11.0,
+      "broker": "GoldStone Realty",
+      "brokerContact": "Carrie McNally",
+      "brokerPhone": "7328983400",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "commercial",
+      "use": "Commercial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "1321_26_8",
@@ -255581,7 +259331,24 @@
     "sewer": false,
     "preservedPct": 0,
     "score": 19,
-    "scoreNotes": "base 50; wetlands 34% -14; FEMA SFHA -15; Highlands Planning -10; acreage in range +5; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; wetlands 34% -14; FEMA SFHA -15; Highlands Planning -10; acreage in range +5; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 9566566,
+      "status": "active",
+      "price": 299900.0,
+      "dom": 1162.0,
+      "acres": 6.8,
+      "broker": "Realty Executives",
+      "brokerContact": "Christopher Bruscino",
+      "brokerPhone": "9739035917",
+      "owner": "Covello I L & Anthony",
+      "ownerPhone": null,
+      "zoning": "C-2",
+      "use": null,
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "2111_4000_5200",
@@ -257709,7 +261476,24 @@
     "sewer": false,
     "preservedPct": 0,
     "score": 17,
-    "scoreNotes": "base 50; wetlands 94% -38; FEMA SFHA -15; 10–40 ac +10; <$5k/ac assessed +10"
+    "scoreNotes": "base 50; wetlands 94% -38; FEMA SFHA -15; 10–40 ac +10; <$5k/ac assessed +10",
+    "listing": {
+      "id": 21517047,
+      "status": "active",
+      "price": 311500.0,
+      "dom": 270.0,
+      "acres": 0.5,
+      "broker": "Foresite Commercial Realty",
+      "brokerContact": "Samantha Zerafa Roessler",
+      "brokerPhone": "6096461919",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "C",
+      "use": "Commercial",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "geo"
+    }
   },
   {
     "pin": "0117_10601_2",
@@ -269777,7 +273561,24 @@
     "sewer": false,
     "preservedPct": 0,
     "score": 15,
-    "scoreNotes": "base 50; wetlands 6% -2; Pinelands Forest Area (cap 15); acreage in range +5; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; wetlands 6% -2; Pinelands Forest Area (cap 15); acreage in range +5; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 21050203,
+      "status": "active",
+      "price": 125000.0,
+      "dom": 428.0,
+      "acres": 8.06,
+      "broker": "Burgos Realty Company",
+      "brokerContact": "Desiree Burgos",
+      "brokerPhone": "9733376475",
+      "owner": "Arcia Steven",
+      "ownerPhone": null,
+      "zoning": "R-5",
+      "use": null,
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "0109_23_42",
@@ -325553,7 +329354,24 @@
     "sewer": false,
     "preservedPct": 0,
     "score": 15,
-    "scoreNotes": "base 50; wetlands 34% -14; Pinelands Forest Area (cap 15); acreage in range +5; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; wetlands 34% -14; Pinelands Forest Area (cap 15); acreage in range +5; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 7163711,
+      "status": "active",
+      "price": 999000.0,
+      "dom": 421.0,
+      "acres": 10.41,
+      "broker": "Berkshire Hathaway Fox & Roach - Devon-Wayne",
+      "brokerContact": "Chris Benstead",
+      "brokerPhone": "8568105711",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "RD-C",
+      "use": "Bank, Commercial, Contractor Storage Yard, Mixed Use, Office, Retail, Strip Center, Warehouse",
+      "lastSaleDate": "2020-02-28",
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "0811_6201_10",
@@ -329921,7 +333739,24 @@
     "sewer": false,
     "preservedPct": 0,
     "score": 15,
-    "scoreNotes": "base 50; wetlands 88% -35; FEMA SFHA -15; acreage in range +5; <$5k/ac assessed +10"
+    "scoreNotes": "base 50; wetlands 88% -35; FEMA SFHA -15; acreage in range +5; <$5k/ac assessed +10",
+    "listing": {
+      "id": 21657255,
+      "status": "active",
+      "price": 2800000.0,
+      "dom": 66.0,
+      "acres": 5.5,
+      "broker": "Colliers",
+      "brokerContact": "Douglas Twyman",
+      "brokerPhone": "7328070338",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "HC",
+      "use": "Commercial, Medical, Retail",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "1402_21001_2",
@@ -331209,7 +335044,24 @@
     "sewer": false,
     "preservedPct": null,
     "score": 15,
-    "scoreNotes": "base 50; wetlands 15% -6; flood unmapped -3; Highlands Preservation (cap 15); preserved-land overlap (pct unknown) -20; 10–40 ac +10; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; wetlands 15% -6; flood unmapped -3; Highlands Preservation (cap 15); preserved-land overlap (pct unknown) -20; 10–40 ac +10; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 10106180,
+      "status": "active",
+      "price": null,
+      "dom": 1477.0,
+      "acres": 97.81,
+      "broker": "American Properties Realty, Inc.",
+      "brokerContact": "Greg Kanter",
+      "brokerPhone": "7322839700",
+      "owner": "Public Service Enterprise Group",
+      "ownerPhone": "9734307000",
+      "zoning": "Rural Conversion",
+      "use": "Public Park, Single Family Development, Utility Sub-Station",
+      "lastSaleDate": "2008-10-07",
+      "lastSalePrice": 862000.0,
+      "join": "geo"
+    }
   },
   {
     "pin": "1414_320.05_3",
@@ -333841,7 +337693,24 @@
     "sewer": false,
     "preservedPct": 0,
     "score": 15,
-    "scoreNotes": "base 50; wetlands 16% -6; flood unmapped -3; Highlands Preservation (cap 15); 10–40 ac +10"
+    "scoreNotes": "base 50; wetlands 16% -6; flood unmapped -3; Highlands Preservation (cap 15); 10–40 ac +10",
+    "listing": {
+      "id": 12237360,
+      "status": "active",
+      "price": null,
+      "dom": 645.0,
+      "acres": 10.98,
+      "broker": "Commercial Property Agents, LLC",
+      "brokerContact": "Jeffrey Rosenberg",
+      "brokerPhone": "9737946591",
+      "owner": "The Morris Companies",
+      "ownerPhone": "2018048700",
+      "zoning": "G-I, General Industrial",
+      "use": "Distribution, Industrial, Warehouse",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "1427_403_2",
@@ -334121,7 +337990,24 @@
     "sewer": false,
     "preservedPct": 0,
     "score": 15,
-    "scoreNotes": "base 50; wetlands 27% -11; flood unmapped -3; Highlands Preservation (cap 15); acreage in range +5; $5–15k/ac assessed +6"
+    "scoreNotes": "base 50; wetlands 27% -11; flood unmapped -3; Highlands Preservation (cap 15); acreage in range +5; $5–15k/ac assessed +6",
+    "listing": {
+      "id": 5605153,
+      "status": "active",
+      "price": 50000000.0,
+      "dom": 2445.0,
+      "acres": 152.0,
+      "broker": "SK Realty & Development",
+      "brokerContact": "Michael Karczynski",
+      "brokerPhone": "7324653535",
+      "owner": "Sunoco",
+      "ownerPhone": "7329811521",
+      "zoning": "Industrial",
+      "use": "Industrial",
+      "lastSaleDate": "2018-05-30",
+      "lastSalePrice": 669905.0,
+      "join": "pin"
+    }
   },
   {
     "pin": "1427_4500_36",
@@ -371025,7 +374911,24 @@
     "sewer": true,
     "preservedPct": 11,
     "score": 7,
-    "scoreNotes": "base 50; sewer service area +25; wetlands 96% -38; FEMA SFHA -15; Pinelands Rural Development -15; preserved land 11% -20; 10–40 ac +10; <$5k/ac assessed +10"
+    "scoreNotes": "base 50; sewer service area +25; wetlands 96% -38; FEMA SFHA -15; Pinelands Rural Development -15; preserved land 11% -20; 10–40 ac +10; <$5k/ac assessed +10",
+    "listing": {
+      "id": 21791580,
+      "status": "active",
+      "price": 999000.0,
+      "dom": 155.0,
+      "acres": 16.946298,
+      "broker": null,
+      "brokerContact": null,
+      "brokerPhone": null,
+      "owner": "FS PROPERTIES 154 LLC",
+      "ownerPhone": null,
+      "zoning": "RS-2",
+      "use": null,
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "pin"
+    }
   },
   {
     "pin": "0324_602_25",
@@ -373573,7 +377476,24 @@
     "sewer": false,
     "preservedPct": 0,
     "score": 4,
-    "scoreNotes": "base 50; wetlands 97% -39; FEMA SFHA -15; acreage in range +5; $15–40k/ac assessed +3"
+    "scoreNotes": "base 50; wetlands 97% -39; FEMA SFHA -15; acreage in range +5; $15–40k/ac assessed +3",
+    "listing": {
+      "id": 9397322,
+      "status": "off-market",
+      "price": 4900000.0,
+      "dom": 4454.0,
+      "acres": 3.8798,
+      "broker": "Evergreen Commercial Real Estate",
+      "brokerContact": "Douglas Balduini",
+      "brokerPhone": "9733320518",
+      "owner": "Philip Deleasa",
+      "ownerPhone": "9739836764",
+      "zoning": "19:4-5.33",
+      "use": "Apartment Units - Senior, Bank, Commercial, Day Care Center, Funeral Home, Health Care, Marina, MultiFamily, Office, Rehabilitation Center, Religious Facility, Restaurant, Retail, Schools, Spclty/Festvl/Entertnmnt",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "0328_300_2",
@@ -373825,7 +377745,24 @@
     "sewer": false,
     "preservedPct": 11,
     "score": 4,
-    "scoreNotes": "base 50; wetlands 64% -26; FEMA SFHA -15; preserved land 11% -20; acreage in range +5; <$5k/ac assessed +10"
+    "scoreNotes": "base 50; wetlands 64% -26; FEMA SFHA -15; preserved land 11% -20; acreage in range +5; <$5k/ac assessed +10",
+    "listing": {
+      "id": 10595102,
+      "status": "active",
+      "price": null,
+      "dom": 276.0,
+      "acres": 5.35,
+      "broker": "The Blau & Berg Company",
+      "brokerContact": "Scott Savastano",
+      "brokerPhone": "9733796644",
+      "owner": null,
+      "ownerPhone": null,
+      "zoning": "HC",
+      "use": "Commercial, Retail",
+      "lastSaleDate": null,
+      "lastSalePrice": null,
+      "join": "near"
+    }
   },
   {
     "pin": "1432_6_44",
