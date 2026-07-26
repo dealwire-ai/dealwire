@@ -3,7 +3,17 @@
 **What this is:** every New Jersey tax parcel classified as vacant land (property class 1)
 between 5 and 100 acres, statewide — 13,751 parcels — screened
 against the public development-blocker layers below. 3,450 parcels
-score 70+ ("priority targets"). Built entirely from public records; no licensed data.
+score 70+ ("priority targets"). Built from public records, plus a CoStar market layer
+(below) pulled under Denholtz's license.
+
+**CoStar market layer (Jul 24, 2026 snapshot):** the accompanying
+`costar-listings-joined-2026-07-24.csv` contains all 1,139 CoStar NJ land listings
+(0.25–100 acres) with asking price, days on market, broker contact + phone,
+CoStar-reported owner, zoning, and proposed use, plus the parcel each listing matched in
+the screen (`pin` column; ~231 matched — the rest are sub-5-acre, other property classes,
+or improved parcels outside this screen's universe). It is a point-in-time export:
+listings close and reprice. Asking prices run several times assessed value — assessed is
+a tax figure, not a market estimate.
 
 **How to read the score (0–99):** every parcel starts at 50. Sewer service adds 25.
 Wetlands coverage subtracts up to 40 (0.4 × percent covered). FEMA flood zones subtract
@@ -24,8 +34,10 @@ each parcel.
 - **Tax figure is prior-year billed tax** (MOD-IV `LAST_YR_TX`), with current assessed
   values. Delinquency and tax-sale status are only public per-municipality in NJ — no
   statewide feed exists; we can pull specific municipalities on request.
-- **No owner information.** New Jersey redacts owner names from its published parcel data
-  (Daniel's Law). Ownership for specific targets can be pulled from county deed records.
+- **Owner names only via CoStar.** New Jersey redacts owner names from its published
+  parcel data (Daniel's Law), so the screen itself carries none. Where a CoStar listing
+  matched, the owner CoStar reports is included (their research, their license); for
+  everything else, ownership comes from county deed records.
 - **Preserved land excluded.** Parcels more than half covered by mapped open space or
   farmland-preservation easements were removed; partial overlaps (5–50%) are flagged in
   `preserved_pct`.
