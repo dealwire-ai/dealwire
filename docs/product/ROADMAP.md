@@ -60,6 +60,11 @@ The deal screener is the wedge. The endgame is an autonomous acquisitions analys
 - S3 document storage for attachments with pre-signed URL downloads
 - SQS async processing pipeline (two queues: email screening + underwriting)
 
+### Client Pilots
+
+- Denholtz NJ land screen (epic #419): 13,751 class-1 vacant parcels 5–100 ac scored for developability from public records; interactive zoom/pan map, analyst chat, client CSV
+- CoStar market layer on the NJ screen (#431): 1,139-listing export joined by parcel number + point-in-polygon — asking prices, brokers, CoStar-reported owners, on-market filter, statewide listings overlay
+
 ## Roadmap
 
 ### Phase 1: Data Quality & Fidelity
