@@ -17,7 +17,7 @@ type Founder = {
   headshot: string;
 };
 
-type Advisor = {
+type Member = {
   name: string;
   role: string;
   headshot: string;
@@ -44,7 +44,24 @@ const FOUNDERS: Founder[] = [
   },
 ];
 
-const ADVISORS: Advisor[] = [
+const ENGINEERS: Member[] = [
+  {
+    name: "Jackson Zheng",
+    role: "Forward Deployed Engineer",
+    headshot: "/headshots/jackson.webp",
+    linkedin: "https://www.linkedin.com/in/jackson-zheng-844172247/",
+    bio: "Software Engineer at a private healthcare company, where he builds and automates the internal systems their operations run on. Computer Science and Mathematics at Northeastern.",
+  },
+  {
+    name: "Alex Weinberger",
+    role: "Forward Deployed Engineer",
+    headshot: "/headshots/alex.webp",
+    linkedin: "https://www.linkedin.com/in/weinberger-alexander/",
+    bio: "Former Full-Stack Software Engineer at MORSE Corp, building software for defense and national security. Focused on distributed systems and fintech. Computer Science at Northeastern.",
+  },
+];
+
+const ADVISORS: Member[] = [
   {
     name: "David Shorenstein",
     role: "Advisor",
@@ -120,7 +137,7 @@ function FounderCard({ founder }: { founder: Founder }) {
   );
 }
 
-function AdvisorCard({ advisor }: { advisor: Advisor }) {
+function MemberCard({ member }: { member: Member }) {
   return (
     <div className="relative group h-full">
       <div className="absolute inset-0 bg-gradient-to-br from-[#C8A96E]/6 to-transparent rounded-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -129,27 +146,27 @@ function AdvisorCard({ advisor }: { advisor: Advisor }) {
           <div className="flex items-center gap-4">
             <div className="relative w-11 h-11 rounded-sm overflow-hidden border border-[#C8A96E]/15 shrink-0">
               <Image
-                src={advisor.headshot}
-                alt={advisor.name}
+                src={member.headshot}
+                alt={member.name}
                 fill
                 className="object-cover"
               />
             </div>
             <div>
               <h3 className="text-sm font-medium text-white/90">
-                {advisor.name}
+                {member.name}
               </h3>
-              <Eyebrow>{advisor.role}</Eyebrow>
+              <Eyebrow>{member.role}</Eyebrow>
             </div>
           </div>
           <a
-            href={advisor.linkedin}
+            href={member.linkedin}
             target="_blank"
             rel="noopener noreferrer"
             onClick={() =>
               posthog.capture("founder_linkedin_clicked", {
-                founder_name: advisor.name,
-                role: "advisor",
+                founder_name: member.name,
+                role: member.role.toLowerCase(),
               })
             }
             className="p-2 bg-white/[0.04] rounded-sm hover:bg-white/8 transition-colors shrink-0"
@@ -157,7 +174,7 @@ function AdvisorCard({ advisor }: { advisor: Advisor }) {
             <Linkedin className="w-4 h-4 text-white/35" />
           </a>
         </div>
-        <p className="text-white/35 text-sm leading-relaxed">{advisor.bio}</p>
+        <p className="text-white/35 text-sm leading-relaxed">{member.bio}</p>
       </div>
     </div>
   );
@@ -225,10 +242,19 @@ export function TeamSection() {
       </div>
 
       <FadeInSection delay={0.3}>
+        <Eyebrow className="mb-4 mt-20">Forward Deployed Engineers</Eyebrow>
+        <div className="grid md:grid-cols-2 gap-3">
+          {ENGINEERS.map((engineer) => (
+            <MemberCard key={engineer.name} member={engineer} />
+          ))}
+        </div>
+      </FadeInSection>
+
+      <FadeInSection delay={0.35}>
         <Eyebrow className="mb-4 mt-20">Strategic Advisors</Eyebrow>
         <div className="grid md:grid-cols-2 gap-3">
           {ADVISORS.map((advisor) => (
-            <AdvisorCard key={advisor.name} advisor={advisor} />
+            <MemberCard key={advisor.name} member={advisor} />
           ))}
         </div>
       </FadeInSection>
