@@ -604,7 +604,7 @@ export default function Custom() {
             </h2>
           </FadeInSection>
 
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid md:grid-cols-2 gap-3">
             {[
               {
                 name: "Isaac Levine",
@@ -630,8 +630,8 @@ export default function Custom() {
               >
                 <div className="relative group h-full">
                   <div className="absolute inset-0 bg-gradient-to-br from-[#C8A96E]/8 to-transparent rounded-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <div className="relative h-full p-8 lg:p-10 bg-white/[0.015] border border-white/[0.06] rounded-sm group-hover:border-[#C8A96E]/20 transition-colors duration-300">
-                    <div className="flex items-start justify-between mb-6">
+                  <div className="relative h-full p-6 bg-white/[0.015] border border-white/[0.06] rounded-sm group-hover:border-[#C8A96E]/20 transition-colors duration-300">
+                    <div className="flex items-start justify-between mb-4">
                       <div className="relative w-14 h-14 rounded-sm overflow-hidden border border-[#C8A96E]/15">
                         <Image
                           src={founder.headshot}
@@ -685,8 +685,75 @@ export default function Custom() {
             ))}
           </div>
 
-          {/* Strategic Advisors */}
+          {/* Forward Deployed Engineers */}
           <FadeInSection delay={0.3}>
+            <div className="grid md:grid-cols-2 gap-3 mt-3">
+              {[
+                {
+                  name: "Jackson Zheng",
+                  role: "Forward Deployed Engineer",
+                  headshot: "/headshots/jackson.webp",
+                  linkedin:
+                    "https://www.linkedin.com/in/jackson-zheng-844172247/",
+                  bio: "Software Engineer at a private healthcare company, where he builds and automates the internal systems their operations run on. Computer Science and Mathematics at Northeastern.",
+                },
+                {
+                  name: "Alex Weinberger",
+                  role: "Forward Deployed Engineer",
+                  headshot: "/headshots/alex.webp",
+                  linkedin: "https://www.linkedin.com/in/weinberger-alexander/",
+                  bio: "Former Full-Stack Software Engineer at MORSE Corp, building software for defense and national security. Focused on distributed systems and fintech. Computer Science at Northeastern.",
+                },
+              ].map((engineer, index) => (
+                <div key={index} className="relative group h-full">
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#C8A96E]/6 to-transparent rounded-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="relative h-full p-6 bg-white/[0.015] border border-white/[0.06] rounded-sm group-hover:border-[#C8A96E]/20 transition-colors duration-300">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-4">
+                        <div className="relative w-11 h-11 rounded-sm overflow-hidden border border-[#C8A96E]/15 shrink-0">
+                          <Image
+                            src={engineer.headshot}
+                            alt={engineer.name}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                        <div>
+                          <h3 className="text-sm font-medium text-white/90">
+                            {engineer.name}
+                          </h3>
+                          <p className="text-[#C8A96E] text-xs font-mono tracking-widest uppercase">
+                            {engineer.role}
+                          </p>
+                        </div>
+                      </div>
+                      <a
+                        href={engineer.linkedin}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() =>
+                          posthog.capture("founder_linkedin_clicked", {
+                            founder_name: engineer.name,
+                            role: "forward deployed engineer",
+                            page: "custom",
+                          })
+                        }
+                        className="p-2 bg-white/[0.04] rounded-sm hover:bg-white/8 transition-colors shrink-0"
+                      >
+                        <Linkedin className="w-4 h-4 text-white/35" />
+                      </a>
+                    </div>
+                    <p className="text-white/35 text-sm leading-relaxed">
+                      {engineer.bio}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </FadeInSection>
+
+          {/* Strategic Advisors */}
+          <FadeInSection delay={0.35}>
             <p className="text-[#C8A96E] text-xs font-mono tracking-widest uppercase mb-4 mt-20">
               Strategic Advisors
             </p>
