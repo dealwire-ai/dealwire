@@ -607,7 +607,7 @@ export default function InboxPage() {
             </h2>
           </FadeInSection>
 
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid md:grid-cols-2 gap-3">
             {[
               {
                 name: "Isaac Levine",
@@ -633,8 +633,8 @@ export default function InboxPage() {
               >
                 <div className="relative group h-full">
                   <div className="absolute inset-0 bg-gradient-to-br from-[#C8A96E]/8 to-transparent rounded-sm opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <div className="relative h-full p-8 lg:p-10 bg-white/[0.015] border border-white/[0.06] rounded-sm group-hover:border-[#C8A96E]/20 transition-colors duration-300">
-                    <div className="flex items-start justify-between mb-6">
+                  <div className="relative h-full p-6 bg-white/[0.015] border border-white/[0.06] rounded-sm group-hover:border-[#C8A96E]/20 transition-colors duration-300">
+                    <div className="flex items-start justify-between mb-4">
                       <div className="relative w-14 h-14 rounded-sm overflow-hidden border border-[#C8A96E]/15">
                         <Image
                           src={founder.headshot}
@@ -690,10 +690,7 @@ export default function InboxPage() {
 
           {/* Forward Deployed Engineers */}
           <FadeInSection delay={0.3}>
-            <p className="text-[#C8A96E] text-xs font-mono tracking-widest uppercase mb-4 mt-20">
-              Forward Deployed Engineers
-            </p>
-            <div className="grid md:grid-cols-2 gap-3">
+            <div className="grid md:grid-cols-2 gap-3 mt-3">
               {[
                 {
                   name: "Jackson Zheng",
