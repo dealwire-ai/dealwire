@@ -50,7 +50,7 @@ const ENGINEERS: Member[] = [
     role: "Forward Deployed Engineer",
     headshot: "/headshots/jackson.webp",
     linkedin: "https://www.linkedin.com/in/jackson-zheng-844172247/",
-    bio: "Software Engineer at a private healthcare company, where he builds and automates the internal systems their operations run on. Computer Science and Mathematics at Northeastern.",
+    bio: "Software Engineer at a private healthcare company, where he builds and automates the internal systems their operations run on. Computer Science and Mathematics at Northeastern. 4x hackathon winner.",
   },
   {
     name: "Alex Weinberger",
