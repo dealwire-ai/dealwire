@@ -45,7 +45,7 @@ export function HeroSection() {
               with the outside data that makes them readable. Specialized agents
               screen inbound flow, underwrite, draft memos, and surface deals
               before the rest of the market sees them &mdash; each reading from
-              your firm&apos;s full history. All through email.
+              your firm&apos;s full history, wherever your team already works.
             </p>
 
             <Link
