@@ -132,7 +132,7 @@ src/service/public-data/
   care-scraper.service.ts      # CARE portal scraper: exact per-BBL lien sale amounts, servicer, status
   distress-scoring.service.ts  # Distress score (0-100): lien, violations, class C
   parcel-query.service.ts      # Query/filter Parcel table; used by controller + agent
-  skip-trace.service.ts        # Tracerfy skip tracing: submitBatch, pollAndStore, cap check
+  skip-trace.service.ts        # Skip Sherpa skip tracing: submitBatch, stale-pending reaper, cap checks
   nyc-utils.ts                 # Borough constants, BBL utilities
 
 src/controller/public-data.controller.ts  # /public-data/* — ingest, parcels, export, stats, skip-trace, care
@@ -173,14 +173,19 @@ POST /public-data/ingest/care
 
 POST /public-data/parcels/skip-trace (or /:bbl/skip-trace)
   → SkipTraceService.submitBatch(bbls)
-      → monthly cap check + idempotency filter
-      → mark pending → POST tracerfy.com/v1/api/trace/
-      → fire-and-forget: pollAndStore(queueId, bbls)
-          → poll GET /queue/:id every 15s (up to 5 min)
-          → write ownerPhones/ownerEmails → Parcel table
+      → 30-day found-cache filter + per-org quota + global cap check
+      → mark pending + stamp skipTraceQueuedAt → grant OrgSkipTrace access
+      → fire-and-forget: PUT skipsherpa.com/api/beta6/properties (chunks of 25, 30s timeout)
+          → write ownerPhones/ownerEmails + status (found/not_found/error) → Parcel table
+      → stale-pending reaper (boot sweep + every 5 min): pending rows older
+        than 10 min → 'error' so the UI offers Retry after a restart killed
+        an in-flight lookup
+
+GET /public-data/parcels/skip-trace/status?bbls=...
+  → frontend polling; org-gated by OrgSkipTrace, same visibility as the list endpoint
 ```
 
-**Env vars:** `NYC_OPEN_DATA_APP_TOKEN` (optional, avoids rate limits), `TRACERFY_API_KEY`, `TRACERFY_MONTHLY_CREDIT_CAP` (default 500), `NYCTL_REPORT_DATE` (optional, e.g. `9-30-2025` — triggers NYCTL ingestion as part of full ingest)
+**Env vars:** `NYC_OPEN_DATA_APP_TOKEN` (optional, avoids rate limits), `SKIPSHERPA_API_KEY`, `TRACERFY_MONTHLY_CREDIT_CAP` (global monthly skip trace cap, default 500), `ORG_SKIP_TRACE_MONTHLY_LIMIT` (default 100), `NYCTL_REPORT_DATE` (optional, e.g. `9-30-2025` — triggers NYCTL ingestion as part of full ingest)
 
 **Agent tools:** `query_parcels`, `get_parcel_stats` (in `DealwireAgentService`)
 
