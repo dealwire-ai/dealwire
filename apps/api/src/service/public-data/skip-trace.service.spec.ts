@@ -216,8 +216,9 @@ describe('SkipTraceService — stale pending reaper', () => {
     const after = Date.now();
 
     expect(count).toBe(2);
-    const arg = prisma.parcel.updateMany.mock
-      .calls[0][0] as unknown as ReaperUpdateArg;
+    const arg = (
+      prisma.parcel.updateMany.mock.calls as Array<[ReaperUpdateArg]>
+    )[0][0];
     expect(arg.where.skipTraceStatus).toBe('pending');
 
     const ltArm = arg.where.OR?.[0]?.skipTraceQueuedAt as { lt: Date };
@@ -238,8 +239,9 @@ describe('SkipTraceService — stale pending reaper', () => {
   it('does not touch rows outside pending status', async () => {
     await service.reapStalePendingTraces();
 
-    const arg = prisma.parcel.updateMany.mock
-      .calls[0][0] as unknown as ReaperUpdateArg;
+    const arg = (
+      prisma.parcel.updateMany.mock.calls as Array<[ReaperUpdateArg]>
+    )[0][0];
     expect(arg.where.skipTraceStatus).toBe('pending');
   });
 
@@ -266,7 +268,7 @@ describe('SkipTraceService — stale pending reaper', () => {
 
     await service.submitBatch(['4001230045'], 'org_test');
     // Let the fire-and-forget lookup settle before the test ends
-    await new Promise(process.nextTick);
+    await new Promise((resolve) => process.nextTick(resolve));
 
     const pendingWrite = (
       prisma.parcel.updateMany.mock.calls as Array<[ReaperUpdateArg]>
