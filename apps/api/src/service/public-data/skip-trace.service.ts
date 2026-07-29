@@ -1,9 +1,16 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { BOROUGH_NAMES } from './nyc-utils';
 
 /** Hard timeout for outbound Skip Sherpa requests so a slow provider can't hang a trace. */
 const SKIP_SHERPA_TIMEOUT_MS = 30_000;
+
+/**
+ * How long a parcel may sit in 'pending' before the reaper flips it to
+ * 'error'. Worst-case legitimate in-flight time is ~90s (chunked lookups at
+ * 30s each), so 10 minutes has wide margin.
+ */
+const STALE_PENDING_MS = 10 * 60_000;
 
 interface OwnerPhone {
   number: string;
@@ -98,7 +105,7 @@ interface QueuedRequest {
 }
 
 @Injectable()
-export class SkipTraceService {
+export class SkipTraceService implements OnApplicationBootstrap {
   private readonly logger = new Logger(SkipTraceService.name);
   private readonly apiKey = process.env.TRACERFY_API_KEY;
   private readonly baseUrl = 'https://tracerfy.com/v1/api';
@@ -121,6 +128,51 @@ export class SkipTraceService {
   private readonly FLUSH_DELAY_MS = 5_000;
 
   constructor(private readonly prisma: PrismaService) {}
+
+  /**
+   * The Skip Sherpa lookup runs as an in-process promise after rows are
+   * marked 'pending', so a restart mid-lookup strands them. Sweep on boot;
+   * PublicDataSchedulerService repeats the sweep on a cron.
+   */
+  async onApplicationBootstrap(): Promise<void> {
+    try {
+      await this.reapStalePendingTraces();
+    } catch (err) {
+      // Never block boot — e.g. migrations may not have run yet
+      this.logger.warn(
+        `Skip trace startup sweep skipped: ${(err as Error).message}`,
+      );
+    }
+  }
+
+  /**
+   * Flip 'pending' rows older than STALE_PENDING_MS to 'error' so the UI
+   * stops showing "Queued" and offers Retry. Rows with no queuedAt timestamp
+   * predate the column and can only be strays — reap those too.
+   */
+  async reapStalePendingTraces(): Promise<number> {
+    const cutoff = new Date(Date.now() - STALE_PENDING_MS);
+    const { count } = await this.prisma.parcel.updateMany({
+      where: {
+        skipTraceStatus: 'pending',
+        OR: [
+          { skipTraceQueuedAt: { lt: cutoff } },
+          { skipTraceQueuedAt: null },
+        ],
+      },
+      data: {
+        skipTraceStatus: 'error',
+        skipTraceQueuedAt: null,
+        skipTraceQueueId: null,
+      },
+    });
+    if (count > 0) {
+      this.logger.warn(
+        `Reaped ${count} stale pending skip trace(s) to 'error'`,
+      );
+    }
+    return count;
+  }
 
   /**
    * Queue a single BBL for skip tracing. Buffers requests for 5 seconds,
