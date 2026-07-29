@@ -269,7 +269,7 @@ export class SkipTraceService {
     // Mark all as pending
     await this.prisma.parcel.updateMany({
       where: { bbl: { in: toQueue.map((p) => p.bbl) } },
-      data: { skipTraceStatus: 'pending' },
+      data: { skipTraceStatus: 'pending', skipTraceQueuedAt: new Date() },
     });
 
     // Grant org access
@@ -553,7 +553,11 @@ export class SkipTraceService {
       );
       await this.prisma.parcel.updateMany({
         where: { bbl: { in: bbls }, skipTraceStatus: 'pending' },
-        data: { skipTraceStatus: 'error', skipTraceQueueId: null },
+        data: {
+          skipTraceStatus: 'error',
+          skipTraceQueuedAt: null,
+          skipTraceQueueId: null,
+        },
       });
     }
   }
@@ -616,7 +620,11 @@ export class SkipTraceService {
         // it stays distinguishable from a genuine miss and remains retryable.
         await this.prisma.parcel.updateMany({
           where: { bbl: { in: parcels.map((p) => p.bbl) } },
-          data: { skipTraceStatus: 'error', skipTraceQueueId: null },
+          data: {
+            skipTraceStatus: 'error',
+            skipTraceQueuedAt: null,
+            skipTraceQueueId: null,
+          },
         });
         return;
       }
@@ -634,6 +642,7 @@ export class SkipTraceService {
             data: {
               skipTraceStatus: 'not_found',
               skipTracedAt: now,
+              skipTraceQueuedAt: null,
               skipTraceQueueId: null,
             },
           });
@@ -654,6 +663,7 @@ export class SkipTraceService {
             ...(emails.length > 0 && { ownerEmails: emails }),
             skipTraceStatus: hasContact ? 'found' : 'not_found',
             skipTracedAt: now,
+            skipTraceQueuedAt: null,
             skipTraceQueueId: null,
           },
         });
