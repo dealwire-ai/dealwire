@@ -114,7 +114,6 @@ export class SkipTraceService implements OnApplicationBootstrap {
       data: {
         skipTraceStatus: 'error',
         skipTraceQueuedAt: null,
-        skipTraceQueueId: null,
       },
     });
     if (count > 0) {
@@ -272,7 +271,6 @@ export class SkipTraceService implements OnApplicationBootstrap {
         data: {
           skipTraceStatus: 'error',
           skipTraceQueuedAt: null,
-          skipTraceQueueId: null,
         },
       });
     }
@@ -339,7 +337,6 @@ export class SkipTraceService implements OnApplicationBootstrap {
           data: {
             skipTraceStatus: 'error',
             skipTraceQueuedAt: null,
-            skipTraceQueueId: null,
           },
         });
         return;
@@ -359,7 +356,6 @@ export class SkipTraceService implements OnApplicationBootstrap {
               skipTraceStatus: 'not_found',
               skipTracedAt: now,
               skipTraceQueuedAt: null,
-              skipTraceQueueId: null,
             },
           });
           continue;
@@ -380,7 +376,6 @@ export class SkipTraceService implements OnApplicationBootstrap {
             skipTraceStatus: hasContact ? 'found' : 'not_found',
             skipTracedAt: now,
             skipTraceQueuedAt: null,
-            skipTraceQueueId: null,
           },
         });
 
@@ -398,7 +393,7 @@ export class SkipTraceService implements OnApplicationBootstrap {
       );
       await this.prisma.parcel.updateMany({
         where: { bbl: { in: parcels.map((p) => p.bbl) } },
-        data: { skipTraceStatus: 'error', skipTraceQueueId: null },
+        data: { skipTraceStatus: 'error', skipTraceQueuedAt: null },
       });
     }
   }

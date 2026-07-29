@@ -25,7 +25,6 @@ interface UpdateManyArg {
   where: { bbl?: string | { in?: string[] }; skipTraceStatus?: string };
   data: {
     skipTraceStatus?: string;
-    skipTraceQueueId?: string | null;
     ownerPhones?: Array<{ number: string; source?: string }>;
   };
 }
