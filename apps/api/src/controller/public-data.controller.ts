@@ -527,7 +527,7 @@ export class PublicDataController {
       );
     }
 
-    return this.skipTrace.getStatusForBbls(bbls);
+    return this.skipTrace.getStatusForBbls(bbls, organizationId);
   }
 
   @Get('parcels/valuation/usage')
