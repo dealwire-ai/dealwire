@@ -649,8 +649,8 @@ export class PublicDataController {
 
     let result: { queueId: string; queued: string[]; skipped: number };
     try {
-      result = await this.skipTrace.enqueue(
-        bbl,
+      result = await this.skipTrace.submitBatch(
+        [bbl],
         organizationId,
         body.force ?? false,
       );

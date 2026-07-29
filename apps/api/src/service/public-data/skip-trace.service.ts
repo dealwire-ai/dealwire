@@ -91,19 +91,6 @@ interface TracerfyQueueResponse {
   [key: string]: unknown;
 }
 
-/** Pending item in the single-BBL queue */
-interface QueuedRequest {
-  bbl: string;
-  force: boolean;
-  organizationId: string;
-  resolve: (result: {
-    queueId: string;
-    queued: string[];
-    skipped: number;
-  }) => void;
-  reject: (err: Error) => void;
-}
-
 @Injectable()
 export class SkipTraceService implements OnApplicationBootstrap {
   private readonly logger = new Logger(SkipTraceService.name);
@@ -121,11 +108,6 @@ export class SkipTraceService implements OnApplicationBootstrap {
   /** Skip Sherpa fallback provider */
   private readonly skipSherpaApiKey = process.env.SKIPSHERPA_API_KEY;
   private readonly skipSherpaBaseUrl = 'https://skipsherpa.com/api/beta6';
-
-  /** Buffer for single-BBL requests — flushed as one batch after FLUSH_DELAY_MS */
-  private pendingQueue: QueuedRequest[] = [];
-  private flushTimer: ReturnType<typeof setTimeout> | null = null;
-  private readonly FLUSH_DELAY_MS = 5_000;
 
   constructor(private readonly prisma: PrismaService) {}
 
@@ -172,67 +154,6 @@ export class SkipTraceService implements OnApplicationBootstrap {
       );
     }
     return count;
-  }
-
-  /**
-   * Queue a single BBL for skip tracing. Buffers requests for 5 seconds,
-   * then flushes all queued BBLs as one Tracerfy batch to avoid rate limits.
-   * Returns a promise that resolves when the batch is submitted.
-   */
-  enqueue(
-    bbl: string,
-    organizationId: string,
-    force = false,
-  ): Promise<{ queueId: string; queued: string[]; skipped: number }> {
-    return new Promise((resolve, reject) => {
-      this.pendingQueue.push({ bbl, force, organizationId, resolve, reject });
-
-      this.logger.log(
-        `Enqueued BBL ${bbl} for batched skip trace (${this.pendingQueue.length} pending)`,
-      );
-
-      // Reset the flush timer on each new request (debounce)
-      if (this.flushTimer) clearTimeout(this.flushTimer);
-      this.flushTimer = setTimeout(
-        () => this.flushQueue(),
-        this.FLUSH_DELAY_MS,
-      );
-    });
-  }
-
-  /** Flush all pending single-BBL requests, grouped by org */
-  private async flushQueue(): Promise<void> {
-    this.flushTimer = null;
-    const items = this.pendingQueue.splice(0);
-    if (items.length === 0) return;
-
-    // Group items by organizationId so each org gets its own batch
-    const byOrg = new Map<string, QueuedRequest[]>();
-    for (const item of items) {
-      const existing = byOrg.get(item.organizationId) ?? [];
-      existing.push(item);
-      byOrg.set(item.organizationId, existing);
-    }
-
-    for (const [organizationId, orgItems] of byOrg) {
-      const bbls = orgItems.map((i) => i.bbl);
-      const force = orgItems.some((i) => i.force);
-
-      this.logger.log(
-        `Flushing ${orgItems.length} queued skip trace requests for org ${organizationId}: [${bbls.join(', ')}]`,
-      );
-
-      try {
-        const result = await this.submitBatch(bbls, organizationId, force);
-        for (const item of orgItems) {
-          item.resolve(result);
-        }
-      } catch (err) {
-        for (const item of orgItems) {
-          item.reject(err as Error);
-        }
-      }
-    }
   }
 
   async submitBatch(
