@@ -3,7 +3,6 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { PrismaModule } from './prisma.module';
 import { NotificationsModule } from './notifications.module';
 import { PublicDataController } from '../controller/public-data.controller';
-import { SkipTraceWebhookController } from '../controller/skip-trace-webhook.controller';
 import { ParcelCrmController } from '../controller/parcel-crm.controller';
 import { SodaAdapter } from '../service/public-data/soda.adapter';
 import { NycIngestionService } from '../service/public-data/nyc-ingestion.service';
@@ -23,11 +22,7 @@ import { ClerkAuthGuard } from '../guard/clerk-auth.guard';
 
 @Module({
   imports: [PrismaModule, NotificationsModule, ScheduleModule],
-  controllers: [
-    PublicDataController,
-    SkipTraceWebhookController,
-    ParcelCrmController,
-  ],
+  controllers: [PublicDataController, ParcelCrmController],
   providers: [
     SodaAdapter,
     NycIngestionService,
