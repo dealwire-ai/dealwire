@@ -402,7 +402,6 @@ model Parcel {
   skipTracedAt      DateTime?
   skipTraceStatus   String? // 'pending' | 'found' | 'not_found' | 'error'
   skipTraceQueuedAt DateTime? // set when status flips to 'pending'; cleared on completion
-  skipTraceQueueId  String? // Tracerfy async queue_id, cleared after completion
 
   // CARE portal scraper (exact per-BBL lien data)
   lienStatus         String? // Raw CARE status: "S Sold", "R Post Sale Redeemed"
