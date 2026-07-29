@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { RefreshCw } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useApi } from "@/hooks/use-api";
 import { PhoneContactPanel } from "./phone-contact-panel";
@@ -27,8 +28,10 @@ export function SkipTraceButton({ parcel, onUpdated }: SkipTraceButtonProps) {
       });
       // Mark as pending locally — results arrive async
       onUpdated?.({ skipTraceStatus: "pending" });
-    } catch {
-      // ignore — user can retry
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Skip trace request failed",
+      );
     } finally {
       setLoading(false);
     }
