@@ -764,9 +764,14 @@ export class SkipTraceService implements OnApplicationBootstrap {
     });
   }
 
-  /** Return the skip trace status for a list of BBLs (used by frontend polling) */
+  /**
+   * Return the skip trace status for a list of BBLs (used by frontend
+   * polling). Parcels the org has no OrgSkipTrace grant for are reported as
+   * untraced, matching the visibility rules of the parcel list endpoint.
+   */
   async getStatusForBbls(
     bbls: string[],
+    organizationId: string,
   ): Promise<
     Record<string, { status: string | null; phones: unknown; emails: unknown }>
   > {
@@ -777,6 +782,10 @@ export class SkipTraceService implements OnApplicationBootstrap {
         skipTraceStatus: true,
         ownerPhones: true,
         ownerEmails: true,
+        orgSkipTraces: {
+          where: { organizationId },
+          select: { id: true },
+        },
       },
     });
 
@@ -785,10 +794,11 @@ export class SkipTraceService implements OnApplicationBootstrap {
       { status: string | null; phones: unknown; emails: unknown }
     > = {};
     for (const p of parcels) {
+      const visible = p.orgSkipTraces.length > 0;
       result[p.bbl] = {
-        status: p.skipTraceStatus,
-        phones: p.ownerPhones,
-        emails: p.ownerEmails,
+        status: visible ? p.skipTraceStatus : null,
+        phones: visible ? p.ownerPhones : null,
+        emails: visible ? p.ownerEmails : null,
       };
     }
     return result;
