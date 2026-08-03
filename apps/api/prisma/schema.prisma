@@ -399,9 +399,9 @@ model Parcel {
   // Skip tracing (owner contact lookup via Tracerfy)
   ownerPhones      Json? // [{ number: string, type: string, rank: number }]
   ownerEmails      Json? // string[]
-  skipTracedAt     DateTime?
-  skipTraceStatus  String? // 'pending' | 'found' | 'not_found' | 'error'
-  skipTraceQueueId String? // Tracerfy async queue_id, cleared after completion
+  skipTracedAt      DateTime?
+  skipTraceStatus   String? // 'pending' | 'found' | 'not_found' | 'error'
+  skipTraceQueuedAt DateTime? // set when status flips to 'pending'; cleared on completion
 
   // CARE portal scraper (exact per-BBL lien data)
   lienStatus         String? // Raw CARE status: "S Sold", "R Post Sale Redeemed"

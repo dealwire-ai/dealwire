@@ -25,6 +25,7 @@ import { AssignPopover, type OrgMember } from "./assign-popover";
 import { formatBuildingClass } from "@/lib/building-class-labels";
 import { BblDisplay } from "./bbl-display";
 import { useApi } from "@/hooks/use-api";
+import { toast } from "sonner";
 
 const BOROUGH_NAMES: Record<string, string> = {
   "1": "Manhattan",
@@ -746,8 +747,10 @@ function InlineSkipTraceButton({
         body: JSON.stringify({ force: false }),
       });
       onUpdated?.({ skipTraceStatus: "pending" });
-    } catch {
-      // ignore — user can retry
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Skip trace request failed",
+      );
     } finally {
       setLoading(false);
     }

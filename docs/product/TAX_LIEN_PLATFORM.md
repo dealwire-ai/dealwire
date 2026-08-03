@@ -627,18 +627,20 @@ All endpoints require Clerk auth + `parcels` feature flag (returns 403 if flag i
 
 ### Skip Tracing (Owner Contact Lookup)
 
-Provider: **Tracerfy** (`tracerfy.com/v1/api`) — pay-as-you-go, $0.02/record.
+Provider: **Skip Sherpa** (`skipsherpa.com/api/beta6`) — synchronous `PUT /properties` lookup, ~$0.02/record.
 
-**Async flow:**
+**Flow:**
 
-1. `POST /trace/` → returns `queue_id` immediately
-2. Server polls `GET /queue/:id` every 15s for up to 5 minutes
-3. Results written to `Parcel.ownerPhones` (JSON array) + `Parcel.ownerEmails` (string[]) on completion
+1. `submitBatch` marks parcels `pending` (stamping `skipTraceQueuedAt`) and grants the org `OrgSkipTrace` visibility
+2. The lookup runs in the background in chunks of 25 (30s timeout per request); results are written to `Parcel.ownerPhones` (JSON array) + `Parcel.ownerEmails` (string[]) with status `found`/`not_found`/`error`
+3. The frontend polls `GET /public-data/parcels/skip-trace/status` (org-gated) every 5s
+4. A reaper (on boot + every 5 minutes) flips `pending` rows older than 10 minutes to `error` so traces killed mid-flight by a restart surface a Retry instead of spinning forever
 
 **Cost controls:**
 
 - Max 500 BBLs per request (hard 400 error)
-- `TRACERFY_MONTHLY_CREDIT_CAP` env var (default 500 = $10/mo)
+- `TRACERFY_MONTHLY_CREDIT_CAP` env var — global monthly cap across all orgs (default 500 ≈ $10/mo)
+- `ORG_SKIP_TRACE_MONTHLY_LIMIT` env var — per-org monthly cap (default 100)
 - Idempotency: skips parcels traced in last 30 days with `status=found` unless `force=true`
 - Never auto-triggered — user-initiated only
 
