@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { NycIngestionService } from './nyc-ingestion.service';
+import { SkipTraceService } from './skip-trace.service';
 import { publicDataConfig } from '../../config/public-data.config';
 
 @Injectable()
@@ -8,7 +9,10 @@ export class PublicDataSchedulerService {
   private readonly logger = new Logger(PublicDataSchedulerService.name);
   private readonly config = publicDataConfig();
 
-  constructor(private readonly ingestion: NycIngestionService) {}
+  constructor(
+    private readonly ingestion: NycIngestionService,
+    private readonly skipTrace: SkipTraceService,
+  ) {}
 
   @Cron(publicDataConfig().refreshCron)
   async handleScheduledRefresh(): Promise<void> {
@@ -31,6 +35,15 @@ export class PublicDataSchedulerService {
         `Scheduled data refresh failed: ${(err as Error).message}`,
         (err as Error).stack,
       );
+    }
+  }
+
+  @Cron(CronExpression.EVERY_5_MINUTES)
+  async reapStaleSkipTraces(): Promise<void> {
+    try {
+      await this.skipTrace.reapStalePendingTraces();
+    } catch (err) {
+      this.logger.error(`Skip trace reaper failed: ${(err as Error).message}`);
     }
   }
 }

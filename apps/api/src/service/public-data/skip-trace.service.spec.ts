@@ -25,7 +25,6 @@ interface UpdateManyArg {
   where: { bbl?: string | { in?: string[] }; skipTraceStatus?: string };
   data: {
     skipTraceStatus?: string;
-    skipTraceQueueId?: string | null;
     ownerPhones?: Array<{ number: string; source?: string }>;
   };
 }
@@ -170,5 +169,113 @@ describe('SkipTraceService — Skip Sherpa response handling', () => {
     expect(errored?.where).toEqual(
       expect.objectContaining({ skipTraceStatus: 'pending' }),
     );
+  });
+});
+
+interface ReaperUpdateArg {
+  where: {
+    skipTraceStatus?: string;
+    OR?: Array<{ skipTraceQueuedAt?: { lt?: Date } | null }>;
+  };
+  data: {
+    skipTraceStatus?: string;
+    skipTraceQueuedAt?: Date | null;
+  };
+}
+
+describe('SkipTraceService — stale pending reaper', () => {
+  let service: SkipTraceService;
+  let prisma: {
+    parcel: { updateMany: jest.Mock; findMany: jest.Mock; count: jest.Mock };
+    orgSkipTrace: { count: jest.Mock; createMany: jest.Mock };
+  };
+
+  beforeEach(() => {
+    process.env.SKIPSHERPA_API_KEY = 'test-key';
+    prisma = {
+      parcel: {
+        updateMany: jest.fn().mockResolvedValue({ count: 2 }),
+        findMany: jest.fn().mockResolvedValue([]),
+        count: jest.fn().mockResolvedValue(0),
+      },
+      orgSkipTrace: {
+        count: jest.fn().mockResolvedValue(0),
+        createMany: jest.fn().mockResolvedValue({ count: 1 }),
+      },
+    };
+    service = new SkipTraceService(prisma as unknown as never);
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('reaps pending rows older than the cutoff or missing a queuedAt', async () => {
+    const before = Date.now();
+    const count = await service.reapStalePendingTraces();
+    const after = Date.now();
+
+    expect(count).toBe(2);
+    const arg = (
+      prisma.parcel.updateMany.mock.calls as Array<[ReaperUpdateArg]>
+    )[0][0];
+    expect(arg.where.skipTraceStatus).toBe('pending');
+
+    const ltArm = arg.where.OR?.[0]?.skipTraceQueuedAt as { lt: Date };
+    const cutoff = ltArm.lt.getTime();
+    const tenMinutes = 10 * 60_000;
+    expect(cutoff).toBeGreaterThanOrEqual(before - tenMinutes);
+    expect(cutoff).toBeLessThanOrEqual(after - tenMinutes);
+    expect(arg.where.OR?.[1]).toEqual({ skipTraceQueuedAt: null });
+
+    expect(arg.data).toEqual(
+      expect.objectContaining({
+        skipTraceStatus: 'error',
+        skipTraceQueuedAt: null,
+      }),
+    );
+  });
+
+  it('does not touch rows outside pending status', async () => {
+    await service.reapStalePendingTraces();
+
+    const arg = (
+      prisma.parcel.updateMany.mock.calls as Array<[ReaperUpdateArg]>
+    )[0][0];
+    expect(arg.where.skipTraceStatus).toBe('pending');
+  });
+
+  it('stamps skipTraceQueuedAt when submitBatch marks rows pending', async () => {
+    prisma.parcel.findMany.mockResolvedValue([
+      {
+        id: 'p1',
+        bbl: '4001230045',
+        ownerName: null,
+        address: '506 FAIRVIEW AVENUE',
+        zipCode: null,
+        borough: '4',
+        skipTracedAt: null,
+        skipTraceStatus: null,
+        ownerPhones: null,
+        ownerEmails: null,
+      },
+    ]);
+    global.fetch = jest.fn().mockResolvedValue({
+      status: 200,
+      ok: true,
+      text: () => Promise.resolve(JSON.stringify({ property_results: [] })),
+    }) as unknown as typeof fetch;
+
+    await service.submitBatch(['4001230045'], 'org_test');
+    // Let the fire-and-forget lookup settle before the test ends
+    await new Promise((resolve) => process.nextTick(resolve));
+
+    const pendingWrite = (
+      prisma.parcel.updateMany.mock.calls as Array<[ReaperUpdateArg]>
+    )
+      .map((c) => c[0])
+      .find((a) => a.data.skipTraceStatus === 'pending');
+    expect(pendingWrite).toBeDefined();
+    expect(pendingWrite?.data.skipTraceQueuedAt).toBeInstanceOf(Date);
   });
 });
