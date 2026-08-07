@@ -17,10 +17,9 @@ export function AssetSection() {
         <FadeInSection delay={0.05}>
           <p>
             Twenty years of deal flow. Every memo, every IC discussion, every
-            broker relationship, every rent roll, every comp, every call that
-            was right, every call that was wrong. It sits in Outlook threads,
-            PDF attachments, SharePoint folders, and the heads of your
-            longest-tenured partners.
+            broker relationship, every call that was right, every call that was
+            wrong. It sits in Outlook threads, PDF attachments, SharePoint
+            folders, and the heads of your longest-tenured partners.
           </p>
         </FadeInSection>
         <FadeInSection delay={0.1}>
@@ -32,14 +31,13 @@ export function AssetSection() {
         </FadeInSection>
         <FadeInSection delay={0.15}>
           <p>
-            Generic AI tools don&apos;t fix this. Plugging a chatbot into one
-            inbox or one data room produces toy answers &mdash; because the
-            institutional intelligence only appears once the whole corpus is
-            unified.
+            Generic AI tools don&apos;t fix this. A chatbot plugged into one
+            inbox gives toy answers. The intelligence only shows up when the
+            whole firm is unified &mdash; and someone builds on top of it.
           </p>
         </FadeInSection>
         <FadeInSection delay={0.2}>
-          <p className="text-white/80 text-xl">That&apos;s what we build.</p>
+          <p className="text-white/80 text-xl">That&apos;s the work we do.</p>
         </FadeInSection>
       </div>
     </SectionShell>

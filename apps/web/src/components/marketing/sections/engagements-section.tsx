@@ -21,7 +21,7 @@ const PHASES = [
   {
     step: "04",
     title: "Operation",
-    body: "We stay embedded. New questions, new data sources, new capabilities ship continuously. Every month your firm\u2019s intelligence layer gets sharper, and the compounding advantage it produces is one your competitors can\u2019t buy off a shelf.",
+    body: "We stay embedded. New questions, new sources, new capabilities ship every month. The longer the system runs, the sharper it gets.",
   },
 ];
 
