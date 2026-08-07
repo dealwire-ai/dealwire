@@ -35,17 +35,15 @@ export function HeroSection() {
             transition={{ duration: 1, ease: EASE_OUT_QUINT }}
           >
             <h1 className="text-5xl md:text-6xl lg:text-[4.5rem] font-normal tracking-tight leading-[1.05] mb-8">
-              Your firm&apos;s
+              The AI partner for
               <br />
-              <span className="text-[#C8A96E]">private brain.</span>
+              <span className="text-[#C8A96E]">private markets.</span>
             </h1>
 
             <p className="text-lg md:text-xl text-white/50 max-w-xl leading-relaxed mb-12">
-              Every deal, every relationship, every decision &mdash; unified
-              with the outside data that makes them readable. Specialized agents
-              screen inbound flow, underwrite, draft memos, and surface deals
-              before the rest of the market sees them &mdash; each reading from
-              your firm&apos;s full history, wherever your team already works.
+              We embed with real estate and private equity firms and build the
+              AI systems they actually use &mdash; screening, underwriting,
+              sourcing, firm memory. Working software in weeks. No decks.
             </p>
 
             <Link

@@ -39,13 +39,13 @@ export function ClosingCtaSection() {
         <div className="max-w-5xl mx-auto">
           <FadeInSection>
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-normal tracking-tight mb-8 leading-[1.1]">
-              Build your firm&apos;s{" "}
-              <span className="text-[#C8A96E]">institutional brain.</span>
+              Put an AI team{" "}
+              <span className="text-[#C8A96E]">inside your firm.</span>
             </h2>
             <p className="text-lg text-white/50 leading-relaxed mb-12 max-w-2xl">
-              We take on a small number of engagements each quarter. If your
-              firm is ready to turn decades of institutional knowledge into a
-              permanent competitive advantage, we&apos;d like to talk.
+              We take a small number of engagements each quarter. If you want
+              systems built for how your firm actually works &mdash; not
+              software your firm adapts to &mdash; let&apos;s talk.
             </p>
             <Link
               href="/book"

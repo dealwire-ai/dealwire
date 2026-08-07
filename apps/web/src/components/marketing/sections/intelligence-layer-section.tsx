@@ -5,28 +5,18 @@ import { SectionShell } from "@/components/marketing/section-shell";
 const LAYERS = [
   {
     num: "01",
-    title: "Captures the firm.",
-    body: "Every deal, every email, every broker interaction, every screening decision, every underwriting run \u2014 ingested automatically. Zero data entry. Within weeks of deployment, your firm\u2019s complete institutional knowledge lives in one system.",
+    title: "A firm operating system.",
+    body: "One system that holds the firm\u2019s knowledge and runs its workflows \u2014 deals, documents, relationships, decisions. Everyone, and every agent, works from the same source of truth.",
   },
   {
     num: "02",
-    title: "Connects the dots.",
-    body: "Every new opportunity is cross-referenced against your firm\u2019s full corpus. \u201CThis deal is in the same submarket where you closed 3 deals last year. The broker has sent you 12 deals \u2014 2 made it to LOI. Your investor Group B expressed interest in this market. Cap rates have compressed 30bps since Q3.\u201D The context a senior partner would surface, surfaced automatically.",
+    title: "Deal screening and underwriting.",
+    body: "Inbound flow screened against your criteria, triaged, and underwritten \u2014 with the first-pass memo done before your team has opened the email.",
   },
   {
     num: "03",
-    title: "Acts on your pipeline.",
-    body: "Screens inbound flow against your buy box. Underwrites opportunities. Drafts IC memos. Composes broker replies. Follows up, reminds, alerts. The analyst work happens around the clock \u2014 freeing your team for the decisions only they can make.",
-  },
-  {
-    num: "04",
-    title: "Sources what others can\u2019t see.",
-    body: "Tax lien lists, lis pendens filings, code violations, distress signals buried in public records. Properties surface before they\u2019re listed; owners surface before they\u2019re sellers. Your team lands first in line on deals the rest of the market never sees.",
-  },
-  {
-    num: "05",
-    title: "Compounds with use.",
-    body: "Every screened deal, every decision, every outcome sharpens the system \u2014 until it reads your firm\u2019s taste better than any new hire ever could.",
+    title: "Off-market sourcing.",
+    body: "Public records and market signals mined for owners likely to sell, so you\u2019re in the door before the deal is a listing.",
   },
 ];
 
@@ -34,10 +24,12 @@ export function IntelligenceLayerSection() {
   return (
     <SectionShell id="approach">
       <FadeInSection>
-        <Eyebrow className="mb-6">The intelligence layer</Eyebrow>
+        <Eyebrow className="mb-6">What we build</Eyebrow>
         <h2 className="text-4xl md:text-5xl font-normal tracking-tight mb-16 leading-[1.1] max-w-4xl">
-          Everything an analyst does.{" "}
-          <span className="text-white/30">Nothing an analyst forgets.</span>
+          Real systems, running inside real firms.{" "}
+          <span className="text-white/30">
+            Every engagement is different. The work looks like this.
+          </span>
         </h2>
       </FadeInSection>
 

@@ -18,20 +18,20 @@ const ibmPlexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Dealwire — Your firm's private brain",
+  title: "Dealwire — The AI partner for private markets",
   description:
-    "Dealwire builds a bespoke private intelligence layer for institutional private-market firms — unifying decades of deal flow, memos, and broker relationships so your whole firm, and every AI you deploy, works from the same source of truth.",
+    "Dealwire embeds with real estate and private equity firms to build the AI systems they run on — deal screening, underwriting, off-market sourcing, and firm memory.",
   metadataBase: new URL("https://dealwire.ai"),
   openGraph: {
-    title: "Dealwire — We build your firm's private intelligence layer",
+    title: "Dealwire — The AI partner for private markets",
     description:
-      "A bespoke private intelligence layer for institutional CRE, real estate PE, family offices, and multi-strategy allocators.",
+      "We embed with real estate and private equity firms and build the AI systems they actually use — screening, underwriting, sourcing, firm memory.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Dealwire — We build your firm's private intelligence layer",
+    title: "Dealwire — The AI partner for private markets",
     description:
-      "A bespoke private intelligence layer for institutional CRE, real estate PE, family offices, and multi-strategy allocators.",
+      "We embed with real estate and private equity firms and build the AI systems they actually use — screening, underwriting, sourcing, firm memory.",
   },
 };
 
