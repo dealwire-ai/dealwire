@@ -13,6 +13,8 @@ export interface ScreeningPreferences {
   skipCriteria?: string;
   /** Structured list of property names/addresses to skip via regex (one per line) */
   knownProperties?: string;
+  /** Literal phrases to skip via regex before the LLM runs (one per line, e.g. "NNN", "single tenant") */
+  skipKeywords?: string;
   /** CRON expression for digest schedule (e.g., "0 12 * * *" for daily at noon) */
   digestSchedule?: string;
   /** Timezone for digest schedule (default: "America/New_York") */
@@ -71,6 +73,7 @@ export class ScreeningPreferencesService {
         passedFolderName: prefs.passedFolderName || undefined,
         skipCriteria: prefs.skipCriteria || undefined,
         knownProperties: prefs.knownProperties || undefined,
+        skipKeywords: prefs.skipKeywords || undefined,
         digestSchedule: prefs.digestSchedule || undefined,
         digestTimeZone: prefs.digestTimeZone || undefined,
         designatedMonitoringInboxEmails:
@@ -91,7 +94,7 @@ export class ScreeningPreferencesService {
   /**
    * Update preferences for an organization (partial update)
    * @param organizationId - The organization ID
-   * @param partial - Partial preferences to update (dealCriteria, skipCriteria, passedFolderName, digestSchedule, digestTimeZone, companyName, brandColor)
+   * @param partial - Partial preferences to update (dealCriteria, skipCriteria, knownProperties, skipKeywords, passedFolderName, digestSchedule, digestTimeZone, companyName, brandColor)
    */
   async updatePreferences(
     organizationId: string,
@@ -101,6 +104,7 @@ export class ScreeningPreferencesService {
         | 'dealCriteria'
         | 'skipCriteria'
         | 'knownProperties'
+        | 'skipKeywords'
         | 'passedFolderName'
         | 'digestSchedule'
         | 'digestTimeZone'
@@ -121,6 +125,8 @@ export class ScreeningPreferencesService {
       data.skipCriteria = partial.skipCriteria;
     if (partial.knownProperties !== undefined)
       data.knownProperties = partial.knownProperties;
+    if (partial.skipKeywords !== undefined)
+      data.skipKeywords = partial.skipKeywords;
     if (partial.passedFolderName !== undefined)
       data.passedFolderName = partial.passedFolderName;
     if (partial.digestSchedule !== undefined) {
@@ -170,6 +176,7 @@ export class ScreeningPreferencesService {
       passedFolderName: updated.passedFolderName || undefined,
       skipCriteria: updated.skipCriteria || undefined,
       knownProperties: updated.knownProperties || undefined,
+      skipKeywords: updated.skipKeywords || undefined,
       digestSchedule: updated.digestSchedule || undefined,
       digestTimeZone: updated.digestTimeZone || undefined,
       designatedMonitoringInboxEmails:
