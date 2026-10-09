@@ -44,6 +44,7 @@ export class ScreeningPreferencesController {
       dealCriteria?: string;
       skipCriteria?: string;
       knownProperties?: string;
+      skipKeywords?: string;
       passedFolderName?: string;
       digestSchedule?: string;
       digestTimeZone?: string;
