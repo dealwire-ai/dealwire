@@ -35,6 +35,7 @@ export class InitialScreeningService {
    * @param senderEmail - Email address of the sender (for contact normalization)
    * @param senderName - Sender display name if available (for contact firstName/lastName)
    * @param structuredData - Pre-extracted structured data from DataExtractionService (price, cap rate, etc.)
+   * @param dealCriteria - Org-level hard requirements (ScreeningPreferences.dealCriteria) applied across all buckets
    * @returns The screening result
    */
   async screen(
@@ -44,10 +45,15 @@ export class InitialScreeningService {
     senderEmail?: string,
     senderName?: string,
     structuredData?: Record<string, unknown>,
+    dealCriteria?: string,
   ): Promise<InitialScreeningResult> {
     const modelName = dealScreeningModelName();
     try {
-      const systemPrompt = this.buildPrompt(buckets, !!structuredData);
+      const systemPrompt = this.buildPrompt(
+        buckets,
+        !!structuredData,
+        dealCriteria,
+      );
 
       // Build user message with structured data section if available
       let userContent = '';
@@ -174,17 +180,29 @@ export class InitialScreeningService {
   private buildPrompt(
     buckets: ScreeningBucket[],
     hasStructuredData: boolean = false,
+    dealCriteria?: string,
   ): string {
     const bucketDescriptions = buckets
-      .map((b, i) => `Bucket ${i + 1}: "${b.name}"\nCriteria: ${b.description}`)
+      .map(
+        (b, i) =>
+          `Bucket ${i + 1}: "${b.name}" (decision if assigned: ${b.isPass ? 'YES' : 'NO'})\nCriteria: ${b.description}`,
+      )
       .join('\n\n');
+
+    const trimmedCriteria = dealCriteria?.trim();
+    const criteriaSection = trimmedCriteria
+      ? '=== CLIENT INVESTMENT CRITERIA (hard rules, apply to every bucket) ===\n' +
+        `${trimmedCriteria}\n\n` +
+        'These rules take precedence over bucket descriptions. A deal that violates any of them must NOT be assigned to a YES bucket.\n\n'
+      : '';
 
     return (
       'You are a real estate deal screener. Classify the deal into exactly one screening bucket.\n\n' +
       '=== IMPORTANT: THIS IS SCREENING, NOT UNDERWRITING ===\n' +
       '- Do NOT evaluate deal quality, financial viability, or investment metrics\n' +
       '- Do NOT reject deals for missing financial metrics, incomplete information, or subjective quality concerns\n' +
-      '- ONLY check if the deal meets or violates the specific requirements listed in the buckets\n\n' +
+      '- ONLY check if the deal meets or violates the specific requirements listed below\n\n' +
+      criteriaSection +
       '=== SCREENING BUCKETS (evaluate in order) ===\n' +
       `${bucketDescriptions}\n\n` +
       '=== RULES ===\n' +
