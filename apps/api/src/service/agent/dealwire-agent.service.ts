@@ -21,6 +21,7 @@ CORE CAPABILITIES:
 3. Update screening preferences based on user feedback
 
 SCREENING PREFERENCES (understand the difference):
+- **skipKeywords**: Literal phrases that auto-skip an email when they appear in the subject or body preview. Matched deterministically via regex, no LLM involved, so use for exact wording: "NNN", "triple net", "single tenant", "just closed", "call for offers". Skipped emails stay in the inbox untouched.
 - **skipCriteria**: Free-text criteria for emails to NEVER process. No analysis, no reply, no folder move. Use for: "skip retail deals", "ignore deals under 40 units", "don't process newsletters". Interpreted by the LLM.
 - **knownProperties**: List of property names/addresses the org already owns or has invested in. Matched deterministically via regex — any email about these properties is auto-skipped. Use for: "we own 1006 S Michigan", "add Bryant Plaza to known properties".
 - **dealCriteria**: Hard requirements for YES/NO evaluation. Fails → moved to "Passed Deals" folder. Passes → stays in inbox with analysis. Use for: "New York only", "min 5% cap rate", "no office".
@@ -32,6 +33,7 @@ When a user gives feedback about deals, interpret it as a criteria change:
 - "Not interested in warehouse" or "skip warehouse deals" → update dealCriteria or skipCriteria depending on severity
 - "Actually this looks interesting" or "we'd consider this type" → suggest expanding criteria
 - "Stop sending me deals like this" → update skipCriteria
+- "Anything that says NNN / single tenant / just closed should be skipped" (an exact phrase) → update skipKeywords
 - "I don't care about ones from [broker]" → update skipCriteria with sender filter
 - "We own [property]" / "that's our building" / "already invested in [property]" → update knownProperties
 - "I already passed on this" / "mute this deal" / "don't show this again" → mute_deal
@@ -119,6 +121,9 @@ export class DealwireAgentService {
       prefs.knownProperties
         ? `Current known properties: ${prefs.knownProperties}`
         : null,
+      prefs.skipKeywords
+        ? `Current skip keywords: ${prefs.skipKeywords}`
+        : null,
     ]
       .filter(Boolean)
       .join('\n');
@@ -180,6 +185,9 @@ export class DealwireAgentService {
       prefs.knownProperties
         ? `Current known properties: ${prefs.knownProperties}`
         : null,
+      prefs.skipKeywords
+        ? `Current skip keywords: ${prefs.skipKeywords}`
+        : null,
     ]
       .filter(Boolean)
       .join('\n');
@@ -197,6 +205,25 @@ export class DealwireAgentService {
         maxSteps: 5,
       }),
     );
+  }
+
+  /**
+   * Append a new entry to a newline-delimited preference list, skipping it
+   * when an equivalent line (case-insensitive, trimmed) is already present.
+   * Keeps free-text lists like skipCriteria from degrading into comma-joined
+   * run-ons with duplicates.
+   */
+  private appendLines(current: string | undefined, addition: string): string {
+    const existing = (current ?? '')
+      .split('\n')
+      .map((line) => line.trim())
+      .filter(Boolean);
+    const seen = new Set(existing.map((line) => line.toLowerCase()));
+    const additions = addition
+      .split('\n')
+      .map((line) => line.trim())
+      .filter((line) => line && !seen.has(line.toLowerCase()));
+    return [...existing, ...additions].join('\n');
   }
 
   /**
@@ -597,9 +624,7 @@ export class DealwireAgentService {
             this.logger.log(
               `[update_skip_criteria] before="${current.skipCriteria ?? ''}" appending="${criteria}"`,
             );
-            const merged = current.skipCriteria
-              ? `${current.skipCriteria}, ${criteria}`
-              : criteria;
+            const merged = this.appendLines(current.skipCriteria, criteria);
             const updated = await this.screeningPreferences.updatePreferences(
               organizationId,
               { skipCriteria: merged },
@@ -626,9 +651,7 @@ export class DealwireAgentService {
             const current =
               await this.screeningPreferences.getPreferences(organizationId);
             this.logger.log(`[update_known_properties] adding="${property}"`);
-            const merged = current.knownProperties
-              ? `${current.knownProperties}\n${property}`
-              : property;
+            const merged = this.appendLines(current.knownProperties, property);
             const updated = await this.screeningPreferences.updatePreferences(
               organizationId,
               { knownProperties: merged },
@@ -637,6 +660,31 @@ export class DealwireAgentService {
               `[update_known_properties] after="${updated.knownProperties}"`,
             );
             return { success: true, knownProperties: updated.knownProperties };
+          }),
+      }),
+
+      update_skip_keywords: tool({
+        description:
+          'Add a literal phrase to the skip keywords list. Emails whose subject or body preview contain the phrase are auto-skipped via regex before any LLM runs. Use for exact wording like "NNN", "triple net", "single tenant", "just closed", "call for offers". Wrap in slashes for a raw regex (e.g. "/\\b\\d+[\\s-]*keys?\\b/" for hotel key counts).',
+        parameters: z.object({
+          keyword: z
+            .string()
+            .describe('The phrase to skip (e.g. "NNN", "single tenant")'),
+        }),
+        execute: async ({ keyword }) =>
+          this.safeTool('update_skip_keywords', async () => {
+            const current =
+              await this.screeningPreferences.getPreferences(organizationId);
+            this.logger.log(`[update_skip_keywords] adding="${keyword}"`);
+            const merged = this.appendLines(current.skipKeywords, keyword);
+            const updated = await this.screeningPreferences.updatePreferences(
+              organizationId,
+              { skipKeywords: merged },
+            );
+            this.logger.log(
+              `[update_skip_keywords] after="${updated.skipKeywords}"`,
+            );
+            return { success: true, skipKeywords: updated.skipKeywords };
           }),
       }),
 
@@ -653,9 +701,7 @@ export class DealwireAgentService {
             this.logger.log(
               `[update_deal_criteria] before="${current.dealCriteria ?? ''}" appending="${criteria}"`,
             );
-            const merged = current.dealCriteria
-              ? `${current.dealCriteria}, ${criteria}`
-              : criteria;
+            const merged = this.appendLines(current.dealCriteria, criteria);
             const updated = await this.screeningPreferences.updatePreferences(
               organizationId,
               { dealCriteria: merged },
@@ -878,6 +924,7 @@ export class DealwireAgentService {
               dealCriteria: prefs.dealCriteria || 'Not set',
               skipCriteria: prefs.skipCriteria || 'Not set',
               knownProperties: prefs.knownProperties || 'Not set',
+              skipKeywords: prefs.skipKeywords || 'Not set',
               passedFolderName: prefs.passedFolderName || 'Passed Deals',
               buckets: buckets.map((b) => ({
                 name: b.name,

@@ -110,6 +110,14 @@ describe('InitialScreeningService', () => {
     jest.clearAllMocks();
   });
 
+  /** Read the system prompt passed to the most recent OpenAI call */
+  function getSystemPrompt(): string {
+    const [request] = mockCreate.mock.calls[0] as [
+      { messages: { content: string }[] },
+    ];
+    return request.messages[0].content;
+  }
+
   /** Helper to set a successful OpenAI response */
   function mockOpenAIResponse(payload: Record<string, unknown>) {
     mockCreate.mockResolvedValue({
@@ -175,6 +183,39 @@ describe('InitialScreeningService', () => {
     expect(result.decision).toBe('no');
     expect(result.bucketId).toBe('bucket-no');
     expect(result.bucketName).toBe('Pass');
+  });
+
+  it('should include org dealCriteria as hard rules in the screening prompt', async () => {
+    mockOpenAIResponse({
+      bucket: 'Pass',
+      reason: 'NNN lease violates client criteria',
+      address: null,
+    });
+
+    await service.screen(
+      'deal-criteria',
+      'Walgreens NNN lease in Ohio',
+      buckets,
+      undefined,
+      undefined,
+      undefined,
+      'No NNN leases. Minimum 40 units.',
+    );
+
+    const systemPrompt = getSystemPrompt();
+    expect(systemPrompt).toContain('CLIENT INVESTMENT CRITERIA');
+    expect(systemPrompt).toContain('No NNN leases. Minimum 40 units.');
+    expect(systemPrompt).toContain('(decision if assigned: YES)');
+    expect(systemPrompt).toContain('(decision if assigned: NO)');
+  });
+
+  it('should omit the client criteria section when dealCriteria is not set', async () => {
+    mockOpenAIResponse({ bucket: 'Pass', reason: 'r', address: null });
+
+    await service.screen('deal-nocriteria', 'some text', buckets);
+
+    const systemPrompt = getSystemPrompt();
+    expect(systemPrompt).not.toContain('CLIENT INVESTMENT CRITERIA');
   });
 
   it('should handle address normalization failure gracefully and continue without asset', async () => {

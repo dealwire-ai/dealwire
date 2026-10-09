@@ -35,9 +35,10 @@ export class DealDetectionService {
    * Quickly determine if an email is about a real estate deal offering.
    * Uses structured output for fast, reliable classification.
    *
-   * Two skip mechanisms:
-   * 1. knownProperties — deterministic regex match (property names/addresses the org already owns)
-   * 2. skipCriteria — LLM-interpreted free-text rules (semantic criteria like "retail deals")
+   * Three skip mechanisms, checked in order:
+   * 1. skipKeywords: deterministic regex match on literal phrases ("NNN", "single tenant")
+   * 2. knownProperties: deterministic regex match (property names/addresses the org already owns)
+   * 3. skipCriteria: LLM-interpreted free-text rules (semantic criteria like "retail deals")
    */
   async isDealEmail(
     subject: string,
@@ -51,14 +52,20 @@ export class DealDetectionService {
       // Load preferences if organizationId is provided
       let skipCriteria: string | null = null;
       let knownProperties: string | null = null;
+      let skipKeywords: string | null = null;
       if (organizationId) {
         try {
           const prefs = await this.prisma.screeningPreferences.findUnique({
             where: { organizationId },
-            select: { skipCriteria: true, knownProperties: true },
+            select: {
+              skipCriteria: true,
+              knownProperties: true,
+              skipKeywords: true,
+            },
           });
           skipCriteria = prefs?.skipCriteria || null;
           knownProperties = prefs?.knownProperties || null;
+          skipKeywords = prefs?.skipKeywords || null;
         } catch (error) {
           const msg = error instanceof Error ? error.message : String(error);
           this.logger.warn(
@@ -67,28 +74,47 @@ export class DealDetectionService {
         }
       }
 
-      // Deterministic knownProperties pre-check — short-circuit before the LLM call.
-      // Each line is a property name/address. We build a regex that matches the core
-      // identifier with word boundaries, handling common abbreviations (S/South, N/North, etc.).
-      if (knownProperties && knownProperties.trim()) {
-        const haystack = `${subject}\n${bodyPreview}`.toLowerCase();
-        const properties = knownProperties
-          .split(/\n/)
-          .map((line) => line.replace(/^[-•*]\s*/, '').trim())
-          .filter((line) => line.length >= 4);
-        for (const property of properties) {
-          const pattern = this.buildPropertyRegex(property);
-          if (pattern.test(haystack)) {
-            this.logger.log(
-              `Deal detection: isDeal=false, confidence=high, reason="Matches known property (deterministic): \\"${property}\\""`,
-            );
-            return {
-              isDeal: false,
-              confidence: 'high',
-              reason: `Matches known property: "${property}"`,
-            };
-          }
-        }
+      // Deterministic pre-checks: short-circuit before the LLM call.
+      // The LLM only sees the subject + first 500 chars, so literal phrases
+      // ("NNN", "single tenant") and known property names are matched by regex
+      // here where they are guaranteed to be caught.
+      const haystack = `${subject}\n${bodyPreview}`.toLowerCase();
+
+      const matchedKeyword = this.findMatchingLine(
+        skipKeywords,
+        haystack,
+        2,
+        (line) => this.buildKeywordRegex(line),
+      );
+      if (matchedKeyword) {
+        this.logger.log(
+          `Deal detection: isDeal=false, confidence=high, reason="Matches skip keyword (deterministic): \\"${matchedKeyword}\\""`,
+        );
+        return {
+          isDeal: false,
+          confidence: 'high',
+          reason: `Matches skip keyword: "${matchedKeyword}"`,
+        };
+      }
+
+      // Each knownProperties line is a property name/address. We build a regex that
+      // matches the core identifier with word boundaries, handling common
+      // abbreviations (S/South, N/North, etc.).
+      const matchedProperty = this.findMatchingLine(
+        knownProperties,
+        haystack,
+        4,
+        (line) => this.buildPropertyRegex(line),
+      );
+      if (matchedProperty) {
+        this.logger.log(
+          `Deal detection: isDeal=false, confidence=high, reason="Matches known property (deterministic): \\"${matchedProperty}\\""`,
+        );
+        return {
+          isDeal: false,
+          confidence: 'high',
+          reason: `Matches known property: "${matchedProperty}"`,
+        };
       }
 
       // Build system prompt
@@ -196,6 +222,54 @@ Has attachments: ${hasAttachments ? 'Yes' : 'No'}`,
         reason: 'Detection failed, defaulting to skip',
       };
     }
+  }
+
+  /**
+   * Split a newline-delimited preference list, strip bullet prefixes, drop
+   * entries shorter than minLength, and return the first entry whose regex
+   * matches the haystack (or null).
+   */
+  private findMatchingLine(
+    list: string | null,
+    haystack: string,
+    minLength: number,
+    buildRegex: (line: string) => RegExp | null,
+  ): string | null {
+    if (!list || !list.trim()) return null;
+    const lines = list
+      .split(/\n/)
+      .map((line) => line.replace(/^[-•*]\s*/, '').trim())
+      .filter((line) => line.length >= minLength);
+    for (const line of lines) {
+      const pattern = buildRegex(line);
+      if (pattern && pattern.test(haystack)) return line;
+    }
+    return null;
+  }
+
+  /**
+   * Build a case-insensitive regex for a literal skip phrase. Whitespace and
+   * hyphens are interchangeable so "single tenant" also matches "single-tenant".
+   * A line wrapped in slashes (e.g. `/\b\d+[\s-]*keys?\b/`) is treated as a
+   * raw regex; an invalid pattern is skipped rather than crashing detection.
+   */
+  private buildKeywordRegex(keyword: string): RegExp | null {
+    const raw = keyword.match(/^\/(.+)\/[a-z]*$/);
+    if (raw) {
+      try {
+        return new RegExp(raw[1], 'i');
+      } catch {
+        this.logger.warn(`Ignoring invalid skip keyword regex: ${keyword}`);
+        return null;
+      }
+    }
+    const parts = keyword
+      .toLowerCase()
+      .split(/[\s-]+/)
+      .filter(Boolean)
+      .map((word) => word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+    if (parts.length === 0) return null;
+    return new RegExp(`\\b${parts.join('[\\s-]+')}\\b`, 'i');
   }
 
   /**

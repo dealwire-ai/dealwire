@@ -76,7 +76,9 @@ describe('EmailProcessorService', () => {
         {
           provide: EmailTemplateService,
           useValue: {
-            formatSummaryAsHtml: jest.fn().mockReturnValue('<html>summary</html>'),
+            formatSummaryAsHtml: jest
+              .fn()
+              .mockReturnValue('<html>summary</html>'),
           },
         },
         {
@@ -91,7 +93,9 @@ describe('EmailProcessorService', () => {
             getAttachmentContent: jest.fn(),
             replyInThreadToSelf: jest.fn().mockResolvedValue(true),
             getOrCreateFolder: jest.fn().mockResolvedValue('folder-id-123'),
-            getMessage: jest.fn().mockResolvedValue({ conversationId: 'conv-123' }),
+            getMessage: jest
+              .fn()
+              .mockResolvedValue({ conversationId: 'conv-123' }),
             moveMessage: jest.fn().mockResolvedValue(true),
             moveConversation: jest.fn().mockResolvedValue(true),
             forwardToAdmins: jest.fn().mockResolvedValue(true),
@@ -117,8 +121,15 @@ describe('EmailProcessorService', () => {
           provide: DealSummaryService,
           useValue: {
             summarizeDeal: jest.fn().mockResolvedValue('AI-generated summary'),
-            generateDealNarrative: jest.fn().mockResolvedValue('Deal narrative text'),
-            summarizeDealWithNarrative: jest.fn().mockResolvedValue({ summary: 'AI-generated summary', narrative: 'Deal narrative text' }),
+            generateDealNarrative: jest
+              .fn()
+              .mockResolvedValue('Deal narrative text'),
+            summarizeDealWithNarrative: jest
+              .fn()
+              .mockResolvedValue({
+                summary: 'AI-generated summary',
+                narrative: 'Deal narrative text',
+              }),
           },
         },
         {
@@ -137,7 +148,11 @@ describe('EmailProcessorService', () => {
           useValue: {
             extract: jest.fn().mockResolvedValue({
               dealType: 'real_estate',
-              extractedData: { askingPrice: 5000000, propertyType: 'multifamily', units: 50 },
+              extractedData: {
+                askingPrice: 5000000,
+                propertyType: 'multifamily',
+                units: 50,
+              },
             }),
           },
         },
@@ -268,7 +283,9 @@ describe('EmailProcessorService', () => {
     });
 
     // Mock S3 download (for text extraction)
-    (s3Service.downloadDealAttachment as jest.Mock) = jest.fn().mockResolvedValue(attachmentContent);
+    (s3Service.downloadDealAttachment as jest.Mock) = jest
+      .fn()
+      .mockResolvedValue(attachmentContent);
 
     // Mock Document creation
     (prismaService.document.create as jest.Mock).mockResolvedValue({
@@ -282,7 +299,7 @@ describe('EmailProcessorService', () => {
     expect(result.processed).toBe(true);
     expect(result.dealId).toBe('deal123');
 
-    // Verify InitialScreeningService.screen() was called with dealId, text, buckets, sender email, sender name, and structured data
+    // Verify InitialScreeningService.screen() was called with dealId, text, buckets, sender email, sender name, structured data, and org dealCriteria
     expect(initialScreeningService.screen).toHaveBeenCalledWith(
       'deal123',
       expect.stringContaining('extracted pdf text'),
@@ -290,6 +307,7 @@ describe('EmailProcessorService', () => {
       'broker@example.com',
       undefined, // event has no fromName in this test
       { askingPrice: 5000000, propertyType: 'multifamily', units: 50 },
+      'Test criteria',
     );
 
     // Verify Document was created with S3 key (attachments already in S3 from webhook)
@@ -330,7 +348,9 @@ describe('EmailProcessorService', () => {
         reason: 'Deal',
       },
     };
-    (prismaService.deal.upsert as jest.Mock).mockResolvedValue({ id: 'deal123' });
+    (prismaService.deal.upsert as jest.Mock).mockResolvedValue({
+      id: 'deal123',
+    });
 
     // Act
     await service.process(ctx);
@@ -343,6 +363,7 @@ describe('EmailProcessorService', () => {
       'broker@example.com',
       'John Smith',
       { askingPrice: 5000000, propertyType: 'multifamily', units: 50 },
+      'Test criteria',
     );
   });
 
@@ -380,14 +401,18 @@ describe('EmailProcessorService', () => {
       },
     };
 
-    (prismaService.deal.upsert as jest.Mock).mockResolvedValue({ id: 'deal123' });
+    (prismaService.deal.upsert as jest.Mock).mockResolvedValue({
+      id: 'deal123',
+    });
     (microsoftGraphService.getAttachmentContent as jest.Mock).mockResolvedValue(
       Buffer.from('content'),
     );
     (s3Service.uploadDealAttachment as jest.Mock).mockRejectedValue(
       new Error('S3 upload failed'),
     );
-    (prismaService.document.create as jest.Mock).mockResolvedValue({ id: 'doc123' });
+    (prismaService.document.create as jest.Mock).mockResolvedValue({
+      id: 'doc123',
+    });
 
     // Act
     const result = await service.process(ctx);
@@ -410,7 +435,7 @@ describe('EmailProcessorService', () => {
   it('should skip processing if detection indicates not a deal', async () => {
     // Arrange
     jest.clearAllMocks(); // Ensure clean state
-    
+
     const emailEvent: NormalizedEmailEvent = {
       source: 'microsoft',
       messageId: 'msg123',
@@ -444,8 +469,10 @@ describe('EmailProcessorService', () => {
     expect(result.skippedReason).toBe('Not a deal email');
     expect(prismaService.deal.upsert).not.toHaveBeenCalled();
     expect(prismaService.document.create).not.toHaveBeenCalled();
-    expect(dealSummaryService.summarizeDealWithNarrative).not.toHaveBeenCalled();
-      expect(initialScreeningService.screen).not.toHaveBeenCalled();
+    expect(
+      dealSummaryService.summarizeDealWithNarrative,
+    ).not.toHaveBeenCalled();
+    expect(initialScreeningService.screen).not.toHaveBeenCalled();
   });
 
   describe('extractTextAndImagesFromHtml', () => {
@@ -469,7 +496,13 @@ describe('EmailProcessorService', () => {
           return Promise.resolve({
             ok: true,
             headers: new Map([['content-type', 'image/jpeg']]) as any,
-            arrayBuffer: () => Promise.resolve(largePngBuffer.buffer.slice(largePngBuffer.byteOffset, largePngBuffer.byteOffset + largePngBuffer.byteLength)),
+            arrayBuffer: () =>
+              Promise.resolve(
+                largePngBuffer.buffer.slice(
+                  largePngBuffer.byteOffset,
+                  largePngBuffer.byteOffset + largePngBuffer.byteLength,
+                ),
+              ),
           });
         }
         return Promise.resolve({ ok: false });
@@ -518,7 +551,10 @@ describe('EmailProcessorService', () => {
 
     it('should return plain text fallback when html is empty', async () => {
       // Act
-      const result = await (service as any).extractTextAndImagesFromHtml('', 'Plain text body');
+      const result = await (service as any).extractTextAndImagesFromHtml(
+        '',
+        'Plain text body',
+      );
 
       // Assert
       expect(result.text).toBe('Plain text body');
@@ -534,7 +570,13 @@ describe('EmailProcessorService', () => {
       global.fetch = jest.fn().mockResolvedValue({
         ok: true,
         headers: new Map([['content-type', 'image/png']]) as any,
-        arrayBuffer: () => Promise.resolve(tinyBuffer.buffer.slice(tinyBuffer.byteOffset, tinyBuffer.byteOffset + tinyBuffer.byteLength)),
+        arrayBuffer: () =>
+          Promise.resolve(
+            tinyBuffer.buffer.slice(
+              tinyBuffer.byteOffset,
+              tinyBuffer.byteOffset + tinyBuffer.byteLength,
+            ),
+          ),
       }) as jest.Mock;
 
       // Act
@@ -568,7 +610,9 @@ describe('EmailProcessorService', () => {
       organizationId: 'org123',
       detection: { isDeal: true, confidence: 'high' as const, reason: 'Deal' },
     };
-    (prismaService.deal.upsert as jest.Mock).mockResolvedValue({ id: 'deal123' });
+    (prismaService.deal.upsert as jest.Mock).mockResolvedValue({
+      id: 'deal123',
+    });
 
     // Act
     await service.process(ctx);
@@ -581,40 +625,139 @@ describe('EmailProcessorService', () => {
       'broker@example.com',
       undefined,
       { askingPrice: 5000000, propertyType: 'multifamily', units: 50 },
+      'Test criteria',
     );
   });
 
   it('should still screen when data extraction fails', async () => {
     // Arrange
-    const dataExtractionService = { extract: jest.fn().mockRejectedValue(new Error('extraction failed')) } as any;
+    const dataExtractionService = {
+      extract: jest.fn().mockRejectedValue(new Error('extraction failed')),
+    } as any;
     // Rebuild with failing data extraction
     const module2 = await Test.createTestingModule({
       providers: [
         EmailProcessorService,
-        { provide: EmailProcessingService, useValue: { processPdfBuffer: jest.fn().mockResolvedValue('text') } },
-        { provide: EmailTemplateService, useValue: { formatSummaryAsHtml: jest.fn().mockReturnValue('<html></html>') } },
+        {
+          provide: EmailProcessingService,
+          useValue: { processPdfBuffer: jest.fn().mockResolvedValue('text') },
+        },
+        {
+          provide: EmailTemplateService,
+          useValue: {
+            formatSummaryAsHtml: jest.fn().mockReturnValue('<html></html>'),
+          },
+        },
         { provide: EmailSenderService, useValue: { sendEmail: jest.fn() } },
-        { provide: MicrosoftGraphService, useValue: { replyInThreadToSelf: jest.fn(), getOrCreateFolder: jest.fn(), getMessage: jest.fn(), moveMessage: jest.fn(), moveConversation: jest.fn(), forwardToAdmins: jest.fn(), getAttachmentContent: jest.fn() } },
-        { provide: ScreeningPreferencesService, useValue: { getPreferences: jest.fn().mockResolvedValue({}) } },
-        { provide: ScreeningBucketService, useValue: { findAll: jest.fn().mockResolvedValue(mockBuckets), ensureDefaultBuckets: jest.fn() } },
-        { provide: DealSummaryService, useValue: { summarizeDeal: jest.fn().mockResolvedValue('summary'), generateDealNarrative: jest.fn().mockResolvedValue('narrative'), summarizeDealWithNarrative: jest.fn().mockResolvedValue({ summary: 'summary', narrative: 'narrative' }) } },
-        { provide: InitialScreeningService, useValue: { screen: jest.fn().mockResolvedValue({ decision: 'yes', reason: 'ok', bucketId: 'bucket-yes', bucketName: 'Yes' }) } },
+        {
+          provide: MicrosoftGraphService,
+          useValue: {
+            replyInThreadToSelf: jest.fn(),
+            getOrCreateFolder: jest.fn(),
+            getMessage: jest.fn(),
+            moveMessage: jest.fn(),
+            moveConversation: jest.fn(),
+            forwardToAdmins: jest.fn(),
+            getAttachmentContent: jest.fn(),
+          },
+        },
+        {
+          provide: ScreeningPreferencesService,
+          useValue: { getPreferences: jest.fn().mockResolvedValue({}) },
+        },
+        {
+          provide: ScreeningBucketService,
+          useValue: {
+            findAll: jest.fn().mockResolvedValue(mockBuckets),
+            ensureDefaultBuckets: jest.fn(),
+          },
+        },
+        {
+          provide: DealSummaryService,
+          useValue: {
+            summarizeDeal: jest.fn().mockResolvedValue('summary'),
+            generateDealNarrative: jest.fn().mockResolvedValue('narrative'),
+            summarizeDealWithNarrative: jest
+              .fn()
+              .mockResolvedValue({
+                summary: 'summary',
+                narrative: 'narrative',
+              }),
+          },
+        },
+        {
+          provide: InitialScreeningService,
+          useValue: {
+            screen: jest
+              .fn()
+              .mockResolvedValue({
+                decision: 'yes',
+                reason: 'ok',
+                bucketId: 'bucket-yes',
+                bucketName: 'Yes',
+              }),
+          },
+        },
         { provide: DataExtractionService, useValue: dataExtractionService },
-        { provide: ImageProcessorService, useValue: { extractTextFromMultipleImages: jest.fn().mockResolvedValue('') } },
+        {
+          provide: ImageProcessorService,
+          useValue: {
+            extractTextFromMultipleImages: jest.fn().mockResolvedValue(''),
+          },
+        },
         { provide: DealDetectionService, useValue: {} },
-        { provide: PrismaService, useValue: { deal: { create: jest.fn(), upsert: jest.fn().mockResolvedValue({ id: 'd1' }), update: jest.fn() }, document: { create: jest.fn() } } },
+        {
+          provide: PrismaService,
+          useValue: {
+            deal: {
+              create: jest.fn(),
+              upsert: jest.fn().mockResolvedValue({ id: 'd1' }),
+              update: jest.fn(),
+            },
+            document: { create: jest.fn() },
+          },
+        },
         { provide: S3Service, useValue: { downloadDealAttachment: jest.fn() } },
-        { provide: MetricsService, useValue: { recordAICall: jest.fn(), recordDealSkipped: jest.fn(), recordDealProcessed: jest.fn(), recordProcessingError: jest.fn(), recordEmailEvent: jest.fn(), recordDealProcessingDuration: jest.fn(), recordFolderMove: jest.fn() } },
-        { provide: NotificationService, useValue: { notifyDealProcessed: jest.fn(), notifyError: jest.fn() } },
-        { provide: BrokerIntelligenceService, useValue: { getBrokerStats: jest.fn().mockResolvedValue(null) } },
+        {
+          provide: MetricsService,
+          useValue: {
+            recordAICall: jest.fn(),
+            recordDealSkipped: jest.fn(),
+            recordDealProcessed: jest.fn(),
+            recordProcessingError: jest.fn(),
+            recordEmailEvent: jest.fn(),
+            recordDealProcessingDuration: jest.fn(),
+            recordFolderMove: jest.fn(),
+          },
+        },
+        {
+          provide: NotificationService,
+          useValue: { notifyDealProcessed: jest.fn(), notifyError: jest.fn() },
+        },
+        {
+          provide: BrokerIntelligenceService,
+          useValue: { getBrokerStats: jest.fn().mockResolvedValue(null) },
+        },
       ],
     }).compile();
 
     const svc2 = module2.get<EmailProcessorService>(EmailProcessorService);
-    const screening2 = module2.get(InitialScreeningService) as jest.Mocked<InitialScreeningService>;
+    const screening2 = module2.get(
+      InitialScreeningService,
+    ) as jest.Mocked<InitialScreeningService>;
 
     const ctx = {
-      event: { source: 'microsoft' as const, messageId: 'm1', userId: 'u1', from: 'b@x.com', to: ['u@x.com'], subject: 'Deal', bodyText: 'text', attachments: [], receivedAt: new Date() },
+      event: {
+        source: 'microsoft' as const,
+        messageId: 'm1',
+        userId: 'u1',
+        from: 'b@x.com',
+        to: ['u@x.com'],
+        subject: 'Deal',
+        bodyText: 'text',
+        attachments: [],
+        receivedAt: new Date(),
+      },
       accessToken: 'tok',
       inboxOwnerEmail: 'u@x.com',
       receivedByUserId: 'u1',
@@ -632,6 +775,7 @@ describe('EmailProcessorService', () => {
       expect.any(String),
       mockBuckets,
       'b@x.com',
+      undefined,
       undefined,
       undefined,
     );

@@ -283,6 +283,129 @@ describe('DealDetectionService', () => {
     expect(result.isDeal).toBe(true);
   });
 
+  it('skipKeywords: matches a literal phrase in the subject and skips LLM call', async () => {
+    (
+      prismaService.screeningPreferences.findUnique as jest.Mock
+    ).mockResolvedValue({
+      skipCriteria: null,
+      knownProperties: null,
+      skipKeywords: 'NNN\ntriple net',
+    });
+
+    const result = await service.isDealEmail(
+      'Just Listed | Walgreens NNN | 6.5% Cap',
+      'Absolute net lease, 12 years remaining...',
+      true,
+      'user-1',
+      'org-jk',
+    );
+
+    expect(result.isDeal).toBe(false);
+    expect(result.confidence).toBe('high');
+    expect(result.reason).toBe('Matches skip keyword: "NNN"');
+    expect(mockCreate).not.toHaveBeenCalled();
+  });
+
+  it('skipKeywords: treats whitespace and hyphens as interchangeable', async () => {
+    (
+      prismaService.screeningPreferences.findUnique as jest.Mock
+    ).mockResolvedValue({
+      skipCriteria: null,
+      knownProperties: null,
+      skipKeywords: 'single tenant',
+    });
+
+    const result = await service.isDealEmail(
+      'Offering: Single-Tenant Industrial Leased to FedEx',
+      'Long WALT...',
+      true,
+      'user-1',
+      'org-jk',
+    );
+
+    expect(result.isDeal).toBe(false);
+    expect(result.reason).toBe('Matches skip keyword: "single tenant"');
+    expect(mockCreate).not.toHaveBeenCalled();
+  });
+
+  it('skipKeywords: respects word boundaries so partial words do not match', async () => {
+    (
+      prismaService.screeningPreferences.findUnique as jest.Mock
+    ).mockResolvedValue({
+      skipCriteria: null,
+      knownProperties: null,
+      skipKeywords: 'flex',
+    });
+    mockCreate.mockResolvedValue({
+      choices: [
+        {
+          message: {
+            content: JSON.stringify({
+              isDeal: true,
+              confidence: 'high',
+              reason: 'Deal email',
+            }),
+          },
+        },
+      ],
+    });
+
+    const result = await service.isDealEmail(
+      'Multifamily with flexible closing timeline',
+      '120 units in Richmond, VA',
+      true,
+      'user-1',
+      'org-jk',
+    );
+
+    expect(mockCreate).toHaveBeenCalled();
+    expect(result.isDeal).toBe(true);
+  });
+
+  it('skipKeywords: supports raw regex lines wrapped in slashes', async () => {
+    (
+      prismaService.screeningPreferences.findUnique as jest.Mock
+    ).mockResolvedValue({
+      skipCriteria: null,
+      knownProperties: null,
+      skipKeywords: '/\\b\\d+[\\s-]*keys?\\b/',
+    });
+
+    const result = await service.isDealEmail(
+      'For Sale: 142-Key Hampton Inn, Savannah GA',
+      'Select-service hotel...',
+      true,
+      'user-1',
+      'org-jk',
+    );
+
+    expect(result.isDeal).toBe(false);
+    expect(result.reason).toContain('Matches skip keyword');
+    expect(mockCreate).not.toHaveBeenCalled();
+  });
+
+  it('skipKeywords: ignores invalid regex lines and continues', async () => {
+    (
+      prismaService.screeningPreferences.findUnique as jest.Mock
+    ).mockResolvedValue({
+      skipCriteria: null,
+      knownProperties: null,
+      skipKeywords: '/[unclosed/\njust closed',
+    });
+
+    const result = await service.isDealEmail(
+      'JUST CLOSED: 200-unit multifamily in Charlotte',
+      'We are pleased to announce...',
+      false,
+      'user-1',
+      'org-jk',
+    );
+
+    expect(result.isDeal).toBe(false);
+    expect(result.reason).toBe('Matches skip keyword: "just closed"');
+    expect(mockCreate).not.toHaveBeenCalled();
+  });
+
   it('should return isDeal=false with low confidence when OpenAI returns no content', async () => {
     // Arrange
     mockCreate.mockResolvedValue({
@@ -398,7 +521,7 @@ describe('DealDetectionService', () => {
     // Assert
     expect(prismaService.screeningPreferences.findUnique).toHaveBeenCalledWith({
       where: { organizationId: 'org-456' },
-      select: { skipCriteria: true, knownProperties: true },
+      select: { skipCriteria: true, knownProperties: true, skipKeywords: true },
     });
   });
 

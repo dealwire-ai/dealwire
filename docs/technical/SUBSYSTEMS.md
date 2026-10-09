@@ -211,7 +211,7 @@ src/controller/agent.controller.ts           # POST /agent/chat (web), POST /age
 
 **Available tools (read):** `get_deals`, `get_deal_stats`, `get_deals_by_contact`, `get_deals_by_location`, `get_contacts`, `get_assets`, `get_broker_stats`, `get_broker_leaderboard`, `get_contact_notes`, `query_parcels`, `get_parcel_stats`
 
-**Available tools (write):** `update_deal_criteria`, `update_always_skip`, `update_buy_box`, `update_digest_schedule`, `update_screening_buckets`, `update_contact_notes`, `update_contact_tags`
+**Available tools (write):** `update_deal_criteria`, `update_skip_criteria`, `update_skip_keywords`, `update_known_properties`, `update_buy_box`, `update_digest_schedule`, `update_screening_buckets`, `update_contact_notes`, `update_contact_tags`
 
 **Model:** gpt-4o (via `OPENAI_API_KEY`), streaming for web chat, non-streaming for email replies
 

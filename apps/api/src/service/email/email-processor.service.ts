@@ -157,6 +157,7 @@ export class EmailProcessorService {
         event.from,
         event.fromName,
         structuredData,
+        prefs.dealCriteria,
       );
 
       // Step 4.6: Associate asset with deal if one was found/created
