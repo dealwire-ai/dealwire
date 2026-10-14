@@ -37,7 +37,7 @@ const FOUNDERS: Founder[] = [
   {
     name: "Noah Weinstein",
     role: "Co-Founder",
-    bio: "Forward Deployed Engineer at Hyperexponential (a16z, Battery Ventures), where he deploys agentic underwriting systems for commercial insurers pricing billions in annual premium. Computer Science at Northeastern. Co-founded and sold frontstep.ai.",
+    bio: "Forward Deployed Engineer at Hyperexponential (backed by a16z and Battery Ventures), where he deploys agentic underwriting systems for commercial insurers pricing billions in annual premium. Computer Science at Northeastern. Co-founded and sold frontstep.ai.",
     linkedin: "https://www.linkedin.com/in/noahweinstein/",
     email: "noah@dealwire.ai",
     headshot: "/headshots/noah.webp",
