@@ -620,7 +620,7 @@ export default function InboxPage() {
               {
                 name: "Noah Weinstein",
                 role: "Co-Founder",
-                bio: "Former Software Engineer at Flexcar and Technical Product Manager at Siphox, a venture-backed health tech startup. Computer Science at Northeastern. Co-founded and sold frontstep.ai.",
+                bio: "Forward Deployed Engineer at Hyperexponential (backed by a16z and Battery Ventures), where he deploys agentic underwriting systems for commercial insurers pricing billions in annual premium. Computer Science at Northeastern. Co-founded and sold frontstep.ai.",
                 linkedin: "https://www.linkedin.com/in/noahweinstein/",
                 email: "noah@dealwire.ai",
                 headshot: "/headshots/noah.webp",
