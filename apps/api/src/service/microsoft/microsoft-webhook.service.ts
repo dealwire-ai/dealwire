@@ -217,6 +217,13 @@ export class MicrosoftWebhookService {
           `Skipping non-deal email: ${emailEvent.messageId} - "${emailEvent.subject}" (${detection.reason})`,
         );
         this.metricsService.recordDealSkipped(detection.reason || 'unknown');
+        if (detection.skippedBy === 'keyword') {
+          await this.moveSkippedEmailToPassedFolder(
+            accessToken,
+            emailEvent.messageId,
+            inboxOwner.organizationId,
+          );
+        }
         if (userEmail) {
           this.metricsService.recordMicrosoftWebhookRequest(
             userEmail,
@@ -256,6 +263,55 @@ export class MicrosoftWebhookService {
         `Error processing email notification ${messageId}: ${msg}`,
       );
       throw error;
+    }
+  }
+
+  /**
+   * File an email that matched a deterministic skip keyword into the org's
+   * passed folder so it leaves the inbox. No deal record is created and it
+   * never reaches the digest; this is purely inbox hygiene for blasts the
+   * client has said they never want to see ("call for offers", NNN, etc.).
+   * Failures are logged and swallowed so a Graph hiccup never fails the webhook.
+   */
+  private async moveSkippedEmailToPassedFolder(
+    accessToken: string,
+    messageId: string,
+    organizationId: string | null,
+  ): Promise<void> {
+    try {
+      let folderName = 'Passed Deals';
+      if (organizationId) {
+        const prefs = await this.prismaService.screeningPreferences.findUnique({
+          where: { organizationId },
+          select: { passedFolderName: true },
+        });
+        if (prefs?.passedFolderName?.trim()) {
+          folderName = prefs.passedFolderName.trim();
+        }
+      }
+
+      const folderId = await this.microsoftGraphService.getOrCreateFolder(
+        accessToken,
+        folderName,
+      );
+      if (!folderId) return;
+
+      const moved = await this.microsoftGraphService.moveMessage(
+        accessToken,
+        messageId,
+        folderId,
+      );
+      if (moved) {
+        this.logger.log(
+          `Moved skip-keyword email ${messageId} to ${folderName}`,
+        );
+        this.metricsService.recordFolderMove(folderName);
+      }
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      this.logger.warn(
+        `Failed to move skip-keyword email ${messageId} to passed folder: ${msg}`,
+      );
     }
   }
 
