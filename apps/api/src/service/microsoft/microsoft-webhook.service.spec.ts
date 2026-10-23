@@ -31,6 +31,8 @@ describe('MicrosoftWebhookService', () => {
               .mockResolvedValue('access-token'),
             toNormalizedEvent: jest.fn(),
             getAttachmentContent: jest.fn(),
+            getOrCreateFolder: jest.fn().mockResolvedValue('folder-id'),
+            moveMessage: jest.fn().mockResolvedValue(true),
           },
         },
         {
@@ -49,6 +51,11 @@ describe('MicrosoftWebhookService', () => {
               findUnique: jest.fn().mockResolvedValue({
                 email: 'user@example.com',
                 organizationId: 'org123',
+              }),
+            },
+            screeningPreferences: {
+              findUnique: jest.fn().mockResolvedValue({
+                passedFolderName: 'Passed Deals',
               }),
             },
           },
@@ -72,6 +79,7 @@ describe('MicrosoftWebhookService', () => {
             recordDealSkipped: jest.fn(),
             recordMicrosoftWebhookRequest: jest.fn(),
             recordRestApiCallDuration: jest.fn(),
+            recordFolderMove: jest.fn(),
           },
         },
         {
@@ -158,6 +166,120 @@ describe('MicrosoftWebhookService', () => {
     expect(metricsService.recordDealSkipped).toHaveBeenCalledWith(
       'Not a deal email',
     );
+    // LLM-decided skips stay in the inbox
+    expect(microsoftGraphService.moveMessage).not.toHaveBeenCalled();
+  });
+
+  describe('skip keyword matches', () => {
+    const notification = {
+      subscriptionId: 'sub123',
+      changeType: 'created',
+      resource: 'messages',
+      resourceData: {
+        id: 'msg123',
+        '@odata.type': '#Microsoft.Graph.Message',
+        '@odata.id':
+          'https://graph.microsoft.com/v1.0/users/user123/messages/msg123',
+        '@odata.etag': 'W/"etag123"',
+      },
+      clientState: 'secret',
+      tenantId: 'tenant123',
+    };
+
+    const emailEvent: NormalizedEmailEvent = {
+      source: 'microsoft',
+      messageId: 'msg123',
+      userId: 'user123',
+      from: 'multifamily@rcm1.com',
+      to: ['user@example.com'],
+      subject: '360 Residences Call for Offers | 213-Unit | San Jose, CA',
+      bodyText: 'Offers due November 10th',
+      attachments: [],
+      receivedAt: new Date(),
+    };
+
+    beforeEach(() => {
+      (microsoftGraphService.toNormalizedEvent as jest.Mock).mockResolvedValue(
+        emailEvent,
+      );
+      (dealDetectionService.isDealEmail as jest.Mock).mockResolvedValue({
+        isDeal: false,
+        confidence: 'high',
+        reason: 'Matches skip keyword: "call for offers"',
+        skippedBy: 'keyword',
+      });
+    });
+
+    it('moves the email to the org passed folder without enqueueing', async () => {
+      await service['processEmailNotification'](notification);
+
+      expect(sqsService.enqueueNormalizedEmail).not.toHaveBeenCalled();
+      expect(microsoftGraphService.getOrCreateFolder).toHaveBeenCalledWith(
+        'access-token',
+        'Passed Deals',
+      );
+      expect(microsoftGraphService.moveMessage).toHaveBeenCalledWith(
+        'access-token',
+        'msg123',
+        'folder-id',
+      );
+      expect(metricsService.recordFolderMove).toHaveBeenCalledWith(
+        'Passed Deals',
+      );
+    });
+
+    it('uses the org passedFolderName when configured', async () => {
+      (
+        prismaService.screeningPreferences.findUnique as jest.Mock
+      ).mockResolvedValue({ passedFolderName: 'Skipped Blasts' });
+
+      await service['processEmailNotification'](notification);
+
+      expect(microsoftGraphService.getOrCreateFolder).toHaveBeenCalledWith(
+        'access-token',
+        'Skipped Blasts',
+      );
+    });
+
+    it('falls back to "Passed Deals" when the org has no preferences', async () => {
+      (
+        prismaService.screeningPreferences.findUnique as jest.Mock
+      ).mockResolvedValue(null);
+
+      await service['processEmailNotification'](notification);
+
+      expect(microsoftGraphService.getOrCreateFolder).toHaveBeenCalledWith(
+        'access-token',
+        'Passed Deals',
+      );
+    });
+
+    it('does not fail the webhook when the folder move errors', async () => {
+      (microsoftGraphService.moveMessage as jest.Mock).mockRejectedValue(
+        new Error('Graph 503'),
+      );
+
+      await expect(
+        service['processEmailNotification'](notification),
+      ).resolves.toBeUndefined();
+      expect(metricsService.recordMicrosoftWebhookRequest).toHaveBeenCalledWith(
+        'user@example.com',
+        'success',
+      );
+    });
+
+    it('leaves known-property matches in the inbox', async () => {
+      (dealDetectionService.isDealEmail as jest.Mock).mockResolvedValue({
+        isDeal: false,
+        confidence: 'high',
+        reason: 'Matches known property: "Bryant Plaza"',
+        skippedBy: 'known_property',
+      });
+
+      await service['processEmailNotification'](notification);
+
+      expect(microsoftGraphService.moveMessage).not.toHaveBeenCalled();
+    });
   });
 
   it('should upload to S3 and enqueue if deal detection returns true', async () => {

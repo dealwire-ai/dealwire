@@ -162,6 +162,7 @@ describe('DealDetectionService', () => {
     expect(result.isDeal).toBe(false);
     expect(result.confidence).toBe('high');
     expect(result.reason).toBe('Matches known property: "1006 S Michigan"');
+    expect(result.skippedBy).toBe('known_property');
     expect(mockCreate).not.toHaveBeenCalled();
   });
 
@@ -303,6 +304,7 @@ describe('DealDetectionService', () => {
     expect(result.isDeal).toBe(false);
     expect(result.confidence).toBe('high');
     expect(result.reason).toBe('Matches skip keyword: "NNN"');
+    expect(result.skippedBy).toBe('keyword');
     expect(mockCreate).not.toHaveBeenCalled();
   });
 
