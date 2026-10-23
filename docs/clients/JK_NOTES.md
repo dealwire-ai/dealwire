@@ -33,7 +33,7 @@ Weekly check-in transcripts and notes are available via Granola MCP tools:
 
 Decisions from the screening preferences review. Config applied to `org_3Ap6kgg5BJHR1YA8YLxKPr6l7Kk` (see GitHub issue #439).
 
-**Always skip (deterministic `skipKeywords`, email left in inbox, never processed):**
+**Always skip (deterministic `skipKeywords`, moved to Passed Deals, never processed, not in digest):**
 
 - NNN / triple net (word for word)
 - Single tenant
@@ -51,4 +51,6 @@ Decisions from the screening preferences review. Config applied to `org_3Ap6kgg5
 
 **Still Yes:** residential development/redevelopment, cash-flowing multifamily (40 to 400 units), BTR, development sites, industrial 100,000+ SF, office with explicit conversion potential.
 
-**Open questions for JK:** does the Long Island under-40-unit exception still stand? Should wrong-type deals (NNN, hotels, medical) be moved to Passed Deals and counted in the digest, or skipped and left in the inbox?
+**Resolved (2026-10-22):** skip keyword matches are moved to Passed Deals instead of being left in the inbox (GitHub issue #442). They still do not get a deal record or a digest entry.
+
+**Open questions for JK:** does the Long Island under-40-unit exception still stand?

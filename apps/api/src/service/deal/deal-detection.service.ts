@@ -16,7 +16,17 @@ const DealDetectionSchema = z.object({
   reason: z.string().describe('Brief reason for the classification'),
 });
 
-export type DealDetection = z.infer<typeof DealDetectionSchema>;
+/**
+ * Which deterministic pre-check short-circuited detection, if any. Set only on
+ * isDeal=false results that never reached the LLM. Callers use it to decide
+ * what to do with the skipped email (e.g. keyword skips are filed to the
+ * passed folder; known-property matches stay in the inbox).
+ */
+export type DealSkipSource = 'keyword' | 'known_property';
+
+export type DealDetection = z.infer<typeof DealDetectionSchema> & {
+  skippedBy?: DealSkipSource;
+};
 
 @Injectable()
 export class DealDetectionService {
@@ -94,6 +104,7 @@ export class DealDetectionService {
           isDeal: false,
           confidence: 'high',
           reason: `Matches skip keyword: "${matchedKeyword}"`,
+          skippedBy: 'keyword',
         };
       }
 
@@ -114,6 +125,7 @@ export class DealDetectionService {
           isDeal: false,
           confidence: 'high',
           reason: `Matches known property: "${matchedProperty}"`,
+          skippedBy: 'known_property',
         };
       }
 
