@@ -8,3 +8,6 @@ dist
 .vercel
 .mcp.json
 .claude/settings.local.json
+
+# CoStar exports: licensed data with broker/owner contact info
+demos/denholtz-nj/output/*.csv

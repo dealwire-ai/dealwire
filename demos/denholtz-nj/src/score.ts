@@ -2,7 +2,7 @@
  * Developability score (0–99): base 50 with transparent additive adjustments
  * and hard caps for regime blockers. Every adjustment is recorded in
  * score_notes so each row self-explains — the formula is documented verbatim
- * in docs/clients/DENHOLTZ_DEMO.md and the demo chat system prompt; keep all
+ * in DENHOLTZ_DEMO.md (private client notes, outside the repo) and the demo chat system prompt; keep all
  * three in sync.
  */
 

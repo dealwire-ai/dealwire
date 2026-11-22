@@ -3,7 +3,7 @@ Build a preview demo for a prospective client. Walk through all 5 phases sequent
 ## Phase 1: Gather Context (Automated)
 
 1. Ask for the **client name and company** (if not provided as an argument: `$ARGUMENTS`)
-2. Check `docs/clients/` for existing client notes — read any matching files
+2. Check `~/dealwire-private/docs/clients/` (outside the repo) for existing client notes — read any matching files
 3. Search Granola for meetings mentioning the client:
    - Use `mcp__claude_ai_Granola__query_granola_meetings` or `mcp__claude_ai_Granola__list_meetings` to find relevant meetings
    - Use `mcp__claude_ai_Granola__get_meeting_transcript` to pull full transcripts from any matches
@@ -87,7 +87,7 @@ Add an entry to `apps/web/src/app/(app)/demos/config.ts`
 
 ### 4. Demo script
 
-Create `docs/clients/<CLIENT>_DEMO.md` with:
+Create `~/dealwire-private/docs/clients/<CLIENT>_DEMO.md` (outside the repo; client notes are never committed) with:
 
 - Client context summary (from Phase 1 + 2)
 - Demo flow: step-by-step walkthrough script
