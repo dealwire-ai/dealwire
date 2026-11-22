@@ -59,10 +59,6 @@ export interface ParcelListing {
   dom: number | null;
   acres: number | null;
   broker: string | null;
-  brokerContact: string | null;
-  brokerPhone: string | null;
-  owner: string | null;
-  ownerPhone: string | null;
   zoning: string | null;
   use: string | null;
   lastSaleDate: string | null;
@@ -93,8 +89,6 @@ export interface MarketListing {
   use: string | null;
   zoning: string | null;
   broker: string | null;
-  brokerContact: string | null;
-  brokerPhone: string | null;
   lastSaleDate: string | null;
   lastSalePrice: number | null;
   pin: string | null;

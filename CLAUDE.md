@@ -117,17 +117,9 @@ All project instructions live in `CLAUDE.md` (this file). `.cursorrules` points 
 | `PUBLIC_DATA_PLATFORM.md` | Architecture for public property data ingestion                                                                                |
 | `TAX_LIEN_PLATFORM.md`    | Tax lien data platform — domain knowledge, features, architecture, commercial terms                                            |
 
-#### `docs/clients/` — Client-Specific Notes
+#### Client notes (not in this repo)
 
-| Document                        | Client          | Purpose                                                        |
-| ------------------------------- | --------------- | -------------------------------------------------------------- |
-| `JK_NOTES.md`                   | Jordan Karlik   | Meeting notes, Google Drive folder, Granola transcripts        |
-| `TAX_LIEN_NOTES.md`             | Daniel Gabay    | Tax lien research, proposals, Google Drive folder              |
-| `BOUTIQUE_HOTEL_OPPORTUNITY.md` | Minas Terlidis  | Bohopo lead — hotel acquisition sourcing vertical              |
-| `DOLAN_DEMO.md`                 | Thomas Dolan    | DD\|HA demo script — Forever Wild guest intelligence           |
-| `SPREADSHEET_ASSESSMENT.md`     | Daniel Gabay    | PropertyShark spreadsheet assessment for lis pendens ingestion |
-| `DENHOLTZ_NOTES.md`             | Steven Denholtz | NJ land pilot — client context, buy box, data sources          |
-| `DENHOLTZ_DEMO.md`              | Steven Denholtz | NJ land screen demo walkthrough script                         |
+Client-specific notes (meeting history, contacts, demo scripts) are kept out of this public repo. They live locally at `~/dealwire-private/docs/clients/`. Never commit client contact details, meeting notes, or private business context to this repository.
 
 #### Reference (not in docs/)
 
@@ -340,14 +332,14 @@ Reference related issues in the PR body with `Relates to #<number>`. Do NOT use 
 
 ### Client context
 
-Each client has a `client:*` label and a notes file in `docs/clients/`. When working on a client-specific issue, read the client notes file for context (meeting history, Drive folders, preferences, domain knowledge).
+Each client has a `client:*` label. Client notes (meeting history, Drive folders, preferences, domain knowledge) live outside this repo at `~/dealwire-private/docs/clients/`. Read the matching file there when working on a client-specific issue.
 
-| Client          | Label             | Notes file                                   | Domain doc                          |
-| --------------- | ----------------- | -------------------------------------------- | ----------------------------------- |
-| Jordan Karlik   | `client:jk`       | `docs/clients/JK_NOTES.md`                   | `docs/product/UNDERWRITING.md`      |
-| Daniel Gabay    | `client:gabay`    | `docs/clients/TAX_LIEN_NOTES.md`             | `docs/product/TAX_LIEN_PLATFORM.md` |
-| Minas Terlidis  | `client:bohopo`   | `docs/clients/BOUTIQUE_HOTEL_OPPORTUNITY.md` | —                                   |
-| Steven Denholtz | `client:denholtz` | `docs/clients/DENHOLTZ_NOTES.md`             | —                                   |
+| Client          | Label             | Notes file (private)            | Domain doc                          |
+| --------------- | ----------------- | ------------------------------- | ----------------------------------- |
+| Jordan Karlik   | `client:jk`       | `JK_NOTES.md`                   | `docs/product/UNDERWRITING.md`      |
+| Daniel Gabay    | `client:gabay`    | `TAX_LIEN_NOTES.md`             | `docs/product/TAX_LIEN_PLATFORM.md` |
+| Minas Terlidis  | `client:bohopo`   | `BOUTIQUE_HOTEL_OPPORTUNITY.md` | —                                   |
+| Steven Denholtz | `client:denholtz` | `DENHOLTZ_NOTES.md`             | —                                   |
 
 ---
 

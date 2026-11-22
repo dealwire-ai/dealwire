@@ -165,10 +165,6 @@ export function ParcelDetailSheet({
               {(
                 [
                   ["Broker", parcel.listing.broker],
-                  ["Broker contact", parcel.listing.brokerContact],
-                  ["Broker phone", parcel.listing.brokerPhone],
-                  ["Owner (CoStar)", parcel.listing.owner],
-                  ["Owner phone", parcel.listing.ownerPhone],
                   ["Zoning", parcel.listing.zoning],
                   ["Proposed use", parcel.listing.use],
                   [

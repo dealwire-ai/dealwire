@@ -272,10 +272,6 @@ def main():
                 "dom": lst["dom"],
                 "acres": lst["acres"],
                 "broker": lst["broker"],
-                "brokerContact": lst["brokerContact"],
-                "brokerPhone": lst["brokerPhone"],
-                "owner": lst["owner"],
-                "ownerPhone": lst["ownerPhone"],
                 "zoning": lst["zoning"],
                 "use": lst["use"],
                 "lastSaleDate": lst["lastSaleDate"],
@@ -314,7 +310,7 @@ def main():
     slim_keys = [
         "id", "tier", "status", "price", "dom", "acres", "lat", "lng",
         "address", "city", "county", "secondaryType", "use", "zoning",
-        "broker", "brokerContact", "brokerPhone", "lastSaleDate",
+        "broker", "lastSaleDate",
         "lastSalePrice", "pin", "join",
     ]
     slim = [{k: lst[k] for k in slim_keys} for lst in listings]
@@ -323,7 +319,8 @@ def main():
     with open(LISTINGS_JSON, "w") as f:
         json.dump(slim, f, separators=(",", ":"), ensure_ascii=False)
 
-    csv_cols = slim_keys + ["score", "owner", "ownerPhone", "parcelMin", "parcelMax"]
+    # Contact columns go only to the gitignored client CSV, never to the committed JSON.
+    csv_cols = slim_keys + ["score", "brokerContact", "brokerPhone", "owner", "ownerPhone", "parcelMin", "parcelMax"]
     with open(OUT_CSV, "w", newline="") as f:
         w = csv.writer(f)
         w.writerow(csv_cols)

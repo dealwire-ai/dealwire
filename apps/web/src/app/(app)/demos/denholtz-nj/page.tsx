@@ -376,8 +376,6 @@ export default function DenholtzNjDemoPage() {
               listing_price: p.listing.price,
               listing_days_on_market: p.listing.dom,
               listing_broker: p.listing.broker,
-              listing_broker_phone: p.listing.brokerPhone,
-              listing_owner: p.listing.owner,
               listing_zoning: p.listing.zoning,
               listing_proposed_use: p.listing.use,
             }

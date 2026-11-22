@@ -7,9 +7,9 @@ score 70+ ("priority targets"). Built from public records, plus a CoStar market 
 (below) pulled under Denholtz's license.
 
 **CoStar market layer (Jul 24, 2026 snapshot):** the accompanying
-`costar-listings-joined-2026-07-24.csv` contains all 1,139 CoStar NJ land listings
-(0.25–100 acres) with asking price, days on market, broker contact + phone,
-CoStar-reported owner, zoning, and proposed use, plus the parcel each listing matched in
+`costar-listings-joined-2026-07-24.csv` (delivered separately, not kept in this repo)
+contains all 1,139 CoStar NJ land listings (0.25–100 acres) with asking price, days on
+market, brokerage, zoning, and proposed use, plus the parcel each listing matched in
 the screen (`pin` column; ~231 matched — the rest are sub-5-acre, other property classes,
 or improved parcels outside this screen's universe). It is a point-in-time export:
 listings close and reprice. Asking prices run several times assessed value — assessed is

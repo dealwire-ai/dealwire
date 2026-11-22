@@ -3,7 +3,7 @@
 One-off ETL for the Denholtz Properties NJ land pilot (epic #419): statewide
 NJ class-1 vacant land, 5–100 CALC_ACRE, screened against public
 development-blocker layers. Feeds the internal demo at `/demos/denholtz-nj`
-and the client CSV. Client context: `docs/clients/DENHOLTZ_NOTES.md`.
+and the client CSV. Client context: `DENHOLTZ_NOTES.md` in the private client notes folder (`~/dealwire-private/docs/clients/`).
 
 ## Run
 
@@ -30,7 +30,8 @@ Denholtz's license) onto the screen: exact parcel-number match, then
 point-in-polygon against Stage A geometry, then nearest-centroid fallback.
 It rewrites `denholtz-nj-parcels.json` (attaching `listing` to ~231 matched
 parcels), emits `denholtz-nj-listings.json` (full slim layer for the map
-overlay), and `output/costar-listings-joined-2026-07-24.csv`.
+overlay), and `output/costar-listings-joined-<date>.csv` (gitignored: CoStar
+contact data is licensed and must not be committed).
 
 This is demo tooling, not a pipeline — the export is a snapshot and is not
 refreshed. Raw xlsx lives in `data/costar/` (gitignored — CoStar-licensed
@@ -42,7 +43,7 @@ the join script after it.
 ## Layers
 
 All endpoints verified live 2026-07-07 — see `src/layers.ts` for URLs and
-`docs/clients/DENHOLTZ_NOTES.md` for the source inventory with vintages.
+`DENHOLTZ_NOTES.md` (private client notes) for the source inventory with vintages.
 Flood uses the NJDEP-hosted NFHL mirror first (FEMA's server throttles) and
 derives SFHA from `FLD_ZONE` since the mirror lacks `SFHA_TF`. Wetlands /
 open-space / preserved-farm coverage percentages are computed locally with
@@ -53,5 +54,5 @@ turf from returned intersecting geometries; failures degrade to
 
 `src/score.ts` — 0–99, base 50, additive with hard caps for Highlands
 Preservation and restrictive Pinelands. The formula is documented for the
-client in `docs/clients/DENHOLTZ_DEMO.md` and embedded in the demo page's
+client in `DENHOLTZ_DEMO.md` (private client notes) and embedded in the demo page's
 chat system prompt. Change all three together.
